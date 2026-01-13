@@ -2,63 +2,162 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>My Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Saya | RCELLFEST</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        body { background: #1a1a2e; color: white; font-family: sans-serif; }
-        .ticket-card { background: #16213e; border: 1px solid #0f3460; border-radius: 15px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .ticket-code-text { font-family: monospace; color: #fff; background: #000; padding: 4px 8px; border-radius: 4px; letter-spacing: 2px; font-size: 1rem; margin-top: 10px; display: inline-block;}
-        .status-valid { color: #0f0; } 
-        .status-used { color: #f00; text-decoration: line-through; }
-        
-        /* Style khusus container QR biar pas di tengah */
-        .qr-container {
-            background: white;
-            padding: 10px;
-            display: inline-block;
-            border-radius: 8px;
-            margin-top: 10px;
+        :root {
+            --primary-color: #0064d2;
+            --bg-color: #f0f2f5;
+            --text-dark: #1f2937;
         }
-        /* Hapus margin bawaan gambar QR */
-        .qr-container img {
-            margin: 0 auto;
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            padding-top: 80px; /* Space navbar */
+        }
+
+        /* Navbar Simple */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--primary-color) !important;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
+
+        /* Card Tiket ala Boarding Pass */
+        .ticket-card {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ticket-header {
+            background: linear-gradient(135deg, #0064d2, #55aaff);
+            color: white;
+            padding: 15px 20px;
+            position: relative;
+        }
+        
+        /* Efek bolong tiket (optional aesthetic) */
+        .ticket-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-top: 2px dashed #e5e7eb;
+            position: relative;
+        }
+        
+        /* Lingkaran kecil biar kayak tiket sobekan */
+        .ticket-body::before, .ticket-body::after {
+            content: ''; position: absolute; top: -10px; 
+            width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%;
+        }
+        .ticket-body::before { left: -10px; }
+        .ticket-body::after { right: -10px; }
+
+        /* Style QR Code Container */
+        .qr-container {
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin: 15px 0;
+            background: #fff;
+        }
+
+        .ticket-code-badge {
+            font-family: monospace;
+            background: #f3f4f6;
+            color: #374151;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            font-weight: 600;
+            border: 1px dashed #d1d5db;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
     </style>
 </head>
-<body class="p-4">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h3>👤 Hello, <span id="userName" class="text-info">User</span></h3>
-            <button onclick="logout()" class="btn btn-danger btn-sm">Log Out</button>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+                RCELLFEST
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span class="small fw-bold text-secondary d-none d-md-block" id="userNameDisplay">Loading...</span>
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                    <i class="bi bi-box-arrow-right"></i> Keluar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h3 class="fw-bold text-dark">E-Tiket Saya</h3>
+                <p class="text-secondary small">Tunjukkan QR Code ini kepada petugas saat masuk venue.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                <a href="index.html" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Beli Tiket Baru
+                </a>
+            </div>
         </div>
 
-        <h4 class="mb-4">🎟️ Tiket Saya</h4>
-        <div id="ticketList" class="row">
-            <p class="text-center text-secondary mt-5">Loading data...</p>
-        </div>
-        
-        <div class="text-center mt-5">
-            <a href="index.html" class="btn btn-outline-light">Beli Tiket Lagi</a>
+        <div id="ticketList" class="row g-4">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-secondary">Sedang memuat tiket...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Cek Login
+        // 1. Cek Login
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        document.getElementById('userName').innerText = user.username;
+        document.getElementById('userNameDisplay').innerText = "Hai, " + user.username;
 
-        // Ambil Data Tiket
+        // 2. Ambil Data Tiket
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             
-            // Animasi Loading
-            list.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-info"></div></div>';
-
             try {
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST',
@@ -69,53 +168,64 @@
 
                 list.innerHTML = '';
                 if(tickets.length === 0) {
-                    list.innerHTML = '<p class="text-secondary text-center">Kamu belum beli tiket apapun.</p>';
+                    list.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-ticket-perforated display-1 text-secondary opacity-25"></i>
+                            <p class="mt-3 text-secondary">Kamu belum memiliki tiket aktif.</p>
+                            <a href="index.html" class="btn btn-outline-primary btn-sm">Cari Event Sekarang</a>
+                        </div>`;
                     return;
                 }
 
-                // TAHAP 1: Render HTML (Siapkan Kotak Kosong buat QR)
+                // TAHAP 1: Render HTML (Card Style Baru)
                 tickets.forEach(t => {
-                    const eventName = t.eventId ? t.eventId.name : 'Event Dihapus';
+                    const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
                     const isUsed = t.status === 'used';
                     
-                    const statusClass = isUsed ? 'status-used' : 'status-valid';
-                    const statusText = isUsed ? 'SUDAH DIPAKAI' : 'VALID / AKTIF';
-                    const borderColor = isUsed ? '#f00' : '#0f0'; // Merah kalau kepakai, Hijau kalau belum
+                    // Logic Warna Status
+                    const statusBadge = isUsed 
+                        ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
+                        : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
+                    
+                    const cardOpacity = isUsed ? 'opacity-75' : ''; // Agak pudar kalau udah dipake
 
                     list.innerHTML += `
-                        <div class="col-md-6">
-                            <div class="ticket-card shadow text-center" style="border-color: ${borderColor}">
-                                <h4 class="fw-bold mb-2">${eventName}</h4>
-                                <p class="text-secondary mb-1 small">Nama: ${t.customerName}</p>
-                                
-                                <div class="qr-container">
-                                    <div id="qrcode-${t._id}"></div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="ticket-card ${cardOpacity}">
+                                <div class="ticket-header">
+                                    <h5 class="fw-bold mb-1 text-truncate">${eventName}</h5>
+                                    <small class="opacity-75"><i class="bi bi-calendar-event me-1"></i> ${new Date(t.purchaseDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</small>
                                 </div>
                                 
-                                <br>
-                                <div class="ticket-code-text">${t.ticketCode}</div>
-
-                                <div class="mt-3 fw-bold small ${statusClass}">
-                                    ${statusText}
+                                <div class="ticket-body text-center">
+                                    <small class="text-secondary fw-bold mb-2">SCAN QR DI PINTU MASUK</small>
+                                    
+                                    <div class="qr-container shadow-sm">
+                                        <div id="qrcode-${t._id}"></div>
+                                    </div>
+                                    
+                                    <div class="ticket-code-badge mb-3">${t.ticketCode}</div>
+                                    
+                                    <div class="mb-2">${statusBadge}</div>
+                                    <small class="text-muted">Pemesan: <b>${t.customerName}</b></small>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
 
-                // TAHAP 2: Generate QR Code Masuk ke Kotak Tadi
+                // TAHAP 2: Generate QR Code (Logic Tetap)
                 tickets.forEach(t => {
-                    // Bersihkan dulu kalau ada isi sebelumnya (biar ga dobel pas reload)
                     const container = document.getElementById(`qrcode-${t._id}`);
-                    container.innerHTML = ""; 
+                    container.innerHTML = ""; // Bersihkan
 
                     new QRCode(container, {
-                        text: t.ticketCode, // Isi QR = Kode Tiket
-                        width: 128,         // Ukuran Lebar
-                        height: 128,        // Ukuran Tinggi
+                        text: t.ticketCode,
+                        width: 150, // Sedikit lebih besar
+                        height: 150,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H // High Error Correction (Biar tahan kotor/silau)
+                        correctLevel : QRCode.CorrectLevel.H
                     });
                 });
 
