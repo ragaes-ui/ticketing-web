@@ -203,4 +203,6 @@ app.post('/api/validate', async (req, res) => {
     }
 });
 const PORT = process.env.PORT || 5000;
+// Tambahan buat Vercel biar bisa baca App-nya
+module.exports = app;
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
