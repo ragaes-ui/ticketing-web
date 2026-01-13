@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>User Login | RCELLFEST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { background: #0f0c29; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; overflow: hidden; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; width: 100%; max-width: 400px; color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .form-control { background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; }
+        .form-control:focus { background: rgba(0,0,0,0.5); color: white; box-shadow: 0 0 10px #ff0080; border-color: #ff0080; }
+        .btn-neon { background: linear-gradient(90deg, #ff0080, #7928ca); border: none; color: white; font-weight: bold; width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        .btn-neon:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,0,128,0.6); color: white; }
+        .toggle-link { color: #00f2ff; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <h3 class="text-center mb-4 fw-bold" id="formTitle">LOGIN USER</h3>
+        
+        <form id="authForm">
+            <div class="mb-3">
+                <label>Email / Username</label>
+                <input type="text" id="identifier" class="form-control" required>
+            </div>
+            
+            <div class="mb-3 d-none" id="emailDiv">
+                <label>Email Address</label>
+                <input type="email" id="email" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-neon" id="btnSubmit">MASUK</button>
+        </form>
+
+        <p class="mt-3 text-center small text-secondary">
+            <span id="textInfo">Belum punya akun?</span> 
+            <span class="toggle-link" onclick="toggleMode()">Daftar di sini</span>
+        </p>
+        <div class="text-center mt-3">
+             <a href="index.html" class="text-secondary small text-decoration-none">← Kembali ke Home</a>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById('formTitle');
+            const btn = document.getElementById('btnSubmit');
+            const info = document.getElementById('textInfo');
+            const link = document.querySelector('.toggle-link');
+            const emailDiv = document.getElementById('emailDiv');
+            const identifierLabel = document.querySelector('label[for="identifier"]');
+
+            if (isLogin) {
+                title.innerText = "LOGIN USER";
+                btn.innerText = "MASUK";
+                info.innerText = "Belum punya akun?";
+                link.innerText = "Daftar di sini";
+                emailDiv.classList.add('d-none');
+                identifierLabel.innerText = "Email / Username";
+            } else {
+                title.innerText = "DAFTAR BARU";
+                btn.innerText = "DAFTAR SEKARANG";
+                info.innerText = "Sudah punya akun?";
+                link.innerText = "Login di sini";
+                emailDiv.classList.remove('d-none');
+                // Pas register, input pertama jadi Username, input kedua jadi Email
+                identifierLabel.innerText = "Username";
+            }
+        }
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const identifier = document.getElementById('identifier').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+
+            // Tentukan URL tujuan (Login atau Register)
+            const url = isLogin ? '/api/login' : '/api/register';
+            
+            // Siapkan data
+            let payload = {};
+            if (isLogin) {
+                payload = { identifier, password };
+            } else {
+                payload = { username: identifier, email, password, role: 'user' };
+            }
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (isLogin) {
+                        // Simpan Data User
+                        localStorage.setItem('userToken', data.token);
+                        localStorage.setItem('userData', JSON.stringify(data.user));
+                        
+                        Swal.fire({
+                            icon: 'success', title: 'Login Berhasil!',
+                            showConfirmButton: false, timer: 1500
+                        }).then(() => {
+                            // Kalau Admin ke admin.html, User ke dashboard.html
+                            if(data.user.role === 'admin') window.location.href = 'admin.html';
+                            else window.location.href = 'dashboard.html';
+                        });
+                    } else {
+                        Swal.fire('Sukses', 'Akun dibuat! Silakan login.', 'success');
+                        toggleMode(); // Balik ke mode login
+                    }
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
