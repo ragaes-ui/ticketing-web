@@ -8,26 +8,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <style>
-        /* TEMA: CLEAN & PROFESSIONAL (Light Mode) */
         :root {
-            --primary-color: #0064d2; /* Biru Tiket */
-            --secondary-color: #f2f3f7; /* Abu-abu Background */
+            --primary-color: #0064d2;
+            --secondary-color: #f2f3f7;
             --text-dark: #1f2937;
-            --price-color: #ff5e1f; /* Oranye Harga */
+            --price-color: #ff5e1f;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--secondary-color);
             color: var(--text-dark);
-            padding-top: 70px; /* Space untuk Navbar Fixed */
+            padding-top: 70px;
         }
 
-        /* 1. NAVBAR STANDARD */
         .navbar {
             background-color: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -37,132 +34,69 @@
             font-weight: 800;
             color: var(--primary-color) !important;
             font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .nav-icon-svg {
-            width: 30px; height: 30px; fill: var(--primary-color);
-        }
+        .nav-icon-svg { width: 30px; height: 30px; fill: var(--primary-color); }
 
-        /* 2. HERO BANNER (Carousel Style) */
         .hero-section {
-            background: white;
-            padding: 20px 0 40px 0;
-            margin-bottom: 30px;
+            background: white; padding: 20px 0 40px 0; margin-bottom: 30px;
         }
         .hero-banner {
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1920&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            height: 350px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
+            background-size: cover; background-position: center;
+            height: 350px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; text-align: center;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .hero-title {
-            font-weight: 800;
-            font-size: 3rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
+        .hero-title { font-weight: 800; font-size: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
-        /* 3. SEARCH BAR (Visual Only) */
         .search-container {
-            margin-top: -30px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            margin-top: -30px; background: white; padding: 20px;
+            border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex; gap: 10px; align-items: center;
         }
 
-        /* 4. EVENT CARDS (Standard Style) */
         .card-event {
-            background: white;
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-            height: 100%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
+            background: white; border: none; border-radius: 12px; overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s; height: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column;
         }
-        .card-event:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
+        .card-event:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        /* Bagian Atas Card (Gambar/Tanggal) */
         .card-img-placeholder {
-            height: 150px;
-            background: linear-gradient(135deg, #0064d2, #55aaff);
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            height: 150px; background: linear-gradient(135deg, #0064d2, #55aaff);
+            position: relative; display: flex; align-items: center; justify-content: center; color: white;
         }
         .date-badge {
-            background: white;
-            color: var(--text-dark);
-            padding: 8px 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            position: absolute;
-            bottom: -20px;
-            right: 20px;
+            background: white; color: var(--text-dark); padding: 8px 15px; border-radius: 8px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: absolute; bottom: -20px; right: 20px;
         }
         .date-day { font-size: 1.2rem; font-weight: 800; line-height: 1; }
         .date-month { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #666; }
 
-        .card-body {
-            padding: 25px 20px 20px 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .card-body { padding: 25px 20px 20px 20px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; color: #111; }
         .event-location { font-size: 0.85rem; color: #6b7280; margin-bottom: 15px; }
-        
-        .price-tag {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--price-color);
-        }
+        .price-tag { font-size: 1.1rem; font-weight: 700; color: var(--price-color); }
 
         .stock-bar { height: 6px; background: #e5e7eb; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .stock-fill { background: var(--primary-color); height: 100%; }
         
         .btn-book {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 10px;
-            border: none;
-            width: 100%;
-            margin-top: auto; /* Biar tombol selalu di bawah */
+            background-color: var(--primary-color); color: white; font-weight: 600;
+            border-radius: 8px; padding: 10px; border: none; width: 100%; margin-top: auto;
         }
         .btn-book:hover { background-color: #0056b3; color: white; }
         .btn-book.disabled { background-color: #d1d5db; color: #6b7280; }
 
-        /* Badge Status */
         .badge-status {
             position: absolute; top: 15px; left: 15px;
             background: rgba(0,0,0,0.6); color: white;
             padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
         }
         .badge-soldout { background: #ef4444; }
-
     </style>
 </head>
 <body>
@@ -175,7 +109,6 @@
                 </svg>
                 RCELLFEST
             </a>
-            
             <div class="ms-auto" id="navUserArea">
                 <a href="user-login.html" class="btn btn-outline-primary btn-sm px-4 rounded-pill fw-bold">Masuk / Daftar</a>
             </div>
@@ -195,8 +128,8 @@
                 <div class="col-md-10">
                     <div class="search-container">
                         <i class="bi bi-search text-secondary ms-2"></i>
-                        <input type="text" class="form-control border-0 shadow-none" placeholder="Cari konser, artis, atau venue...">
-                        <button class="btn btn-primary px-4 rounded-pill">Cari</button>
+                        <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Cari konser, artis, atau venue...">
+                        <button onclick="searchEvent()" class="btn btn-primary px-4 rounded-pill">Cari</button>
                     </div>
                 </div>
             </div>
@@ -206,7 +139,7 @@
     <div class="container pb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">🔥 Event Pilihan Untukmu</h4>
-            <a href="#" class="text-decoration-none small fw-bold">Lihat Semua</a>
+            <a href="#" class="text-decoration-none small fw-bold" onclick="resetSearch()">Lihat Semua</a>
         </div>
 
         <div class="row g-4" id="event-list">
@@ -228,7 +161,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. CEK LOGIN & UPDATE NAVBAR
+        // Variabel Global untuk nyimpen data
+        let allEvents = [];
+
+        // 1. CEK LOGIN
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
@@ -259,81 +195,114 @@
             window.location.reload();
         }
 
-        // 2. LOAD EVENTS
+        // 2. LOAD DATA DARI SERVER (Disimpan dulu, baru ditampilkan)
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
-                const events = await res.json();
-                const container = document.getElementById('event-list');
-                
-                container.innerHTML = ''; 
-
-                if(events.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center text-secondary py-5">Belum ada event yang tersedia saat ini.</div>';
-                    return;
-                }
-
-                events.forEach(event => {
-                    const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(event.price);
-                    const isSoldOut = event.availableSeats <= 0;
-                    const dateObj = new Date(event.date);
-                    const day = dateObj.getDate();
-                    const month = dateObj.toLocaleString('default', { month: 'short' });
-                    const percent = (event.availableSeats / event.totalCapacity) * 100;
-
-                    container.innerHTML += `
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card card-event">
-                                <div class="card-img-placeholder">
-                                    <i class="bi bi-music-note-beamed display-4 opacity-50"></i>
-                                    <div class="badge-status ${isSoldOut ? 'badge-soldout' : ''}">
-                                        ${isSoldOut ? 'HABIS TERJUAL' : 'POPULER'}
-                                    </div>
-                                    <div class="date-badge">
-                                        <div class="date-day">${day}</div>
-                                        <div class="date-month">${month}</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="card-body">
-                                    <h5 class="event-title text-truncate">${event.name}</h5>
-                                    <div class="event-location">
-                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> ICE BSD City
-                                    </div>
-
-                                    <div class="d-flex justify-content-between align-items-end mb-2">
-                                        <div>
-                                            <small class="text-secondary" style="font-size: 0.7rem;">Mulai dari</small>
-                                            <div class="price-tag">${harga}</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex justify-content-between small text-secondary mb-1" style="font-size: 0.75rem;">
-                                        <span>Sisa Tiket</span>
-                                        <span>${event.availableSeats}</span>
-                                    </div>
-                                    <div class="stock-bar mb-3">
-                                        <div class="stock-fill" style="width: ${percent}%"></div>
-                                    </div>
-
-                                    <button onclick="buyTicket('${event._id}')" 
-                                        class="btn btn-book ${isSoldOut ? 'disabled' : ''}">
-                                        ${isSoldOut ? 'Full Booked' : 'Pilih Tiket'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
+                allEvents = await res.json(); // Simpan ke variabel global
+                renderEvents(allEvents); // Tampilkan semua
             } catch (err) {
                 console.error(err);
             }
         }
 
-        // 3. FUNGSI BELI TIKET (Logic Sama Persis)
+        // 3. FUNGSI RENDER (Menampilkan Kartu Event)
+        function renderEvents(data) {
+            const container = document.getElementById('event-list');
+            container.innerHTML = ''; 
+
+            if(data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-search display-1 text-secondary opacity-25"></i>
+                        <p class="mt-3 text-secondary">Oops, event tidak ditemukan.</p>
+                        <button onclick="resetSearch()" class="btn btn-outline-primary btn-sm">Lihat Semua Event</button>
+                    </div>`;
+                return;
+            }
+
+            data.forEach(event => {
+                const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(event.price);
+                const isSoldOut = event.availableSeats <= 0;
+                const dateObj = new Date(event.date);
+                const day = dateObj.getDate();
+                const month = dateObj.toLocaleString('default', { month: 'short' });
+                const percent = (event.availableSeats / event.totalCapacity) * 100;
+
+                container.innerHTML += `
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card card-event">
+                            <div class="card-img-placeholder">
+                                <i class="bi bi-music-note-beamed display-4 opacity-50"></i>
+                                <div class="badge-status ${isSoldOut ? 'badge-soldout' : ''}">
+                                    ${isSoldOut ? 'HABIS TERJUAL' : 'POPULER'}
+                                </div>
+                                <div class="date-badge">
+                                    <div class="date-day">${day}</div>
+                                    <div class="date-month">${month}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <h5 class="event-title text-truncate">${event.name}</h5>
+                                <div class="event-location">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> ICE BSD City
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <div>
+                                        <small class="text-secondary" style="font-size: 0.7rem;">Mulai dari</small>
+                                        <div class="price-tag">${harga}</div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between small text-secondary mb-1" style="font-size: 0.75rem;">
+                                    <span>Sisa Tiket</span>
+                                    <span>${event.availableSeats}</span>
+                                </div>
+                                <div class="stock-bar mb-3">
+                                    <div class="stock-fill" style="width: ${percent}%"></div>
+                                </div>
+
+                                <button onclick="buyTicket('${event._id}')" 
+                                    class="btn btn-book ${isSoldOut ? 'disabled' : ''}">
+                                    ${isSoldOut ? 'Full Booked' : 'Pilih Tiket'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 4. FUNGSI SEARCH
+        function searchEvent() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filter data yang ada di allEvents
+            const filteredData = allEvents.filter(event => 
+                event.name.toLowerCase().includes(keyword)
+            );
+            
+            renderEvents(filteredData);
+        }
+
+        // Biar bisa search pas tekan ENTER
+        document.getElementById('searchInput').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchEvent();
+            }
+        });
+        
+        // Reset Search
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            renderEvents(allEvents);
+        }
+
+        // 5. FUNGSI BELI TIKET (Tetap sama)
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
-            
             if (!userRaw) {
                 Swal.fire({
                     title: 'Login Diperlukan',
@@ -344,25 +313,14 @@
                     showCancelButton: true,
                     cancelButtonText: 'Nanti Saja'
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'user-login.html';
-                    }
+                    if (result.isConfirmed) window.location.href = 'user-login.html';
                 });
                 return;
             }
-
             const user = JSON.parse(userRaw);
-
             const confirm = await Swal.fire({
                 title: 'Konfirmasi Pesanan',
-                html: `
-                    <div class="text-start bg-light p-3 rounded">
-                        <small class="text-secondary">Pemesan:</small><br>
-                        <strong>${user.username}</strong><br>
-                        <small class="text-secondary">${user.email}</small>
-                    </div>
-                    <p class="mt-3">Lanjutkan pembayaran tiket ini?</p>
-                `,
+                html: `<div class="text-start bg-light p-3 rounded"><small class="text-secondary">Pemesan:</small><br><strong>${user.username}</strong><br><small class="text-secondary">${user.email}</small></div><p class="mt-3">Lanjutkan pembayaran tiket ini?</p>`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Bayar Sekarang',
@@ -372,46 +330,23 @@
             });
 
             if (confirm.isConfirmed) {
-                Swal.fire({
-                    title: 'Memproses Pembayaran...',
-                    allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading() }
-                });
-
+                Swal.fire({ title: 'Memproses Pembayaran...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 try {
                     const res = await fetch('/api/order', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            eventId,
-                            quantity: 1,
-                            customerName: user.username, 
-                            customerEmail: user.email
-                        })
+                        body: JSON.stringify({ eventId, quantity: 1, customerName: user.username, customerEmail: user.email })
                     });
-
                     const data = await res.json();
-
                     if (res.ok) {
                         await Swal.fire({
                             title: 'Pembayaran Berhasil!',
-                            html: `
-                                <p>Tiket elektronik telah diterbitkan.</p>
-                                <div class="bg-light p-2 border rounded">
-                                    <h3 class="m-0 text-primary">${data.ticket.ticketCode}</h3>
-                                </div>
-                                <a href="dashboard.html" class="btn btn-primary mt-3 w-100">Lihat E-Ticket Saya</a>
-                            `,
-                            icon: 'success',
-                            showConfirmButton: false
+                            html: `<p>Tiket elektronik telah diterbitkan.</p><div class="bg-light p-2 border rounded"><h3 class="m-0 text-primary">${data.ticket.ticketCode}</h3></div><a href="dashboard.html" class="btn btn-primary mt-3 w-100">Lihat E-Ticket Saya</a>`,
+                            icon: 'success', showConfirmButton: false
                         });
                         loadEvents(); 
-                    } else {
-                        Swal.fire('Gagal', data.message, 'error');
-                    }
-                } catch (err) {
-                    Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
-                }
+                    } else { Swal.fire('Gagal', data.message, 'error'); }
+                } catch (err) { Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
             }
         }
 
