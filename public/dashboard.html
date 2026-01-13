@@ -135,38 +135,3 @@
     </script>
 </body>
 </html>
-
-                    `;
-                });
-
-                // TAHAP 2: Generate Gambar Barcode ke dalam SVG
-                tickets.forEach(t => {
-                    try {
-                        JsBarcode(`#barcode-${t._id}`, t.ticketCode, {
-                            format: "CODE128",
-                            lineColor: "#000",
-                            width: 2,
-                            height: 50,
-                            displayValue: false // Kita sembunyikan angka bawaan, pake teks manual aja
-                        });
-                    } catch (e) {
-                        console.error("Gagal generate barcode untuk", t.ticketCode);
-                    }
-                });
-
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = '<p class="text-danger text-center">Gagal memuat data tiket.</p>';
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('userData');
-            localStorage.removeItem('userToken');
-            window.location.href = 'user-login.html';
-        }
-
-        loadTickets();
-    </script>
-</body>
-</html>
