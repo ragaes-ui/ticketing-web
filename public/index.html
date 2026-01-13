@@ -3,186 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RCELLFEST WEB | Concert Booking</title>
+    <title>RCELLFEST | Tiket Konser & Event</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <style>
+        /* TEMA: CLEAN & PROFESSIONAL (Light Mode) */
+        :root {
+            --primary-color: #0064d2; /* Biru Tiket */
+            --secondary-color: #f2f3f7; /* Abu-abu Background */
+            --text-dark: #1f2937;
+            --price-color: #ff5e1f; /* Oranye Harga */
+        }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
-            min-height: 100vh;
-            padding-top: 60px; /* Biar gak ketutup navbar */
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            padding-top: 70px; /* Space untuk Navbar Fixed */
         }
 
-        /* Navbar Transparan */
+        /* 1. NAVBAR STANDARD */
         .navbar {
-            backdrop-filter: blur(10px);
-            background: rgba(0,0,0,0.3);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 0.8rem 1rem;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-icon-svg {
+            width: 30px; height: 30px; fill: var(--primary-color);
         }
 
-        /* Hero Section */
-        .hero {
-            background: url('https://images.unsplash.com/photo-1459749411177-287ce63e3ba0?q=80&w=2000&auto=format&fit=crop');
+        /* 2. HERO BANNER (Carousel Style) */
+        .hero-section {
+            background: white;
+            padding: 20px 0 40px 0;
+            margin-bottom: 30px;
+        }
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            height: 60vh;
+            height: 350px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .hero-title {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* 3. SEARCH BAR (Visual Only) */
+        .search-container {
+            margin-top: -30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* 4. EVENT CARDS (Standard Style) */
+        .card-event {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .card-event:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Bagian Atas Card (Gambar/Tanggal) */
+        .card-img-placeholder {
+            height: 150px;
+            background: linear-gradient(135deg, #0064d2, #55aaff);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .hero::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), #1a1a2e);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            text-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
-            letter-spacing: -2px;
-        }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-color: rgba(168, 85, 247, 0.5);
-        }
-
-        .badge-neon {
-            background-color: #a855f7;
             color: white;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+        .date-badge {
+            background: white;
+            color: var(--text-dark);
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+        }
+        .date-day { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+        .date-month { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #666; }
+
+        .card-body {
+            padding: 25px 20px 20px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        .btn-glow {
-            background: linear-gradient(45deg, #7928ca, #ff0080);
-            border: none;
+        .event-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; color: #111; }
+        .event-location { font-size: 0.85rem; color: #6b7280; margin-bottom: 15px; }
+        
+        .price-tag {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--price-color);
+        }
+
+        .stock-bar { height: 6px; background: #e5e7eb; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .stock-fill { background: var(--primary-color); height: 100%; }
+        
+        .btn-book {
+            background-color: var(--primary-color);
             color: white;
             font-weight: 600;
-            transition: 0.3s;
+            border-radius: 8px;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            margin-top: auto; /* Biar tombol selalu di bawah */
         }
+        .btn-book:hover { background-color: #0056b3; color: white; }
+        .btn-book.disabled { background-color: #d1d5db; color: #6b7280; }
 
-        .btn-glow:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
-            color: white;
+        /* Badge Status */
+        .badge-status {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
         }
+        .badge-soldout { background: #ef4444; }
 
-        /* Neon Icon Style */
-        .brand-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-bottom: 30px; margin-top: 20px;
-        }
-
-        .neon-icon {
-            width: 60px; height: 60px; color: #ff0080;
-            filter: drop-shadow(0 0 5px #ff0080) drop-shadow(0 0 15px #7928ca) drop-shadow(0 0 30px #ff0080);
-            animation: icon-flicker 4s infinite alternate;
-        }
-
-        .neon-title {
-            font-weight: 900; font-size: 3rem; letter-spacing: 2px;
-            background: linear-gradient(to right, #ff0080, #7928ca, #00f2ff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(255, 0, 128, 0.5));
-            margin-top: -10px;
-        }
-
-        @keyframes icon-flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #ff0080) drop-shadow(0 0 15px #7928ca) drop-shadow(0 0 30px #ff0080); }
-            20%, 24%, 55% { opacity: 0.7; filter: none; }
-        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark fixed-top px-4 py-3">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold text-white">RCELLFEST</span>
-            <div id="navUserArea">
-                <a href="user-login.html" class="btn btn-outline-light btn-sm rounded-pill px-4">Loading...</a>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+                RCELLFEST
+            </a>
+            
+            <div class="ms-auto" id="navUserArea">
+                <a href="user-login.html" class="btn btn-outline-primary btn-sm px-4 rounded-pill fw-bold">Masuk / Daftar</a>
             </div>
         </div>
     </nav>
 
-    <div class="container text-center pt-4">
-        <div class="brand-container">
-            <svg class="neon-icon mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
-            </svg>
-            <h1 class="neon-title">RCELLFEST</h1>
-            <p class="text-secondary">The Ultimate Cyberpunk Music Experience</p>
-        </div>
-    </div>
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-banner">
+                <div>
+                    <h1 class="hero-title">Temukan Konser Impianmu</h1>
+                    <p class="lead opacity-75">Booking tiket mudah, cepat, dan terpercaya.</p>
+                </div>
+            </div>
 
-    <div class="hero">
-        <div class="hero-content container">
-            <h1>RCELLFEST WEB</h1>
-            <p class="lead text-light opacity-75">Secure Your Spot. Experience the Sound.</p>
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="search-container">
+                        <i class="bi bi-search text-secondary ms-2"></i>
+                        <input type="text" class="form-control border-0 shadow-none" placeholder="Cari konser, artis, atau venue...">
+                        <button class="btn btn-primary px-4 rounded-pill">Cari</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="container" style="margin-top: -80px; position: relative; z-index: 5;">
-        <div class="row" id="event-list">
+    <div class="container pb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">🔥 Event Pilihan Untukmu</h4>
+            <a href="#" class="text-decoration-none small fw-bold">Lihat Semua</a>
+        </div>
+
+        <div class="row g-4" id="event-list">
             <div class="col-12 text-center py-5">
-                <div class="spinner-border text-light" role="status"></div>
-                <p class="mt-2">Memuat Konser...</p>
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-secondary">Sedang memuat event terbaik...</p>
             </div>
         </div>
     </div>
 
-    <footer class="text-center py-4 mt-5 text-secondary small">
-        <p>&copy; 2026 rcelltech Inc. Built with love</p>
-        <a href="login.html" class="text-decoration-none text-secondary opacity-25">Admin Login</a>
+    <footer class="bg-white py-4 mt-5 border-top">
+        <div class="container text-center text-secondary">
+            <small>&copy; 2026 PT Rcelltech Indonesia. All rights reserved.</small><br>
+            <a href="login.html" class="text-decoration-none text-secondary small opacity-50">Admin Access</a>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. CEK STATUS LOGIN & UPDATE NAVBAR
+        // 1. CEK LOGIN & UPDATE NAVBAR
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
 
             if (userRaw) {
-                // User SUDAH Login
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
-                    <span class="text-white me-3 small fw-bold">Hi, ${user.username}</span>
-                    <a href="dashboard.html" class="btn btn-outline-info btn-sm rounded-pill me-2">Tiket Saya</a>
-                    <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill">Logout</button>
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle fs-5 text-primary"></i>
+                            <span class="small fw-bold">${user.username}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-ticket-perforated me-2"></i>Tiket Saya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Keluar</button></li>
+                        </ul>
+                    </div>
                 `;
             } else {
-                // User BELUM Login
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-light btn-sm rounded-pill px-4">Login Member</a>`;
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold">Masuk / Daftar</a>`;
             }
         }
 
@@ -192,7 +259,7 @@
             window.location.reload();
         }
 
-        // 2. LOAD EVENTS DARI SERVER
+        // 2. LOAD EVENTS
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
@@ -202,43 +269,56 @@
                 container.innerHTML = ''; 
 
                 if(events.length === 0) {
-                    container.innerHTML = '<div class="text-center text-white">Belum ada konser tersedia.</div>';
+                    container.innerHTML = '<div class="col-12 text-center text-secondary py-5">Belum ada event yang tersedia saat ini.</div>';
                     return;
                 }
 
                 events.forEach(event => {
-                    const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(event.price);
+                    const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(event.price);
                     const isSoldOut = event.availableSeats <= 0;
+                    const dateObj = new Date(event.date);
+                    const day = dateObj.getDate();
+                    const month = dateObj.toLocaleString('default', { month: 'short' });
+                    const percent = (event.availableSeats / event.totalCapacity) * 100;
 
                     container.innerHTML += `
-                        <div class="col-md-4 mb-4">
-                            <div class="glass-card h-100 d-flex flex-column">
-                                <div class="bg-black bg-opacity-25 p-4 text-center">
-                                    <h1 class="display-6 fw-bold mb-0">${new Date(event.date).getDate()}</h1>
-                                    <small class="text-uppercase tracking-wider">${new Date(event.date).toLocaleString('default', { month: 'long' })}</small>
-                                </div>
-                                <div class="p-4 flex-grow-1">
-                                    <h4 class="fw-bold mb-1">${event.name}</h4>
-                                    <p class="text-secondary small mb-3"><i class="bi bi-geo-alt-fill text-info"></i> ICE BSD City</p>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <span class="fs-5 text-warning fw-bold">${harga}</span>
-                                        <span class="badge ${isSoldOut ? 'bg-danger' : 'badge-neon'} rounded-pill">
-                                            ${isSoldOut ? 'SOLD OUT' : 'AVAILABLE'}
-                                        </span>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card card-event">
+                                <div class="card-img-placeholder">
+                                    <i class="bi bi-music-note-beamed display-4 opacity-50"></i>
+                                    <div class="badge-status ${isSoldOut ? 'badge-soldout' : ''}">
+                                        ${isSoldOut ? 'HABIS TERJUAL' : 'POPULER'}
                                     </div>
-                                    
-                                    <div class="progress mb-3" style="height: 6px; background: #333;">
-                                        <div class="progress-bar bg-info" role="progressbar" 
-                                            style="width: ${(event.availableSeats / event.totalCapacity) * 100}%">
+                                    <div class="date-badge">
+                                        <div class="date-day">${day}</div>
+                                        <div class="date-month">${month}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <h5 class="event-title text-truncate">${event.name}</h5>
+                                    <div class="event-location">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> ICE BSD City
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-end mb-2">
+                                        <div>
+                                            <small class="text-secondary" style="font-size: 0.7rem;">Mulai dari</small>
+                                            <div class="price-tag">${harga}</div>
                                         </div>
                                     </div>
-                                    <small class="text-secondary d-block mb-3">Sisa: ${event.availableSeats} Tiket</small>
-                                </div>
-                                <div class="p-4 pt-0">
+
+                                    <div class="d-flex justify-content-between small text-secondary mb-1" style="font-size: 0.75rem;">
+                                        <span>Sisa Tiket</span>
+                                        <span>${event.availableSeats}</span>
+                                    </div>
+                                    <div class="stock-bar mb-3">
+                                        <div class="stock-fill" style="width: ${percent}%"></div>
+                                    </div>
+
                                     <button onclick="buyTicket('${event._id}')" 
-                                        class="btn w-100 ${isSoldOut ? 'btn-secondary disabled' : 'btn-glow'} py-2 rounded-pill">
-                                        ${isSoldOut ? 'TIKET HABIS' : 'BELI TIKET <i class="bi bi-ticket-perforated"></i>'}
+                                        class="btn btn-book ${isSoldOut ? 'disabled' : ''}">
+                                        ${isSoldOut ? 'Full Booked' : 'Pilih Tiket'}
                                     </button>
                                 </div>
                             </div>
@@ -250,57 +330,52 @@
             }
         }
 
-        // 3. FUNGSI BELI TIKET (Satpam Login)
+        // 3. FUNGSI BELI TIKET (Logic Sama Persis)
         async function buyTicket(eventId) {
-            // A. CEK LOGIN
             const userRaw = localStorage.getItem('userData');
             
             if (!userRaw) {
-                // BELUM LOGIN -> TENDANG KE HALAMAN LOGIN
                 Swal.fire({
-                    title: 'Eits, Login Dulu!',
-                    text: 'Kamu harus login member buat beli tiket.',
-                    icon: 'warning',
-                    background: '#16213e',
-                    color: '#fff',
-                    confirmButtonText: 'Login Sekarang',
-                    confirmButtonColor: '#ff0080',
+                    title: 'Login Diperlukan',
+                    text: 'Silakan login member untuk melanjutkan pemesanan.',
+                    icon: 'info',
+                    confirmButtonText: 'Masuk / Daftar',
+                    confirmButtonColor: '#0064d2',
                     showCancelButton: true,
-                    cancelButtonText: 'Batal'
+                    cancelButtonText: 'Nanti Saja'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = 'user-login.html';
                     }
                 });
-                return; // Stop di sini
+                return;
             }
 
-            // B. SUDAH LOGIN -> LANJUT PROSES BELI
             const user = JSON.parse(userRaw);
 
             const confirm = await Swal.fire({
-                title: 'Konfirmasi Order',
+                title: 'Konfirmasi Pesanan',
                 html: `
-                    <p>Beli tiket menggunakan akun:</p>
-                    <h4 class="text-info">${user.username}</h4>
-                    <small class="text-secondary">${user.email}</small>
+                    <div class="text-start bg-light p-3 rounded">
+                        <small class="text-secondary">Pemesan:</small><br>
+                        <strong>${user.username}</strong><br>
+                        <small class="text-secondary">${user.email}</small>
+                    </div>
+                    <p class="mt-3">Lanjutkan pembayaran tiket ini?</p>
                 `,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'GAS BELI! 🚀',
+                confirmButtonText: 'Bayar Sekarang',
                 cancelButtonText: 'Batal',
-                background: '#16213e',
-                color: '#fff',
-                confirmButtonColor: '#0f0',
-                cancelButtonColor: '#d33'
+                confirmButtonColor: '#0064d2',
+                reverseButtons: true
             });
 
             if (confirm.isConfirmed) {
                 Swal.fire({
-                    title: 'Sedang Memproses...',
+                    title: 'Memproses Pembayaran...',
                     allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading() },
-                    background: '#16213e', color: '#fff'
+                    didOpen: () => { Swal.showLoading() }
                 });
 
                 try {
@@ -319,18 +394,18 @@
 
                     if (res.ok) {
                         await Swal.fire({
-                            title: '✅ BERHASIL!',
+                            title: 'Pembayaran Berhasil!',
                             html: `
-                                <p>Tiket tersimpan di akunmu!</p>
-                                <h2 style="color: #0f0; background: #000; padding: 10px;">${data.ticket.ticketCode}</h2>
-                                <a href="dashboard.html" class="btn btn-primary mt-2">Lihat di Dashboard</a>
+                                <p>Tiket elektronik telah diterbitkan.</p>
+                                <div class="bg-light p-2 border rounded">
+                                    <h3 class="m-0 text-primary">${data.ticket.ticketCode}</h3>
+                                </div>
+                                <a href="dashboard.html" class="btn btn-primary mt-3 w-100">Lihat E-Ticket Saya</a>
                             `,
                             icon: 'success',
-                            background: '#16213e',
-                            color: '#fff'
+                            showConfirmButton: false
                         });
-                        
-                        loadEvents(); // Refresh stok
+                        loadEvents(); 
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
                     }
@@ -340,7 +415,6 @@
             }
         }
 
-        // Jalankan saat halaman dibuka
         checkLoginStatus();
         loadEvents();
     </script>
