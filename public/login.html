@@ -3,200 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Access | rcellfest web</title>
+    <title>Admin Portal | RCELLFEST</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <style>
-        /* 1. Background Animasi */
+        :root {
+            --primary-color: #0064d2; /* Biru Konsisten */
+            --bg-color: #f0f2f5;
+        }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background: #0f0c29;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: relative;
         }
 
-        /* Bola-bola Neon di Belakang (Hiasan) */
-        .neon-blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: 1;
-            opacity: 0.6;
-            animation: move 10s infinite alternate;
-        }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7928ca; }
-        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #ff0080; animation-delay: -5s; }
-
-        @keyframes move {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(30px, -30px) scale(1.1); }
-        }
-
-        /* 2. Kartu Login Kaca (Glassmorphism) */
         .login-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem 2rem;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* 3. Input Custom */
-        .form-floating > .form-control {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #333;
-            color: white;
-            border-radius: 12px;
-        }
-        .form-floating > .form-control:focus {
-            background: rgba(0, 0, 0, 0.5);
-            border-color: #a855f7;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
-            color: white;
-        }
-        .form-floating > label { color: #aaa; }
-        .form-floating > .form-control:focus ~ label { color: #a855f7; }
-
-        /* 4. Tombol Neon */
-        .btn-neon {
-            background: linear-gradient(90deg, #7928ca, #ff0080);
+            background: white;
             border: none;
-            color: white;
-            font-weight: 800;
-            letter-spacing: 1px;
-            padding: 14px;
             border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
         }
-        .btn-neon:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(255, 0, 128, 0.6);
-            color: white;
-        }
-        
-        .logo-text {
+
+        .brand-logo {
+            color: var(--primary-color);
             font-weight: 800;
-            background: linear-gradient(to right, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .nav-icon-svg { width: 32px; height: 32px; fill: var(--primary-color); }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+        }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 100, 210, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #9ca3af;
         }
     </style>
 </head>
 <body>
 
-    <div class="neon-blob blob-1"></div>
-    <div class="neon-blob blob-2"></div>
+    <div class="login-card">
+        <div class="brand-logo">
+            <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
+            </svg>
+            RCELLFEST
+        </div>
 
-    <div class="container d-flex justify-content-center">
-        <div class="login-card text-center">
+        <h4 class="text-center fw-bold mb-1">Admin Portal</h4>
+        <p class="text-center text-secondary small mb-4">Masuk untuk mengelola event & tiket</p>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Masukkan username admin" required>
+            </div>
             
             <div class="mb-4">
-                <i class="bi bi-shield-lock-fill text-white display-1"></i>
-            </div>
-            
-            <h2 class="mb-1 text-white fw-bold">Welcome Back</h2>
-            <p class="text-secondary mb-4 small">Please enter your admin credentials</p>
-
-            <form id="loginForm">
-                <div class="form-floating mb-3 text-start">
-                    <input type="text" class="form-control" id="username" placeholder="Username" required>
-                    <label for="username">Username</label>
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" placeholder="Masukkan password" required>
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePass()">
+                        <i class="bi bi-eye"></i>
+                    </button>
                 </div>
-                
-                <div class="form-floating mb-4 text-start">
-                    <input type="password" class="form-control" id="password" placeholder="Password" required>
-                    <label for="password">Password</label>
-                </div>
-
-                <button type="submit" class="btn btn-neon w-100" id="btnSubmit">
-                    ACCESS DASHBOARD <i class="bi bi-arrow-right-short"></i>
-                </button>
-            </form>
-
-            <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
-                <small class="text-secondary">Powered by <span class="logo-text">rcelltech System</span></small>
             </div>
+
+            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                Masuk Dashboard
+            </button>
+        </form>
+
+        <div class="footer-text">
+            &copy; 2026 Rcelltech Inc. Secure System.
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Cek kalau udah login, langsung lempar
+        // 1. Cek Token (Kalau udah login, lempar masuk)
         if(localStorage.getItem('adminToken')) {
             window.location.href = 'admin.html';
         }
 
+        // 2. Fitur Lihat Password
+        function togglePass() {
+            const passInput = document.getElementById('password');
+            const icon = document.querySelector('.bi-eye, .bi-eye-slash');
+            
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                passInput.type = "password";
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
+
+        // 3. Logic Login
         const loginForm = document.getElementById('loginForm');
         const btnSubmit = document.getElementById('btnSubmit');
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Efek Loading di Tombol
+            // Loading State
             const originalText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Loading...';
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Memproses...';
             btnSubmit.disabled = true;
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             try {
+                // Tembak API Login (Pakai API yang sama buat Admin)
+                // Catatan: Di server.js kita tadi bikin login umum. 
+                // Pastikan user admin punya role: 'admin' di database.
+                
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ identifier: username, password: password }) 
+                    // Perhatikan: endpoint login kita di server.js pakai 'identifier'
                 });
 
                 const data = await res.json();
 
                 if (data.success) {
-                    localStorage.setItem('adminToken', data.token);
-                    
-                    // Alert Sukses
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Access Granted',
-                        text: 'Welcome back, Commander!',
-                        background: '#16213e',
-                        color: '#fff',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        window.location.href = 'admin.html';
-                    });
+                    // CEK ROLE: Hanya boleh masuk kalau Admin
+                    if(data.user.role === 'admin') {
+                        localStorage.setItem('adminToken', data.token);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Login Berhasil',
+                            text: 'Mengalihkan ke Dashboard...',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = 'admin.html';
+                        });
+                    } else {
+                        // Kalau user biasa coba login di sini
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Akses Ditolak',
+                            text: 'Akun ini bukan akun Admin!',
+                            confirmButtonColor: '#0064d2'
+                        });
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
+                    }
                 } else {
-                    // Alert Gagal
                     Swal.fire({
                         icon: 'error',
-                        title: 'Access Denied',
-                        text: data.message, // "Password Salah" atau "User gak ada"
-                        background: '#16213e',
-                        color: '#fff',
-                        confirmButtonColor: '#ff0080'
+                        title: 'Gagal Masuk',
+                        text: data.message,
+                        confirmButtonColor: '#0064d2'
                     });
-                    
-                    // Balikin Tombol
                     btnSubmit.innerHTML = originalText;
                     btnSubmit.disabled = false;
                 }
             } catch (err) {
                 console.error(err);
+                Swal.fire('Error', 'Terjadi kesalahan server', 'error');
                 btnSubmit.innerHTML = originalText;
                 btnSubmit.disabled = false;
             }
