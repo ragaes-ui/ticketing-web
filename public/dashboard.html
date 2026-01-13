@@ -5,14 +5,17 @@
     <title>My Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
     <style>
         body { background: #1a1a2e; color: white; font-family: sans-serif; }
         .ticket-card { background: #16213e; border: 1px solid #0f3460; border-radius: 15px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .ticket-code { background: black; color: #0f0; font-family: monospace; padding: 5px 10px; border-radius: 5px; font-size: 1.2rem; display: inline-block; margin-top: 10px; }
-        .status-valid { color: #0f0; } .status-used { color: #f00; text-decoration: line-through; }
+        .ticket-code-text { font-family: monospace; color: #aaa; letter-spacing: 2px; font-size: 0.9rem; margin-top: 5px; }
+        .status-valid { color: #0f0; } 
+        .status-used { color: #f00; text-decoration: line-through; }
     </style>
 </head>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <body class="p-4">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5">
@@ -40,6 +43,10 @@
         // Ambil Data Tiket
         async function loadTickets() {
             const list = document.getElementById('ticketList');
+            
+            // Animasi Loading
+            list.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-info"></div></div>';
+
             try {
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST',
@@ -54,17 +61,27 @@
                     return;
                 }
 
+                // TAHAP 1: Render HTML (Siapkan tempat buat Barcode)
                 tickets.forEach(t => {
                     const eventName = t.eventId ? t.eventId.name : 'Event Dihapus';
-                    const statusClass = t.status === 'valid' ? 'status-valid' : 'status-used';
-                    const statusText = t.status === 'valid' ? 'VALID (Belum Dipakai)' : 'SUDAH DIPAKAI';
+                    const isUsed = t.status === 'used';
                     
+                    const statusClass = isUsed ? 'status-used' : 'status-valid';
+                    const statusText = isUsed ? 'SUDAH DIPAKAI' : 'VALID / AKTIF';
+                    const borderColor = isUsed ? '#f00' : '#0f0';
+
                     list.innerHTML += `
                         <div class="col-md-6">
-                            <div class="ticket-card shadow">
-                                <h4 class="fw-bold">${eventName}</h4>
-                                <p class="text-secondary mb-1">Nama Pemesan: ${t.customerName}</p>
-                                <div class="ticket-code">${t.ticketCode}</div>
+                            <div class="ticket-card shadow text-center" style="border-color: ${borderColor}">
+                                <h4 class="fw-bold mb-3">${eventName}</h4>
+                                <p class="text-secondary mb-2 small">Nama Pemesan: ${t.customerName}</p>
+                                
+                                <div class="bg-white p-2 d-inline-block rounded mt-2">
+                                    <svg id="barcode-${t._id}"></svg>
+                                </div>
+                                
+                                <div class="ticket-code-text">${t.ticketCode}</div>
+
                                 <div class="mt-3 fw-bold small ${statusClass}">
                                     ${statusText}
                                 </div>
@@ -72,8 +89,25 @@
                         </div>
                     `;
                 });
+
+                // TAHAP 2: Generate Gambar Barcode ke dalam SVG
+                tickets.forEach(t => {
+                    try {
+                        JsBarcode(`#barcode-${t._id}`, t.ticketCode, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 50,
+                            displayValue: false // Kita sembunyikan angka bawaan, pake teks manual aja
+                        });
+                    } catch (e) {
+                        console.error("Gagal generate barcode untuk", t.ticketCode);
+                    }
+                });
+
             } catch (err) {
                 console.error(err);
+                list.innerHTML = '<p class="text-danger text-center">Gagal memuat data tiket.</p>';
             }
         }
 
