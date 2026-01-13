@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RCELLFEST WEB | Concert Booking</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
     <style>
         body {
             font-family: 'Outfit', sans-serif;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: white;
             min-height: 100vh;
+            padding-top: 60px; /* Biar gak ketutup navbar */
+        }
+
+        /* Navbar Transparan */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.3);
         }
 
         /* Hero Section */
@@ -85,87 +95,52 @@
             color: white;
         }
 
-        /* Modal Custom */
-        .modal-content {
-            background: #1f1b2e;
-            color: white;
-            border: 1px solid #444;
+        /* Neon Icon Style */
+        .brand-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin-bottom: 30px; margin-top: 20px;
         }
-        .form-control {
-            background: #12101c;
-            border: 1px solid #444;
-            color: white;
-        }
-        .form-control:focus {
-            background: #12101c;
-            color: white;
-            box-shadow: 0 0 0 2px #7928ca;
-            border-color: #7928ca;
-        }
-       
-    /* ... CSS Abang yang lain ... */
 
-    /* Wadah untuk Icon dan Teks biar tengah */
-    .brand-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 30px; /* Jarak ke bawah */
-        margin-top: 20px;
-    }
-
-    /* Gaya Icon SVG */
-    .neon-icon {
-        width: 60px;  /* Ukuran icon */
-        height: 60px;
-        color: #ff0080; /* Warna dasar Pink */
-        /* Efek Glow Tumpuk (Pink + Ungu) */
-        filter: drop-shadow(0 0 5px #ff0080) 
-                drop-shadow(0 0 15px #7928ca)
-                drop-shadow(0 0 30px #ff0080);
-        animation: icon-flicker 4s infinite alternate; /* Animasi kedip */
-    }
-
-    /* Gaya Teks RCELLFEST */
-    .neon-title {
-        font-weight: 900;
-        font-size: 3rem; /* Ukuran teks besar */
-        letter-spacing: 2px;
-        background: linear-gradient(to right, #ff0080, #7928ca, #00f2ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 10px rgba(255, 0, 128, 0.5));
-        margin-top: -10px; /* Biar agak nempel ke icon */
-    }
-
-    /* Animasi Kedip-kedip kayak neon rusak dikit */
-    @keyframes icon-flicker {
-        0%, 18%, 22%, 25%, 53%, 57%, 100% {
-            opacity: 1;
+        .neon-icon {
+            width: 60px; height: 60px; color: #ff0080;
             filter: drop-shadow(0 0 5px #ff0080) drop-shadow(0 0 15px #7928ca) drop-shadow(0 0 30px #ff0080);
+            animation: icon-flicker 4s infinite alternate;
         }
-        20%, 24%, 55% {
-            opacity: 0.7;
-            filter: none; /* Pas kedip mati, glownya ilang */
+
+        .neon-title {
+            font-weight: 900; font-size: 3rem; letter-spacing: 2px;
+            background: linear-gradient(to right, #ff0080, #7928ca, #00f2ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 128, 0.5));
+            margin-top: -10px;
         }
-    }
+
+        @keyframes icon-flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #ff0080) drop-shadow(0 0 15px #7928ca) drop-shadow(0 0 30px #ff0080); }
+            20%, 24%, 55% { opacity: 0.7; filter: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="container text-center">
-    <div class="brand-container">
-        
-        <svg class="neon-icon mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
-        </svg>
-        
-        <h1 class="neon-title">RCELLFEST</h1>
-        <p class="text-secondary">The Ultimate Cyberpunk Music Experience</p>
 
+    <nav class="navbar navbar-dark fixed-top px-4 py-3">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-bold text-white">RCELLFEST</span>
+            <div id="navUserArea">
+                <a href="user-login.html" class="btn btn-outline-light btn-sm rounded-pill px-4">Loading...</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container text-center pt-4">
+        <div class="brand-container">
+            <svg class="neon-icon mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
+            </svg>
+            <h1 class="neon-title">RCELLFEST</h1>
+            <p class="text-secondary">The Ultimate Cyberpunk Music Experience</p>
+        </div>
     </div>
-</div>
-
 
     <div class="hero">
         <div class="hero-content container">
@@ -183,48 +158,41 @@
         </div>
     </div>
 
-<footer class="text-center py-4 mt-5 text-secondary small">
-    <p>&copy; 2026 rcelltech Inc. Built with love</p>
-    <a href="login.html" class="text-decoration-none text-secondary opacity-25">Admin Login</a>
-</footer>
-
-    <div class="modal fade" id="buyModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass-card">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">🎟️ Checkout Tiket</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="modalEventId">
-                    <h4 id="modalEventName" class="text-center mb-4 fw-bold text-info"></h4>
-                    
-                    <div class="mb-3">
-                        <label class="small text-secondary">Nama Lengkap</label>
-                        <input type="text" id="inputNama" class="form-control" placeholder="Nama sesuai KTP">
-                    </div>
-                    <div class="mb-3">
-                        <label class="small text-secondary">Email</label>
-                        <input type="email" id="inputEmail" class="form-control" placeholder="email@contoh.com">
-                    </div>
-                    <div class="mb-3">
-                        <label class="small text-secondary">Jumlah Tiket</label>
-                        <input type="number" id="inputQty" class="form-control" value="1" min="1">
-                    </div>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-glow w-50" onclick="prosesBeli()">BAYAR SEKARANG</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <footer class="text-center py-4 mt-5 text-secondary small">
+        <p>&copy; 2026 rcelltech Inc. Built with love</p>
+        <a href="login.html" class="text-decoration-none text-secondary opacity-25">Admin Login</a>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <script>
-        const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
-        
-        // 1. Load Events
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // 1. CEK STATUS LOGIN & UPDATE NAVBAR
+        function checkLoginStatus() {
+            const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+
+            if (userRaw) {
+                // User SUDAH Login
+                const user = JSON.parse(userRaw);
+                navArea.innerHTML = `
+                    <span class="text-white me-3 small fw-bold">Hi, ${user.username}</span>
+                    <a href="dashboard.html" class="btn btn-outline-info btn-sm rounded-pill me-2">Tiket Saya</a>
+                    <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill">Logout</button>
+                `;
+            } else {
+                // User BELUM Login
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-light btn-sm rounded-pill px-4">Login Member</a>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('userToken');
+            window.location.reload();
+        }
+
+        // 2. LOAD EVENTS DARI SERVER
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
@@ -234,13 +202,12 @@
                 container.innerHTML = ''; 
 
                 if(events.length === 0) {
-                    container.innerHTML = '<div class="text-center">Belum ada konser tersedia.</div>';
+                    container.innerHTML = '<div class="text-center text-white">Belum ada konser tersedia.</div>';
                     return;
                 }
 
                 events.forEach(event => {
                     const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(event.price);
-                    const tanggal = new Date(event.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                     const isSoldOut = event.availableSeats <= 0;
 
                     container.innerHTML += `
@@ -269,7 +236,7 @@
                                     <small class="text-secondary d-block mb-3">Sisa: ${event.availableSeats} Tiket</small>
                                 </div>
                                 <div class="p-4 pt-0">
-                                    <button onclick="bukaModal('${event._id}', '${event.name}')" 
+                                    <button onclick="buyTicket('${event._id}')" 
                                         class="btn w-100 ${isSoldOut ? 'btn-secondary disabled' : 'btn-glow'} py-2 rounded-pill">
                                         ${isSoldOut ? 'TIKET HABIS' : 'BELI TIKET <i class="bi bi-ticket-perforated"></i>'}
                                     </button>
@@ -283,71 +250,98 @@
             }
         }
 
-        // 2. Buka Modal
-        function bukaModal(id, name) {
-            document.getElementById('modalEventId').value = id;
-            document.getElementById('modalEventName').innerText = name;
-            buyModal.show();
-        }
-
-        // 3. Proses Beli (Connect API)
-        async function prosesBeli() {
-            const id = document.getElementById('modalEventId').value;
-            const nama = document.getElementById('inputNama').value;
-            const email = document.getElementById('inputEmail').value;
-            const qty = document.getElementById('inputQty').value;
-
-            if (!nama || !email) {
-                Swal.fire('Oops...', 'Lengkapi data diri dulu ya!', 'warning');
-                return;
+        // 3. FUNGSI BELI TIKET (Satpam Login)
+        async function buyTicket(eventId) {
+            // A. CEK LOGIN
+            const userRaw = localStorage.getItem('userData');
+            
+            if (!userRaw) {
+                // BELUM LOGIN -> TENDANG KE HALAMAN LOGIN
+                Swal.fire({
+                    title: 'Eits, Login Dulu!',
+                    text: 'Kamu harus login member buat beli tiket.',
+                    icon: 'warning',
+                    background: '#16213e',
+                    color: '#fff',
+                    confirmButtonText: 'Login Sekarang',
+                    confirmButtonColor: '#ff0080',
+                    showCancelButton: true,
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'user-login.html';
+                    }
+                });
+                return; // Stop di sini
             }
 
-            // Tutup modal dulu biar smooth
-            buyModal.hide();
-            
-            // Loading Effect
-            Swal.fire({
-                title: 'Sedang Memproses...',
-                text: 'Jangan tutup halaman ini',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() }
+            // B. SUDAH LOGIN -> LANJUT PROSES BELI
+            const user = JSON.parse(userRaw);
+
+            const confirm = await Swal.fire({
+                title: 'Konfirmasi Order',
+                html: `
+                    <p>Beli tiket menggunakan akun:</p>
+                    <h4 class="text-info">${user.username}</h4>
+                    <small class="text-secondary">${user.email}</small>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'GAS BELI! 🚀',
+                cancelButtonText: 'Batal',
+                background: '#16213e',
+                color: '#fff',
+                confirmButtonColor: '#0f0',
+                cancelButtonColor: '#d33'
             });
 
-            try {
-                const res = await fetch('/api/order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        eventId: id,
-                        quantity: parseInt(qty),
-                        customerName: nama,
-                        customerEmail: email
-                    })
+            if (confirm.isConfirmed) {
+                Swal.fire({
+                    title: 'Sedang Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading() },
+                    background: '#16213e', color: '#fff'
                 });
 
-                const result = await res.json();
-
-                if (res.ok) {
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        html: `Tiket diamankan.<br>Kode: <b>${result.ticket.ticketCode}</b>`,
-                        icon: 'success',
-                        background: '#1f1b2e',
-                        color: '#fff'
-                    }).then(() => {
-                        loadEvents(); // Refresh data
-                        // Reset form
-                        document.getElementById('inputNama').value = '';
-                        document.getElementById('inputEmail').value = '';
+                try {
+                    const res = await fetch('/api/order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            eventId,
+                            quantity: 1,
+                            customerName: user.username, 
+                            customerEmail: user.email
+                        })
                     });
-                } else {
-                    Swal.fire('Gagal', result.message, 'error');
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        await Swal.fire({
+                            title: '✅ BERHASIL!',
+                            html: `
+                                <p>Tiket tersimpan di akunmu!</p>
+                                <h2 style="color: #0f0; background: #000; padding: 10px;">${data.ticket.ticketCode}</h2>
+                                <a href="dashboard.html" class="btn btn-primary mt-2">Lihat di Dashboard</a>
+                            `,
+                            icon: 'success',
+                            background: '#16213e',
+                            color: '#fff'
+                        });
+                        
+                        loadEvents(); // Refresh stok
+                    } else {
+                        Swal.fire('Gagal', data.message, 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
                 }
-            } catch (err) {
-                Swal.fire('Error', 'Gagal koneksi ke server', 'error');
             }
         }
 
+        // Jalankan saat halaman dibuka
+        checkLoginStatus();
         loadEvents();
     </script>
 </body>
