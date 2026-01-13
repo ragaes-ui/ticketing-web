@@ -98,31 +98,70 @@ app.delete('/api/events/:id', async (req, res) => {
     }
 });
 
-// 5. Login Admin
-app.post('/api/login', async (req, res) => {
+// --- 1. REGISTER USER BARU ---
+app.post('/api/register', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ username });
+        const { username, email, password, role } = req.body;
         
-        if (!user) return res.status(400).json({ success: false, message: "Username tidak ditemukan" });
+        // Cek email kembar
+        const cekEmail = await User.findOne({ email });
+        if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
-
-        res.json({ success: true, token: "admin-token-rahasia" });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const newUser = new User({ 
+            username, 
+            email, 
+            password: hashedPassword,
+            role: role || 'user' // Kalau gak diisi, otomatis jadi 'user'
+        });
+        
+        await newUser.save();
+        res.json({ success: true, message: "Registrasi Berhasil! Silakan Login." });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// 6. Register Admin (Buat nambah user lewat console)
-app.post('/api/register', async (req, res) => {
+// --- 2. LOGIN (Bisa buat Admin & User) ---
+app.post('/api/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, password: hashedPassword });
-        await newUser.save();
-        res.json({ message: "Admin dibuat!" });
+        // Bisa login pakai Username atau Email
+        const { identifier, password } = req.body;
+        
+        // Cari user (cek username ATAU email)
+        const user = await User.findOne({ 
+            $or: [{ username: identifier }, { email: identifier }] 
+        });
+        
+        if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
+
+        // Kirim data user balik ke frontend
+        res.json({ 
+            success: true, 
+            token: "token-rahasia-" + user._id, // Harusnya pake JWT, tapi ini simulasi dulu
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- 3. API DASHBOARD USER (Lihat Tiket Saya) ---
+app.post('/api/my-tickets', async (req, res) => {
+    try {
+        const { email } = req.body;
+        // Cari order berdasarkan email user
+        const tickets = await Order.find({ email: email }).populate('eventId');
+        res.json(tickets);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
