@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <style>
+        body { background-color: #1a1a2e; color: #e0e0e0; font-family: sans-serif; }
+        .card { background-color: #16213e; border: 1px solid #2a3b55; }
+        .form-control { background-color: #0f3460; border: 1px solid #16213e; color: white; }
+        .form-control:focus { background-color: #0f3460; color: white; box-shadow: none; border-color: #e94560; }
+        .btn-primary { background-color: #e94560; border: none; }
+        .btn-primary:hover { background-color: #c81938; }
+        .table { color: #e0e0e0; }
+        .table-hover tbody tr:hover { color: #fff; background-color: rgba(255,255,255,0.05); }
+        
+        /* Modal Custom */
+        .modal-content { background-color: #16213e; color: white; border: 1px solid #2a3b55; }
+        .modal-header { border-bottom: 1px solid #2a3b55; }
+        .modal-footer { border-top: 1px solid #2a3b55; }
+        .btn-close { filter: invert(1); }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>⚡ Admin Dashboard</h3>
+            <div>
+                <a href="index.html" class="btn btn-outline-light btn-sm me-2" target="_blank">Lihat Website Utama</a>
+                <button onclick="logout()" class="btn btn-danger btn-sm">Keluar 🚪</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-4 shadow-lg sticky-top" style="top: 20px;">
+                    <h5 class="mb-3 text-info">Buat Konser Baru</h5>
+                    <form id="formEvent">
+                        <div class="mb-3">
+                            <label class="small text-secondary">Nama Event</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-secondary">Tanggal</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small text-secondary">Harga</label>
+                                <input type="number" id="price" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small text-secondary">Kapasitas</label>
+                                <input type="number" id="capacity" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">PUBLISH EVENT</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card p-4 shadow-lg">
+                    <h5 class="mb-3 text-info">Daftar Konser Aktif</h5>
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover align-middle">
+                            <thead>
+                                <tr class="border-bottom border-secondary">
+                                    <th>Event</th>
+                                    <th>Tanggal</th>
+                                    <th>Harga</th>
+                                    <th>Stok</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Edit Konser</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEdit">
+                        <input type="hidden" id="editId">
+                        <div class="mb-3">
+                            <label class="small text-secondary">Nama Event</label>
+                            <input type="text" id="editName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-secondary">Tanggal</label>
+                            <input type="date" id="editDate" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small text-secondary">Harga</label>
+                                <input type="number" id="editPrice" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small text-secondary">Sisa Stok</label>
+                                <input type="number" id="editStock" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-secondary">Total Kapasitas (Gedung)</label>
+                            <input type="number" id="editCapacity" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" onclick="saveEdit()" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+
+        // 1. Load Events
+        async function loadTable() {
+            try {
+                const res = await fetch('/api/events');
+                const events = await res.json();
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '';
+
+                events.forEach(ev => {
+                    const date = new Date(ev.date).toLocaleDateString('id-ID');
+                    const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(ev.price);
+                    
+                    // Kita simpan data mentah di dalam atribut tombol biar gampang diambil
+                    // Perhatikan tanda kutipnya
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="fw-bold">${ev.name}</td>
+                            <td>${date}</td>
+                            <td>${harga}</td>
+                            <td>
+                                <span class="badge ${ev.availableSeats > 0 ? 'bg-success' : 'bg-danger'}">
+                                    ${ev.availableSeats} / ${ev.totalCapacity}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button onclick="bukaModalEdit('${ev._id}', '${ev.name}', '${ev.date}', '${ev.price}', '${ev.availableSeats}', '${ev.totalCapacity}')" 
+                                        class="btn btn-warning btn-sm text-dark fw-bold">✏️ Edit</button>
+                                    
+                                    <button onclick="hapusKonser('${ev._id}')" class="btn btn-danger btn-sm">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 2. Buka Modal & Isi Data Lama
+        function bukaModalEdit(id, name, date, price, stock, capacity) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            // Format tanggal biar bisa masuk ke input type="date"
+            document.getElementById('editDate').value = new Date(date).toISOString().split('T')[0];
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editStock').value = stock;
+            document.getElementById('editCapacity').value = capacity;
+            
+            editModal.show();
+        }
+
+        // 3. Simpan Perubahan (Update)
+        async function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                name: document.getElementById('editName').value,
+                date: document.getElementById('editDate').value,
+                price: document.getElementById('editPrice').value,
+                availableSeats: document.getElementById('editStock').value, // Update stok
+                capacity: document.getElementById('editCapacity').value
+            };
+
+            try {
+                const res = await fetch(`/api/events/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if(res.ok) {
+                    editModal.hide();
+                    Swal.fire('Berhasil', 'Data konser diupdate!', 'success');
+                    loadTable();
+                } else {
+                    Swal.fire('Gagal', 'Terjadi kesalahan', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 4. Tambah Event Baru
+        document.getElementById('formEvent').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Menyimpan...';
+            btn.disabled = true;
+
+            const data = {
+                name: document.getElementById('name').value,
+                date: document.getElementById('date').value,
+                price: document.getElementById('price').value,
+                capacity: document.getElementById('capacity').value
+            };
+
+            await fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            Swal.fire('Sukses', 'Event berhasil dibuat', 'success');
+            loadTable();
+            e.target.reset();
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+
+        // 5. Hapus Konser
+        async function hapusKonser(id) {
+            const result = await Swal.fire({
+                title: 'Hapus?',
+                text: "Data akan hilang permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus'
+            });
+
+            if (result.isConfirmed) {
+                await fetch(`/api/events/${id}`, { method: 'DELETE' });
+                Swal.fire('Terhapus!', '', 'success');
+                loadTable();
+            }
+        }
+
+        function logout() {
+            if(confirm('Logout?')) {
+                localStorage.removeItem('adminToken');
+                window.location.href = 'login.html';
+            }
+        }
+
+        loadTable();
+    </script>
+</body>
+</html>
