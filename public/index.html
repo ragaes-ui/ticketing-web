@@ -102,9 +102,70 @@
             box-shadow: 0 0 0 2px #7928ca;
             border-color: #7928ca;
         }
+       
+    /* ... CSS Abang yang lain ... */
+
+    /* Wadah untuk Icon dan Teks biar tengah */
+    .brand-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px; /* Jarak ke bawah */
+        margin-top: 20px;
+    }
+
+    /* Gaya Icon SVG */
+    .neon-icon {
+        width: 60px;  /* Ukuran icon */
+        height: 60px;
+        color: #ff0080; /* Warna dasar Pink */
+        /* Efek Glow Tumpuk (Pink + Ungu) */
+        filter: drop-shadow(0 0 5px #ff0080) 
+                drop-shadow(0 0 15px #7928ca)
+                drop-shadow(0 0 30px #ff0080);
+        animation: icon-flicker 4s infinite alternate; /* Animasi kedip */
+    }
+
+    /* Gaya Teks RCELLFEST */
+    .neon-title {
+        font-weight: 900;
+        font-size: 3rem; /* Ukuran teks besar */
+        letter-spacing: 2px;
+        background: linear-gradient(to right, #ff0080, #7928ca, #00f2ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(255, 0, 128, 0.5));
+        margin-top: -10px; /* Biar agak nempel ke icon */
+    }
+
+    /* Animasi Kedip-kedip kayak neon rusak dikit */
+    @keyframes icon-flicker {
+        0%, 18%, 22%, 25%, 53%, 57%, 100% {
+            opacity: 1;
+            filter: drop-shadow(0 0 5px #ff0080) drop-shadow(0 0 15px #7928ca) drop-shadow(0 0 30px #ff0080);
+        }
+        20%, 24%, 55% {
+            opacity: 0.7;
+            filter: none; /* Pas kedip mati, glownya ilang */
+        }
+    }
     </style>
 </head>
 <body>
+    <div class="container text-center">
+    <div class="brand-container">
+        
+        <svg class="neon-icon mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
+        </svg>
+        
+        <h1 class="neon-title">RCELLFEST</h1>
+        <p class="text-secondary">The Ultimate Cyberpunk Music Experience</p>
+
+    </div>
+</div>
+
 
     <div class="hero">
         <div class="hero-content container">
