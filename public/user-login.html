@@ -6,6 +6,8 @@
     <title>User Login | RCELLFEST</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
+
     <style>
         body { background: #0f0c29; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; overflow: hidden; }
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; width: 100%; max-width: 400px; color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
@@ -15,7 +17,14 @@
         .btn-neon:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,0,128,0.6); color: white; }
         .toggle-link { color: #00f2ff; cursor: pointer; text-decoration: underline; }
         
-        /* Custom Scrollbar biar rapi */
+        .btn-google {
+            background: white; color: #333; font-weight: 600; border: none;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 10px; width: 100%; border-radius: 10px; margin-top: 15px;
+            transition: 0.2s;
+        }
+        .btn-google:hover { background: #f1f1f1; transform: scale(1.02); }
+
         .glass-card::-webkit-scrollbar { width: 5px; }
         .glass-card::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
     </style>
@@ -56,6 +65,14 @@
             <button type="submit" class="btn btn-neon" id="btnSubmit">MASUK</button>
         </form>
 
+        <div class="text-center mt-3">
+            <small class="text-white-50">Atau masuk dengan</small>
+            <a href="/auth/google" class="btn-google">
+                <img src="https://authjs.dev/img/providers/google.svg" width="20" alt="Google">
+                <span>Google Account</span>
+            </a>
+        </div>
+
         <p class="mt-3 text-center small text-secondary">
             <span id="textInfo">Belum punya akun?</span> 
             <span class="toggle-link" onclick="toggleMode()">Daftar di sini</span>
@@ -85,10 +102,9 @@
                 info.innerText = "Belum punya akun?";
                 link.innerText = "Daftar di sini";
                 
-                registerFields.classList.add('d-none'); // Sembunyikan Nama, HP, Email
+                registerFields.classList.add('d-none'); 
                 lblIdentifier.innerText = "Email / Username";
                 
-                // Hapus required biar gak error saat login
                 document.getElementById('fullName').removeAttribute('required');
                 document.getElementById('phone').removeAttribute('required');
                 document.getElementById('email').removeAttribute('required');
@@ -99,10 +115,9 @@
                 info.innerText = "Sudah punya akun?";
                 link.innerText = "Login di sini";
                 
-                registerFields.classList.remove('d-none'); // Munculkan field tambahan
-                lblIdentifier.innerText = "Username"; // Input pertama jadi Username saja
+                registerFields.classList.remove('d-none'); 
+                lblIdentifier.innerText = "Username"; 
                 
-                // Tambah required wajib diisi
                 document.getElementById('fullName').setAttribute('required', 'true');
                 document.getElementById('phone').setAttribute('required', 'true');
                 document.getElementById('email').setAttribute('required', 'true');
@@ -115,7 +130,6 @@
             const identifier = document.getElementById('identifier').value;
             const password = document.getElementById('password').value;
             
-            // Ambil data tambahan
             const fullName = document.getElementById('fullName').value;
             const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
@@ -126,7 +140,6 @@
             if (isLogin) {
                 payload = { identifier, password };
             } else {
-                // Payload Register jadi lebih lengkap
                 payload = { 
                     username: identifier, 
                     email: email, 
@@ -155,11 +168,11 @@
                             showConfirmButton: false, timer: 1500
                         }).then(() => {
                             if(data.user.role === 'admin') window.location.href = 'admin.html';
-                            else window.location.href = 'index.html'; // Balik ke halaman utama
+                            else window.location.href = 'index.html'; 
                         });
                     } else {
                         Swal.fire('Sukses', 'Akun berhasil dibuat! Silakan login.', 'success');
-                        toggleMode(); // Otomatis pindah ke mode login
+                        toggleMode(); 
                     }
                 } else {
                     Swal.fire('Gagal', data.message, 'error');
@@ -169,6 +182,38 @@
                 Swal.fire('Error', 'Gagal terhubung ke server', 'error');
             }
         });
+    </script>
+
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('/api/maintenance');
+                const data = await res.json();
+                
+                // Cek Admin Token
+                const isAdmin = localStorage.getItem('adminToken'); 
+
+                // Jika maintenance aktif DAN bukan admin, blokir akses
+                if (data.isActive && !isAdmin) {
+                    document.body.innerHTML = `
+                        <div style="height: 100vh; background: #0e1e3b; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; font-family: sans-serif;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="#f0ad4e" class="bi bi-cone-striped" viewBox="0 0 16 16" style="margin-bottom: 20px;">
+                              <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12m-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098m4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"/>
+                            </svg>
+                            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">SYSTEM MAINTENANCE</h1>
+                            <p style="font-size: 1.2rem; color: #b0c0d6; max-width: 500px; padding: 0 20px;">
+                                Login sedang dinonaktifkan sementara.<br>Silakan coba lagi nanti.
+                            </p>
+                            <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 30px; border-radius: 50px; border: none; background: #0049CC; color: white; font-weight: bold; cursor: pointer;">
+                                Coba Refresh
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.log("Gagal cek maintenance status");
+            }
+        })();
     </script>
 </body>
 </html>
