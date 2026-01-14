@@ -152,7 +152,9 @@ app.post('/api/login', async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                fullName: user.fullName || user.username, // Kirim Nama Lengkap
+                phone: user.phone || ""      // Kirim No HP
             }
         });
     } catch (error) {
