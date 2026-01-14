@@ -1,10 +1,10 @@
-require('dotenv').config();
+Require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const User = require('./models/user'); // Pastikan nama file modelnya benar (User.js atau users.js)
-const Order = require('./models/order'); // Pastikan nama file modelnya benar (Order.js atau order.js)
+const User = require('./models/users'); 
+const Order = require('./models/order'); 
 
 const app = express();
 
@@ -14,7 +14,6 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // --- KONEKSI DATABASE ---
-// Tips: Sebaiknya connection string ditaruh di .env, tapi hardcode begini jalan buat development.
 mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority")
   .then(() => console.log('✅ DATABASE NYAMBUNG BANG!'))
   .catch(err => console.log('❌ Gagal Konek:', err));
@@ -27,9 +26,10 @@ const eventSchema = new mongoose.Schema({
     totalCapacity: Number,
     availableSeats: Number,
     description: { type: String, default: "" },
-    // 1. TAMBAHAN: Field Category & Location (PERBAIKAN SINTAKS)
+    // 1. TAMBAHAN: Field Category
     category: { type: String, default: "General" }, 
-    location: { type: String, default: "TBA" } // <--- INI CARA NULIS YANG BENAR
+  location: location || "TBA"
+        
 });
 
 const Event = mongoose.model('Event', eventSchema); 
@@ -49,7 +49,8 @@ app.get('/api/events', async (req, res) => {
 // 2. Tambah Konser Baru (Create)
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, date, price, capacity, description, category, location } = req.body;
+        // Ambil category dari body
+        const { name, date, price, capacity, description, category, location} = req.body;
         
         const newEvent = new Event({
             name,
@@ -57,9 +58,9 @@ app.post('/api/events', async (req, res) => {
             price,
             totalCapacity: capacity,
             availableSeats: capacity,
-            description: description,
+            description: description, // JANGAN LUPA KOMA DI SINI
             category: category, 
-            location: location // <--- PERBAIKAN: Pakai titik dua, bukan sama dengan
+            event.location = location// Simpan kategori yang dipilih admin
         });
         await newEvent.save();
         res.json(newEvent);
@@ -72,6 +73,7 @@ app.post('/api/events', async (req, res) => {
 app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        // Ambil category dari frontend untuk diupdate
         const { name, date, price, capacity, availableSeats, description, category, location } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -84,9 +86,9 @@ app.put('/api/events/:id', async (req, res) => {
             price, 
             totalCapacity: capacity,
             availableSeats: availableSeats,
-            description: description,
-            category: category,
-            location: location // <--- PERBAIKAN SINTAKS
+            description: description, // JANGAN LUPA KOMA
+            category: category, // ISI DENGAN VARIABLE, BUKAN SCHEMA
+          event.location = location
         }, { new: true }); 
 
         res.json({ message: "Sukses update!", data: updatedEvent });
@@ -110,7 +112,7 @@ app.delete('/api/events/:id', async (req, res) => {
 // --- 1. REGISTER USER BARU ---
 app.post('/api/register', async (req, res) => {
     try {
-        const { username, email, password, role, fullName, phone } = req.body;
+        const { username, email, password, role,  fullName, phone} = req.body;
         
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
@@ -122,8 +124,8 @@ app.post('/api/register', async (req, res) => {
             email, 
             password: hashedPassword,
             role: role || 'user',
-            fullName: fullName, 
-            phone: phone
+            fullName: fullName, // Simpan Nama Lengkap
+            phone: phone        // Simpan No HP
         });
         
         await newUser.save();
@@ -155,8 +157,8 @@ app.post('/api/login', async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                fullName: user.fullName || user.username, 
-                phone: user.phone || ""
+                fullName: user.fullName || user.username, // Kirim Nama Lengkap
+                phone: user.phone || ""      // Kirim No HP
             }
         });
     } catch (error) {
@@ -187,10 +189,7 @@ app.post('/api/order', async (req, res) => {
         event.availableSeats -= quantity;
         await event.save();
 
-        // --- UPDATE PENTING: KODE PENDEK BIAR BISA DISCAN ---
-        // Format: RCELL-XXXXX (Bukan Timestamp panjang)
-        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-        const ticketCode = "RCELL-" + randomStr;
+        const ticketCode = "TIKET-" + Date.now() + Math.floor(Math.random() * 1000);
 
         const newOrder = new Order({
             ticketCode,
@@ -252,13 +251,11 @@ app.put('/api/user/update-name', async (req, res) => {
     try {
         const { userId, newName } = req.body;
         
+        // Cari user dan update namanya
         const user = await User.findById(userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
         user.username = newName;
-        // Kalau mau update fullName juga:
-        if(user.fullName) user.fullName = newName; 
-        
         await user.save();
 
         res.json({ success: true, message: "Nama berhasil diubah" });
@@ -275,9 +272,11 @@ app.put('/api/user/change-password', async (req, res) => {
         const user = await User.findById(userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
+        // Cek password lama benar atau tidak
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
 
+        // Enkripsi password baru
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedNewPassword;
         await user.save();
@@ -290,4 +289,4 @@ app.put('/api/user/change-password', async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); 
