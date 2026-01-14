@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 // --- PERHATIKAN HURUF BESAR/KECIL NAMA FILE ---
 // Pastikan file di folder models namanya User.js dan Order.js (Huruf depan Besar)
 // Kalau filenya users.js (kecil), ganti jadi './models/users'
-const User = require('./models/user'); 
+const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event'); // Tambahkan ini biar rapi
 
