@@ -152,7 +152,9 @@
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        document.getElementById('userNameDisplay').innerText = "Hai, " + user.username;
+        // UPDATE: Tampilkan Nama Lengkap di Navbar (Fallback ke username jika nama kosong)
+        const displayName = user.fullName ? user.fullName : user.username;
+        document.getElementById('userNameDisplay').innerText = "Hai, " + displayName;
 
         // 2. Ambil Data Tiket
         async function loadTickets() {
@@ -177,24 +179,28 @@
                     return;
                 }
 
-                // TAHAP 1: Render HTML (Card Style Baru)
+                // TAHAP 1: Render HTML
                 tickets.forEach(t => {
                     const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
                     const isUsed = t.status === 'used';
                     
-                    // Logic Warna Status
                     const statusBadge = isUsed 
                         ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
                         : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
                     
-                    const cardOpacity = isUsed ? 'opacity-75' : ''; // Agak pudar kalau udah dipake
+                    const cardOpacity = isUsed ? 'opacity-75' : '';
+
+                    // UPDATE PENTING:
+                    // Di sini kita pakai 'displayName' (Nama Lengkap Akun) sebagai Pemesan
+                    // Kalau mau sesuai data database order lama, pakai t.customerName
+                    const pemesanName = displayName; 
 
                     list.innerHTML += `
                         <div class="col-md-6 col-lg-4">
                             <div class="ticket-card ${cardOpacity}">
                                 <div class="ticket-header">
                                     <h5 class="fw-bold mb-1 text-truncate">${eventName}</h5>
-                                    <small class="opacity-75"><i class="bi bi-calendar-event me-1"></i> ${new Date(t.purchaseDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</small>
+                                    <small class="opacity-75"><i class="bi bi-calendar-event me-1"></i> ${new Date(t.purchaseDate || Date.now()).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</small>
                                 </div>
                                 
                                 <div class="ticket-body text-center">
@@ -207,21 +213,21 @@
                                     <div class="ticket-code-badge mb-3">${t.ticketCode}</div>
                                     
                                     <div class="mb-2">${statusBadge}</div>
-                                    <small class="text-muted">Pemesan: <b>${t.customerName}</b></small>
+                                    <small class="text-muted">Pemesan: <b>${pemesanName}</b></small>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
 
-                // TAHAP 2: Generate QR Code (Logic Tetap)
+                // TAHAP 2: Generate QR Code
                 tickets.forEach(t => {
                     const container = document.getElementById(`qrcode-${t._id}`);
-                    container.innerHTML = ""; // Bersihkan
+                    container.innerHTML = ""; 
 
                     new QRCode(container, {
                         text: t.ticketCode,
-                        width: 150, // Sedikit lebih besar
+                        width: 150,
                         height: 150,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
