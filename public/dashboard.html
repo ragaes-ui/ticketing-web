@@ -26,83 +26,37 @@
             padding-top: 80px;
         }
 
-        /* Navbar Simple */
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .navbar-brand {
-            font-weight: 800;
-            color: var(--primary-color) !important;
-            font-size: 1.2rem;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
         .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
+
+        /* Card Profil Baru */
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+        }
 
         /* Card Tiket */
         .ticket-card {
-            background: white;
-            border: none;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            background: white; border: none; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; height: 100%; display: flex; flex-direction: column;
         }
+        .ticket-header { background: linear-gradient(135deg, #0064d2, #55aaff); color: white; padding: 15px 20px; position: relative; }
+        .ticket-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; border-top: 2px dashed #e5e7eb; position: relative; }
+        .ticket-body::before, .ticket-body::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%; }
+        .ticket-body::before { left: -10px; } .ticket-body::after { right: -10px; }
+        .qr-container { padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; margin: 15px 0; background: #fff; }
+        .ticket-code-badge { font-family: monospace; background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; font-weight: 600; border: 1px dashed #d1d5db; }
+        .status-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         
-        .ticket-header {
-            background: linear-gradient(135deg, #0064d2, #55aaff);
-            color: white;
-            padding: 15px 20px;
-            position: relative;
-        }
-        
-        .ticket-body {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-top: 2px dashed #e5e7eb;
-            position: relative;
-        }
-        
-        /* Lingkaran sobekan tiket */
-        .ticket-body::before, .ticket-body::after {
-            content: ''; position: absolute; top: -10px; 
-            width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%;
-        }
-        .ticket-body::before { left: -10px; }
-        .ticket-body::after { right: -10px; }
-
-        .qr-container {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            margin: 15px 0;
-            background: #fff;
-        }
-
-        .ticket-code-badge {
-            font-family: monospace;
-            background: #f3f4f6;
-            color: #374151;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            font-weight: 600;
-            border: 1px dashed #d1d5db;
-        }
-
-        .status-badge {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        /* Modal Style */
+        .modal-content { border-radius: 16px; border: none; }
+        .modal-header { border-bottom: 1px solid #f0f0f0; }
+        .modal-footer { border-top: 1px solid #f0f0f0; }
     </style>
 </head>
 <body>
@@ -115,9 +69,9 @@
                 </svg>
                 RCELLFEST
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="small fw-bold text-secondary d-none d-md-block" id="userNameDisplay">Loading...</span>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+            <div class="d-flex align-items-center gap-2">
+                <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none d-md-block">Beranda</a>
+                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3">
                     <i class="bi bi-box-arrow-right"></i> Keluar
                 </button>
             </div>
@@ -125,14 +79,38 @@
     </nav>
 
     <div class="container pb-5">
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <h3 class="fw-bold text-dark">E-Tiket Saya</h3>
-                <p class="text-secondary small">Tunjukkan QR Code ini kepada petugas saat masuk venue.</p>
+        
+        <div class="profile-card">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0" id="userNameDisplay">Loading...</h5>
+                            <small class="text-secondary" id="userEmailDisplay">...</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button onclick="openNameModal()" class="btn btn-outline-primary btn-sm rounded-pill me-2">
+                        <i class="bi bi-pencil-square"></i> Ubah Nama
+                    </button>
+                    <button onclick="openPassModal()" class="btn btn-outline-dark btn-sm rounded-pill">
+                        <i class="bi bi-key"></i> Ganti Password
+                    </button>
+                </div>
             </div>
-            <div class="col-md-4 text-md-end mt-2 mt-md-0">
-                <a href="index.html" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                    <i class="bi bi-plus-lg me-1"></i> Beli Tiket Baru
+        </div>
+
+        <div class="row mb-4 align-items-center">
+            <div class="col-6">
+                <h4 class="fw-bold text-dark m-0">Tiket Saya</h4>
+            </div>
+            <div class="col-6 text-end">
+                <a href="index.html" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-plus-lg"></i> Beli Baru
                 </a>
             </div>
         </div>
@@ -145,18 +123,145 @@
         </div>
     </div>
 
+    <div class="modal fade" id="nameModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Ubah Nama Profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label small text-secondary">Nama Baru</label>
+                    <input type="text" id="inputNewName" class="form-control" placeholder="Masukkan nama baru">
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button onclick="saveName()" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Ganti Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Password Lama</label>
+                        <input type="password" id="oldPass" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Password Baru</label>
+                        <input type="password" id="newPass" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button onclick="savePassword()" class="btn btn-dark">Update Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // 1. Cek Login
+        // INIT DATA USER
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        const displayName = user.fullName ? user.fullName : user.username;
-        document.getElementById('userNameDisplay').innerText = "Hai, " + displayName;
+        // Tampilkan Nama & Email di Profil Card
+        function renderProfile() {
+            document.getElementById('userNameDisplay').innerText = user.username;
+            document.getElementById('userEmailDisplay').innerText = user.email;
+        }
+        renderProfile();
 
-        // 2. Ambil Data Tiket
+        // --- 1. LOGIC UBAH NAMA ---
+        const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
+
+        function openNameModal() {
+            document.getElementById('inputNewName').value = user.username;
+            nameModal.show();
+        }
+
+        async function saveName() {
+            const newName = document.getElementById('inputNewName').value;
+            if(!newName) return Swal.fire('Error', 'Nama tidak boleh kosong', 'warning');
+
+            try {
+                const res = await fetch('/api/user/update-name', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, newName: newName }) // Kirim ID dan Nama Baru
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    // Update LocalStorage biar gak perlu login ulang
+                    user.username = newName;
+                    localStorage.setItem('userData', JSON.stringify(user));
+                    
+                    renderProfile(); // Update tampilan
+                    nameModal.hide();
+                    Swal.fire('Berhasil', 'Nama profil berhasil diubah!', 'success');
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        // --- 2. LOGIC GANTI PASSWORD ---
+        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
+
+        function openPassModal() {
+            document.getElementById('oldPass').value = '';
+            document.getElementById('newPass').value = '';
+            passModal.show();
+        }
+
+        async function savePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+
+            if(!oldPass || !newPass) return Swal.fire('Warning', 'Isi semua kolom password', 'warning');
+
+            try {
+                const res = await fetch('/api/user/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, oldPassword: oldPass, newPassword: newPass })
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    passModal.hide();
+                    Swal.fire({
+                        title: 'Password Diubah',
+                        text: 'Silakan login ulang demi keamanan.',
+                        icon: 'success',
+                        confirmButtonText: 'Login Ulang'
+                    }).then(() => {
+                        logout();
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        // --- LOAD TIKET (LOGIC LAMA) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
-            
             try {
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST',
@@ -167,85 +272,43 @@
 
                 list.innerHTML = '';
                 if(tickets.length === 0) {
-                    list.innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <i class="bi bi-ticket-perforated display-1 text-secondary opacity-25"></i>
-                            <p class="mt-3 text-secondary">Kamu belum memiliki tiket aktif.</p>
-                            <a href="index.html" class="btn btn-outline-primary btn-sm">Cari Event Sekarang</a>
-                        </div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Belum ada tiket.</p></div>`;
                     return;
                 }
 
                 tickets.forEach(t => {
-                    // AMBIL DATA EVENT
                     const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
-                    
-                    // --- PERBAIKAN TANGGAL EVENT ---
-                    // Mengambil t.eventId.date (bukan tanggal pembelian)
                     let eventDateStr = "Tanggal Belum Ditentukan";
                     if(t.eventId && t.eventId.date) {
-                        eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', {
-                            weekday: 'long', 
-                            day: 'numeric', 
-                            month: 'long', 
-                            year: 'numeric'
-                        });
+                        eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     }
-
                     const isUsed = t.status === 'used';
-                    const statusBadge = isUsed 
-                        ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
-                        : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
-                    
+                    const statusBadge = isUsed ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
                     const cardOpacity = isUsed ? 'opacity-75' : '';
-                    const pemesanName = displayName; 
 
                     list.innerHTML += `
                         <div class="col-md-6 col-lg-4">
                             <div class="ticket-card ${cardOpacity}">
                                 <div class="ticket-header">
                                     <h5 class="fw-bold mb-1 text-truncate">${eventName}</h5>
-                                    
-                                    <small class="opacity-100 fw-bold">
-                                        <i class="bi bi-calendar-check me-1"></i> ${eventDateStr}
-                                    </small>
+                                    <small class="opacity-100 fw-bold"><i class="bi bi-calendar-check me-1"></i> ${eventDateStr}</small>
                                 </div>
-                                
                                 <div class="ticket-body text-center">
-                                    <small class="text-secondary fw-bold mb-2">SCAN QR DI PINTU MASUK</small>
-                                    
-                                    <div class="qr-container shadow-sm">
-                                        <div id="qrcode-${t._id}"></div>
-                                    </div>
-                                    
+                                    <div class="qr-container shadow-sm"><div id="qrcode-${t._id}"></div></div>
                                     <div class="ticket-code-badge mb-3">${t.ticketCode}</div>
-                                    
                                     <div class="mb-2">${statusBadge}</div>
-                                    <small class="text-muted">Pemesan: <b>${pemesanName}</b></small>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
 
-                // Generate QR Code
                 tickets.forEach(t => {
                     const container = document.getElementById(`qrcode-${t._id}`);
                     container.innerHTML = ""; 
-                    new QRCode(container, {
-                        text: t.ticketCode,
-                        width: 150,
-                        height: 150,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    });
+                    new QRCode(container, { text: t.ticketCode, width: 150, height: 150 });
                 });
-
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = '<p class="text-danger text-center">Gagal memuat data tiket.</p>';
-            }
+            } catch (err) { console.error(err); }
         }
 
         function logout() {
