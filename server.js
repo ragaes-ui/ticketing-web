@@ -1,10 +1,15 @@
-Require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const User = require('./models/users'); 
+
+// --- PERHATIKAN HURUF BESAR/KECIL NAMA FILE ---
+// Pastikan file di folder models namanya User.js dan Order.js (Huruf depan Besar)
+// Kalau filenya users.js (kecil), ganti jadi './models/users'
+const User = require('./models/user'); 
 const Order = require('./models/order'); 
+const Event = require('./models/event'); // Tambahkan ini biar rapi
 
 const app = express();
 
@@ -17,22 +22,6 @@ app.use(express.static('public'));
 mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority")
   .then(() => console.log('✅ DATABASE NYAMBUNG BANG!'))
   .catch(err => console.log('❌ Gagal Konek:', err));
-
-// --- DEFINISI SCHEMA KONSER ---
-const eventSchema = new mongoose.Schema({
-    name: String,
-    date: Date,
-    price: Number,
-    totalCapacity: Number,
-    availableSeats: Number,
-    description: { type: String, default: "" },
-    // 1. TAMBAHAN: Field Category
-    category: { type: String, default: "General" }, 
-  location: location || "TBA"
-        
-});
-
-const Event = mongoose.model('Event', eventSchema); 
 
 // --- ROUTES API ---
 
@@ -49,8 +38,7 @@ app.get('/api/events', async (req, res) => {
 // 2. Tambah Konser Baru (Create)
 app.post('/api/events', async (req, res) => {
     try {
-        // Ambil category dari body
-        const { name, date, price, capacity, description, category, location} = req.body;
+        const { name, date, price, capacity, description, category, location } = req.body;
         
         const newEvent = new Event({
             name,
@@ -58,9 +46,9 @@ app.post('/api/events', async (req, res) => {
             price,
             totalCapacity: capacity,
             availableSeats: capacity,
-            description: description, // JANGAN LUPA KOMA DI SINI
-            category: category, 
-            event.location = location// Simpan kategori yang dipilih admin
+            description: description || "",
+            category: category || "General",
+            location: location || "TBA" // ✅ SUDAH DIPERBAIKI (Pakai titik dua)
         });
         await newEvent.save();
         res.json(newEvent);
@@ -73,7 +61,6 @@ app.post('/api/events', async (req, res) => {
 app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        // Ambil category dari frontend untuk diupdate
         const { name, date, price, capacity, availableSeats, description, category, location } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -86,9 +73,9 @@ app.put('/api/events/:id', async (req, res) => {
             price, 
             totalCapacity: capacity,
             availableSeats: availableSeats,
-            description: description, // JANGAN LUPA KOMA
-            category: category, // ISI DENGAN VARIABLE, BUKAN SCHEMA
-          event.location = location
+            description: description,
+            category: category,
+            location: location // ✅ SUDAH DIPERBAIKI
         }, { new: true }); 
 
         res.json({ message: "Sukses update!", data: updatedEvent });
@@ -112,7 +99,7 @@ app.delete('/api/events/:id', async (req, res) => {
 // --- 1. REGISTER USER BARU ---
 app.post('/api/register', async (req, res) => {
     try {
-        const { username, email, password, role,  fullName, phone} = req.body;
+        const { username, email, password, role, fullName, phone } = req.body;
         
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
@@ -124,8 +111,8 @@ app.post('/api/register', async (req, res) => {
             email, 
             password: hashedPassword,
             role: role || 'user',
-            fullName: fullName, // Simpan Nama Lengkap
-            phone: phone        // Simpan No HP
+            fullName: fullName, 
+            phone: phone
         });
         
         await newUser.save();
@@ -157,8 +144,8 @@ app.post('/api/login', async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                fullName: user.fullName || user.username, // Kirim Nama Lengkap
-                phone: user.phone || ""      // Kirim No HP
+                fullName: user.fullName || user.username, 
+                phone: user.phone || ""
             }
         });
     } catch (error) {
@@ -189,7 +176,8 @@ app.post('/api/order', async (req, res) => {
         event.availableSeats -= quantity;
         await event.save();
 
-        const ticketCode = "TIKET-" + Date.now() + Math.floor(Math.random() * 1000);
+        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const ticketCode = "RCELL-" + randomStr;
 
         const newOrder = new Order({
             ticketCode,
@@ -213,18 +201,10 @@ app.post('/api/order', async (req, res) => {
 app.post('/api/validate', async (req, res) => {
     try {
         const { ticketCode } = req.body;
-        console.log("📡 Menerima Scan Kode:", ticketCode);
-
         const ticket = await Order.findOne({ ticketCode: ticketCode.trim() }).populate('eventId');
-        console.log("🔎 Hasil Pencarian di DB:", ticket);
 
-        if (!ticket) {
-            return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
-        }
-
-        if (ticket.status === 'used') {
-            return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
-        }
+        if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
+        if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
 
         ticket.status = 'used';
         await ticket.save();
@@ -232,61 +212,43 @@ app.post('/api/validate', async (req, res) => {
         res.json({ 
             valid: true, 
             message: "TIKET VALID! SILAKAN MASUK ✅", 
-            data: {
-                name: ticket.customerName,
-                event: ticket.eventId ? ticket.eventId.name : 'Event Tidak Diketahui'
-            }
+            data: { name: ticket.customerName, event: ticket.eventId ? ticket.eventId.name : 'Event Tidak Diketahui' }
         });
 
     } catch (error) {
-        console.error("❌ Error Validasi:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- TAMBAHAN: UPDATE PROFIL USER ---
-
-// 1. API Ubah Nama
+// --- API PROFILE USER ---
 app.put('/api/user/update-name', async (req, res) => {
     try {
         const { userId, newName } = req.body;
-        
-        // Cari user dan update namanya
         const user = await User.findById(userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
         user.username = newName;
+        if(user.fullName) user.fullName = newName;
         await user.save();
-
         res.json({ success: true, message: "Nama berhasil diubah" });
-    } catch (error) {
-        res.status(500).json({ message: "Gagal update nama", error: error.message });
-    }
+    } catch (error) { res.status(500).json({ message: "Gagal update", error: error.message }); }
 });
 
-// 2. API Ganti Password
 app.put('/api/user/change-password', async (req, res) => {
     try {
         const { userId, oldPassword, newPassword } = req.body;
-
         const user = await User.findById(userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
-        // Cek password lama benar atau tidak
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
 
-        // Enkripsi password baru
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedNewPassword;
+        user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
-
         res.json({ success: true, message: "Password berhasil diganti" });
-    } catch (error) {
-        res.status(500).json({ message: "Gagal ganti password", error: error.message });
-    }
+    } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
 });
 
 const PORT = process.env.PORT || 5000;
-module.exports = app;
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); 
+module.exports = app; // PENTING BUAT VERCEL
+app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
