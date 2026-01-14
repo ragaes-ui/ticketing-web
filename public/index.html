@@ -88,7 +88,9 @@
 
         /* Icon Categories */
         .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
-        .category-item:hover { background: #f0f7ff; }
+        .category-item:hover, .category-item.active { background: #f0f7ff; transform: scale(1.05); }
+        .category-item.active .cat-text { color: var(--primary-blue); font-weight: 800; }
+        
         .icon-circle {
             width: 45px; height: 45px; background: #e6f0ff; color: var(--primary-blue);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -107,6 +109,11 @@
         .card-img-top {
             height: 160px; background: linear-gradient(135deg, #0049CC, #4facfe);
             position: relative; display: flex; align-items: center; justify-content: center; color: white;
+        }
+        .category-badge-img {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.5); color: white; font-size: 0.7rem; 
+            padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px);
         }
         .date-float {
             position: absolute; bottom: 10px; left: 10px;
@@ -191,26 +198,30 @@
 
     <div class="container">
         <div class="row justify-content-center mb-5 g-2 px-2">
-            <div class="col-3 col-md-2" onclick="resetSearch()">
-                <div class="category-item">
+            
+            <div class="col-3 col-md-2" onclick="filterCategory('All')">
+                <div class="category-item" id="btn-cat-All">
                     <div class="icon-circle"><i class="bi bi-grid-fill"></i></div>
                     <div class="cat-text">Semua</div>
                 </div>
             </div>
-            <div class="col-3 col-md-2">
-                <div class="category-item">
+
+            <div class="col-3 col-md-2" onclick="filterCategory('Konser')">
+                <div class="category-item" id="btn-cat-Konser">
                     <div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div>
                     <div class="cat-text">Konser</div>
                 </div>
             </div>
-            <div class="col-3 col-md-2">
-                <div class="category-item">
+
+            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')">
+                <div class="category-item" id="btn-cat-Olahraga">
                     <div class="icon-circle"><i class="bi bi-trophy-fill"></i></div>
                     <div class="cat-text">Olahraga</div>
                 </div>
             </div>
-            <div class="col-3 col-md-2">
-                <div class="category-item">
+
+            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')">
+                <div class="category-item" id="btn-cat-Workshop">
                     <div class="icon-circle"><i class="bi bi-palette-fill"></i></div>
                     <div class="cat-text">Workshop</div>
                 </div>
@@ -219,7 +230,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
             <h5 class="fw-bold m-0">🔥 Pilihan Hari Ini</h5>
-            <a href="#" class="text-decoration-none fw-bold small" onclick="resetSearch()">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+            <a href="#" class="text-decoration-none fw-bold small" onclick="filterCategory('All')">Lihat Semua <i class="bi bi-arrow-right"></i></a>
         </div>
 
         <div class="row g-3" id="event-list">
@@ -265,14 +276,14 @@
             <div class="modal-content">
                 <div class="position-relative">
                     <div class="modal-header-img">
-                        <i class="bi bi-music-note-beamed"></i>
+                        <i class="bi bi-ticket-perforated-fill"></i>
                     </div>
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <span class="badge bg-primary mb-2" id="modalCategory">Konser</span>
+                            <span class="badge bg-primary mb-2" id="modalCategory">General</span>
                             <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
                             <div class="text-secondary small"><i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue">ICE BSD City</span> &bull; <span id="modalDate">Tanggal</span></div>
                         </div>
@@ -345,8 +356,25 @@
             try {
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
-                renderEvents(allEvents);
+                renderEvents(allEvents); // Tampilkan semua saat awal load
             } catch (err) { console.error(err); }
+        }
+
+        // FUNGSI BARU: FILTER KATEGORI
+        function filterCategory(category) {
+            // 1. Reset visual tombol active
+            document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`btn-cat-${category}`).classList.add('active');
+
+            // 2. Filter Data
+            if (category === 'All') {
+                renderEvents(allEvents);
+            } else {
+                // Filter array berdasarkan category yang ada di database
+                // (Pastikan di database tulisannya sama persis, misal "Konser")
+                const filtered = allEvents.filter(e => e.category === category);
+                renderEvents(filtered);
+            }
         }
 
         function renderEvents(data) {
@@ -354,7 +382,7 @@
             container.innerHTML = ''; 
 
             if(data.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Event tidak ditemukan.</p><button onclick="resetSearch()" class="btn btn-link btn-sm">Reset</button></div>`;
+                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Tidak ada event untuk kategori ini.</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">Lihat Semua Event</button></div>`;
                 return;
             }
 
@@ -362,12 +390,16 @@
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isSoldOut = event.availableSeats <= 0;
                 const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                
+                // Set default kategori jika kosong
+                const catName = event.category || 'General'; 
 
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card-event" onclick="showDetail('${event._id}')">
                             <div class="card-img-top">
-                                <i class="bi bi-music-note-beamed fs-1 opacity-50"></i>
+                                <i class="bi bi-ticket-perforated fs-1 opacity-50"></i>
+                                <span class="category-badge-img">${catName}</span>
                                 <div class="date-float">${dateStr}</div>
                             </div>
                             <div class="card-body">
@@ -395,7 +427,9 @@
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
             
-            // PENTING: Ambil deskripsi dari database. Jika kosong, tampilkan pesan default.
+            // Tampilkan kategori di modal
+            document.getElementById('modalCategory').innerText = event.category || "Event";
+            
             document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
 
             const btnBuy = document.getElementById('btnModalBuy');
@@ -431,7 +465,7 @@
         
         function resetSearch() {
             document.getElementById('searchInput').value = '';
-            renderEvents(allEvents);
+            filterCategory('All'); // Reset ke semua kategori
         }
 
         async function buyTicket(eventId) {
