@@ -143,7 +143,7 @@
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
                 <h3 class="fw-bold text-dark m-0">Event Management</h3>
-                <p class="text-secondary small m-0">Kelola jadwal konser, harga, dan ketersediaan tiket.</p>
+                <p class="text-secondary small m-0">Kelola jadwal konser, harga, deskripsi, dan tiket.</p>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <div class="d-inline-flex gap-3">
@@ -175,6 +175,12 @@
                                 <label class="form-label">Tanggal Pelaksanaan</label>
                                 <input type="date" id="date" class="form-control" required>
                             </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi Event</label>
+                                <textarea id="description" class="form-control" rows="3" placeholder="Tulis info artis, syarat & ketentuan..."></textarea>
+                            </div>
+
                             <div class="row g-2">
                                 <div class="col-6 mb-3">
                                     <label class="form-label">Harga Tiket (Rp)</label>
@@ -240,6 +246,11 @@
                             <label class="form-label">Tanggal</label>
                             <input type="date" id="editDate" class="form-control bg-light" required>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea id="editDescription" class="form-control bg-light" rows="4"></textarea>
+                        </div>
                         
                         <div class="row g-3">
                             <div class="col-6">
@@ -273,25 +284,27 @@
     
     <script>
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        let eventsData = []; // Menyimpan data global agar mudah diakses saat edit
 
         // 1. Load Events
         async function loadTable() {
             try {
                 const res = await fetch('/api/events');
-                const events = await res.json();
+                eventsData = await res.json(); // Simpan ke variabel global
+                
                 const tbody = document.getElementById('tableBody');
                 
                 // Update Badge Counter
-                document.getElementById('totalEventBadge').innerText = events.length;
+                document.getElementById('totalEventBadge').innerText = eventsData.length;
 
                 tbody.innerHTML = '';
 
-                if(events.length === 0) {
+                if(eventsData.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-secondary">Belum ada event yang dibuat. Silakan tambah di menu sebelah kiri.</td></tr>`;
                     return;
                 }
 
-                events.forEach(ev => {
+                eventsData.forEach(ev => {
                     const date = new Date(ev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                     const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(ev.price);
                     
@@ -317,7 +330,7 @@
                                 <small class="text-muted" style="font-size: 0.65rem;">dari ${ev.totalCapacity}</small>
                             </td>
                             <td class="text-end">
-                                <button onclick="bukaModalEdit('${ev._id}', '${ev.name}', '${ev.date}', '${ev.price}', '${ev.availableSeats}', '${ev.totalCapacity}')" 
+                                <button onclick="bukaModalEdit('${ev._id}')" 
                                     class="btn btn-action btn-outline-secondary me-1" title="Edit">
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
@@ -336,16 +349,24 @@
             }
         }
 
-        // 2. Buka Modal & Isi Data Lama
-        function bukaModalEdit(id, name, date, price, stock, capacity) {
-            document.getElementById('editId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editDate').value = new Date(date).toISOString().split('T')[0];
-            document.getElementById('editPrice').value = price;
-            document.getElementById('editStock').value = stock;
-            document.getElementById('editCapacity').value = capacity;
+        // 2. Buka Modal & Isi Data Lama (Diupdate agar ambil Deskripsi)
+        function bukaModalEdit(id) {
+            // Cari data event berdasarkan ID dari variabel global
+            const ev = eventsData.find(e => e._id === id);
             
-            editModal.show();
+            if (ev) {
+                document.getElementById('editId').value = ev._id;
+                document.getElementById('editName').value = ev.name;
+                document.getElementById('editDate').value = new Date(ev.date).toISOString().split('T')[0];
+                document.getElementById('editPrice').value = ev.price;
+                document.getElementById('editStock').value = ev.availableSeats;
+                document.getElementById('editCapacity').value = ev.totalCapacity;
+                
+                // Isi deskripsi (jika kosong, kasih string kosong)
+                document.getElementById('editDescription').value = ev.description || '';
+                
+                editModal.show();
+            }
         }
 
         // 3. Simpan Perubahan (Update)
@@ -355,11 +376,11 @@
                 name: document.getElementById('editName').value,
                 date: document.getElementById('editDate').value,
                 price: document.getElementById('editPrice').value,
+                description: document.getElementById('editDescription').value, // Kirim Deskripsi Baru
                 availableSeats: document.getElementById('editStock').value,
                 capacity: document.getElementById('editCapacity').value
             };
 
-            // Loading Alert
             Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
 
             try {
@@ -393,7 +414,8 @@
                 name: document.getElementById('name').value,
                 date: document.getElementById('date').value,
                 price: document.getElementById('price').value,
-                capacity: document.getElementById('capacity').value
+                capacity: document.getElementById('capacity').value,
+                description: document.getElementById('description').value // Ambil Deskripsi
             };
 
             try {
@@ -456,7 +478,6 @@
             })
         }
 
-        // Jalankan saat halaman dibuka
         loadTable();
     </script>
 </body>
