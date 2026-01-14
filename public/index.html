@@ -476,6 +476,8 @@
             }
             const user = JSON.parse(userRaw);
             const event = allEvents.find(e => e._id === eventId);
+            // LOGIC BARU: Gunakan Nama Lengkap jika ada, jika tidak pakai Username
+            const namaPemesan = user.fullName ? user.fullName : user.username;
 
             const confirm = await Swal.fire({
                 title: 'Konfirmasi Pembelian',
@@ -493,7 +495,7 @@
                 try {
                     const res = await fetch('/api/order', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ eventId, quantity: 1, customerName: user.username, customerEmail: user.email })
+                        body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email })
                     });
                     const data = await res.json();
                     if (res.ok) {
