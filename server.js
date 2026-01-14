@@ -27,7 +27,9 @@ const eventSchema = new mongoose.Schema({
     availableSeats: Number,
     description: { type: String, default: "" },
     // 1. TAMBAHAN: Field Category
-    category: { type: String, default: "General" } 
+    category: { type: String, default: "General" }, 
+  location: location || "TBA"
+        
 });
 
 const Event = mongoose.model('Event', eventSchema); 
