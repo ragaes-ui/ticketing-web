@@ -108,7 +108,7 @@ app.delete('/api/events/:id', async (req, res) => {
 // --- 1. REGISTER USER BARU ---
 app.post('/api/register', async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
+        const { username, email, password, role,  fullName, phone} = req.body;
         
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
@@ -119,7 +119,9 @@ app.post('/api/register', async (req, res) => {
             username, 
             email, 
             password: hashedPassword,
-            role: role || 'user'
+            role: role || 'user',
+            fullName: fullName, // Simpan Nama Lengkap
+            phone: phone        // Simpan No HP
         });
         
         await newUser.save();
