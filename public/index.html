@@ -123,7 +123,7 @@
 
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; }
-        .event-venue { font-size: 0.8rem; color: #888; margin-bottom: 15px; }
+        .event-venue { font-size: 0.8rem; color: #888; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
         
         .btn-outline-book {
@@ -191,7 +191,7 @@
     <div class="search-wrapper mb-4">
         <div class="search-box">
             <i class="bi bi-search text-secondary ms-2"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
             <button onclick="searchEvent()" class="btn-search">Cari</button>
         </div>
     </div>
@@ -297,7 +297,11 @@
                         <div>
                             <span class="badge bg-primary mb-2" id="modalCategory">General</span>
                             <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
-                            <div class="text-secondary small"><i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue">ICE BSD City</span> &bull; <span id="modalDate">Tanggal</span></div>
+                            
+                            <div class="text-secondary small mt-2">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
+                                &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -305,7 +309,7 @@
                     
                     <h6 class="fw-bold">Deskripsi Event</h6>
                     <p class="modal-desc-text" id="modalDesc">
-                        </p>
+                    </p>
 
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -368,22 +372,17 @@
             try {
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
-                renderEvents(allEvents); // Tampilkan semua saat awal load
+                renderEvents(allEvents);
             } catch (err) { console.error(err); }
         }
 
-        // FUNGSI BARU: FILTER KATEGORI
         function filterCategory(category) {
-            // 1. Reset visual tombol active
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`btn-cat-${category}`).classList.add('active');
 
-            // 2. Filter Data
             if (category === 'All') {
                 renderEvents(allEvents);
             } else {
-                // Filter array berdasarkan category yang ada di database
-                // (Pastikan di database tulisannya sama persis, misal "Konser")
                 const filtered = allEvents.filter(e => e.category === category);
                 renderEvents(filtered);
             }
@@ -403,8 +402,9 @@
                 const isSoldOut = event.availableSeats <= 0;
                 const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
                 
-                // Set default kategori jika kosong
                 const catName = event.category || 'General'; 
+                // AMBIL LOKASI (Default TBA jika kosong)
+                const locationName = event.location || 'Lokasi TBA';
 
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
@@ -416,7 +416,11 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="event-title text-truncate">${event.name}</h5>
-                                <div class="event-venue"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ICE BSD</div>
+                                
+                                <div class="event-venue text-truncate">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
+                                </div>
+                                
                                 <div class="price-val">Rp ${harga}</div>
                                 <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
                                     ${isSoldOut ? 'HABIS' : 'BELI'}
@@ -438,9 +442,10 @@
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
-            
-            // Tampilkan kategori di modal
             document.getElementById('modalCategory').innerText = event.category || "Event";
+            
+            // UPDATE: TAMPILKAN LOKASI DI MODAL
+            document.getElementById('modalVenue').innerText = event.location || "TBA";
             
             document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
 
@@ -467,7 +472,11 @@
 
         function searchEvent() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword));
+            // FILTER: Nama ATAU Lokasi
+            const filtered = allEvents.filter(e => 
+                e.name.toLowerCase().includes(keyword) || 
+                (e.location && e.location.toLowerCase().includes(keyword))
+            );
             renderEvents(filtered);
         }
 
@@ -477,7 +486,7 @@
         
         function resetSearch() {
             document.getElementById('searchInput').value = '';
-            filterCategory('All'); // Reset ke semua kategori
+            filterCategory('All');
         }
 
         async function buyTicket(eventId) {
@@ -488,7 +497,6 @@
             }
             const user = JSON.parse(userRaw);
             const event = allEvents.find(e => e._id === eventId);
-            // LOGIC BARU: Gunakan Nama Lengkap jika ada, jika tidak pakai Username
             const namaPemesan = user.fullName ? user.fullName : user.username;
 
             const confirm = await Swal.fire({
