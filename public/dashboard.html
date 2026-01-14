@@ -171,18 +171,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // INIT DATA USER
+        // 1. INIT DATA USER
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
         // Tampilkan Nama & Email di Profil Card
         function renderProfile() {
-            document.getElementById('userNameDisplay').innerText = user.username;
+            // Priority: fullName > username > 'User'
+            const displayName = user.fullName || user.username || 'User';
+            document.getElementById('userNameDisplay').innerText = displayName;
             document.getElementById('userEmailDisplay').innerText = user.email;
         }
         renderProfile();
 
-        // --- 1. LOGIC UBAH NAMA ---
+        // --- 2. LOGIC UBAH NAMA ---
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
 
         function openNameModal() {
@@ -198,27 +200,24 @@
                 const res = await fetch('/api/user/update-name', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: user.id, newName: newName }) // Kirim ID dan Nama Baru
+                    body: JSON.stringify({ userId: user.id, newName: newName }) 
                 });
                 const data = await res.json();
 
                 if(res.ok) {
-                    // Update LocalStorage biar gak perlu login ulang
                     user.username = newName;
                     localStorage.setItem('userData', JSON.stringify(user));
                     
-                    renderProfile(); // Update tampilan
+                    renderProfile(); 
                     nameModal.hide();
                     Swal.fire('Berhasil', 'Nama profil berhasil diubah!', 'success');
                 } else {
                     Swal.fire('Gagal', data.message, 'error');
                 }
-            } catch(err) {
-                console.error(err);
-            }
+            } catch(err) { console.error(err); }
         }
 
-        // --- 2. LOGIC GANTI PASSWORD ---
+        // --- 3. LOGIC GANTI PASSWORD ---
         const passModal = new bootstrap.Modal(document.getElementById('passModal'));
 
         function openPassModal() {
@@ -248,18 +247,14 @@
                         text: 'Silakan login ulang demi keamanan.',
                         icon: 'success',
                         confirmButtonText: 'Login Ulang'
-                    }).then(() => {
-                        logout();
-                    });
+                    }).then(() => { logout(); });
                 } else {
                     Swal.fire('Gagal', data.message, 'error');
                 }
-            } catch(err) {
-                console.error(err);
-            }
+            } catch(err) { console.error(err); }
         }
 
-        // --- LOAD TIKET (LOGIC LAMA) ---
+        // --- 4. LOAD TIKET (FIX: Nama Pemesan Muncul) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             try {
@@ -278,12 +273,19 @@
 
                 tickets.forEach(t => {
                     const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
+                    
                     let eventDateStr = "Tanggal Belum Ditentukan";
                     if(t.eventId && t.eventId.date) {
                         eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     }
+                    
+                    // Logic Nama Pemesan (Prioritas: Data Tiket -> Akun Login -> Default)
+                    const namaPemesan = t.customerName || user.username || "Pengunjung";
+
                     const isUsed = t.status === 'used';
-                    const statusBadge = isUsed ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
+                    const statusBadge = isUsed 
+                        ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
+                        : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
                     const cardOpacity = isUsed ? 'opacity-75' : '';
 
                     list.innerHTML += `
@@ -294,9 +296,14 @@
                                     <small class="opacity-100 fw-bold"><i class="bi bi-calendar-check me-1"></i> ${eventDateStr}</small>
                                 </div>
                                 <div class="ticket-body text-center">
+                                    <small class="text-secondary fw-bold mb-2">SCAN QR DI PINTU MASUK</small>
                                     <div class="qr-container shadow-sm"><div id="qrcode-${t._id}"></div></div>
                                     <div class="ticket-code-badge mb-3">${t.ticketCode}</div>
                                     <div class="mb-2">${statusBadge}</div>
+                                    
+                                    <small class="text-muted d-block mt-2 border-top pt-2 w-100">
+                                        Pemesan: <b class="text-dark">${namaPemesan}</b>
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -305,8 +312,10 @@
 
                 tickets.forEach(t => {
                     const container = document.getElementById(`qrcode-${t._id}`);
-                    container.innerHTML = ""; 
-                    new QRCode(container, { text: t.ticketCode, width: 150, height: 150 });
+                    if(container) {
+                        container.innerHTML = ""; 
+                        new QRCode(container, { text: t.ticketCode, width: 150, height: 150 });
+                    }
                 });
             } catch (err) { console.error(err); }
         }
