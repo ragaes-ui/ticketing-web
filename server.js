@@ -240,6 +240,49 @@ app.post('/api/validate', async (req, res) => {
     }
 });
 
+// --- TAMBAHAN: UPDATE PROFIL USER ---
+
+// 1. API Ubah Nama
+app.put('/api/user/update-name', async (req, res) => {
+    try {
+        const { userId, newName } = req.body;
+        
+        // Cari user dan update namanya
+        const user = await User.findById(userId);
+        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
+
+        user.username = newName;
+        await user.save();
+
+        res.json({ success: true, message: "Nama berhasil diubah" });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal update nama", error: error.message });
+    }
+});
+
+// 2. API Ganti Password
+app.put('/api/user/change-password', async (req, res) => {
+    try {
+        const { userId, oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(userId);
+        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
+
+        // Cek password lama benar atau tidak
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
+
+        // Enkripsi password baru
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedNewPassword;
+        await user.save();
+
+        res.json({ success: true, message: "Password berhasil diganti" });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal ganti password", error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 module.exports = app;
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
