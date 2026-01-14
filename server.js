@@ -9,7 +9,8 @@ const bcrypt = require('bcryptjs');
 // Kalau filenya users.js (kecil), ganti jadi './models/users'
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
-const Event = require('./models/event'); // Tambahkan ini biar rapi
+const Event = require('./models/event');
+const Config = require('./models/config'); // Jangan lupa import di atas// Tambahkan ini biar rapi
 
 const app = express();
 
@@ -248,7 +249,41 @@ app.put('/api/user/change-password', async (req, res) => {
         res.json({ success: true, message: "Password berhasil diganti" });
     } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
 });
+// --- API MAINTENANCE MODE ---
 
+// 1. Cek Status (Dipakai oleh halaman depan & admin)
+app.get('/api/maintenance', async (req, res) => {
+    try {
+        // Cari config, kalau belum ada, buat baru otomatis (default: mati)
+        let config = await Config.findOne({ key: 'maintenance' });
+        if (!config) {
+            config = new Config({ key: 'maintenance', isActive: false });
+            await config.save();
+        }
+        res.json(config);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 2. Ubah Status (Dipakai oleh Admin)
+app.post('/api/maintenance', async (req, res) => {
+    try {
+        const { isActive } = req.body;
+        let config = await Config.findOne({ key: 'maintenance' });
+
+        if (!config) {
+            config = new Config({ key: 'maintenance', isActive: isActive });
+        } else {
+            config.isActive = isActive;
+        }
+
+        await config.save();
+        res.json({ success: true, status: config.isActive ? "MAINTENANCE ON" : "WEBSITE ONLINE" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 const PORT = process.env.PORT || 5000;
 module.exports = app; // PENTING BUAT VERCEL
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
