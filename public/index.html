@@ -8,8 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='20' fill='url(%23b)'/%3E%3Cg fill='white' font-family='Arial, sans-serif' font-weight='900' font-size='34' letter-spacing='-2'%3E%3Ctext x='10' y='45'%3ERF%3C/text%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
-
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
         :root {
@@ -404,7 +404,6 @@
                 const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
                 
                 const catName = event.category || 'General'; 
-                // AMBIL LOKASI (Default TBA jika kosong)
                 const locationName = event.location || 'Lokasi TBA';
 
                 container.innerHTML += `
@@ -444,10 +443,7 @@
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
             document.getElementById('modalCategory').innerText = event.category || "Event";
-            
-            // UPDATE: TAMPILKAN LOKASI DI MODAL
             document.getElementById('modalVenue').innerText = event.location || "TBA";
-            
             document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
 
             const btnBuy = document.getElementById('btnModalBuy');
@@ -473,7 +469,6 @@
 
         function searchEvent() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
-            // FILTER: Nama ATAU Lokasi
             const filtered = allEvents.filter(e => 
                 e.name.toLowerCase().includes(keyword) || 
                 (e.location && e.location.toLowerCase().includes(keyword))
@@ -525,6 +520,38 @@
                 } catch (err) { Swal.fire('Error', 'Gagal koneksi ke server.', 'error'); }
             }
         }
+    </script>
+    
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('/api/maintenance');
+                const data = await res.json();
+                
+                // Cek Admin Token
+                const isAdmin = localStorage.getItem('adminToken'); 
+
+                // Jika maintenance aktif DAN bukan admin, blokir akses
+                if (data.isActive && !isAdmin) {
+                    document.body.innerHTML = `
+                        <div style="height: 100vh; background: #0e1e3b; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; font-family: sans-serif;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="#f0ad4e" class="bi bi-cone-striped" viewBox="0 0 16 16" style="margin-bottom: 20px;">
+                              <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12m-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098m4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"/>
+                            </svg>
+                            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">SYSTEM MAINTENANCE</h1>
+                            <p style="font-size: 1.2rem; color: #b0c0d6; max-width: 500px; padding: 0 20px;">
+                                Website sedang dalam perbaikan.<br>Silakan kembali lagi nanti.
+                            </p>
+                            <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 30px; border-radius: 50px; border: none; background: #0049CC; color: white; font-weight: bold; cursor: pointer;">
+                                Coba Refresh
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.log("Gagal cek maintenance status");
+            }
+        })();
     </script>
 </body>
 </html>
