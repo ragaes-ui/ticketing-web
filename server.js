@@ -3,8 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const User = require('./models/User'); // Pastikan nama file modelnya benar (User.js atau users.js)
-const Order = require('./models/Order'); // Pastikan nama file modelnya benar (Order.js atau order.js)
+const User = require('./models/user'); // Pastikan nama file modelnya benar (User.js atau users.js)
+const Order = require('./models/order'); // Pastikan nama file modelnya benar (Order.js atau order.js)
 
 const app = express();
 
