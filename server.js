@@ -3,8 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const User = require('./models/users'); // Pastikan file models/users.js ada
-const Order = require('./models/order'); // Pastikan file models/order.js ada
+const User = require('./models/users'); 
+const Order = require('./models/order'); 
 
 const app = express();
 
@@ -25,8 +25,9 @@ const eventSchema = new mongoose.Schema({
     price: Number,
     totalCapacity: Number,
     availableSeats: Number,
-    // 1. TAMBAHAN PENTING: Field Description
-    description: { type: String, default: "" } 
+    description: { type: String, default: "" },
+    // 1. TAMBAHAN: Field Category
+    category: { type: String, default: "General" } 
 });
 
 const Event = mongoose.model('Event', eventSchema); 
@@ -46,16 +47,17 @@ app.get('/api/events', async (req, res) => {
 // 2. Tambah Konser Baru (Create)
 app.post('/api/events', async (req, res) => {
     try {
-        // 2. TAMBAHAN PENTING: Ambil description dari body
-        const { name, date, price, capacity, description } = req.body;
+        // Ambil category dari body
+        const { name, date, price, capacity, description, category } = req.body;
         
         const newEvent = new Event({
             name,
             date,
             price,
             totalCapacity: capacity,
-            availableSeats: capacity, // Awal dibuat, stok = kapasitas
-            description: description // Simpan deskripsi ke database
+            availableSeats: capacity,
+            description: description, // JANGAN LUPA KOMA DI SINI
+            category: category // Simpan kategori yang dipilih admin
         });
         await newEvent.save();
         res.json(newEvent);
@@ -68,10 +70,9 @@ app.post('/api/events', async (req, res) => {
 app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        // 3. TAMBAHAN PENTING: Ambil description untuk diupdate
-        const { name, date, price, capacity, availableSeats, description } = req.body;
+        // Ambil category dari frontend untuk diupdate
+        const { name, date, price, capacity, availableSeats, description, category } = req.body;
 
-        // Cek dulu ID-nya valid gak
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(404).json({ error: "ID Konser gak valid" });
         }
@@ -82,9 +83,9 @@ app.put('/api/events/:id', async (req, res) => {
             price, 
             totalCapacity: capacity,
             availableSeats: availableSeats,
-            description: description // Update deskripsi juga
-            category: { type: String, default: "General" }
-        }, { new: true }); // {new: true} biar data balikan adalah yg terbaru
+            description: description, // JANGAN LUPA KOMA
+            category: category // ISI DENGAN VARIABLE, BUKAN SCHEMA
+        }, { new: true }); 
 
         res.json({ message: "Sukses update!", data: updatedEvent });
     } catch (error) {
@@ -109,7 +110,6 @@ app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
         
-        // Cek email kembar
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
 
@@ -158,7 +158,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- 3. API DASHBOARD USER (Lihat Tiket Saya) ---
+// --- 3. API DASHBOARD USER ---
 app.post('/api/my-tickets', async (req, res) => {
     try {
         const { email } = req.body;
@@ -174,7 +174,6 @@ app.post('/api/order', async (req, res) => {
     try {
         const { eventId, quantity, customerName, customerEmail } = req.body;
         
-        // 1. Cek & Kurangi Stok
         const event = await Event.findById(eventId);
         if(event.availableSeats < quantity) {
             return res.status(400).json({ message: "Tiket Habis!" });
@@ -182,10 +181,8 @@ app.post('/api/order', async (req, res) => {
         event.availableSeats -= quantity;
         await event.save();
 
-        // 2. Buat Kode Tiket Unik
         const ticketCode = "TIKET-" + Date.now() + Math.floor(Math.random() * 1000);
 
-        // 3. Simpan Tiket ke Database
         const newOrder = new Order({
             ticketCode,
             eventId,
@@ -221,7 +218,6 @@ app.post('/api/validate', async (req, res) => {
             return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
         }
 
-        // Kalau valid
         ticket.status = 'used';
         await ticket.save();
 
