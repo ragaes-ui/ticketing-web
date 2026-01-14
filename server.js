@@ -50,7 +50,7 @@ app.get('/api/events', async (req, res) => {
 app.post('/api/events', async (req, res) => {
     try {
         // Ambil category dari body
-        const { name, date, price, capacity, description, category } = req.body;
+        const { name, date, price, capacity, description, category, location} = req.body;
         
         const newEvent = new Event({
             name,
@@ -59,7 +59,8 @@ app.post('/api/events', async (req, res) => {
             totalCapacity: capacity,
             availableSeats: capacity,
             description: description, // JANGAN LUPA KOMA DI SINI
-            category: category // Simpan kategori yang dipilih admin
+            category: category, 
+            event.location = location// Simpan kategori yang dipilih admin
         });
         await newEvent.save();
         res.json(newEvent);
@@ -73,7 +74,7 @@ app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
         // Ambil category dari frontend untuk diupdate
-        const { name, date, price, capacity, availableSeats, description, category } = req.body;
+        const { name, date, price, capacity, availableSeats, description, category, location } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(404).json({ error: "ID Konser gak valid" });
@@ -86,7 +87,8 @@ app.put('/api/events/:id', async (req, res) => {
             totalCapacity: capacity,
             availableSeats: availableSeats,
             description: description, // JANGAN LUPA KOMA
-            category: category // ISI DENGAN VARIABLE, BUKAN SCHEMA
+            category: category, // ISI DENGAN VARIABLE, BUKAN SCHEMA
+          event.location = location
         }, { new: true }); 
 
         res.json({ message: "Sukses update!", data: updatedEvent });
