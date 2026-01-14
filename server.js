@@ -83,6 +83,7 @@ app.put('/api/events/:id', async (req, res) => {
             totalCapacity: capacity,
             availableSeats: availableSeats,
             description: description // Update deskripsi juga
+            category: { type: String, default: "General" }
         }, { new: true }); // {new: true} biar data balikan adalah yg terbaru
 
         res.json({ message: "Sukses update!", data: updatedEvent });
