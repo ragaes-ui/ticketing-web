@@ -12,9 +12,7 @@
     
     <script>
         const token = localStorage.getItem('adminToken');
-        if (!token) {
-            window.location.href = 'login.html';
-        }
+        if (!token) window.location.href = 'login.html';
     </script>
 
     <style>
@@ -29,89 +27,28 @@
             background-color: var(--bg-color);
             color: var(--text-dark);
             font-family: 'Inter', sans-serif;
-            padding-top: 80px; /* Space navbar */
+            padding-top: 80px;
         }
 
-        /* 1. Navbar Professional */
-        .navbar {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 70px;
-        }
-        .navbar-brand {
-            font-weight: 800;
-            color: var(--primary-color) !important;
-            font-size: 1.2rem;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .navbar { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 70px; }
+        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
         .nav-icon-svg { width: 28px; height: 28px; fill: var(--primary-color); }
 
-        /* 2. Card Style */
-        .card {
-            background: white;
-            border: none;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            font-weight: 700;
-            padding: 20px;
-            border-radius: 12px 12px 0 0 !important;
-        }
+        .card { background: white; border: none; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 20px; }
+        .card-header { background: white; border-bottom: 1px solid #e5e7eb; font-weight: 700; padding: 20px; border-radius: 12px 12px 0 0 !important; }
 
-        /* 3. Form Input */
-        .form-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #4b5563;
-            margin-bottom: 5px;
-        }
-        .form-control, .form-select {
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            font-size: 0.9rem;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 100, 210, 0.1);
-        }
+        .form-label { font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 5px; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px; border: 1px solid #d1d5db; font-size: 0.9rem; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 100, 210, 0.1); }
 
-        /* 4. Table Style */
-        .table thead th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: #6b7280;
-            background: #f9fafb;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .table tbody td {
-            padding: 16px;
-            vertical-align: middle;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .table-hover tbody tr:hover {
-            background-color: #f9fafb;
-        }
+        .table thead th { font-size: 0.75rem; text-transform: uppercase; color: #6b7280; background: #f9fafb; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+        .table tbody td { padding: 16px; vertical-align: middle; font-size: 0.9rem; border-bottom: 1px solid #f3f4f6; }
+        .table-hover tbody tr:hover { background-color: #f9fafb; }
 
-        /* 5. Buttons */
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
+        .btn-primary { background-color: var(--primary-color); border: none; font-weight: 600; padding: 10px 20px; border-radius: 8px; }
         .btn-primary:hover { background-color: #0056b3; }
-        
         .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; }
         
-        /* 6. Modal */
         .modal-content { border-radius: 12px; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .modal-header { border-bottom: 1px solid #e5e7eb; padding: 20px; }
         .modal-footer { border-top: 1px solid #e5e7eb; padding: 20px; }
@@ -143,7 +80,7 @@
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
                 <h3 class="fw-bold text-dark m-0">Event Management</h3>
-                <p class="text-secondary small m-0">Kelola jadwal konser, kategori, harga, dan tiket.</p>
+                <p class="text-secondary small m-0">Kelola jadwal konser, lokasi, harga, dan tiket.</p>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <div class="d-inline-flex gap-3">
@@ -183,13 +120,21 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label">Lokasi Venue</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                    <input type="text" id="location" class="form-control" placeholder="Contoh: ICE BSD City" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">Tanggal Pelaksanaan</label>
                                 <input type="date" id="date" class="form-control" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label class="form-label">Deskripsi Event</label>
-                                <textarea id="description" class="form-control" rows="3" placeholder="Tulis info artis, syarat & ketentuan..."></textarea>
+                                <textarea id="description" class="form-control" rows="2" placeholder="Info singkat..."></textarea>
                             </div>
 
                             <div class="row g-2">
@@ -220,9 +165,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Nama & Kategori</th> <th>Tanggal</th>
+                                    <th>Event Info</th> 
+                                    <th>Jadwal & Lokasi</th>
                                     <th>Harga</th>
-                                    <th class="text-center">Ketersediaan</th>
+                                    <th class="text-center">Stok</th>
                                     <th class="text-end">Aksi</th>
                                 </tr>
                             </thead>
@@ -263,13 +209,21 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">Lokasi Venue</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" id="editLocation" class="form-control bg-light" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Tanggal</label>
                             <input type="date" id="editDate" class="form-control bg-light" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Deskripsi</label>
-                            <textarea id="editDescription" class="form-control bg-light" rows="4"></textarea>
+                            <textarea id="editDescription" class="form-control bg-light" rows="3"></textarea>
                         </div>
                         
                         <div class="row g-3">
@@ -286,7 +240,6 @@
                         <div class="mt-3 pt-3 border-top">
                             <label class="form-label text-danger">Update Sisa Stok Manual</label>
                             <input type="number" id="editStock" class="form-control border-danger" required>
-                            <small class="text-secondary">Hati-hati mengubah ini jika tiket sudah terjual.</small>
                         </div>
 
                     </form>
@@ -318,7 +271,7 @@
                 tbody.innerHTML = '';
 
                 if(eventsData.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-secondary">Belum ada event yang dibuat. Silakan tambah di menu sebelah kiri.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-secondary">Belum ada event.</td></tr>`;
                     return;
                 }
 
@@ -331,61 +284,51 @@
                     if(percent < 20) badgeColor = 'bg-danger';
                     else if(percent < 50) badgeColor = 'bg-warning text-dark';
 
-                    // Default Category jika kosong
                     const category = ev.category || 'General';
+                    const location = ev.location || 'Lokasi Belum Diisi'; // Tampilkan lokasi
 
                     tbody.innerHTML += `
                         <tr>
                             <td>
                                 <div class="fw-bold text-dark">${ev.name}</div>
                                 <span class="badge bg-info text-dark" style="font-size:0.7rem;">${category}</span>
-                                <small class="text-secondary d-block mt-1" style="font-size:0.7rem;">ID: ${ev._id.substr(-6)}</small>
                             </td>
-                            <td>${date}</td>
+                            <td>
+                                <div class="fw-bold text-dark">${date}</div>
+                                <small class="text-secondary"><i class="bi bi-geo-alt-fill text-danger"></i> ${location}</small>
+                            </td>
                             <td class="fw-bold text-primary">${harga}</td>
                             <td class="text-center">
-                                <span class="badge ${badgeColor} rounded-pill mb-1">${ev.availableSeats} Tersedia</span>
-                                <div class="progress" style="height: 4px; width: 80px; margin: 0 auto;">
+                                <span class="badge ${badgeColor} rounded-pill mb-1">${ev.availableSeats}</span>
+                                <div class="progress" style="height: 4px; width: 60px; margin: 0 auto;">
                                     <div class="progress-bar bg-dark" style="width: ${percent}%"></div>
                                 </div>
-                                <small class="text-muted" style="font-size: 0.65rem;">dari ${ev.totalCapacity}</small>
                             </td>
                             <td class="text-end">
-                                <button onclick="bukaModalEdit('${ev._id}')" 
-                                    class="btn btn-action btn-outline-secondary me-1" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                
-                                <button onclick="hapusKonser('${ev._id}')" 
-                                    class="btn btn-action btn-outline-danger" title="Hapus">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-action btn-outline-secondary me-1"><i class="bi bi-pencil-square"></i></button>
+                                <button onclick="hapusKonser('${ev._id}')" class="btn btn-action btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </td>
                         </tr>
                     `;
                 });
             } catch (err) {
                 console.error(err);
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data server.</td></tr>`;
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>`;
             }
         }
 
-        // 2. Buka Modal & Isi Data Lama
+        // 2. Buka Modal & Isi Data
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
-            
             if (ev) {
                 document.getElementById('editId').value = ev._id;
                 document.getElementById('editName').value = ev.name;
-                
-                // Isi Dropdown Kategori di Modal
                 document.getElementById('editCategory').value = ev.category || 'General';
-
+                document.getElementById('editLocation').value = ev.location || ''; // Isi Lokasi
                 document.getElementById('editDate').value = new Date(ev.date).toISOString().split('T')[0];
                 document.getElementById('editPrice').value = ev.price;
                 document.getElementById('editStock').value = ev.availableSeats;
                 document.getElementById('editCapacity').value = ev.totalCapacity;
-                
                 document.getElementById('editDescription').value = ev.description || '';
                 
                 editModal.show();
@@ -397,7 +340,8 @@
             const id = document.getElementById('editId').value;
             const data = {
                 name: document.getElementById('editName').value,
-                category: document.getElementById('editCategory').value, // Kirim Kategori Update
+                category: document.getElementById('editCategory').value,
+                location: document.getElementById('editLocation').value, // Kirim Lokasi Update
                 date: document.getElementById('editDate').value,
                 price: document.getElementById('editPrice').value,
                 description: document.getElementById('editDescription').value,
@@ -416,14 +360,12 @@
 
                 if(res.ok) {
                     editModal.hide();
-                    Swal.fire('Berhasil', 'Data konser diperbarui!', 'success');
+                    Swal.fire('Berhasil', 'Data update sukses!', 'success');
                     loadTable();
                 } else {
-                    Swal.fire('Gagal', 'Terjadi kesalahan sistem', 'error');
+                    Swal.fire('Gagal', 'Error update data', 'error');
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         // 4. Tambah Event Baru
@@ -436,7 +378,8 @@
 
             const data = {
                 name: document.getElementById('name').value,
-                category: document.getElementById('category').value, // Kirim Kategori Baru
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value, // Kirim Lokasi Baru
                 date: document.getElementById('date').value,
                 price: document.getElementById('price').value,
                 capacity: document.getElementById('capacity').value,
@@ -449,58 +392,24 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
-                Swal.fire({
-                    title: 'Sukses',
-                    text: 'Event berhasil ditambahkan ke sistem.',
-                    icon: 'success',
-                    confirmButtonColor: '#0064d2'
-                });
-                
+                Swal.fire('Sukses', 'Event dibuat!', 'success');
                 loadTable();
                 e.target.reset();
-            } catch (err) {
-                Swal.fire('Error', 'Gagal menambah event', 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            } catch (err) { Swal.fire('Error', 'Gagal', 'error'); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
         });
 
         // 5. Hapus Konser
         async function hapusKonser(id) {
-            const result = await Swal.fire({
-                title: 'Hapus Event Ini?',
-                text: "Data yang dihapus tidak bisa dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Hapus Permanen',
-                cancelButtonText: 'Batal'
-            });
-
-            if (result.isConfirmed) {
+            if((await Swal.fire({ title:'Hapus?', icon:'warning', showCancelButton:true })).isConfirmed) {
                 await fetch(`/api/events/${id}`, { method: 'DELETE' });
-                Swal.fire('Terhapus!', 'Data event telah dibersihkan.', 'success');
                 loadTable();
             }
         }
 
         function logout() {
-            Swal.fire({
-                title: 'Konfirmasi Logout',
-                text: "Anda akan keluar dari sesi admin.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Logout',
-                confirmButtonColor: '#d33'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('adminToken');
-                    window.location.href = 'login.html';
-                }
-            })
+            localStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
         }
 
         loadTable();
