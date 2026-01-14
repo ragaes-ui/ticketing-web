@@ -69,13 +69,13 @@
             color: #4b5563;
             margin-bottom: 5px;
         }
-        .form-control {
+        .form-control, .form-select {
             border-radius: 8px;
             padding: 10px;
             border: 1px solid #d1d5db;
             font-size: 0.9rem;
         }
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(0, 100, 210, 0.1);
         }
@@ -143,7 +143,7 @@
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
                 <h3 class="fw-bold text-dark m-0">Event Management</h3>
-                <p class="text-secondary small m-0">Kelola jadwal konser, harga, deskripsi, dan tiket.</p>
+                <p class="text-secondary small m-0">Kelola jadwal konser, kategori, harga, dan tiket.</p>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <div class="d-inline-flex gap-3">
@@ -171,6 +171,17 @@
                                 <label class="form-label">Nama Event</label>
                                 <input type="text" id="name" class="form-control" placeholder="Contoh: Rock Festival 2026" required>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Kategori Event</label>
+                                <select id="category" class="form-select">
+                                    <option value="Konser">Konser Musik</option>
+                                    <option value="Olahraga">Olahraga</option>
+                                    <option value="Workshop">Workshop</option>
+                                    <option value="General">General/Lainnya</option>
+                                </select>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Pelaksanaan</label>
                                 <input type="date" id="date" class="form-control" required>
@@ -209,8 +220,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Nama Event</th>
-                                    <th>Tanggal</th>
+                                    <th>Nama & Kategori</th> <th>Tanggal</th>
                                     <th>Harga</th>
                                     <th class="text-center">Ketersediaan</th>
                                     <th class="text-end">Aksi</th>
@@ -242,6 +252,16 @@
                             <input type="text" id="editName" class="form-control bg-light" required>
                         </div>
                         
+                        <div class="mb-3">
+                            <label class="form-label">Kategori</label>
+                            <select id="editCategory" class="form-select bg-light">
+                                <option value="Konser">Konser Musik</option>
+                                <option value="Olahraga">Olahraga</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="General">General/Lainnya</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Tanggal</label>
                             <input type="date" id="editDate" class="form-control bg-light" required>
@@ -284,17 +304,15 @@
     
     <script>
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-        let eventsData = []; // Menyimpan data global agar mudah diakses saat edit
+        let eventsData = []; 
 
         // 1. Load Events
         async function loadTable() {
             try {
                 const res = await fetch('/api/events');
-                eventsData = await res.json(); // Simpan ke variabel global
+                eventsData = await res.json();
                 
                 const tbody = document.getElementById('tableBody');
-                
-                // Update Badge Counter
                 document.getElementById('totalEventBadge').innerText = eventsData.length;
 
                 tbody.innerHTML = '';
@@ -308,17 +326,20 @@
                     const date = new Date(ev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                     const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(ev.price);
                     
-                    // Hitung Persentase Terisi
                     const percent = Math.round((ev.availableSeats / ev.totalCapacity) * 100);
                     let badgeColor = 'bg-success';
                     if(percent < 20) badgeColor = 'bg-danger';
                     else if(percent < 50) badgeColor = 'bg-warning text-dark';
 
+                    // Default Category jika kosong
+                    const category = ev.category || 'General';
+
                     tbody.innerHTML += `
                         <tr>
                             <td>
                                 <div class="fw-bold text-dark">${ev.name}</div>
-                                <small class="text-secondary">ID: ${ev._id.substr(-6)}</small>
+                                <span class="badge bg-info text-dark" style="font-size:0.7rem;">${category}</span>
+                                <small class="text-secondary d-block mt-1" style="font-size:0.7rem;">ID: ${ev._id.substr(-6)}</small>
                             </td>
                             <td>${date}</td>
                             <td class="fw-bold text-primary">${harga}</td>
@@ -349,20 +370,22 @@
             }
         }
 
-        // 2. Buka Modal & Isi Data Lama (Diupdate agar ambil Deskripsi)
+        // 2. Buka Modal & Isi Data Lama
         function bukaModalEdit(id) {
-            // Cari data event berdasarkan ID dari variabel global
             const ev = eventsData.find(e => e._id === id);
             
             if (ev) {
                 document.getElementById('editId').value = ev._id;
                 document.getElementById('editName').value = ev.name;
+                
+                // Isi Dropdown Kategori di Modal
+                document.getElementById('editCategory').value = ev.category || 'General';
+
                 document.getElementById('editDate').value = new Date(ev.date).toISOString().split('T')[0];
                 document.getElementById('editPrice').value = ev.price;
                 document.getElementById('editStock').value = ev.availableSeats;
                 document.getElementById('editCapacity').value = ev.totalCapacity;
                 
-                // Isi deskripsi (jika kosong, kasih string kosong)
                 document.getElementById('editDescription').value = ev.description || '';
                 
                 editModal.show();
@@ -374,9 +397,10 @@
             const id = document.getElementById('editId').value;
             const data = {
                 name: document.getElementById('editName').value,
+                category: document.getElementById('editCategory').value, // Kirim Kategori Update
                 date: document.getElementById('editDate').value,
                 price: document.getElementById('editPrice').value,
-                description: document.getElementById('editDescription').value, // Kirim Deskripsi Baru
+                description: document.getElementById('editDescription').value,
                 availableSeats: document.getElementById('editStock').value,
                 capacity: document.getElementById('editCapacity').value
             };
@@ -412,10 +436,11 @@
 
             const data = {
                 name: document.getElementById('name').value,
+                category: document.getElementById('category').value, // Kirim Kategori Baru
                 date: document.getElementById('date').value,
                 price: document.getElementById('price').value,
                 capacity: document.getElementById('capacity').value,
-                description: document.getElementById('description').value // Ambil Deskripsi
+                description: document.getElementById('description').value 
             };
 
             try {
