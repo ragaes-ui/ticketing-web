@@ -23,7 +23,7 @@
             background-color: var(--bg-color);
             color: var(--text-dark);
             font-family: 'Inter', sans-serif;
-            padding-top: 80px; /* Space navbar */
+            padding-top: 80px;
         }
 
         /* Navbar Simple */
@@ -39,7 +39,7 @@
         }
         .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
 
-        /* Card Tiket ala Boarding Pass */
+        /* Card Tiket */
         .ticket-card {
             background: white;
             border: none;
@@ -59,7 +59,6 @@
             position: relative;
         }
         
-        /* Efek bolong tiket (optional aesthetic) */
         .ticket-body {
             padding: 20px;
             flex-grow: 1;
@@ -70,7 +69,7 @@
             position: relative;
         }
         
-        /* Lingkaran kecil biar kayak tiket sobekan */
+        /* Lingkaran sobekan tiket */
         .ticket-body::before, .ticket-body::after {
             content: ''; position: absolute; top: -10px; 
             width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%;
@@ -78,7 +77,6 @@
         .ticket-body::before { left: -10px; }
         .ticket-body::after { right: -10px; }
 
-        /* Style QR Code Container */
         .qr-container {
             padding: 10px;
             border: 1px solid #e5e7eb;
@@ -152,7 +150,6 @@
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        // UPDATE: Tampilkan Nama Lengkap di Navbar (Fallback ke username jika nama kosong)
         const displayName = user.fullName ? user.fullName : user.username;
         document.getElementById('userNameDisplay').innerText = "Hai, " + displayName;
 
@@ -179,20 +176,28 @@
                     return;
                 }
 
-                // TAHAP 1: Render HTML
                 tickets.forEach(t => {
+                    // AMBIL DATA EVENT
                     const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
-                    const isUsed = t.status === 'used';
                     
+                    // --- PERBAIKAN TANGGAL EVENT ---
+                    // Mengambil t.eventId.date (bukan tanggal pembelian)
+                    let eventDateStr = "Tanggal Belum Ditentukan";
+                    if(t.eventId && t.eventId.date) {
+                        eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', {
+                            weekday: 'long', 
+                            day: 'numeric', 
+                            month: 'long', 
+                            year: 'numeric'
+                        });
+                    }
+
+                    const isUsed = t.status === 'used';
                     const statusBadge = isUsed 
                         ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
                         : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
                     
                     const cardOpacity = isUsed ? 'opacity-75' : '';
-
-                    // UPDATE PENTING:
-                    // Di sini kita pakai 'displayName' (Nama Lengkap Akun) sebagai Pemesan
-                    // Kalau mau sesuai data database order lama, pakai t.customerName
                     const pemesanName = displayName; 
 
                     list.innerHTML += `
@@ -200,7 +205,10 @@
                             <div class="ticket-card ${cardOpacity}">
                                 <div class="ticket-header">
                                     <h5 class="fw-bold mb-1 text-truncate">${eventName}</h5>
-                                    <small class="opacity-75"><i class="bi bi-calendar-event me-1"></i> ${new Date(t.purchaseDate || Date.now()).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</small>
+                                    
+                                    <small class="opacity-100 fw-bold">
+                                        <i class="bi bi-calendar-check me-1"></i> ${eventDateStr}
+                                    </small>
                                 </div>
                                 
                                 <div class="ticket-body text-center">
@@ -220,11 +228,10 @@
                     `;
                 });
 
-                // TAHAP 2: Generate QR Code
+                // Generate QR Code
                 tickets.forEach(t => {
                     const container = document.getElementById(`qrcode-${t._id}`);
                     container.innerHTML = ""; 
-
                     new QRCode(container, {
                         text: t.ticketCode,
                         width: 150,
