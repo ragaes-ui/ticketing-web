@@ -3,8 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const User = require('./models/users'); // Pastikan file models/User.js ada
-const Order = require('./models/order'); // <--- TAMBAH INI
+const User = require('./models/users'); // Pastikan file models/users.js ada
+const Order = require('./models/order'); // Pastikan file models/order.js ada
 
 const app = express();
 
@@ -14,21 +14,21 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // --- KONEKSI DATABASE ---
-// Ganti password sesuai punya Abang kalau beda
 mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority")
   .then(() => console.log('✅ DATABASE NYAMBUNG BANG!'))
   .catch(err => console.log('❌ Gagal Konek:', err));
 
-// --- DEFINISI SCHEMA KONSER (Supaya Server Kenal "Event") ---
+// --- DEFINISI SCHEMA KONSER ---
 const eventSchema = new mongoose.Schema({
     name: String,
     date: Date,
     price: Number,
     totalCapacity: Number,
-    availableSeats: Number
+    availableSeats: Number,
+    // 1. TAMBAHAN PENTING: Field Description
+    description: { type: String, default: "" } 
 });
 
-// Kalau di database namanya 'events', Mongoose otomatis cocokin
 const Event = mongoose.model('Event', eventSchema); 
 
 // --- ROUTES API ---
@@ -43,16 +43,19 @@ app.get('/api/events', async (req, res) => {
     }
 });
 
-// 2. Tambah Konser Baru
+// 2. Tambah Konser Baru (Create)
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, date, price, capacity } = req.body;
+        // 2. TAMBAHAN PENTING: Ambil description dari body
+        const { name, date, price, capacity, description } = req.body;
+        
         const newEvent = new Event({
             name,
             date,
             price,
             totalCapacity: capacity,
-            availableSeats: capacity // Awal dibuat, stok = kapasitas
+            availableSeats: capacity, // Awal dibuat, stok = kapasitas
+            description: description // Simpan deskripsi ke database
         });
         await newEvent.save();
         res.json(newEvent);
@@ -61,11 +64,12 @@ app.post('/api/events', async (req, res) => {
     }
 });
 
-// 3. Update Konser (EDIT) - Kode yang tadi bikin error
+// 3. Update Konser (Edit)
 app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, date, price, capacity, availableSeats } = req.body;
+        // 3. TAMBAHAN PENTING: Ambil description untuk diupdate
+        const { name, date, price, capacity, availableSeats, description } = req.body;
 
         // Cek dulu ID-nya valid gak
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -77,13 +81,14 @@ app.put('/api/events/:id', async (req, res) => {
             date, 
             price, 
             totalCapacity: capacity,
-            availableSeats: availableSeats 
+            availableSeats: availableSeats,
+            description: description // Update deskripsi juga
         }, { new: true }); // {new: true} biar data balikan adalah yg terbaru
 
         res.json({ message: "Sukses update!", data: updatedEvent });
     } catch (error) {
-        console.error("Error Update:", error); // Muncul di terminal
-        res.status(500).json({ error: error.message }); // Muncul di browser
+        console.error("Error Update:", error);
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -113,7 +118,7 @@ app.post('/api/register', async (req, res) => {
             username, 
             email, 
             password: hashedPassword,
-            role: role || 'user' // Kalau gak diisi, otomatis jadi 'user'
+            role: role || 'user'
         });
         
         await newUser.save();
@@ -123,13 +128,11 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- 2. LOGIN (Bisa buat Admin & User) ---
+// --- 2. LOGIN ---
 app.post('/api/login', async (req, res) => {
     try {
-        // Bisa login pakai Username atau Email
         const { identifier, password } = req.body;
         
-        // Cari user (cek username ATAU email)
         const user = await User.findOne({ 
             $or: [{ username: identifier }, { email: identifier }] 
         });
@@ -139,10 +142,9 @@ app.post('/api/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
 
-        // Kirim data user balik ke frontend
         res.json({ 
             success: true, 
-            token: "token-rahasia-" + user._id, // Harusnya pake JWT, tapi ini simulasi dulu
+            token: "token-rahasia-" + user._id,
             user: {
                 id: user._id,
                 username: user.username,
@@ -159,7 +161,6 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/my-tickets', async (req, res) => {
     try {
         const { email } = req.body;
-        // Cari order berdasarkan email user
         const tickets = await Order.find({ email: email }).populate('eventId');
         res.json(tickets);
     } catch (error) {
@@ -167,6 +168,7 @@ app.post('/api/my-tickets', async (req, res) => {
     }
 });
 
+// --- 4. ORDER / BELI TIKET ---
 app.post('/api/order', async (req, res) => {
     try {
         const { eventId, quantity, customerName, customerEmail } = req.body;
@@ -180,16 +182,15 @@ app.post('/api/order', async (req, res) => {
         await event.save();
 
         // 2. Buat Kode Tiket Unik
-        // Kita bikin kode simpel: TIKET-[JAM]-[ANGKA_ACAK]
         const ticketCode = "TIKET-" + Date.now() + Math.floor(Math.random() * 1000);
 
-        // 3. Simpan Tiket ke Database (PENTING BUAT VALIDASI)
+        // 3. Simpan Tiket ke Database
         const newOrder = new Order({
             ticketCode,
             eventId,
             customerName,
             email: customerEmail,
-            status: 'valid' // Awal beli statusnya masih valid
+            status: 'valid'
         });
         await newOrder.save();
 
@@ -201,18 +202,14 @@ app.post('/api/order', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 // --- API CEK TIKET (VALIDASI) ---
 app.post('/api/validate', async (req, res) => {
     try {
         const { ticketCode } = req.body;
-        
-        // 1. CCTV: Laporin kode yang diterima server
         console.log("📡 Menerima Scan Kode:", ticketCode);
 
-        // Cari tiket (Pakai trim() biar spasi hilang)
         const ticket = await Order.findOne({ ticketCode: ticketCode.trim() }).populate('eventId');
-
-        // 2. CCTV: Laporin hasil pencarian
         console.log("🔎 Hasil Pencarian di DB:", ticket);
 
         if (!ticket) {
@@ -241,7 +238,7 @@ app.post('/api/validate', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 const PORT = process.env.PORT || 5000;
-// Tambahan buat Vercel biar bisa baca App-nya
 module.exports = app;
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
