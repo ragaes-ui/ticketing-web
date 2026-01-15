@@ -257,6 +257,7 @@ app.post('/api/order', async (req, res) => {
 });
 
 // ==========================================
+// ==========================================
 // 5. WEBHOOK / NOTIFICATION (WAJIB BUAT UPDATE STATUS)
 // ==========================================
 // Endpoint ini akan dipanggil otomatis oleh Midtrans saat user sudah bayar
@@ -279,34 +280,24 @@ app.post('/api/payment-notification', async (req, res) => {
         // Logic Update Status
         if (transactionStatus == 'capture'){
             if (fraudStatus == 'challenge'){
-                // TODO: set transaction status on your database to 'challenge'
                 order.status = 'pending';
             } else if (fraudStatus == 'accept'){
-                // PEMBAYARAN SUKSES (KARTU KREDIT)
-                order.status = 'valid';
-                
-                // Kurangi Stok Tiket Disini (Kalau belum dikurangi di awal)
-                const event = await Event.findById(order.eventId);
-                if(event) {
-                    event.availableSeats -= 1; // Asumsi qty 1, kalau qty banyak harus simpan qty di order
-                    await event.save();
-                }
+                order.status = 'valid'; // SUKSES KARTU KREDIT
+                // Kurangi stok disini jika perlu
             }
         } else if (transactionStatus == 'settlement'){
-            // PEMBAYARAN SUKSES (TRANSFER/GOPAY/DLL)
-            order.status = 'valid';
+            order.status = 'valid'; // SUKSES (GOPAY/QRIS/VA)
             
+            // Kurangi stok tiket saat lunas
             const event = await Event.findById(order.eventId);
             if(event) {
                 event.availableSeats -= 1; 
                 await event.save();
             }
         } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-            // PEMBAYARAN GAGAL
-            order.status = 'failed';
+            order.status = 'failed'; // GAGAL
         } else if (transactionStatus == 'pending'){
-            // MENUNGGU PEMBAYARAN
-            order.status = 'pending';
+            order.status = 'pending'; // MENUNGGU
         }
 
         await order.save();
