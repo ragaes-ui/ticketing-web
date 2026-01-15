@@ -329,27 +329,148 @@
     <script>
         (async function() {
             try {
+                // Endpoint API Maintenance
                 const res = await fetch('/api/maintenance');
                 const data = await res.json();
+                
+                // Cek Admin Token
                 const isAdmin = localStorage.getItem('adminToken'); 
 
+                // Jika maintenance aktif DAN bukan admin, tampilkan layar maintenance
                 if (data.isActive && !isAdmin) {
                     document.body.innerHTML = `
-                        <div style="height: 100vh; background: #0e1e3b; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; font-family: sans-serif;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="#f0ad4e" class="bi bi-cone-striped" viewBox="0 0 16 16" style="margin-bottom: 20px;">
-                              <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12m-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098m4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"/>
-                            </svg>
-                            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">SYSTEM MAINTENANCE</h1>
-                            <p style="font-size: 1.2rem; color: #b0c0d6; max-width: 500px; padding: 0 20px;">
-                                Dashboard sedang dalam perbaikan.<br>Silakan kembali lagi nanti.
+                        <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+                            
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                font-family: 'Poppins', sans-serif;
+                                background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe);
+                                background-size: 400% 400%;
+                                animation: gradientBG 15s ease infinite;
+                                height: 100vh;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                overflow: hidden;
+                            }
+
+                            /* Background Animation */
+                            @keyframes gradientBG {
+                                0% { background-position: 0% 50%; }
+                                50% { background-position: 100% 50%; }
+                                100% { background-position: 0% 50%; }
+                            }
+
+                            .glass-card {
+                                background: rgba(255, 255, 255, 0.05);
+                                backdrop-filter: blur(20px);
+                                -webkit-backdrop-filter: blur(20px);
+                                border-radius: 24px;
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                padding: 50px 40px;
+                                text-align: center;
+                                max-width: 500px;
+                                width: 90%;
+                                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                                color: white;
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .floating-illustration {
+                                font-size: 80px;
+                                margin-bottom: 20px;
+                                display: inline-block;
+                                animation: float 3s ease-in-out infinite;
+                                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+                            }
+
+                            @keyframes float {
+                                0% { transform: translateY(0px) rotate(0deg); }
+                                50% { transform: translateY(-20px) rotate(5deg); }
+                                100% { transform: translateY(0px) rotate(0deg); }
+                            }
+
+                            h1 {
+                                font-size: 2rem;
+                                font-weight: 800;
+                                margin-bottom: 10px;
+                                background: linear-gradient(to right, #fff, #b0c0d6);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                            }
+
+                            p {
+                                color: #d1d5db;
+                                font-size: 1rem;
+                                line-height: 1.6;
+                                margin-bottom: 30px;
+                            }
+
+                            .btn-retry {
+                                background: white;
+                                color: #0e1e3b;
+                                border: none;
+                                padding: 12px 35px;
+                                border-radius: 50px;
+                                font-weight: 700;
+                                font-size: 1rem;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+                            }
+
+                            .btn-retry:hover {
+                                transform: scale(1.05);
+                                box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+                            }
+
+                            .btn-retry:active {
+                                transform: scale(0.95);
+                            }
+
+                            /* Hiasan bubbles */
+                            .bubble {
+                                position: absolute;
+                                border-radius: 50%;
+                                background: rgba(255, 255, 255, 0.1);
+                                animation: rise 10s infinite ease-in;
+                                bottom: -50px;
+                            }
+                            @keyframes rise {
+                                0% { bottom: -50px; transform: translateX(0); }
+                                50% { transform: translateX(50px); }
+                                100% { bottom: 120%; transform: translateX(-50px); }
+                            }
+                        </style>
+
+                        <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 8s;"></div>
+                        <div class="bubble" style="width: 40px; height: 40px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
+                        <div class="bubble" style="width: 80px; height: 80px; left: 70%; animation-duration: 15s; animation-delay: 1s;"></div>
+                        <div class="bubble" style="width: 30px; height: 30px; left: 90%; animation-duration: 10s; animation-delay: 4s;"></div>
+
+                        <div class="glass-card">
+                            <div class="floating-illustration">
+                                👾🛠️
+                            </div>
+                            <h1>Lagi Didandanin! ✨</h1>
+                            <p>
+                                Sstt... Dashboard kamu lagi istirahat sebentar. <br>
+                                Tim IT kami lagi ngopi sambil benerin kabel yang kusut.
+                                <br><br>
+                                <b>Coba balik lagi nanti ya!</b>
                             </p>
-                            <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 30px; border-radius: 50px; border: none; background: #0049CC; color: white; font-weight: bold; cursor: pointer;">
-                                Coba Refresh
+                            <button onclick="location.reload()" class="btn-retry">
+                                Cek Lagi Dong ↻
                             </button>
                         </div>
                     `;
                 }
-            } catch (err) { console.log("Gagal cek maintenance status"); }
+            } catch (err) {
+                console.log("Gagal cek maintenance status, mungkin API error atau offline.");
+            }
         })();
     </script>
 </body>
