@@ -28,11 +28,11 @@ mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/
 // KONFIGURASI MIDTRANS
 // ==========================================
 let snap = new midtransClient.Snap({
-    // Set ke false untuk Sandbox (Testing), true untuk Production (Live)
-    isProduction : false,
-    // GANTI DENGAN SERVER KEY KAMU DARI DASHBOARD MIDTRANS
-    serverKey : 'Mid-server-JR2YmASM8xBrpfxJVA_lvzdz'
+    isProduction : false, // Pastikan ini false (Sandbox)
+    // GUNAKAN KUNCI YANG AWALANNYA 'SB-Mid-server-...'
+    serverKey : 'SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg' 
 });
+
 
 // --- ROUTES API ---
 
