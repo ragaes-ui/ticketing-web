@@ -204,8 +204,7 @@ app.post('/api/order', async (req, res) => {
         const orderId = `RCELL-${new Date().getTime()}-${Math.floor(Math.random() * 1000)}`;
         
         // 4. Buat Tiket Code Sementara (Nanti diaktifkan setelah bayar)
-        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-        const ticketCode = "TICKET-" + randomStr;
+        const ticketCode = `TIKET-${new Date().getTime()}${Math.floor(Math.random() * 1000)}`;
 
         // 5. Simpan Order ke Database status 'pending'
         const newOrder = new Order({
