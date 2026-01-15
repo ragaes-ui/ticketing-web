@@ -160,6 +160,33 @@
         .modal-content { border-radius: 16px; border: none; }
         .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
         .modal-desc-text { color: #555; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
+
+        /* TOMBOL BANTUAN MELAYANG */
+        .btn-help-floating {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-help-floating:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
+            background: var(--primary-blue);
+            color: white;
+        }
+        .btn-help-floating i { font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -243,6 +270,14 @@
             </div>
         </div>
     </div>
+
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ragaganz01@gmail.com&su=Bantuan%20RCELLFEST&body=Halo%20Admin,%20saya%20butuh%20bantuan%20terkait..."
+       target="_blank"
+       class="btn-help-floating"
+       title="Kirim Email ke Admin">
+        <i class="bi bi-envelope-heart-fill"></i>
+        <span>Bantuan</span>
+    </a>
 
     <footer class="footer-loket">
         <div class="container">
