@@ -1,11 +1,26 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  ticketCode: { type: String, required: true, unique: true }, // Kode Unik (misal: TIKET-172839)
-  eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }, // Konser apa?
+  // Kode Tiket (misal: TICKET-AB123)
+  ticketCode: { type: String, required: true, unique: true }, 
+  
+  // Relasi ke Event
+  eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }, 
+  
   customerName: String,
   email: String,
-  status: { type: String, default: 'valid' }, // Status: 'valid' atau 'used' (sudah dipakai)
+  
+  // PENTING: Update status agar mendukung flow pembayaran
+  status: { 
+    type: String, 
+    default: 'pending', // Default 'pending' dulu sebelum dibayar
+    enum: ['pending', 'valid', 'used', 'failed'] // Pilihan status yang diizinkan
+  },
+  
+  // PENTING: Field baru untuk menyimpan ID unik transaksi Midtrans
+  // Nanti dipakai buat mencocokkan pembayaran yang masuk
+  orderIdMidtrans: { type: String }, 
+  
   purchaseDate: { type: Date, default: Date.now }
 });
 
