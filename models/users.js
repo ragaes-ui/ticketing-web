@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, default: 'user' }, // 'admin' atau 'user'
     fullName: { type: String, default: '' },
-    phone: { type: String, default: '' }
+    phone: { type: String, default: '' },
+    googleId: { type: String } // <--- TAMBAHAN KHUSUS GOOGLE
 });
 
 module.exports = mongoose.model('User', userSchema);
