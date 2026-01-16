@@ -16,6 +16,10 @@
       "dest": "/server.js"
     },
     {
+      "source": "/auth/(.*)",
+      "destination": "/server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }
