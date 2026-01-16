@@ -1,3 +1,4 @@
+const path = require('path'); // Wajib ada di paling atas
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -11,6 +12,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // --- MODEL DATABASE ---
+// Pastikan nama file model ini sesuai dengan yang ada di folder models (besar/kecil huruf ngaruh di Vercel/Linux)
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event');
@@ -21,11 +23,13 @@ const app = express();
 // Middleware Dasar
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+
+// ⚠️ UPDATE PENTING: Biar Vercel gak bingung cari folder public
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- KONFIGURASI SESSION & PASSPORT (WAJIB BUAT GOOGLE) ---
 app.use(session({
-    secret: 'rcelltech-auth-rcellfest', // Boleh diganti bebas
+    secret: 'rcelltech-auth-rcellfest', 
     resave: false,
     saveUninitialized: true
 }));
@@ -50,8 +54,8 @@ let snap = new midtransClient.Snap({
 // KONFIGURASI GOOGLE STRATEGY
 // ==========================================
 passport.use(new GoogleStrategy({
-    clientID: "366556901765-pdld1bmsv3afffsp758t09c2v5kar22s.apps.googleusercontent.com", // <--- GANTI INI
-    clientSecret: "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", // <--- GANTI INI
+    clientID: "366556901765-pdld1bmsv3afffsp758t09c2v5kar22s.apps.googleusercontent.com", 
+    clientSecret: "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", 
     callbackURL: "/auth/google/callback"
   },
   async function(accessToken, refreshToken, profile, cb) {
@@ -337,6 +341,52 @@ app.post('/api/order', async (req, res) => {
     }
 });
 
+// --- 6. WEBHOOK NOTIFICATION (MIDTRANS) ---
+app.post('/api/payment-notification', async (req, res) => {
+    try {
+        const statusResponse = await snap.transaction.notification(req.body);
+        let orderId = statusResponse.order_id;
+        let transactionStatus = statusResponse.transaction_status;
+        let fraudStatus = statusResponse.fraud_status;
+
+        console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}.`);
+
+        const order = await Order.findOne({ orderIdMidtrans: orderId });
+        
+        if (!order) {
+            return res.status(404).json({message: "Order not found"});
+        }
+
+        if (transactionStatus == 'capture'){
+            if (fraudStatus == 'challenge'){
+                order.status = 'pending';
+            } else if (fraudStatus == 'accept'){
+                order.status = 'valid';
+            }
+        } else if (transactionStatus == 'settlement'){
+            order.status = 'valid';
+            
+            // Kurangi stok tiket saat lunas (opsional, kalau belum dikurangi di atas)
+            const event = await Event.findById(order.eventId);
+            if(event) {
+                event.availableSeats -= 1; 
+                await event.save();
+            }
+        } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
+            order.status = 'failed';
+        } else if (transactionStatus == 'pending'){
+            order.status = 'pending';
+        }
+
+        await order.save();
+        res.status(200).send('OK');
+
+    } catch (error) {
+        console.error("Notification Error:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // --- API CEK TIKET (VALIDASI) ---
 app.post('/api/validate', async (req, res) => {
     try {
@@ -419,6 +469,20 @@ app.post('/api/maintenance', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// ==========================================
+// ⚠️ ROUTE PENYELAMAT (CATCH-ALL)
+// WAJIB DITARUH PALING BAWAH (SEBELUM APP.LISTEN)
+// DAN JANGAN DIMASUKKAN KE DALAM FUNCTION LAIN
+// ==========================================
+app.get('*', (req, res) => {
+    // Kecuali kalau dia mau akses API atau Auth, jangan ditimpa
+    if (req.path.startsWith('/api') || req.path.startsWith('/auth')) {
+        return res.status(404).json({ error: 'Not Found' });
+    }
+    // Sisanya (Halaman Web) kasih index.html
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
