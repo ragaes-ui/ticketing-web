@@ -3,10 +3,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-// 1. IMPORT MIDTRANS
 const midtransClient = require('midtrans-client');
 
-// --- PERHATIKAN HURUF BESAR/KECIL NAMA FILE ---
+// --- LIBRARY GOOGLE LOGIN ---
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+// --- MODEL DATABASE ---
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event');
@@ -14,10 +18,20 @@ const Config = require('./models/config');
 
 const app = express();
 
-// Middleware
+// Middleware Dasar
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+// --- KONFIGURASI SESSION & PASSPORT (WAJIB BUAT GOOGLE) ---
+app.use(session({
+    secret: 'rcelltech-auth-rcellfest', // Boleh diganti bebas
+    resave: false,
+    saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // --- KONEKSI DATABASE ---
 mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority")
@@ -28,9 +42,54 @@ mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/
 // KONFIGURASI MIDTRANS
 // ==========================================
 let snap = new midtransClient.Snap({
-    isProduction : false, // Pastikan ini false (Sandbox)
-    // GUNAKAN KUNCI YANG AWALANNYA 'SB-Mid-server-...'
+    isProduction : false, 
     serverKey : 'SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg' 
+});
+
+// ==========================================
+// KONFIGURASI GOOGLE STRATEGY
+// ==========================================
+passport.use(new GoogleStrategy({
+    clientID: "366556901765-pdld1bmsv3afffsp758t09c2v5kar22s.apps.googleusercontent.com", // <--- GANTI INI
+    clientSecret: "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", // <--- GANTI INI
+    callbackURL: "/auth/google/callback"
+  },
+  async function(accessToken, refreshToken, profile, cb) {
+    try {
+        // 1. Cek apakah user sudah ada berdasarkan Google ID
+        let user = await User.findOne({ googleId: profile.id });
+        
+        // 2. Kalau belum, cek emailnya
+        if (!user) {
+            user = await User.findOne({ email: profile.emails[0].value });
+            
+            if (user) {
+                // Email ada, sambungkan Google ID
+                user.googleId = profile.id;
+                await user.save();
+            } else {
+                // User baru, buat akun
+                user = new User({
+                    username: profile.displayName,
+                    email: profile.emails[0].value,
+                    googleId: profile.id,
+                    fullName: profile.displayName,
+                    role: 'user'
+                });
+                await user.save();
+            }
+        }
+        return cb(null, user);
+    } catch (err) {
+        return cb(err, null);
+    }
+  }
+));
+
+// Serialize User untuk Session
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((id, done) => {
+    User.findById(id).then(user => done(null, user));
 });
 
 
@@ -107,6 +166,34 @@ app.delete('/api/events/:id', async (req, res) => {
     }
 });
 
+// --- ROUTE KHUSUS GOOGLE LOGIN ---
+
+// A. Tombol Login Google Ditekan
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// B. Google Balikin User ke Server
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/user-login.html' }),
+  function(req, res) {
+    const user = req.user;
+    
+    // Siapkan data token manual
+    const token = "token-google-" + user._id;
+    
+    const userData = JSON.stringify({
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        fullName: user.fullName
+    });
+    
+    // Redirect ke halaman perantara
+    res.redirect(`/google-success.html?token=${token}&userData=${encodeURIComponent(userData)}`);
+  });
+
+
 // --- 1. REGISTER USER BARU ---
 app.post('/api/register', async (req, res) => {
     try {
@@ -133,7 +220,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- 2. LOGIN ---
+// --- 2. LOGIN MANUAL ---
 app.post('/api/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
@@ -143,6 +230,9 @@ app.post('/api/login', async (req, res) => {
         });
         
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
+
+        // Kalau user login pake password tapi akunnya akun Google (password kosong)
+        if (!user.password) return res.status(400).json({ success: false, message: "Silakan login menggunakan Google" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
@@ -168,7 +258,6 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/my-tickets', async (req, res) => {
     try {
         const { email } = req.body;
-        // Hanya tampilkan tiket yang statusnya 'valid' atau 'used' (jangan tampilkan yang pending/belum bayar)
         const tickets = await Order.find({ 
             email: email, 
             status: { $in: ['valid', 'used'] } 
@@ -179,135 +268,74 @@ app.post('/api/my-tickets', async (req, res) => {
     }
 });
 
-// ==========================================
-// 4. ORDER / BELI TIKET (UPDATED FOR MIDTRANS)
-// ==========================================
+// --- 4. API MINTA TOKEN PEMBAYARAN (MIDTRANS) ---
+app.post('/api/payment-token', async (req, res) => {
+    try {
+        const { eventId, customerName, customerEmail, quantity } = req.body;
+        
+        const event = await Event.findById(eventId);
+        if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
+        
+        const grossAmount = event.price * quantity;
+        const orderId = "ORDER-" + new Date().getTime();
+
+        let parameter = {
+            transaction_details: {
+                order_id: orderId,
+                gross_amount: grossAmount
+            },
+            credit_card:{ secure : true },
+            customer_details: {
+                first_name: customerName,
+                email: customerEmail
+            },
+            item_details: [{
+                id: eventId,
+                price: event.price,
+                quantity: quantity,
+                name: event.name.substring(0, 50)
+            }]
+        };
+
+        const transaction = await snap.createTransaction(parameter);
+        res.json({ token: transaction.token, orderId: orderId });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// --- 5. ORDER / SIMPAN DATABASE ---
 app.post('/api/order', async (req, res) => {
     try {
         const { eventId, quantity, customerName, customerEmail } = req.body;
         
-        // 1. Cek Ketersediaan Tiket
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
-        // Cek stok (optional: dikurangi nanti saat payment sukses atau sekarang)
-        // Untuk Midtrans lebih aman cek stok dulu tapi jangan kurangi permanen sampai bayar
-        if(event.availableSeats < quantity) {
-            return res.status(400).json({ message: "Tiket Habis!" });
-        }
+        // Buat Tiket Code
+        const ticketCode = `RCELL-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-        // 2. Hitung Total Harga
-        const grossAmount = event.price * quantity;
-        
-        // 3. Buat Order ID Unik
-        // Format: RCELL-{timestamp}-{random} biar unik
-        const orderId = `RCELL-${new Date().getTime()}-${Math.floor(Math.random() * 1000)}`;
-        
-        // 4. Buat Tiket Code Sementara (Nanti diaktifkan setelah bayar)
-        const ticketCode = `TIKET-${new Date().getTime()}${Math.floor(Math.random() * 1000)}`;
-
-        // 5. Simpan Order ke Database status 'pending'
         const newOrder = new Order({
             ticketCode,
             eventId,
             customerName,
             email: customerEmail,
-            status: 'pending', // Status awal pending
-            orderIdMidtrans: orderId // Simpan order ID Midtrans buat referensi nanti
+            status: 'valid' // Asumsi kalau masuk sini berarti sudah bayar via Frontend Snap
         });
         await newOrder.save();
 
-        // 6. Siapkan Parameter Midtrans
-        let parameter = {
-            "transaction_details": {
-                "order_id": orderId,
-                "gross_amount": grossAmount
-            },
-            "credit_card":{
-                "secure" : true
-            },
-            "customer_details": {
-                "first_name": customerName,
-                "email": customerEmail,
-            },
-            "item_details": [
-                {
-                    "id": event._id.toString(),
-                    "price": event.price,
-                    "quantity": quantity,
-                    "name": event.name.substring(0, 50) // Midtrans limit nama item 50 char
-                }
-            ]
-        };
+        // Kurangi Stok
+        event.availableSeats -= quantity;
+        await event.save();
 
-        // 7. Minta Token ke Midtrans
-        const transaction = await snap.createTransaction(parameter);
-        
-        // 8. Kirim Token ke Frontend
-        res.json({ 
-            token: transaction.token,
-            orderId: orderId
-        });
+        res.json({ message: "Order Berhasil", ticketCode });
 
     } catch (err) {
-        console.error("Midtrans Error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
-
-// ==========================================
-// ==========================================
-// 5. WEBHOOK / NOTIFICATION (WAJIB BUAT UPDATE STATUS)
-// ==========================================
-// Endpoint ini akan dipanggil otomatis oleh Midtrans saat user sudah bayar
-app.post('/api/payment-notification', async (req, res) => {
-    try {
-        const statusResponse = await snap.transaction.notification(req.body);
-        let orderId = statusResponse.order_id;
-        let transactionStatus = statusResponse.transaction_status;
-        let fraudStatus = statusResponse.fraud_status;
-
-        console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`);
-
-        // Cari Order di Database berdasarkan orderIdMidtrans
-        const order = await Order.findOne({ orderIdMidtrans: orderId });
-        
-        if (!order) {
-            return res.status(404).json({message: "Order not found"});
-        }
-
-        // Logic Update Status
-        if (transactionStatus == 'capture'){
-            if (fraudStatus == 'challenge'){
-                order.status = 'pending';
-            } else if (fraudStatus == 'accept'){
-                order.status = 'valid'; // SUKSES KARTU KREDIT
-                // Kurangi stok disini jika perlu
-            }
-        } else if (transactionStatus == 'settlement'){
-            order.status = 'valid'; // SUKSES (GOPAY/QRIS/VA)
-            
-            // Kurangi stok tiket saat lunas
-            const event = await Event.findById(order.eventId);
-            if(event) {
-                event.availableSeats -= 1; 
-                await event.save();
-            }
-        } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-            order.status = 'failed'; // GAGAL
-        } else if (transactionStatus == 'pending'){
-            order.status = 'pending'; // MENUNGGU
-        }
-
-        await order.save();
-        res.status(200).send('OK');
-
-    } catch (error) {
-        console.error("Notification Error:", error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 
 // --- API CEK TIKET (VALIDASI) ---
 app.post('/api/validate', async (req, res) => {
@@ -316,10 +344,6 @@ app.post('/api/validate', async (req, res) => {
         const ticket = await Order.findOne({ ticketCode: ticketCode.trim() }).populate('eventId');
 
         if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
-        
-        // Cek apakah status valid (sudah dibayar)
-        if (ticket.status === 'pending') return res.status(400).json({ valid: false, message: "TIKET BELUM DIBAYAR! 💰" });
-        if (ticket.status === 'failed') return res.status(400).json({ valid: false, message: "TRANSAKSI GAGAL/BATAL! ❌" });
         if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
 
         ticket.status = 'used';
@@ -366,7 +390,6 @@ app.put('/api/user/change-password', async (req, res) => {
 });
 
 // --- API MAINTENANCE MODE ---
-// 1. Cek Status (Dipakai oleh halaman depan & admin)
 app.get('/api/maintenance', async (req, res) => {
     try {
         let config = await Config.findOne({ key: 'maintenance' });
@@ -380,7 +403,6 @@ app.get('/api/maintenance', async (req, res) => {
     }
 });
 
-// 2. Ubah Status (Dipakai oleh Admin)
 app.post('/api/maintenance', async (req, res) => {
     try {
         const { isActive } = req.body;
