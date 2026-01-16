@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Berhasil...</title>
+    <script>
+        // Ambil data dari URL
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const userData = params.get('userData');
+
+        if (token && userData) {
+            // Simpan ke LocalStorage (Seperti login biasa)
+            localStorage.setItem('userToken', token);
+            localStorage.setItem('userData', decodeURIComponent(userData));
+            
+            // Redirect ke Dashboard
+            window.location.href = 'dashboard.html';
+        } else {
+            alert('Login Gagal');
+            window.location.href = 'user-login.html';
+        }
+    </script>
+</head>
+<body>
+    <h3 style="text-align: center; font-family: sans-serif; margin-top: 50px;">
+        Sedang mengalihkan... 🚀
+    </h3>
+</body>
+</html>
