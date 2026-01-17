@@ -299,4 +299,4 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); server js saya
+app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); 
