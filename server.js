@@ -98,7 +98,12 @@ passport.deserializeUser((id, done) => {
 
 
 // --- ROUTES API ---
+// --- TES ROUTE (Taruh di atas app.get '*') ---
+app.get('/tes', (req, res) => {
+  res.send('<h1>HALO BANG! Server Jalan Nih! 🚀</h1>');
+});
 
+// ... baru kode app.get('*') di bawahnya
 // 1. Ambil Semua Konser
 app.get('/api/events', async (req, res) => {
     try {
