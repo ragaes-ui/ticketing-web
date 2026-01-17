@@ -18,15 +18,6 @@
         .btn-neon:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,0,128,0.6); color: white; }
         .toggle-link { color: #00f2ff; cursor: pointer; text-decoration: underline; }
         
-        /* Tombol Google */
-        .btn-google {
-            background: white; color: #333; font-weight: 600; border: none;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            padding: 10px; width: 100%; border-radius: 10px; margin-top: 15px;
-            transition: 0.2s; text-decoration: none;
-        }
-        .btn-google:hover { background: #f1f1f1; transform: scale(1.02); color: #333; }
-
         .glass-card::-webkit-scrollbar { width: 5px; }
         .glass-card::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
     </style>
@@ -67,15 +58,7 @@
             <button type="submit" class="btn btn-neon" id="btnSubmit">MASUK</button>
         </form>
 
-        <div class="text-center mt-3">
-            <small class="text-white-50">Atau masuk dengan</small>
-            <a href="/auth/google" class="btn-google">
-                <img src="https://authjs.dev/img/providers/google.svg" width="20" alt="Google">
-                <span>Google Account</span>
-            </a>
-        </div>
-
-        <p class="mt-3 text-center small text-secondary">
+        <p class="mt-4 text-center small text-secondary">
             <span id="textInfo">Belum punya akun?</span> 
             <span class="toggle-link" onclick="toggleMode()">Daftar di sini</span>
         </p>
