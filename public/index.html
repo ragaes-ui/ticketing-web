@@ -14,196 +14,64 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        :root {
-            --primary-blue: #0049CC;
-            --dark-navy: #0e1e3b;
-            --bg-light: #f8f9fa;
-            --text-dark: #333;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: white;
-            color: var(--text-dark);
-            padding-top: 76px;
-            overflow-x: hidden;
-        }
-
-        /* Navbar Clean */
-        .navbar {
-            background-color: white;
-            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
-            padding: 12px 0;
-            height: 76px;
-        }
-        .navbar-brand {
-            font-weight: 800;
-            color: var(--primary-blue) !important;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        :root { --primary-blue: #0049CC; --dark-navy: #0e1e3b; --text-dark: #333; }
+        body { font-family: 'Inter', sans-serif; background-color: white; color: var(--text-dark); padding-top: 76px; overflow-x: hidden; }
+        
+        .navbar { background-color: white; box-shadow: 0 1px 10px rgba(0,0,0,0.05); padding: 12px 0; height: 76px; }
+        .navbar-brand { font-weight: 800; color: var(--primary-blue) !important; font-size: 1.4rem; display: flex; align-items: center; gap: 8px; }
         .nav-link { font-weight: 500; color: #555; margin: 0 10px; }
         .nav-link:hover { color: var(--primary-blue); }
 
-        /* Hero Banner */
-        .hero-section {
-            background: linear-gradient(135deg, #0049CC 0%, #007bff 100%);
-            padding: 60px 0 100px 0;
-            color: white;
-            position: relative;
-            width: 100%;
-            margin: 0;
-        }
-        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
-
-        @media (max-width: 768px) {
-            .hero-section { padding: 40px 0 90px 0; }
-            .hero-title { font-size: 2rem; }
-            .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; }
-        }
-        @media (min-width: 769px) {
-            .hero-title { font-size: 3.5rem; }
-            .hero-lead { font-size: 1.2rem; }
-        }
-
-        .hero-bg-circle {
-            position: absolute; width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%; top: -50px; right: -50px; pointer-events: none;
-        }
+        .hero-section { background: linear-gradient(135deg, #0049CC 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; }
+        .hero-title { font-weight: 800; line-height: 1.2; }
+        .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
         
-        /* Search Bar Floating */
-        .search-wrapper {
-            margin-top: -45px; position: relative; z-index: 10; padding: 0 15px;
-        }
-        .search-box {
-            background: white; padding: 8px; border-radius: 50px;
-            box-shadow: 0 8px 25px rgba(0,73,204,0.15);
-            display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto;
-        }
-        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; }
-        .btn-search {
-            background: var(--primary-blue); color: white; border: none; padding: 10px 25px;
-            border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap;
-        }
-        .btn-search:hover { background: #003db3; }
+        @media (max-width: 768px) { .hero-title { font-size: 2rem; } }
+        @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } }
 
-        /* Icon Categories */
+        .search-wrapper { margin-top: -45px; position: relative; z-index: 10; padding: 0 15px; }
+        .search-box { background: white; padding: 8px; border-radius: 50px; box-shadow: 0 8px 25px rgba(0,73,204,0.15); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; }
+        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; width: 100%; }
+        .btn-search { background: var(--primary-blue); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; }
+        
         .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
         .category-item:hover, .category-item.active { background: #f0f7ff; transform: scale(1.05); }
         .category-item.active .cat-text { color: var(--primary-blue); font-weight: 800; }
-        
-        .icon-circle {
-            width: 45px; height: 45px; background: #e6f0ff; color: var(--primary-blue);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin: 0 auto 8px auto;
-        }
+        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: #555; }
 
-        /* Event Card */
-        .card-event {
-            border: 1px solid #eee; border-radius: 16px; overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s; background: white; height: 100%;
-            display: flex; flex-direction: column; cursor: pointer;
-        }
-        .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: transparent; }
-        
-        .card-img-top {
-            height: 160px; background: linear-gradient(135deg, #0049CC, #4facfe);
-            position: relative; display: flex; align-items: center; justify-content: center; color: white;
-        }
-        .category-badge-img {
-            position: absolute; top: 10px; right: 10px;
-            background: rgba(0,0,0,0.5); color: white; font-size: 0.7rem; 
-            padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px);
-        }
-        .date-float {
-            position: absolute; bottom: 10px; left: 10px;
-            background: white; color: #333; padding: 4px 10px; border-radius: 8px;
-            font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
+        .card-event { border: 1px solid #eee; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; background: white; height: 100%; display: flex; flex-direction: column; cursor: pointer; }
+        .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        .card-img-top { height: 160px; background: linear-gradient(135deg, #0049CC, #4facfe); position: relative; display: flex; align-items: center; justify-content: center; color: white; }
+        .category-badge-img { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px); }
+        .date-float { position: absolute; bottom: 10px; left: 10px; background: white; color: #333; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; }
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; }
-        .event-venue { font-size: 0.8rem; color: #888; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
         
-        .btn-outline-book {
-            border: 1px solid var(--primary-blue); color: var(--primary-blue); font-weight: 600;
-            padding: 8px; border-radius: 8px; background: white; width: 100%; margin-top: auto; font-size: 0.9rem;
-            position: relative; z-index: 2;
-        }
+        .btn-outline-book { border: 1px solid var(--primary-blue); color: var(--primary-blue); font-weight: 600; padding: 8px; border-radius: 8px; background: white; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
         .btn-outline-book:hover { background: var(--primary-blue); color: white; }
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
 
-        /* Footer */
         .footer-loket { background-color: var(--dark-navy); color: white; padding: 50px 0 30px 0; margin-top: 60px; font-size: 0.85rem; }
-        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
-        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; }
         .footer-link:hover { color: white; text-decoration: underline; }
-        .social-btn {
-            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            display: inline-flex; align-items: center; justify-content: center;
-            color: white; margin-right: 8px; text-decoration: none;
-        }
-        .social-btn:hover { background: white; color: var(--dark-navy); }
-
-        /* MODAL STYLING */
-        .modal-header-img {
-            height: 200px;
-            background: linear-gradient(135deg, #0049CC, #4facfe);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 3rem;
-            border-radius: 12px 12px 0 0;
-        }
-        .modal-content { border-radius: 16px; border: none; }
-        .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
-        .modal-desc-text { color: #555; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
-
-        /* TOMBOL BANTUAN MELAYANG (BULET) */
-        .btn-help-floating {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;  /* Lebar Fix */
-            height: 60px; /* Tinggi Fix */
-            background: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            border-radius: 50%; /* Bulat Sempurna */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
-            z-index: 9999;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 1.5rem; /* Icon Besar */
-        }
-        .btn-help-floating:hover {
-            transform: translateY(-5px) rotate(10deg) scale(1.1); /* Efek Muter Dikit */
-            box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
-            background: var(--primary-blue);
-            color: white;
-        }
+        
+        .btn-help-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2); z-index: 9999; font-size: 1.5rem; transition: 0.3s; }
+        .btn-help-floating:hover { transform: translateY(-5px); background: var(--primary-blue); color: white; }
     </style>
 </head>
 <body>
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
-            </a>
-            
+            <a class="navbar-brand" href="#"><i class="bi bi-ticket-detailed-fill"></i> RCELLFEST</a>
             <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="#">Jelajah</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Tentang Kami</a></li>
                 </ul>
             </div>
-
             <div id="navUserArea">
                 <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
             </div>
@@ -221,41 +89,17 @@
     <div class="search-wrapper mb-4">
         <div class="search-box">
             <i class="bi bi-search text-secondary ms-2"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari konser...">
             <button onclick="searchEvent()" class="btn-search">Cari</button>
         </div>
     </div>
 
     <div class="container">
         <div class="row justify-content-center mb-5 g-2 px-2">
-            
-            <div class="col-3 col-md-2" onclick="filterCategory('All')">
-                <div class="category-item" id="btn-cat-All">
-                    <div class="icon-circle"><i class="bi bi-grid-fill"></i></div>
-                    <div class="cat-text">Semua</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Konser')">
-                <div class="category-item" id="btn-cat-Konser">
-                    <div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div>
-                    <div class="cat-text">Konser</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')">
-                <div class="category-item" id="btn-cat-Olahraga">
-                    <div class="icon-circle"><i class="bi bi-trophy-fill"></i></div>
-                    <div class="cat-text">Olahraga</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')">
-                <div class="category-item" id="btn-cat-Workshop">
-                    <div class="icon-circle"><i class="bi bi-palette-fill"></i></div>
-                    <div class="cat-text">Workshop</div>
-                </div>
-            </div>
+            <div class="col-3 col-md-2" onclick="filterCategory('All')"><div class="category-item active" id="btn-cat-All"><div class="icon-circle"><i class="bi bi-grid-fill"></i></div><div class="cat-text">Semua</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Konser')"><div class="category-item" id="btn-cat-Konser"><div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div><div class="cat-text">Konser</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')"><div class="category-item" id="btn-cat-Olahraga"><div class="icon-circle"><i class="bi bi-trophy-fill"></i></div><div class="cat-text">Olahraga</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')"><div class="category-item" id="btn-cat-Workshop"><div class="icon-circle"><i class="bi bi-palette-fill"></i></div><div class="cat-text">Workshop</div></div></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
@@ -264,97 +108,33 @@
         </div>
 
         <div class="row g-3" id="event-list">
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-secondary small">Memuat event...</p>
-            </div>
+            <div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-secondary small">Memuat event...</p></div>
         </div>
     </div>
 
-    <a href="mailto:ragaganz01@gmail.com?subject=Bantuan%20RCELLFEST&body=Halo%20Admin,%20saya%20butuh%20bantuan%20terkait..."
-       class="btn-help-floating"
-       title="Kirim Email ke Admin">
-        <i class="bi bi-envelope-heart-fill"></i>
-    </a>
+    <a href="mailto:ragaganz01@gmail.com?subject=Bantuan%20RCELLFEST" class="btn-help-floating"><i class="bi bi-envelope-heart-fill"></i></a>
 
     <footer class="footer-loket">
         <div class="container">
             <div class="row g-4">
-                <div class="col-6 col-lg-3">
-                    <div class="footer-head">Tentang</div>
-                    <a href="#" class="footer-link">Tentang Kami</a>
-                    <a href="#" class="footer-link">Blog</a>
-                    <a href="#" class="footer-link">Karir</a>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="footer-head">Penyelenggara</div>
-                    <a href="#" class="footer-link">Buat Event</a>
-                    <a href="#" class="footer-link">Panduan</a>
-                    <a href="login.html" class="footer-link text-warning">Login Admin</a>
-                </div>
-                <div class="col-lg-3">
-                <div class="footer-head">Ikuti Kami</div>
-                    <div class="mb-3">
-                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn" title="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                        
-                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn" title="Twitter">
-                            <i class="bi bi-twitter-x"></i>
-                        </a>
-                        
-                        <a href="https://www.youtube.com/@rcellfest_official" target="_blank" class="social-btn" title="YouTube">
-                            <i class="bi bi-youtube"></i>
-                        </a>
-                        
-                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn" title="TikTok">
-                            <i class="bi bi-tiktok"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 Rcelltech inc Global created with love.</small>
-                </div>
+                <div class="col-6 col-lg-3"><div class="footer-head">Tentang</div><a href="#" class="footer-link">Tentang Kami</a></div>
+                <div class="col-6 col-lg-3"><div class="footer-head">Penyelenggara</div><a href="login.html" class="footer-link text-warning">Login Admin</a></div>
+                <div class="col-lg-3"><div class="footer-head">Ikuti Kami</div><small class="text-white-50">&copy; 2026 Rcelltech inc Global.</small></div>
             </div>
         </div>
     </footer>
 
-    <div class="modal fade" id="eventDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="eventDetailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="position-relative">
-                    <div class="modal-header-img">
-                        <i class="bi bi-ticket-perforated-fill"></i>
-                    </div>
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <div class="modal-body p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <span class="badge bg-primary mb-2" id="modalCategory">General</span>
-                            <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
-                            
-                            <div class="text-secondary small mt-2">
-                                <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
-                                &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
-                            </div>
-                        </div>
-                    </div>
-                    
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                    <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
                     <hr>
-                    
-                    <h6 class="fw-bold">Deskripsi Event</h6>
-                    <p class="modal-desc-text" id="modalDesc">
-                    </p>
-
+                    <p class="modal-desc-text" id="modalDesc"></p>
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="text-secondary d-block">Harga Tiket</small>
-                            <div class="modal-price-tag" id="modalPrice">Rp 0</div>
-                        </div>
-                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">
-                            Beli Tiket
-                        </button>
+                        <div><small class="text-secondary">Harga Tiket</small><div class="modal-price-tag" id="modalPrice">Rp 0</div></div>
+                        <button id="btnModalBuy" class="btn btn-primary btn-lg rounded-pill fw-bold">Beli Tiket</button>
                     </div>
                 </div>
             </div>
@@ -377,36 +157,18 @@
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
-
             if (userRaw) {
                 const user = JSON.parse(userRaw);
-                navArea.innerHTML = `
-                    <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle text-primary"></i>
-                            <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
-                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li>
-                        </ul>
-                    </div>
-                `;
+                navArea.innerHTML = `<div class="dropdown"><button class="btn btn-light dropdown-toggle border rounded-pill px-3 py-1" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> ${user.username}</button><ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2"><li><a class="dropdown-item" href="dashboard.html">Tiket Saya</a></li><li><hr class="dropdown-divider"></li><li><button class="dropdown-item text-danger" onclick="logout()">Keluar</button></li></ul></div>`;
             } else {
                 navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
             }
         }
 
-        function logout() {
-            localStorage.removeItem('userData');
-            localStorage.removeItem('userToken');
-            window.location.reload();
-        }
+        function logout() { localStorage.clear(); window.location.reload(); }
 
         async function loadEvents() {
             try {
-                // Pastikan endpoint ini sesuai dengan URL backend kamu (misal dari Render)
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
                 renderEvents(allEvents);
@@ -416,76 +178,41 @@
         function filterCategory(category) {
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`btn-cat-${category}`).classList.add('active');
-
-            if (category === 'All') {
-                renderEvents(allEvents);
-            } else {
-                const filtered = allEvents.filter(e => e.category === category);
-                renderEvents(filtered);
-            }
+            renderEvents(category === 'All' ? allEvents : allEvents.filter(e => e.category === category));
         }
 
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
-
-            if(data.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Tidak ada event untuk kategori ini.</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">Lihat Semua Event</button></div>`;
-                return;
-            }
+            if(data.length === 0) return container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Tidak ada event.</p></div>`;
 
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isSoldOut = event.availableSeats <= 0;
-                const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                
-                const catName = event.category || 'General'; 
-                const locationName = event.location || 'Lokasi TBA';
-
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card-event" onclick="showDetail('${event._id}')">
-                            <div class="card-img-top">
-                                <i class="bi bi-ticket-perforated fs-1 opacity-50"></i>
-                                <span class="category-badge-img">${catName}</span>
-                                <div class="date-float">${dateStr}</div>
-                            </div>
+                            <div class="card-img-top"><i class="bi bi-ticket-perforated fs-1 opacity-50"></i><span class="category-badge-img">${event.category || 'Event'}</span></div>
                             <div class="card-body">
                                 <h5 class="event-title text-truncate">${event.name}</h5>
-                                
-                                <div class="event-venue text-truncate">
-                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
-                                </div>
-                                
                                 <div class="price-val">Rp ${harga}</div>
-                                <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
-                                    ${isSoldOut ? 'HABIS' : 'BELI'}
-                                </button>
+                                <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">${isSoldOut ? 'HABIS' : 'BELI'}</button>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
-
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
-            const dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
-            
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
-            document.getElementById('modalDate').innerText = dateStr;
-            document.getElementById('modalCategory').innerText = event.category || "Event";
-            document.getElementById('modalVenue').innerText = event.location || "TBA";
-            document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
-
-            const btnBuy = document.getElementById('btnModalBuy');
-            const isSoldOut = event.availableSeats <= 0;
+            document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia.";
             
-            if (isSoldOut) {
+            const btnBuy = document.getElementById('btnModalBuy');
+            if (event.availableSeats <= 0) {
                 btnBuy.innerText = "TIKET HABIS";
                 btnBuy.classList.add('disabled', 'btn-secondary');
                 btnBuy.classList.remove('btn-primary');
@@ -494,245 +221,98 @@
                 btnBuy.innerText = "Beli Tiket Sekarang";
                 btnBuy.classList.remove('disabled', 'btn-secondary');
                 btnBuy.classList.add('btn-primary');
-                btnBuy.onclick = function() {
-                    detailModal.hide();
-                    buyTicket(eventId);
-                };
+                btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId); };
             }
-
             detailModal.show();
         }
 
         function searchEvent() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allEvents.filter(e => 
-                e.name.toLowerCase().includes(keyword) || 
-                (e.location && e.location.toLowerCase().includes(keyword))
-            );
-            renderEvents(filtered);
+            renderEvents(allEvents.filter(e => e.name.toLowerCase().includes(keyword)));
         }
 
-        document.getElementById('searchInput').addEventListener("keypress", function(e) {
-            if (e.key === "Enter") searchEvent();
-        });
-        
-        function resetSearch() {
-            document.getElementById('searchInput').value = '';
-            filterCategory('All');
-        }
-
-        // --- FUNGSI BELI TIKET (INTEGRASI MIDTRANS) ---
+        // --- FUNGSI BELI TIKET (FIXED) ---
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
-                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
+                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket.', icon: 'info', confirmButtonText: 'Ke Halaman Login' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
                 return;
             }
             const user = JSON.parse(userRaw);
             const event = allEvents.find(e => e._id === eventId);
-            const namaPemesan = user.fullName ? user.fullName : user.username;
 
             const confirm = await Swal.fire({
                 title: 'Konfirmasi Pembelian',
-                html: `Beli tiket <b>${event ? event.name : ''}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b><br><small>Metode Pembayaran: Midtrans</small>`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0049CC',
-                cancelButtonText: 'Batal',
-                confirmButtonText: 'Bayar Sekarang'
+                html: `Beli tiket <b>${event.name}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b>`,
+                showCancelButton: true, confirmButtonText: 'Bayar Sekarang'
             });
 
             if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-
+                Swal.showLoading();
                 try {
-                    // Panggil API Backend (Sesuaikan URL jika sudah di Render)
-                    const res = await fetch('/api/order', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email })
+                    // Manggil API yang BENAR: /api/payment-token
+                    const res = await fetch('/api/payment-token', {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            eventId, 
+                            quantity: 1, 
+                            customerName: user.fullName || user.username, 
+                            customerEmail: user.email 
+                        })
                     });
                     const data = await res.json();
-                    
-                    Swal.close(); // Tutup loading
+                    Swal.close(); 
 
                     if (res.ok && data.token) {
-                        // BUKA POPUP MIDTRANS
                         window.snap.pay(data.token, {
-                            onSuccess: function(result){
-                                console.log('success', result);
-                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Tiket sudah aktif.', 'success').then(() => {
-                                    window.location.href = 'dashboard.html';
-                                });
-                            },
-                            onPending: function(result){
-                                console.log('pending', result);
-                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda.', 'info');
-                            },
-                            onError: function(result){
-                                console.log('error', result);
-                                Swal.fire('Gagal', 'Pembayaran gagal atau dibatalkan.', 'error');
-                            },
-                            onClose: function(){
-                                console.log('customer closed the popup without finishing the payment');
-                                Swal.fire('Dibatalkan', 'Anda menutup halaman pembayaran.', 'warning');
-                            }
+                            onSuccess: function(result){ Swal.fire('Berhasil!', 'Tiket sedang diproses.', 'success').then(() => window.location.href = 'dashboard.html'); },
+                            onPending: function(result){ Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran.', 'info'); },
+                            onError: function(result){ Swal.fire('Gagal', 'Pembayaran gagal.', 'error'); }
                         });
                     } else { 
-                        Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat membuat pesanan.', 'error'); 
+                        Swal.fire('Gagal', data.message || 'Error server.', 'error'); 
                     }
-                } catch (err) { 
-                    console.error(err);
-                    Swal.fire('Error', 'Gagal koneksi ke server.', 'error'); 
-                }
+                } catch (err) { Swal.fire('Error', 'Gagal koneksi.', 'error'); }
             }
         }
     </script>
-    
+
     <script>
         (async function() {
             try {
-                // SCRIPT MAINTENANCE AESTHETIC & LUCU
-                const res = await fetch('/api/maintenance'); 
+                // Cek status maintenance dari backend
+                const res = await fetch('/api/maintenance');
                 const data = await res.json();
                 
-                // Cek Admin Token (Biar admin tetep bisa akses)
+                // Cek apakah admin login (biar admin tetep bisa akses)
                 const isAdmin = localStorage.getItem('adminToken'); 
 
-                // Jika maintenance aktif DAN bukan admin, tampilkan layar maintenance
+                // Jika maintenance aktif DAN user bukan admin, timpa layar
                 if (data.isActive && !isAdmin) {
-                    // Kita inject Style CSS + HTML baru
                     document.body.innerHTML = `
                         <style>
                             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-                            
-                            body {
-                                margin: 0;
-                                padding: 0;
-                                font-family: 'Poppins', sans-serif;
-                                background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe);
-                                background-size: 400% 400%;
-                                animation: gradientBG 15s ease infinite;
-                                height: 100vh;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                overflow: hidden;
-                            }
-
-                            /* Background Animation */
-                            @keyframes gradientBG {
-                                0% { background-position: 0% 50%; }
-                                50% { background-position: 100% 50%; }
-                                100% { background-position: 0% 50%; }
-                            }
-
-                            .glass-card {
-                                background: rgba(255, 255, 255, 0.05);
-                                backdrop-filter: blur(20px);
-                                -webkit-backdrop-filter: blur(20px);
-                                border-radius: 24px;
-                                border: 1px solid rgba(255, 255, 255, 0.1);
-                                padding: 50px 40px;
-                                text-align: center;
-                                max-width: 500px;
-                                width: 90%;
-                                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-                                color: white;
-                                position: relative;
-                                overflow: hidden;
-                            }
-
-                            .floating-illustration {
-                                font-size: 80px;
-                                margin-bottom: 20px;
-                                display: inline-block;
-                                animation: float 3s ease-in-out infinite;
-                                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-                            }
-
-                            @keyframes float {
-                                0% { transform: translateY(0px) rotate(0deg); }
-                                50% { transform: translateY(-20px) rotate(5deg); }
-                                100% { transform: translateY(0px) rotate(0deg); }
-                            }
-
-                            h1 {
-                                font-size: 2rem;
-                                font-weight: 800;
-                                margin-bottom: 10px;
-                                background: linear-gradient(to right, #fff, #b0c0d6);
-                                -webkit-background-clip: text;
-                                -webkit-text-fill-color: transparent;
-                            }
-
-                            p {
-                                color: #d1d5db;
-                                font-size: 1rem;
-                                line-height: 1.6;
-                                margin-bottom: 30px;
-                            }
-
-                            .btn-retry {
-                                background: white;
-                                color: #0e1e3b;
-                                border: none;
-                                padding: 12px 35px;
-                                border-radius: 50px;
-                                font-weight: 700;
-                                font-size: 1rem;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-                            }
-
-                            .btn-retry:hover {
-                                transform: scale(1.05);
-                                box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
-                            }
-
-                            .btn-retry:active {
-                                transform: scale(0.95);
-                            }
-
-                            /* Hiasan bubbles */
-                            .bubble {
-                                position: absolute;
-                                border-radius: 50%;
-                                background: rgba(255, 255, 255, 0.1);
-                                animation: rise 10s infinite ease-in;
-                                bottom: -50px;
-                            }
-                            @keyframes rise {
-                                0% { bottom: -50px; transform: translateX(0); }
-                                50% { transform: translateX(50px); }
-                                100% { bottom: 120%; transform: translateX(-50px); }
-                            }
+                            body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+                            @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+                            .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }
+                            .floating-illustration { font-size: 80px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; }
+                            @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+                            h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                            p { color: #d1d5db; margin-bottom: 30px; }
+                            .btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+                            .btn-retry:hover { transform: scale(1.05); }
                         </style>
-
-                        <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 8s;"></div>
-                        <div class="bubble" style="width: 40px; height: 40px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
-                        <div class="bubble" style="width: 80px; height: 80px; left: 70%; animation-duration: 15s; animation-delay: 1s;"></div>
-                        <div class="bubble" style="width: 30px; height: 30px; left: 90%; animation-duration: 10s; animation-delay: 4s;"></div>
-
                         <div class="glass-card">
-                            <div class="floating-illustration">
-                                👾🛠️
-                            </div>
+                            <div class="floating-illustration">👾🛠️</div>
                             <h1>Lagi Didandanin! ✨</h1>
-                            <p>
-                                Sstt... Servernya lagi istirahat sebentar biar nanti makin ngebut. 
-                                Tim IT kami lagi ngopi sambil benerin kabel yang kusut.
-                                <br><br>
-                                <b>Coba balik lagi nanti ya!</b>
-                            </p>
-                            <button onclick="location.reload()" class="btn-retry">
-                                Cek Lagi Dong ↻
-                            </button>
+                            <p>Sstt... Servernya lagi istirahat sebentar biar nanti makin ngebut. <br><br><b>Coba balik lagi nanti ya!</b></p>
+                            <button onclick="location.reload()" class="btn-retry">Cek Lagi Dong ↻</button>
                         </div>
                     `;
                 }
             } catch (err) {
-                console.log("Gagal cek maintenance status, mungkin API error atau offline.");
+                console.log("Gagal cek maintenance status.");
             }
         })();
     </script>
