@@ -52,14 +52,6 @@
         .modal-content { border-radius: 12px; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .modal-header { border-bottom: 1px solid #e5e7eb; padding: 20px; }
         .modal-footer { border-top: 1px solid #e5e7eb; padding: 20px; }
-        
-        /* Style Switch Status */
-        .form-switch .form-check-input {
-            width: 3em; height: 1.5em; cursor: pointer;
-        }
-        .form-switch .form-check-input:checked {
-            background-color: #198754; border-color: #198754;
-        }
     </style>
 </head>
 <body class="pb-5">
@@ -113,7 +105,7 @@
                             <small class="text-secondary">Jika aktif, pengunjung tidak bisa mengakses website.</small>
                         </div>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="switchMaintenance">
+                            <input class="form-check-input" type="checkbox" id="switchMaintenance" style="width: 3.5em; height: 1.75em; cursor: pointer;">
                         </div>
                     </div>
                 </div>
@@ -171,15 +163,6 @@
                                     <input type="number" id="capacity" class="form-control" placeholder="1000" required>
                                 </div>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Status Awal Penjualan</label>
-                                <select id="statusOpen" class="form-select">
-                                    <option value="true" selected>✅ Langsung Buka (Open)</option>
-                                    <option value="false">🔒 Tutup Dulu (Locked)</option>
-                                </select>
-                            </div>
-
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="bi bi-rocket-takeoff me-2"></i> Publish
                             </button>
@@ -199,9 +182,10 @@
                             <thead>
                                 <tr>
                                     <th>Event Info</th> 
+                                    <th>Jadwal & Lokasi</th>
                                     <th>Harga</th>
                                     <th class="text-center">Stok</th>
-                                    <th class="text-center">Status Jual</th> <th class="text-end">Aksi</th>
+                                    <th class="text-end">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
@@ -269,14 +253,6 @@
                             </div>
                         </div>
 
-                        <div class="mt-3">
-                            <label class="form-label">Status Penjualan</label>
-                            <select id="editIsOpen" class="form-select border-primary">
-                                <option value="true">✅ DIBUKA (User Bisa Beli)</option>
-                                <option value="false">🔒 DITUTUP (Tombol Lock)</option>
-                            </select>
-                        </div>
-
                         <div class="mt-3 pt-3 border-top">
                             <label class="form-label text-danger">Update Sisa Stok Manual</label>
                             <input type="number" id="editStock" class="form-control border-danger" required>
@@ -339,7 +315,7 @@
             });
         }
         
-        // --- 2. LOAD TABLE (DENGAN TOMBOL SWITCH LOCK/UNLOCK) ---
+        // --- 2. LOAD TABLE ---
         async function loadTable() {
             try {
                 const res = await fetch('/api/events');
@@ -366,28 +342,21 @@
                     const category = ev.category || 'General';
                     const location = ev.location || 'Lokasi TBA';
 
-                    // --- LOGIKA TOMBOL SWITCH ---
-                    const isOpen = ev.isOpen !== false; // Default true kalau undefined
-                    const switchState = isOpen ? 'checked' : '';
-                    const statusLabel = isOpen ? '<span class="text-success small fw-bold">OPEN</span>' : '<span class="text-danger small fw-bold">LOCKED</span>';
-
                     tbody.innerHTML += `
                         <tr>
                             <td>
                                 <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">${ev.name}</div>
-                                <div class="small text-secondary">${date}</div>
+                                <span class="badge bg-info text-dark" style="font-size:0.7rem;">${category}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark" style="font-size: 0.85rem;">${date}</div>
+                                <small class="text-secondary"><i class="bi bi-geo-alt-fill text-danger"></i> ${location}</small>
                             </td>
                             <td class="fw-bold text-primary" style="font-size: 0.9rem;">${harga}</td>
                             <td class="text-center">
                                 <span class="badge ${badgeColor} rounded-pill mb-1">${ev.availableSeats}</span>
                                 <div class="progress" style="height: 4px; width: 60px; margin: 0 auto;">
                                     <div class="progress-bar bg-dark" style="width: ${percent}%"></div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check form-switch d-flex justify-content-center align-items-center gap-2">
-                                    <input class="form-check-input" type="checkbox" onchange="toggleEventStatus('${ev._id}', this)" ${switchState} style="width: 2.5em; height: 1.2em;">
-                                    ${statusLabel}
                                 </div>
                             </td>
                             <td class="text-end">
@@ -398,29 +367,6 @@
                     `;
                 });
             } catch (err) { console.error(err); }
-        }
-
-        // --- FITUR BARU: TOGGLE STATUS (LOCK/UNLOCK) DARI TABEL ---
-        async function toggleEventStatus(id, checkbox) {
-            const isOpen = checkbox.checked;
-            try {
-                const res = await fetch(`/api/events/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ isOpen: isOpen })
-                });
-                
-                if(res.ok) {
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                    Toast.fire({ icon: 'success', title: isOpen ? 'Event DIBUKA ✅' : 'Event DITUTUP 🔒' });
-                    loadTable(); // Refresh biar label berubah
-                } else {
-                    throw new Error('Gagal');
-                }
-            } catch (err) {
-                checkbox.checked = !isOpen; // Balikin kalau gagal
-                Swal.fire('Error', 'Gagal mengubah status event', 'error');
-            }
         }
 
         // --- 3. BUKA MODAL EDIT ---
@@ -441,9 +387,6 @@
                 document.getElementById('editCapacity').value = ev.totalCapacity;
                 document.getElementById('editDescription').value = ev.description || '';
                 
-                // Set value dropdown status
-                document.getElementById('editIsOpen').value = (ev.isOpen !== false).toString();
-                
                 editModal.show();
             }
         }
@@ -459,8 +402,7 @@
                 price: document.getElementById('editPrice').value,
                 description: document.getElementById('editDescription').value,
                 availableSeats: document.getElementById('editStock').value,
-                capacity: document.getElementById('editCapacity').value,
-                isOpen: document.getElementById('editIsOpen').value === 'true' // Simpan status
+                capacity: document.getElementById('editCapacity').value
             };
 
             Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
@@ -497,8 +439,7 @@
                 date: document.getElementById('date').value,
                 price: document.getElementById('price').value,
                 capacity: document.getElementById('capacity').value,
-                description: document.getElementById('description').value,
-                isOpen: document.getElementById('statusOpen').value === 'true' // Ambil status awal
+                description: document.getElementById('description').value
             };
 
             try {
@@ -532,4 +473,4 @@
         checkMaintenanceStatus();
     </script>
 </body>
-</html>
+</html>  
