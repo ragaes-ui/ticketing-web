@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
     
     <script>
         const token = localStorage.getItem('adminToken');
@@ -31,27 +30,29 @@
         }
 
         .navbar { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 70px; }
-        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
-        .nav-icon-svg { width: 28px; height: 28px; fill: var(--primary-color); }
+        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; }
 
         .card { background: white; border: none; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 20px; }
         .card-header { background: white; border-bottom: 1px solid #e5e7eb; font-weight: 700; padding: 20px; border-radius: 12px 12px 0 0 !important; }
 
         .form-label { font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 5px; }
         .form-control, .form-select { border-radius: 8px; padding: 10px; border: 1px solid #d1d5db; font-size: 0.9rem; }
-        .form-control:focus, .form-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 100, 210, 0.1); }
-
+        
         .table thead th { font-size: 0.75rem; text-transform: uppercase; color: #6b7280; background: #f9fafb; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
         .table tbody td { padding: 16px; vertical-align: middle; font-size: 0.9rem; border-bottom: 1px solid #f3f4f6; }
-        .table-hover tbody tr:hover { background-color: #f9fafb; }
 
         .btn-primary { background-color: var(--primary-color); border: none; font-weight: 600; padding: 10px 20px; border-radius: 8px; }
-        .btn-primary:hover { background-color: #0056b3; }
         .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; }
         
-        .modal-content { border-radius: 12px; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .modal-header { border-bottom: 1px solid #e5e7eb; padding: 20px; }
-        .modal-footer { border-top: 1px solid #e5e7eb; padding: 20px; }
+        /* Highlight untuk input data akun */
+        .digital-box {
+            background-color: #eff6ff;
+            border: 1px dashed #0064d2;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none; /* Hidden by default */
+        }
     </style>
 </head>
 <body class="pb-5">
@@ -59,15 +60,12 @@
     <nav class="navbar navbar-expand-lg fixed-top px-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
-                </svg>
-                ADMIN PORTAL
+                <i class="bi bi-shield-lock-fill me-2"></i> ADMIN PANEL
             </a>
             
             <div class="d-flex align-items-center gap-3">
                 <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill px-3" target="_blank">
-                    <i class="bi bi-box-arrow-up-right me-1"></i> Lihat Website
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Web Utama
                 </a>
                 <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3">
                     <i class="bi bi-power"></i> Logout
@@ -79,34 +77,14 @@
     <div class="container mt-4">
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
-                <h3 class="fw-bold text-dark m-0">Event Management</h3>
-                <p class="text-secondary small m-0">Kelola jadwal konser, harga, dan tiket.</p>
+                <h3 class="fw-bold text-dark m-0">Produk & Event</h3>
+                <p class="text-secondary small m-0">Kelola tiket konser dan akun digital.</p>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <div class="d-inline-flex gap-3">
                     <div class="bg-white px-4 py-2 rounded-3 shadow-sm border">
-                        <small class="text-secondary d-block" style="font-size: 0.7rem;">TOTAL EVENT</small>
+                        <small class="text-secondary d-block" style="font-size: 0.7rem;">TOTAL PRODUK</small>
                         <span class="fw-bold fs-5 text-dark" id="totalEventBadge">0</span>
-                    </div>
-                    <div class="bg-white px-4 py-2 rounded-3 shadow-sm border">
-                        <small class="text-secondary d-block" style="font-size: 0.7rem;">STATUS SYSTEM</small>
-                        <span class="fw-bold fs-5 text-success">ONLINE</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-warning border-2">
-                    <div class="card-body d-flex justify-content-between align-items-center bg-warning-subtle py-3">
-                        <div>
-                            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-cone-striped me-2"></i>Maintenance Mode</h5>
-                            <small class="text-secondary">Jika aktif, pengunjung tidak bisa mengakses website.</small>
-                        </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="switchMaintenance" style="width: 3.5em; height: 1.75em; cursor: pointer;">
-                        </div>
                     </div>
                 </div>
             </div>
@@ -116,55 +94,68 @@
             <div class="col-lg-4">
                 <div class="card sticky-top" style="top: 100px; z-index: 1;">
                     <div class="card-header">
-                        <i class="bi bi-plus-circle me-2 text-primary"></i> Tambah Event Baru
+                        <i class="bi bi-plus-circle me-2 text-primary"></i> Tambah Baru
                     </div>
                     <div class="card-body">
                         <form id="formEvent">
                             <div class="mb-3">
-                                <label class="form-label">Kategori</label>
-                                <select id="category" class="form-select">
-                                    <option value="General">General / Lainnya</option>
-                                    <option value="Konser">Konser Musik</option>
-                                    <option value="Olahraga">Olahraga</option>
-                                    <option value="Workshop">Workshop</option>
+                                <label class="form-label">Jenis Produk</label>
+                                <select id="productType" class="form-select bg-light border-primary" onchange="toggleFormType('add')">
+                                    <option value="ticket" selected>🎫 Tiket Event / Konser</option>
+                                    <option value="digital">🔐 Akun Premium / App</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Nama Event</label>
-                                <input type="text" id="name" class="form-control" placeholder="Contoh: Rock Festival" required>
+                                <label class="form-label">Nama Produk/Event</label>
+                                <input type="text" id="name" class="form-control" placeholder="Contoh: Netflix 1 Bulan / Konser A" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Lokasi Venue</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                    <input type="text" id="location" class="form-control" placeholder="Contoh: ICE BSD" required>
+                                <label class="form-label">Kategori</label>
+                                <select id="category" class="form-select">
+                                    <option value="Konser">Konser Musik</option>
+                                    <option value="Streaming">Akun Streaming</option>
+                                    <option value="Game">Voucher Game</option>
+                                    <option value="General">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div id="digitalField_add" class="digital-box">
+                                <label class="form-label text-primary"><i class="bi bi-key-fill"></i> Data Akun / Pesan Rahasia</label>
+                                <textarea id="digitalContent" class="form-control" rows="3" placeholder="Masukkan Email/Pass/Link di sini. &#10;Data ini akan dikirim ke pembeli setelah bayar."></textarea>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">*User akan menerima data ini di Email/Dashboard mereka.</small>
+                            </div>
+
+                            <div id="ticketField_add">
+                                <div class="mb-3">
+                                    <label class="form-label">Lokasi / Venue</label>
+                                    <input type="text" id="location" class="form-control" placeholder="ICE BSD / Online">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Waktu Pelaksanaan</label>
+                                    <input type="datetime-local" id="date" class="form-control">
                                 </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Pelaksanaan</label>
-                                <input type="datetime-local" id="date" class="form-control" required>
-                            </div>
                             
-                            <div class="mb-3">
-                                <label class="form-label">Deskripsi</label>
-                                <textarea id="description" class="form-control" rows="3" placeholder="Info singkat..."></textarea>
-                            </div>
-
                             <div class="row g-2">
                                 <div class="col-6 mb-3">
-                                    <label class="form-label">Harga Tiket (Rp)</label>
+                                    <label class="form-label">Harga (Rp)</label>
                                     <input type="number" id="price" class="form-control" placeholder="50000" required>
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <label class="form-label">Kapasitas</label>
-                                    <input type="number" id="capacity" class="form-control" placeholder="1000" required>
+                                    <label class="form-label">Stok / Kuota</label>
+                                    <input type="number" id="capacity" class="form-control" placeholder="100" required>
                                 </div>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi Umum</label>
+                                <textarea id="description" class="form-control" rows="2" placeholder="Info produk untuk ditampilkan di web..."></textarea>
+                            </div>
+
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-rocket-takeoff me-2"></i> Publish
+                                <i class="bi bi-save me-2"></i> Simpan Produk
                             </button>
                         </form>
                     </div>
@@ -174,22 +165,22 @@
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-list-ul me-2 text-primary"></i> Database Event</span>
+                        <span><i class="bi bi-list-ul me-2 text-primary"></i> Daftar Produk Aktif</span>
                         <button class="btn btn-sm btn-light border" onclick="loadTable()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Event Info</th> 
-                                    <th>Jadwal & Lokasi</th>
+                                    <th>Produk</th> 
+                                    <th>Detail / Data</th>
                                     <th>Harga</th>
                                     <th class="text-center">Stok</th>
                                     <th class="text-end">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
-                                <tr><td colspan="5" class="text-center py-4 text-secondary">Sedang memuat data...</td></tr>
+                                <tr><td colspan="5" class="text-center py-4">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -202,7 +193,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">✏️ Edit Data</h5>
+                    <h5 class="modal-title fw-bold">✏️ Edit Produk</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -210,58 +201,54 @@
                         <input type="hidden" id="editId">
                         
                         <div class="mb-3">
-                            <label class="form-label">Nama Event</label>
-                            <input type="text" id="editName" class="form-control bg-light" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Kategori</label>
-                            <select id="editCategory" class="form-select bg-light">
-                                <option value="General">General</option>
-                                <option value="Konser">Konser Musik</option>
-                                <option value="Olahraga">Olahraga</option>
-                                <option value="Workshop">Workshop</option>
+                            <label class="form-label">Jenis Produk</label>
+                            <select id="editProductType" class="form-select" onchange="toggleFormType('edit')">
+                                <option value="ticket">🎫 Tiket Event</option>
+                                <option value="digital">🔐 Akun Digital</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Lokasi</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
-                                <input type="text" id="editLocation" class="form-control bg-light" required>
+                            <label class="form-label">Nama Produk</label>
+                            <input type="text" id="editName" class="form-control bg-light" required>
+                        </div>
+
+                        <div id="digitalField_edit" class="digital-box">
+                            <label class="form-label text-primary">Data Akun / Rahasia (Dikirim ke User)</label>
+                            <textarea id="editDigitalContent" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div id="ticketField_edit">
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi</label>
+                                <input type="text" id="editLocation" class="form-control bg-light">
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal</label>
-                            <input type="datetime-local" id="editDate" class="form-control bg-light" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Deskripsi</label>
-                            <textarea id="editDescription" class="form-control bg-light" rows="3"></textarea>
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal</label>
+                                <input type="datetime-local" id="editDate" class="form-control bg-light">
+                            </div>
                         </div>
                         
                         <div class="row g-3">
                             <div class="col-6">
-                                <label class="form-label">Harga Tiket</label>
+                                <label class="form-label">Harga</label>
                                 <input type="number" id="editPrice" class="form-control bg-light" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Total Kapasitas</label>
-                                <input type="number" id="editCapacity" class="form-control bg-light" required>
+                                <label class="form-label">Sisa Stok</label>
+                                <input type="number" id="editStock" class="form-control border-danger" required>
                             </div>
                         </div>
 
-                        <div class="mt-3 pt-3 border-top">
-                            <label class="form-label text-danger">Update Sisa Stok Manual</label>
-                            <input type="number" id="editStock" class="form-control border-danger" required>
+                        <div class="mt-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea id="editDescription" class="form-control bg-light" rows="2"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" onclick="saveEdit()" class="btn btn-primary px-4">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" onclick="saveEdit()" class="btn btn-primary">Update</button>
                 </div>
             </div>
         </div>
@@ -274,48 +261,22 @@
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
         let eventsData = []; 
 
-        // --- 1. LOGIC MAINTENANCE MODE (TETAP ADA) ---
-        const switchMaint = document.getElementById('switchMaintenance');
+        // 1. LOGIC GANTI TAMPILAN FORM (TIKET vs DIGITAL)
+        function toggleFormType(mode) {
+            const type = document.getElementById(mode === 'add' ? 'productType' : 'editProductType').value;
+            const digitalBox = document.getElementById(mode === 'add' ? 'digitalField_add' : 'digitalField_edit');
+            const ticketBox = document.getElementById(mode === 'add' ? 'ticketField_add' : 'ticketField_edit');
 
-        async function checkMaintenanceStatus() {
-            try {
-                const res = await fetch('/api/maintenance');
-                const data = await res.json();
-                if(switchMaint) switchMaint.checked = data.isActive;
-            } catch (err) { console.error(err); }
+            if (type === 'digital') {
+                digitalBox.style.display = 'block';
+                ticketBox.style.display = 'none';
+            } else {
+                digitalBox.style.display = 'none';
+                ticketBox.style.display = 'block';
+            }
         }
 
-        if(switchMaint) {
-            switchMaint.addEventListener('change', async function() {
-                const isMaintenance = this.checked;
-                const confirm = await Swal.fire({
-                    title: isMaintenance ? 'Matikan Website?' : 'Nyalakan Website?',
-                    text: isMaintenance ? "Pengunjung akan melihat layar perbaikan." : "Website akan bisa diakses kembali.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: isMaintenance ? '#d33' : '#0064d2',
-                    confirmButtonText: isMaintenance ? 'Ya, Matikan!' : 'Ya, Online-kan!'
-                });
-
-                if (confirm.isConfirmed) {
-                    try {
-                        await fetch('/api/maintenance', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isActive: isMaintenance })
-                        });
-                        Swal.fire('Sukses', isMaintenance ? 'Website sedang Maintenance.' : 'Website Online Kembali!', 'success');
-                    } catch (err) {
-                        Swal.fire('Error', 'Gagal update status', 'error');
-                        this.checked = !isMaintenance;
-                    }
-                } else {
-                    this.checked = !isMaintenance;
-                }
-            });
-        }
-        
-        // --- 2. LOAD TABLE ---
+        // 2. LOAD TABLE
         async function loadTable() {
             try {
                 const res = await fetch('/api/events');
@@ -326,41 +287,37 @@
                 tbody.innerHTML = '';
 
                 if(eventsData.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-secondary">Belum ada event.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-secondary">Belum ada produk.</td></tr>`;
                     return;
                 }
 
                 eventsData.forEach(ev => {
-                    const date = new Date(ev.date).toLocaleString('id-ID');
                     const harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(ev.price);
-                    const percent = Math.round((ev.availableSeats / ev.totalCapacity) * 100);
                     
-                    let badgeColor = 'bg-success';
-                    if(percent < 20) badgeColor = 'bg-danger';
-                    else if(percent < 50) badgeColor = 'bg-warning text-dark';
-
-                    const category = ev.category || 'General';
-                    const location = ev.location || 'Lokasi TBA';
+                    // Tentukan Ikon & Info berdasarkan tipe
+                    let iconType = ev.productType === 'digital' ? '<i class="bi bi-phone-fill text-warning"></i> DIGITAL' : '<i class="bi bi-ticket-perforated-fill text-primary"></i> TIKET';
+                    
+                    let detailInfo = '';
+                    if(ev.productType === 'digital') {
+                        detailInfo = `<small class="text-muted"><i class="bi bi-key"></i> Data Auto-Kirim</small>`;
+                    } else {
+                        const date = ev.date ? new Date(ev.date).toLocaleString('id-ID') : '-';
+                        detailInfo = `<div style="font-size:0.8rem;">${date}</div><small class="text-secondary">${ev.location || 'Online'}</small>`;
+                    }
 
                     tbody.innerHTML += `
                         <tr>
                             <td>
-                                <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">${ev.name}</div>
-                                <span class="badge bg-info text-dark" style="font-size:0.7rem;">${category}</span>
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">${ev.name}</div>
+                                <span class="badge bg-light text-dark border">${iconType}</span>
                             </td>
-                            <td>
-                                <div class="fw-bold text-dark" style="font-size: 0.85rem;">${date}</div>
-                                <small class="text-secondary"><i class="bi bi-geo-alt-fill text-danger"></i> ${location}</small>
-                            </td>
-                            <td class="fw-bold text-primary" style="font-size: 0.9rem;">${harga}</td>
+                            <td>${detailInfo}</td>
+                            <td class="fw-bold text-success" style="font-size: 0.9rem;">${harga}</td>
                             <td class="text-center">
-                                <span class="badge ${badgeColor} rounded-pill mb-1">${ev.availableSeats}</span>
-                                <div class="progress" style="height: 4px; width: 60px; margin: 0 auto;">
-                                    <div class="progress-bar bg-dark" style="width: ${percent}%"></div>
-                                </div>
+                                <span class="badge bg-secondary rounded-pill">${ev.availableSeats}</span>
                             </td>
                             <td class="text-end">
-                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-action btn-outline-secondary me-1"><i class="bi bi-pencil-square"></i></button>
+                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-action btn-outline-primary me-1"><i class="bi bi-pencil-square"></i></button>
                                 <button onclick="hapusKonser('${ev._id}')" class="btn btn-action btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </td>
                         </tr>
@@ -369,43 +326,86 @@
             } catch (err) { console.error(err); }
         }
 
-        // --- 3. BUKA MODAL EDIT ---
+        // 3. TAMBAH BARU
+        document.getElementById('formEvent').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const type = document.getElementById('productType').value;
+            
+            const data = {
+                productType: type, // 'ticket' atau 'digital'
+                name: document.getElementById('name').value,
+                category: document.getElementById('category').value,
+                price: document.getElementById('price').value,
+                capacity: document.getElementById('capacity').value, // Stok
+                availableSeats: document.getElementById('capacity').value, // Stok awal sama dengan kapasitas
+                description: document.getElementById('description').value,
+                
+                // Kondisional
+                location: type === 'ticket' ? document.getElementById('location').value : 'Digital Delivery',
+                date: type === 'ticket' ? document.getElementById('date').value : null,
+                digitalContent: type === 'digital' ? document.getElementById('digitalContent').value : '' 
+            };
+
+            try {
+                await fetch('/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                Swal.fire('Sukses', 'Produk berhasil ditambahkan!', 'success');
+                loadTable();
+                e.target.reset();
+                toggleFormType('add'); // Reset tampilan
+            } catch (err) { Swal.fire('Error', 'Gagal menyimpan', 'error'); }
+        });
+
+        // 4. BUKA MODAL EDIT
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if (ev) {
                 document.getElementById('editId').value = ev._id;
                 document.getElementById('editName').value = ev.name;
-                document.getElementById('editCategory').value = ev.category || 'General';
-                document.getElementById('editLocation').value = ev.location || ''; 
-                
-                const d = new Date(ev.date);
-                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-                document.getElementById('editDate').value = d.toISOString().slice(0,16);
-
                 document.getElementById('editPrice').value = ev.price;
                 document.getElementById('editStock').value = ev.availableSeats;
-                document.getElementById('editCapacity').value = ev.totalCapacity;
                 document.getElementById('editDescription').value = ev.description || '';
+                
+                // Set Tipe
+                const type = ev.productType || 'ticket'; // Default ke ticket kalo kosong
+                document.getElementById('editProductType').value = type;
+                toggleFormType('edit');
+
+                if(type === 'digital') {
+                    document.getElementById('editDigitalContent').value = ev.digitalContent || '';
+                } else {
+                    document.getElementById('editLocation').value = ev.location || ''; 
+                    if(ev.date) {
+                        const d = new Date(ev.date);
+                        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                        document.getElementById('editDate').value = d.toISOString().slice(0,16);
+                    }
+                }
                 
                 editModal.show();
             }
         }
 
-        // --- 4. SIMPAN PERUBAHAN ---
+        // 5. SIMPAN EDIT
         async function saveEdit() {
             const id = document.getElementById('editId').value;
+            const type = document.getElementById('editProductType').value;
+            
             const data = {
+                productType: type,
                 name: document.getElementById('editName').value,
-                category: document.getElementById('editCategory').value,
-                location: document.getElementById('editLocation').value,
-                date: document.getElementById('editDate').value,
                 price: document.getElementById('editPrice').value,
                 description: document.getElementById('editDescription').value,
                 availableSeats: document.getElementById('editStock').value,
-                capacity: document.getElementById('editCapacity').value
+                
+                location: type === 'ticket' ? document.getElementById('editLocation').value : 'Digital Delivery',
+                date: type === 'ticket' ? document.getElementById('editDate').value : null,
+                digitalContent: type === 'digital' ? document.getElementById('editDigitalContent').value : ''
             };
-
-            Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
 
             try {
                 const res = await fetch(`/api/events/${id}`, {
@@ -416,48 +416,14 @@
 
                 if(res.ok) {
                     editModal.hide();
-                    Swal.fire('Berhasil', 'Data update sukses!', 'success');
+                    Swal.fire('Berhasil', 'Update sukses!', 'success');
                     loadTable();
-                } else {
-                    Swal.fire('Gagal', 'Error update data', 'error');
-                }
+                } else { Swal.fire('Gagal', 'Error update', 'error'); }
             } catch (err) { console.error(err); }
         }
 
-        // --- 5. TAMBAH EVENT BARU ---
-        document.getElementById('formEvent').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-            btn.disabled = true;
-
-            const data = {
-                name: document.getElementById('name').value,
-                category: document.getElementById('category').value,
-                location: document.getElementById('location').value,
-                date: document.getElementById('date').value,
-                price: document.getElementById('price').value,
-                capacity: document.getElementById('capacity').value,
-                description: document.getElementById('description').value
-            };
-
-            try {
-                await fetch('/api/events', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                Swal.fire('Sukses', 'Event dibuat!', 'success');
-                loadTable();
-                e.target.reset();
-            } catch (err) { Swal.fire('Error', 'Gagal', 'error'); } 
-            finally { btn.innerHTML = originalText; btn.disabled = false; }
-        });
-
-        // --- 6. HAPUS ---
         async function hapusKonser(id) {
-            if((await Swal.fire({ title:'Hapus?', icon:'warning', showCancelButton:true })).isConfirmed) {
+            if((await Swal.fire({ title:'Hapus Produk?', icon:'warning', showCancelButton:true })).isConfirmed) {
                 await fetch(`/api/events/${id}`, { method: 'DELETE' });
                 loadTable();
             }
@@ -468,9 +434,9 @@
             window.location.href = 'login.html';
         }
 
-        // Init
+        // Init saat loading
         loadTable();
-        checkMaintenanceStatus();
+        toggleFormType('add'); 
     </script>
 </body>
 </html>
