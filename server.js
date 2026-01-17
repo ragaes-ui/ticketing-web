@@ -486,4 +486,4 @@ app.get('*', (req, res) => {
 });
 const PORT = process.env.PORT || 5000;
 module.exports = app; 
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); coba updatein dah
+app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); 
