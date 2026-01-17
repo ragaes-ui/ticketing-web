@@ -1,41 +1,17 @@
-const mongoose = require('mongoose'); // 'const' harus huruf kecil
+const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    name: { 
-        type: String, 
-        required: true 
-    },
-    date: { 
-        type: Date, 
-        required: true 
-    },
-    price: { 
-        type: Number, 
-        required: true 
-    },
-    totalCapacity: { 
-        type: Number, 
-        required: true 
-    },
-    availableSeats: { 
-        type: Number, 
-        required: true 
-    },
+    name: { type: String, required: true },
+    date: { type: Date, required: true },
+    price: { type: Number, required: true },
+    totalCapacity: { type: Number, required: true },
+    availableSeats: { type: Number, required: true },
     
-
-    // --- KOLOM TAMBAHAN ---
-    description: { 
-        type: String, 
-        default: "" 
-    },
-    category: { 
-        type: String, 
-        default: 'General' 
-    },
-    location: { 
-        type: String, 
-        default: 'TBA' 
-    }
-}, { timestamps: true }); // Opsional: Biar ada created_at & updated_at
+    // --- FITUR LOCK SUDAH DIHAPUS ---
+    
+    description: { type: String, default: "" },
+    category: { type: String, default: 'General' },
+    location: { type: String, default: 'TBA' }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);
