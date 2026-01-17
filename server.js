@@ -1,4 +1,4 @@
-const path = require('path');
+Const path = require('path');
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -39,6 +39,7 @@ async function connectDB() {
       serverSelectionTimeoutMS: 5000, // Timeout max 5 detik
     };
 
+    // Ganti URI ini dengan punya Abang
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
 
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
@@ -58,6 +59,7 @@ async function connectDB() {
 }
 
 // 🔥 MIDDLEWARE WAJIB: TUNGGU DB KONEK SEBELUM LANJUT
+// Ini yang bikin error "Buffering Timed Out" hilang selamanya
 app.use(async (req, res, next) => {
     // Skip buat file statis (gambar/css/js) biar cepet
     if (req.path.includes('.') && !req.path.startsWith('/api')) {
@@ -90,34 +92,21 @@ app.get('/api/events', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 2. Tambah Konser Baru (UPDATE: Support isOpen)
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, date, price, capacity, description, category, location, isOpen } = req.body;
-        
+        const { name, date, price, capacity, description, category, location } = req.body;
         const newEvent = new Event({
-            name, 
-            date, 
-            price, 
-            totalCapacity: capacity, 
-            availableSeats: capacity,
-            description: description || "", 
-            category: category || "General", 
-            location: location || "TBA",
-            isOpen: isOpen !== undefined ? isOpen : true // Default BUKA kalau tidak diset
+            name, date, price, totalCapacity: capacity, availableSeats: capacity,
+            description: description || "", category: category || "General", location: location || "TBA"
         });
-        
         await newEvent.save();
         res.json(newEvent);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 3. Update Konser
 app.put('/api/events/:id', async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(404).json({ error: "ID Konser gak valid" });
-        
-        // req.body otomatis membawa field isOpen jika dikirim dari Admin
         const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true }); 
         res.json({ message: "Sukses update!", data: updatedEvent });
     } catch (error) { res.status(500).json({ error: error.message }); }
@@ -180,11 +169,6 @@ app.post('/api/payment-token', async (req, res) => {
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
-        // Cek lagi di Backend biar aman (Security Layer)
-        if (event.isOpen === false) {
-            return res.status(400).json({ message: "Penjualan tiket untuk event ini sedang ditutup." });
-        }
-
         const grossAmount = event.price * quantity;
         const orderId = "ORDER-" + new Date().getTime(); 
 
@@ -197,7 +181,7 @@ app.post('/api/payment-token', async (req, res) => {
 
         const transaction = await snap.createTransaction(parameter);
 
-        // Tiket Code: TIKET- + Random String
+        // Bikin Tiket Code: TIKET-12ANGKA/HURUF
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
@@ -315,4 +299,4 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`)); server js saya
