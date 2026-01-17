@@ -127,12 +127,12 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Ubah Nama Profil</h5>
+                    <h5 class="modal-title fw-bold">Ubah Nama Lengkap</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <label class="form-label small text-secondary">Nama Baru</label>
-                    <input type="text" id="inputNewName" class="form-control" placeholder="Masukkan nama baru">
+                    <label class="form-label small text-secondary">Nama Lengkap Baru</label>
+                    <input type="text" id="inputNewName" class="form-control" placeholder="Contoh: Raga Ganteng">
                 </div>
                 <div class="modal-footer border-0">
                     <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
@@ -175,19 +175,21 @@
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        // Tampilkan Nama & Email di Profil Card
+        // Tampilkan Nama & Email di Profil Card (PRIORITAS: FULL NAME)
         function renderProfile() {
+            // Kita cek fullName dulu, baru username
             const displayName = user.fullName || user.username || 'User';
             document.getElementById('userNameDisplay').innerText = displayName;
             document.getElementById('userEmailDisplay').innerText = user.email;
         }
         renderProfile();
 
-        // --- 2. LOGIC UBAH NAMA ---
+        // --- 2. LOGIC UBAH NAMA (UPDATE: Full Name) ---
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
 
         function openNameModal() {
-            document.getElementById('inputNewName').value = user.username;
+            // Pre-fill dengan fullName kalau ada, kalau gak ada username
+            document.getElementById('inputNewName').value = user.fullName || user.username;
             nameModal.show();
         }
 
@@ -204,7 +206,9 @@
                 const data = await res.json();
 
                 if(res.ok) {
-                    user.username = newName;
+                    // Update Local Storage dengan Nama Baru (fullName & username disamakan biar aman)
+                    user.fullName = newName;
+                    user.username = newName; 
                     localStorage.setItem('userData', JSON.stringify(user));
                     
                     renderProfile(); 
@@ -278,7 +282,9 @@
                         eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     }
                     
-                    const namaPemesan = t.customerName || user.username || "Pengunjung";
+                    // Prioritaskan Nama Customer dari DB Order -> Full Name -> Username
+                    const namaPemesan = t.customerName || user.fullName || user.username || "Pengunjung";
+                    
                     const isUsed = t.status === 'used';
                     const statusBadge = isUsed 
                         ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
@@ -341,130 +347,28 @@
                     document.body.innerHTML = `
                         <style>
                             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-                            
-                            body {
-                                margin: 0;
-                                padding: 0;
-                                font-family: 'Poppins', sans-serif;
-                                background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe);
-                                background-size: 400% 400%;
-                                animation: gradientBG 15s ease infinite;
-                                height: 100vh;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                overflow: hidden;
-                            }
-
-                            /* Background Animation */
-                            @keyframes gradientBG {
-                                0% { background-position: 0% 50%; }
-                                50% { background-position: 100% 50%; }
-                                100% { background-position: 0% 50%; }
-                            }
-
-                            .glass-card {
-                                background: rgba(255, 255, 255, 0.05);
-                                backdrop-filter: blur(20px);
-                                -webkit-backdrop-filter: blur(20px);
-                                border-radius: 24px;
-                                border: 1px solid rgba(255, 255, 255, 0.1);
-                                padding: 50px 40px;
-                                text-align: center;
-                                max-width: 500px;
-                                width: 90%;
-                                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-                                color: white;
-                                position: relative;
-                                overflow: hidden;
-                            }
-
-                            .floating-illustration {
-                                font-size: 80px;
-                                margin-bottom: 20px;
-                                display: inline-block;
-                                animation: float 3s ease-in-out infinite;
-                                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-                            }
-
-                            @keyframes float {
-                                0% { transform: translateY(0px) rotate(0deg); }
-                                50% { transform: translateY(-20px) rotate(5deg); }
-                                100% { transform: translateY(0px) rotate(0deg); }
-                            }
-
-                            h1 {
-                                font-size: 2rem;
-                                font-weight: 800;
-                                margin-bottom: 10px;
-                                background: linear-gradient(to right, #fff, #b0c0d6);
-                                -webkit-background-clip: text;
-                                -webkit-text-fill-color: transparent;
-                            }
-
-                            p {
-                                color: #d1d5db;
-                                font-size: 1rem;
-                                line-height: 1.6;
-                                margin-bottom: 30px;
-                            }
-
-                            .btn-retry {
-                                background: white;
-                                color: #0e1e3b;
-                                border: none;
-                                padding: 12px 35px;
-                                border-radius: 50px;
-                                font-weight: 700;
-                                font-size: 1rem;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-                            }
-
-                            .btn-retry:hover {
-                                transform: scale(1.05);
-                                box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
-                            }
-
-                            .btn-retry:active {
-                                transform: scale(0.95);
-                            }
-
-                            /* Hiasan bubbles */
-                            .bubble {
-                                position: absolute;
-                                border-radius: 50%;
-                                background: rgba(255, 255, 255, 0.1);
-                                animation: rise 10s infinite ease-in;
-                                bottom: -50px;
-                            }
-                            @keyframes rise {
-                                0% { bottom: -50px; transform: translateX(0); }
-                                50% { transform: translateX(50px); }
-                                100% { bottom: 120%; transform: translateX(-50px); }
-                            }
+                            body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+                            @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+                            .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }
+                            .floating-illustration { font-size: 80px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); }
+                            @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+                            h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                            p { color: #d1d5db; font-size: 1rem; line-height: 1.6; margin-bottom: 30px; }
+                            .btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); }
+                            .btn-retry:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4); }
+                            .btn-retry:active { transform: scale(0.95); }
+                            .bubble { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1); animation: rise 10s infinite ease-in; bottom: -50px; }
+                            @keyframes rise { 0% { bottom: -50px; transform: translateX(0); } 50% { transform: translateX(50px); } 100% { bottom: 120%; transform: translateX(-50px); } }
                         </style>
-
                         <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 8s;"></div>
                         <div class="bubble" style="width: 40px; height: 40px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
                         <div class="bubble" style="width: 80px; height: 80px; left: 70%; animation-duration: 15s; animation-delay: 1s;"></div>
                         <div class="bubble" style="width: 30px; height: 30px; left: 90%; animation-duration: 10s; animation-delay: 4s;"></div>
-
                         <div class="glass-card">
-                            <div class="floating-illustration">
-                                👾🛠️
-                            </div>
+                            <div class="floating-illustration">👾🛠️</div>
                             <h1>Lagi Didandanin! ✨</h1>
-                            <p>
-                                Sstt... Dashboard kamu lagi istirahat sebentar. <br>
-                                Tim IT kami lagi ngopi sambil benerin kabel yang kusut.
-                                <br><br>
-                                <b>Coba balik lagi nanti ya!</b>
-                            </p>
-                            <button onclick="location.reload()" class="btn-retry">
-                                Cek Lagi Dong ↻
-                            </button>
+                            <p>Sstt... Dashboard kamu lagi istirahat sebentar. <br>Tim IT kami lagi ngopi sambil benerin kabel yang kusut.<br><br><b>Coba balik lagi nanti ya!</b></p>
+                            <button onclick="location.reload()" class="btn-retry">Cek Lagi Dong ↻</button>
                         </div>
                     `;
                 }
