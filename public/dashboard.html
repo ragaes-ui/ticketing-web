@@ -30,7 +30,7 @@
         .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
         .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
 
-        /* Card Profil Baru */
+        /* Card Profil */
         .profile-card {
             background: white;
             border-radius: 16px;
@@ -132,7 +132,7 @@
                 </div>
                 <div class="modal-body">
                     <label class="form-label small text-secondary">Nama Lengkap Baru</label>
-                    <input type="text" id="inputNewName" class="form-control" placeholder="Contoh: Raga Ganteng">
+                    <input type="text" id="inputNewName" class="form-control" placeholder="Contoh: Raga Admin Ganteng">
                 </div>
                 <div class="modal-footer border-0">
                     <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
@@ -177,18 +177,17 @@
 
         // Tampilkan Nama & Email di Profil Card (PRIORITAS: FULL NAME)
         function renderProfile() {
-            // Kita cek fullName dulu, baru username
+            // Ambil fullName dulu, kalau kosong baru username
             const displayName = user.fullName || user.username || 'User';
             document.getElementById('userNameDisplay').innerText = displayName;
             document.getElementById('userEmailDisplay').innerText = user.email;
         }
         renderProfile();
 
-        // --- 2. LOGIC UBAH NAMA (UPDATE: Full Name) ---
+        // --- 2. LOGIC UBAH NAMA ---
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
 
         function openNameModal() {
-            // Pre-fill dengan fullName kalau ada, kalau gak ada username
             document.getElementById('inputNewName').value = user.fullName || user.username;
             nameModal.show();
         }
@@ -206,12 +205,15 @@
                 const data = await res.json();
 
                 if(res.ok) {
-                    // Update Local Storage dengan Nama Baru (fullName & username disamakan biar aman)
+                    // Update Local Storage biar langsung berubah tanpa refresh
                     user.fullName = newName;
-                    user.username = newName; 
+                    user.username = newName; // Update juga username biar sinkron
                     localStorage.setItem('userData', JSON.stringify(user));
                     
                     renderProfile(); 
+                    // Reload tiket biar nama di tiket juga berubah
+                    loadTickets();
+                    
                     nameModal.hide();
                     Swal.fire('Berhasil', 'Nama profil berhasil diubah!', 'success');
                 } else {
@@ -257,7 +259,7 @@
             } catch(err) { console.error(err); }
         }
 
-        // --- 4. LOAD TIKET ---
+        // --- 4. LOAD TIKET (PERBAIKAN NAMA PEMESAN) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             try {
@@ -282,8 +284,10 @@
                         eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     }
                     
-                    // Prioritaskan Nama Customer dari DB Order -> Full Name -> Username
-                    const namaPemesan = t.customerName || user.fullName || user.username || "Pengunjung";
+                    // 🔥 UPDATE PENTING:
+                    // Kita Prioritaskan Nama Lengkap dari Profil (user.fullName)
+                    // Jadi walaupun di database tiketnya masih username lama, tampilannya tetap Nama Lengkap Abang.
+                    const namaPemesan = user.fullName || t.customerName || user.username || "Pengunjung";
                     
                     const isUsed = t.status === 'used';
                     const statusBadge = isUsed 
@@ -313,6 +317,7 @@
                     `;
                 });
 
+                // Generate QR Code
                 tickets.forEach(t => {
                     const container = document.getElementById(`qrcode-${t._id}`);
                     if(container) {
@@ -335,14 +340,10 @@
     <script>
         (async function() {
             try {
-                // Endpoint API Maintenance
                 const res = await fetch('/api/maintenance');
                 const data = await res.json();
-                
-                // Cek Admin Token
                 const isAdmin = localStorage.getItem('adminToken'); 
 
-                // Jika maintenance aktif DAN bukan admin, tampilkan layar maintenance
                 if (data.isActive && !isAdmin) {
                     document.body.innerHTML = `
                         <style>
@@ -360,10 +361,6 @@
                             .bubble { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1); animation: rise 10s infinite ease-in; bottom: -50px; }
                             @keyframes rise { 0% { bottom: -50px; transform: translateX(0); } 50% { transform: translateX(50px); } 100% { bottom: 120%; transform: translateX(-50px); } }
                         </style>
-                        <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 8s;"></div>
-                        <div class="bubble" style="width: 40px; height: 40px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
-                        <div class="bubble" style="width: 80px; height: 80px; left: 70%; animation-duration: 15s; animation-delay: 1s;"></div>
-                        <div class="bubble" style="width: 30px; height: 30px; left: 90%; animation-duration: 10s; animation-delay: 4s;"></div>
                         <div class="glass-card">
                             <div class="floating-illustration">👾🛠️</div>
                             <h1>Lagi Didandanin! ✨</h1>
