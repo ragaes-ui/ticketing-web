@@ -12,7 +12,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // --- MODEL DATABASE ---
-// Pastikan nama file model ini sesuai dengan yang ada di folder models (besar/kecil huruf ngaruh di Vercel/Linux)
+// Pastikan nama file model ini sesuai dengan yang ada di folder models
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event');
@@ -24,10 +24,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ⚠️ UPDATE PENTING: Biar Vercel gak bingung cari folder public
-app.use(express.static(path.join(process.cwd(), 'public')));
+// ⚠️ UPDATE PENTING: Paksa Vercel cari folder public di root
+const publicPath = path.join(process.cwd(), 'public');
+app.use(express.static(publicPath));
 
-// --- KONFIGURASI SESSION & PASSPORT (WAJIB BUAT GOOGLE) ---
+// --- KONFIGURASI SESSION & PASSPORT ---
 app.use(session({
     secret: 'rcelltech-auth-rcellfest', 
     resave: false,
@@ -60,19 +61,13 @@ passport.use(new GoogleStrategy({
   },
   async function(accessToken, refreshToken, profile, cb) {
     try {
-        // 1. Cek apakah user sudah ada berdasarkan Google ID
         let user = await User.findOne({ googleId: profile.id });
-        
-        // 2. Kalau belum, cek emailnya
         if (!user) {
             user = await User.findOne({ email: profile.emails[0].value });
-            
             if (user) {
-                // Email ada, sambungkan Google ID
                 user.googleId = profile.id;
                 await user.save();
             } else {
-                // User baru, buat akun
                 user = new User({
                     username: profile.displayName,
                     email: profile.emails[0].value,
@@ -90,7 +85,6 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-// Serialize User untuk Session
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
     User.findById(id).then(user => done(null, user));
@@ -99,7 +93,6 @@ passport.deserializeUser((id, done) => {
 
 // --- ROUTES API ---
 
-// 1. Ambil Semua Konser
 app.get('/api/events', async (req, res) => {
     try {
         const events = await Event.find();
@@ -109,20 +102,12 @@ app.get('/api/events', async (req, res) => {
     }
 });
 
-// 2. Tambah Konser Baru (Create)
 app.post('/api/events', async (req, res) => {
     try {
         const { name, date, price, capacity, description, category, location } = req.body;
-        
         const newEvent = new Event({
-            name,
-            date,
-            price,
-            totalCapacity: capacity,
-            availableSeats: capacity,
-            description: description || "",
-            category: category || "General",
-            location: location || "TBA"
+            name, date, price, totalCapacity: capacity, availableSeats: capacity,
+            description: description || "", category: category || "General", location: location || "TBA"
         });
         await newEvent.save();
         res.json(newEvent);
@@ -131,111 +116,60 @@ app.post('/api/events', async (req, res) => {
     }
 });
 
-// 3. Update Konser (Edit)
 app.put('/api/events/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, date, price, capacity, availableSeats, description, category, location } = req.body;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(404).json({ error: "ID Konser gak valid" });
-        }
-
-        const updatedEvent = await Event.findByIdAndUpdate(id, { 
-            name, 
-            date, 
-            price, 
-            totalCapacity: capacity,
-            availableSeats: availableSeats,
-            description: description,
-            category: category,
-            location: location 
-        }, { new: true }); 
-
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ error: "ID Konser gak valid" });
+        const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true }); 
         res.json({ message: "Sukses update!", data: updatedEvent });
     } catch (error) {
-        console.error("Error Update:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// 4. Hapus Konser
 app.delete('/api/events/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        await Event.findByIdAndDelete(id);
+        await Event.findByIdAndDelete(req.params.id);
         res.json({ message: "Terhapus!" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- ROUTE KHUSUS GOOGLE LOGIN ---
+// --- ROUTE AUTH ---
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// A. Tombol Login Google Ditekan
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// B. Google Balikin User ke Server
 app.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/user-login.html' }),
   function(req, res) {
     const user = req.user;
-    
-    // Siapkan data token manual
     const token = "token-google-" + user._id;
-    
     const userData = JSON.stringify({
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        fullName: user.fullName
+        id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName
     });
-    
-    // Redirect ke halaman perantara
     res.redirect(`/google-success.html?token=${token}&userData=${encodeURIComponent(userData)}`);
   });
 
-
-// --- 1. REGISTER USER BARU ---
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
-        
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        
-        const newUser = new User({ 
-            username, 
-            email, 
-            password: hashedPassword,
-            role: role || 'user',
-            fullName: fullName, 
-            phone: phone
-        });
-        
+        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user', fullName, phone });
         await newUser.save();
-        res.json({ success: true, message: "Registrasi Berhasil! Silakan Login." });
+        res.json({ success: true, message: "Registrasi Berhasil!" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- 2. LOGIN MANUAL ---
 app.post('/api/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
-        
-        const user = await User.findOne({ 
-            $or: [{ username: identifier }, { email: identifier }] 
-        });
-        
+        const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
-
-        // Kalau user login pake password tapi akunnya akun Google (password kosong)
         if (!user.password) return res.status(400).json({ success: false, message: "Silakan login menggunakan Google" });
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -244,104 +178,52 @@ app.post('/api/login', async (req, res) => {
         res.json({ 
             success: true, 
             token: "token-rahasia-" + user._id,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                fullName: user.fullName || user.username, 
-                phone: user.phone || ""
-            }
+            user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone }
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- 3. API DASHBOARD USER ---
 app.post('/api/my-tickets', async (req, res) => {
     try {
-        const { email } = req.body;
-        const tickets = await Order.find({ 
-            email: email, 
-            status: { $in: ['valid', 'used'] } 
-        }).populate('eventId');
+        const tickets = await Order.find({ email: req.body.email, status: { $in: ['valid', 'used'] } }).populate('eventId');
         res.json(tickets);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- 4. API MINTA TOKEN PEMBAYARAN (MIDTRANS) ---
 app.post('/api/payment-token', async (req, res) => {
     try {
         const { eventId, customerName, customerEmail, quantity } = req.body;
-        
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
-        const grossAmount = event.price * quantity;
         const orderId = "ORDER-" + new Date().getTime();
-
         let parameter = {
-            transaction_details: {
-                order_id: orderId,
-                gross_amount: grossAmount
-            },
-            credit_card:{ secure : true },
-            customer_details: {
-                first_name: customerName,
-                email: customerEmail
-            },
-            item_details: [{
-                id: eventId,
-                price: event.price,
-                quantity: quantity,
-                name: event.name.substring(0, 50)
-            }]
+            transaction_details: { order_id: orderId, gross_amount: event.price * quantity },
+            customer_details: { first_name: customerName, email: customerEmail },
+            item_details: [{ id: eventId, price: event.price, quantity: quantity, name: event.name.substring(0, 50) }]
         };
-
         const transaction = await snap.createTransaction(parameter);
         res.json({ token: transaction.token, orderId: orderId });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
+    } catch (error) { res.status(500).json({ message: error.message }); }
 });
 
-// --- 5. ORDER / SIMPAN DATABASE ---
 app.post('/api/order', async (req, res) => {
     try {
         const { eventId, quantity, customerName, customerEmail } = req.body;
-        
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
-        // Buat Tiket Code
         const ticketCode = `RCELL-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
-        const newOrder = new Order({
-            ticketCode,
-            eventId,
-            customerName,
-            email: customerEmail,
-            status: 'valid' // Asumsi kalau masuk sini berarti sudah bayar via Frontend Snap
-        });
+        const newOrder = new Order({ ticketCode, eventId, customerName, email: customerEmail, status: 'valid' });
         await newOrder.save();
-
-        // Kurangi Stok
         event.availableSeats -= quantity;
         await event.save();
-
         res.json({ message: "Order Berhasil", ticketCode });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- 6. WEBHOOK NOTIFICATION (MIDTRANS) ---
 app.post('/api/payment-notification', async (req, res) => {
     try {
         const statusResponse = await snap.transaction.notification(req.body);
@@ -349,76 +231,44 @@ app.post('/api/payment-notification', async (req, res) => {
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
 
-        console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}.`);
-
         const order = await Order.findOne({ orderIdMidtrans: orderId });
-        
-        if (!order) {
-            return res.status(404).json({message: "Order not found"});
-        }
+        if (!order) return res.status(404).json({message: "Order not found"});
 
         if (transactionStatus == 'capture'){
-            if (fraudStatus == 'challenge'){
-                order.status = 'pending';
-            } else if (fraudStatus == 'accept'){
-                order.status = 'valid';
-            }
+            if (fraudStatus == 'challenge') order.status = 'pending';
+            else if (fraudStatus == 'accept') order.status = 'valid';
         } else if (transactionStatus == 'settlement'){
             order.status = 'valid';
-            
-            // Kurangi stok tiket saat lunas (opsional, kalau belum dikurangi di atas)
             const event = await Event.findById(order.eventId);
-            if(event) {
-                event.availableSeats -= 1; 
-                await event.save();
-            }
+            if(event) { event.availableSeats -= 1; await event.save(); }
         } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
             order.status = 'failed';
         } else if (transactionStatus == 'pending'){
             order.status = 'pending';
         }
-
         await order.save();
         res.status(200).send('OK');
-
-    } catch (error) {
-        console.error("Notification Error:", error.message);
-        res.status(500).json({ error: error.message });
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API CEK TIKET (VALIDASI) ---
 app.post('/api/validate', async (req, res) => {
     try {
-        const { ticketCode } = req.body;
-        const ticket = await Order.findOne({ ticketCode: ticketCode.trim() }).populate('eventId');
-
+        const ticket = await Order.findOne({ ticketCode: req.body.ticketCode.trim() }).populate('eventId');
         if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
         if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
 
         ticket.status = 'used';
         await ticket.save();
-
-        res.json({ 
-            valid: true, 
-            message: "TIKET VALID! SILAKAN MASUK ✅", 
-            data: { name: ticket.customerName, event: ticket.eventId ? ticket.eventId.name : 'Event Tidak Diketahui' }
-        });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+        res.json({ valid: true, message: "TIKET VALID! SILAKAN MASUK ✅", data: { name: ticket.customerName, event: ticket.eventId?.name } });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API PROFILE USER ---
 app.put('/api/user/update-name', async (req, res) => {
     try {
-        const { userId, newName } = req.body;
-        const user = await User.findById(userId);
+        const user = await User.findById(req.body.userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-
-        user.username = newName;
-        if(user.fullName) user.fullName = newName;
+        user.username = req.body.newName;
+        if(user.fullName) user.fullName = req.body.newName;
         await user.save();
         res.json({ success: true, message: "Nama berhasil diubah" });
     } catch (error) { res.status(500).json({ message: "Gagal update", error: error.message }); }
@@ -429,17 +279,14 @@ app.put('/api/user/change-password', async (req, res) => {
         const { userId, oldPassword, newPassword } = req.body;
         const user = await User.findById(userId);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
-
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
         res.json({ success: true, message: "Password berhasil diganti" });
     } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
 });
 
-// --- API MAINTENANCE MODE ---
 app.get('/api/maintenance', async (req, res) => {
     try {
         let config = await Config.findOne({ key: 'maintenance' });
@@ -448,42 +295,81 @@ app.get('/api/maintenance', async (req, res) => {
             await config.save();
         }
         res.json(config);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/maintenance', async (req, res) => {
     try {
-        const { isActive } = req.body;
         let config = await Config.findOne({ key: 'maintenance' });
-
-        if (!config) {
-            config = new Config({ key: 'maintenance', isActive: isActive });
-        } else {
-            config.isActive = isActive;
-        }
-
+        if (!config) config = new Config({ key: 'maintenance', isActive: req.body.isActive });
+        else config.isActive = req.body.isActive;
         await config.save();
         res.json({ success: true, status: config.isActive ? "MAINTENANCE ON" : "WEBSITE ONLINE" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ==========================================
+// 🔥 ROUTE KHUSUS BUAT DEBUGGING VERCEL 🔥
+// Akses ini kalau web masih blank/error 500
+// ==========================================
+app.get('/cek-server', (req, res) => {
+    const fs = require('fs');
+    let output = {};
+    
+    output.cwd = process.cwd();
+    output.publicPath = path.join(process.cwd(), 'public');
+    
+    try {
+        output.filesInPublic = fs.readdirSync(output.publicPath);
+        output.status = "✅ Folder Public DITEMUKAN!";
+    } catch (e) {
+        output.status = "❌ Folder Public GAK KETEMU!";
+        output.error = e.message;
+        
+        // Coba cek folder root isinya apa aja
+        try {
+            output.filesInRoot = fs.readdirSync(process.cwd());
+        } catch (e2) {
+            output.filesInRoot = "Gak bisa baca root juga: " + e2.message;
+        }
     }
+    res.json(output);
 });
 
 // ==========================================
 // ⚠️ ROUTE PENYELAMAT (CATCH-ALL)
-// WAJIB DITARUH PALING BAWAH (SEBELUM APP.LISTEN)
-// DAN JANGAN DIMASUKKAN KE DALAM FUNCTION LAIN
 // ==========================================
 app.get('*', (req, res) => {
-    // Kecuali kalau dia mau akses API atau Auth, jangan ditimpa
+    // 1. Jangan handle request API
     if (req.path.startsWith('/api') || req.path.startsWith('/auth')) {
         return res.status(404).json({ error: 'Not Found' });
     }
-    // Sisanya (Halaman Web) kasih index.html
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+    
+    // 2. Coba kirim file index.html dengan Error Handling
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error("Gagal kirim index.html:", err);
+            // Kalau gagal, kasih pesan error yang jelas di browser
+            res.status(500).send(`
+                <div style="font-family: sans-serif; padding: 20px; text-align: center;">
+                    <h1>💀 ERROR 500: Server Gagal Baca File</h1>
+                    <p>File <b>index.html</b> tidak ditemukan di:</p>
+                    <code style="background: #eee; padding: 5px;">${indexPath}</code>
+                    <br><br>
+                    <p><b>Solusi:</b></p>
+                    <ol style="display: inline-block; text-align: left;">
+                        <li>Pastikan folder <b>public</b> ter-upload ke GitHub.</li>
+                        <li>Cek file <b>vercel.json</b> apakah sudah ada "includeFiles".</li>
+                        <li>Coba buka link: <a href="/cek-server">/cek-server</a> untuk diagnosa.</li>
+                    </ol>
+                </div>
+            `);
+        }
+    });
 });
+
 const PORT = process.env.PORT || 5000;
-module.exports = app; 
+module.exports = app;
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
