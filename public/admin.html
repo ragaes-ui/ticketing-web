@@ -298,7 +298,7 @@
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
         let eventsData = []; 
 
-        // --- 1. LOGIC MAINTENANCE MODE ---
+        // --- 1. LOGIC MAINTENANCE MODE (TETAP ADA) ---
         const switchMaint = document.getElementById('switchMaintenance');
 
         async function checkMaintenanceStatus() {
@@ -363,6 +363,10 @@
                     if(percent < 20) badgeColor = 'bg-danger';
                     else if(percent < 50) badgeColor = 'bg-warning text-dark';
 
+                    const category = ev.category || 'General';
+                    const location = ev.location || 'Lokasi TBA';
+
+                    // --- LOGIKA TOMBOL SWITCH ---
                     const isOpen = ev.isOpen !== false; // Default true kalau undefined
                     const switchState = isOpen ? 'checked' : '';
                     const statusLabel = isOpen ? '<span class="text-success small fw-bold">OPEN</span>' : '<span class="text-danger small fw-bold">LOCKED</span>';
