@@ -484,31 +484,6 @@ app.get('*', (req, res) => {
     // Sisanya (Halaman Web) kasih index.html
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
-// --- TARUH INI DI ATAS app.listen ---
-
-app.get('/cek-file', (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  
-  // Cek folder saat ini
-  const currentDir = process.cwd();
-  
-  // Coba cari folder public
-  const publicPath = path.join(currentDir, 'public');
-  let publicFiles = 'Folder public TIDAK DITEMUKAN ❌';
-  
-  if (fs.existsSync(publicPath)) {
-    publicFiles = fs.readdirSync(publicPath).join(', ');
-  }
-
-  res.send(`
-    <h1>🔍 HASIL RONTGEN SERVER</h1>
-    <p><b>Posisi Sekarang:</b> ${currentDir}</p>
-    <p><b>Isi Folder Public:</b> ${publicFiles}</p>
-    <hr>
-    <p><b>Isi Folder Root:</b> ${fs.readdirSync(currentDir).join(', ')}</p>
-  `);
-});
 const PORT = process.env.PORT || 5000;
 module.exports = app; 
 app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
