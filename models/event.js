@@ -22,12 +22,6 @@ const eventSchema = new mongoose.Schema({
         required: true 
     },
     
-    // --- 👇 FITUR LOCK (PENTING) 👇 ---
-    isOpen: { 
-        type: Boolean, 
-        default: true 
-    }, // <--- JANGAN LUPA KOMA INI (PENTING!)
-    // ----------------------------------
 
     // --- KOLOM TAMBAHAN ---
     description: { 
