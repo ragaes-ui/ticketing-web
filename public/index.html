@@ -136,6 +136,11 @@
         }
         .btn-outline-book:hover { background: var(--primary-blue); color: white; }
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
+        
+        /* Style Tambahan untuk Tombol Lock */
+        .btn-locked {
+            border-color: #ddd; color: #999; background: #f0f0f0; cursor: not-allowed;
+        }
 
         /* Footer */
         .footer-loket { background-color: var(--dark-navy); color: white; padding: 50px 0 30px 0; margin-top: 60px; font-size: 0.85rem; }
@@ -406,7 +411,6 @@
 
         async function loadEvents() {
             try {
-                // Pastikan endpoint ini sesuai dengan URL backend kamu (misal dari Render)
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
                 renderEvents(allEvents);
@@ -425,6 +429,7 @@
             }
         }
 
+        // --- UPDATE LOGIKA TOMBOL (LOCK & SOLD OUT) ---
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
@@ -436,11 +441,27 @@
 
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
-                const isSoldOut = event.availableSeats <= 0;
                 const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                
                 const catName = event.category || 'General'; 
                 const locationName = event.location || 'Lokasi TBA';
+
+                // LOGIKA TOMBOL
+                const isLocked = event.isOpen === false; // Cek status Lock dari Admin
+                const isSoldOut = event.availableSeats <= 0;
+
+                let btnText = 'BELI';
+                let btnClass = 'btn-outline-book';
+                let btnAttr = '';
+
+                if (isLocked) {
+                    btnText = 'DITUTUP';
+                    btnClass = 'btn-locked disabled'; // Jadi abu-abu
+                    btnAttr = 'disabled';
+                } else if (isSoldOut) {
+                    btnText = 'HABIS';
+                    btnClass = 'btn-outline-book disabled';
+                    btnAttr = 'disabled';
+                }
 
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
@@ -458,8 +479,8 @@
                                 </div>
                                 
                                 <div class="price-val">Rp ${harga}</div>
-                                <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
-                                    ${isSoldOut ? 'HABIS' : 'BELI'}
+                                <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn ${btnClass}" ${btnAttr}>
+                                    ${btnText}
                                 </button>
                             </div>
                         </div>
@@ -468,6 +489,7 @@
             });
         }
 
+        // --- UPDATE MODAL (LOCK & SOLD OUT) ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -484,15 +506,21 @@
 
             const btnBuy = document.getElementById('btnModalBuy');
             const isSoldOut = event.availableSeats <= 0;
+            const isLocked = event.isOpen === false;
             
-            if (isSoldOut) {
+            // Reset Class
+            btnBuy.className = 'btn btn-lg px-4 rounded-pill fw-bold';
+            btnBuy.removeAttribute('onclick');
+            btnBuy.removeAttribute('disabled');
+
+            if (isLocked) {
+                btnBuy.innerText = "PENJUALAN DITUTUP";
+                btnBuy.classList.add('btn-secondary', 'disabled');
+            } else if (isSoldOut) {
                 btnBuy.innerText = "TIKET HABIS";
-                btnBuy.classList.add('disabled', 'btn-secondary');
-                btnBuy.classList.remove('btn-primary');
-                btnBuy.removeAttribute('onclick');
+                btnBuy.classList.add('btn-secondary', 'disabled');
             } else {
                 btnBuy.innerText = "Beli Tiket Sekarang";
-                btnBuy.classList.remove('disabled', 'btn-secondary');
                 btnBuy.classList.add('btn-primary');
                 btnBuy.onclick = function() {
                     detailModal.hide();
@@ -522,15 +550,20 @@
         }
 
         // --- FUNGSI BELI TIKET (INTEGRASI MIDTRANS) ---
-        // UPDATE: SEKARANG MENGGUNAKAN API /api/payment-token
         async function buyTicket(eventId) {
+            // Cek Status Event (Security Layer)
+            const event = allEvents.find(e => e._id === eventId);
+            if (event && event.isOpen === false) {
+                Swal.fire('Maaf', 'Penjualan tiket untuk event ini sedang ditutup.', 'warning');
+                return;
+            }
+
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
                 Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
                 return;
             }
             const user = JSON.parse(userRaw);
-            const event = allEvents.find(e => e._id === eventId);
             const namaPemesan = user.fullName ? user.fullName : user.username;
 
             const confirm = await Swal.fire({
@@ -559,7 +592,7 @@
                     });
                     const data = await res.json();
                     
-                    Swal.close(); // Tutup loading
+                    Swal.close(); 
 
                     if (res.ok && data.token) {
                         // BUKA POPUP MIDTRANS
