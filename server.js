@@ -10,7 +10,7 @@ const midtransClient = require('midtrans-client');
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event');
-const Config = require('./models/config'); // Pastikan file models/config.js ada!
+const Config = require('./models/config');
 
 const app = express();
 
@@ -19,10 +19,61 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'public')));
 
-// --- KONEKSI DATABASE ---
-mongoose.connect("mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority")
-  .then(() => console.log('✅ DATABASE NYAMBUNG BANG!'))
-  .catch(err => console.log('❌ Gagal Konek:', err));
+// ==========================================
+// 🛠️ FIX KONEKSI DATABASE (TEKNIK CACHING VERCEL)
+// ==========================================
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false, // PENTING: Biar gak nunggu lama kalau error
+      serverSelectionTimeoutMS: 5000, // Timeout max 5 detik
+    };
+
+    // Ganti URI ini dengan punya Abang
+    const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+
+    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
+      console.log('✅ DATABASE BARU AJA KONEK!');
+      return mongoose;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+// 🔥 MIDDLEWARE WAJIB: TUNGGU DB KONEK SEBELUM LANJUT
+// Ini yang bikin error "Buffering Timed Out" hilang selamanya
+app.use(async (req, res, next) => {
+    // Skip buat file statis (gambar/css/js) biar cepet
+    if (req.path.includes('.') && !req.path.startsWith('/api')) {
+        return next();
+    }
+    
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error("❌ Gagal Konek DB di Middleware:", error);
+        res.status(500).json({ error: "Database Connection Failed", detail: error.message });
+    }
+});
 
 // ==========================================
 // KONFIGURASI MIDTRANS
@@ -34,17 +85,13 @@ let snap = new midtransClient.Snap({
 
 // --- ROUTES API ---
 
-// 1. Ambil Semua Konser
 app.get('/api/events', async (req, res) => {
     try {
         const events = await Event.find();
         res.json(events);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 2. Tambah Konser Baru
 app.post('/api/events', async (req, res) => {
     try {
         const { name, date, price, capacity, description, category, location } = req.body;
@@ -57,7 +104,6 @@ app.post('/api/events', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 3. Update Konser
 app.put('/api/events/:id', async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(404).json({ error: "ID Konser gak valid" });
@@ -66,7 +112,6 @@ app.put('/api/events/:id', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 4. Hapus Konser
 app.delete('/api/events/:id', async (req, res) => {
     try {
         await Event.findByIdAndDelete(req.params.id);
@@ -74,7 +119,7 @@ app.delete('/api/events/:id', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API AUTHENTICATION (MANUAL) ---
+// --- API AUTHENTICATION ---
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
@@ -121,11 +166,9 @@ app.post('/api/payment-token', async (req, res) => {
     try {
         const { eventId, customerName, customerEmail, quantity } = req.body;
         
-        // 1. Cek Event
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
-        // 2. Siapkan Data Midtrans
         const grossAmount = event.price * quantity;
         const orderId = "ORDER-" + new Date().getTime(); 
 
@@ -136,11 +179,11 @@ app.post('/api/payment-token', async (req, res) => {
             item_details: [{ id: eventId, price: event.price, quantity: quantity, name: event.name.substring(0, 50) }]
         };
 
-        // 3. Minta Token ke Midtrans
         const transaction = await snap.createTransaction(parameter);
 
-        // 4. SIMPAN ORDER KE DATABASE
-        const ticketCode = `RCELL-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        // Bikin Tiket Code: TIKET-12ANGKA/HURUF
+        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
         const newOrder = new Order({
             ticketCode: ticketCode,
@@ -201,7 +244,6 @@ app.post('/api/validate', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API USER UPDATE ---
 app.put('/api/user/update-name', async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
@@ -226,39 +268,27 @@ app.put('/api/user/change-password', async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
 });
 
-// ==========================================
-// 🛠️ API MAINTENANCE (SUDAH ADA LAGI!)
-// ==========================================
+// --- API MAINTENANCE ---
 app.get('/api/maintenance', async (req, res) => {
     try {
         let config = await Config.findOne({ key: 'maintenance' });
         if (!config) {
-            // Kalau belum ada settingan, bikin default (OFF)
             config = new Config({ key: 'maintenance', isActive: false });
             await config.save();
         }
         res.json(config);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/maintenance', async (req, res) => {
     try {
         const { isActive } = req.body;
         let config = await Config.findOne({ key: 'maintenance' });
-
-        if (!config) {
-            config = new Config({ key: 'maintenance', isActive: isActive });
-        } else {
-            config.isActive = isActive;
-        }
-
+        if (!config) config = new Config({ key: 'maintenance', isActive: isActive });
+        else config.isActive = isActive;
         await config.save();
         res.json({ success: true, status: config.isActive ? "MAINTENANCE ON" : "WEBSITE ONLINE" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- ROUTE PENYELAMAT ---
