@@ -10,7 +10,7 @@ const midtransClient = require('midtrans-client');
 const User = require('./models/users'); 
 const Order = require('./models/order'); 
 const Event = require('./models/event');
-const Config = require('./models/config');
+const Config = require('./models/config'); // Pastikan file models/config.js ada!
 
 const app = express();
 
@@ -127,7 +127,7 @@ app.post('/api/payment-token', async (req, res) => {
         
         // 2. Siapkan Data Midtrans
         const grossAmount = event.price * quantity;
-        const orderId = "ORDER-" + new Date().getTime(); // ID Unik untuk Midtrans
+        const orderId = "ORDER-" + new Date().getTime(); 
 
         let parameter = {
             transaction_details: { order_id: orderId, gross_amount: grossAmount },
@@ -139,8 +139,7 @@ app.post('/api/payment-token', async (req, res) => {
         // 3. Minta Token ke Midtrans
         const transaction = await snap.createTransaction(parameter);
 
-        // 4. SIMPAN ORDER KE DATABASE (Status awal: pending)
-        // Kita simpan dulu biar nanti pas notifikasi masuk, datanya sudah ada
+        // 4. SIMPAN ORDER KE DATABASE
         const ticketCode = `RCELL-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
         
         const newOrder = new Order({
@@ -148,12 +147,11 @@ app.post('/api/payment-token', async (req, res) => {
             eventId: eventId,
             customerName: customerName,
             email: customerEmail,
-            status: 'pending',       // Status pending, menunggu bayar
-            orderIdMidtrans: orderId // KUNCI: Ini buat nyocokin sama notifikasi Midtrans
+            status: 'pending',       
+            orderIdMidtrans: orderId 
         });
         await newOrder.save();
 
-        // 5. Kirim Token ke Frontend
         res.json({ token: transaction.token, orderId: orderId });
 
     } catch (error) {
@@ -170,7 +168,6 @@ app.post('/api/payment-notification', async (req, res) => {
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
 
-        // Cari order berdasarkan ID dari Midtrans
         const order = await Order.findOne({ orderIdMidtrans: orderId });
         if (!order) return res.status(404).json({message: "Order not found"});
 
@@ -179,7 +176,6 @@ app.post('/api/payment-notification', async (req, res) => {
             else if (fraudStatus == 'accept') order.status = 'valid';
         } else if (transactionStatus == 'settlement'){
             order.status = 'valid';
-            // Kurangi stok saat lunas
             const event = await Event.findById(order.eventId);
             if(event) { event.availableSeats -= 1; await event.save(); }
         } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
@@ -203,6 +199,66 @@ app.post('/api/validate', async (req, res) => {
         await ticket.save();
         res.json({ valid: true, message: "TIKET VALID! SILAKAN MASUK ✅", data: { name: ticket.customerName, event: ticket.eventId?.name } });
     } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// --- API USER UPDATE ---
+app.put('/api/user/update-name', async (req, res) => {
+    try {
+        const user = await User.findById(req.body.userId);
+        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
+        user.username = req.body.newName;
+        if(user.fullName) user.fullName = req.body.newName;
+        await user.save();
+        res.json({ success: true, message: "Nama berhasil diubah" });
+    } catch (error) { res.status(500).json({ message: "Gagal update", error: error.message }); }
+});
+
+app.put('/api/user/change-password', async (req, res) => {
+    try {
+        const { userId, oldPassword, newPassword } = req.body;
+        const user = await User.findById(userId);
+        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        res.json({ success: true, message: "Password berhasil diganti" });
+    } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
+});
+
+// ==========================================
+// 🛠️ API MAINTENANCE (SUDAH ADA LAGI!)
+// ==========================================
+app.get('/api/maintenance', async (req, res) => {
+    try {
+        let config = await Config.findOne({ key: 'maintenance' });
+        if (!config) {
+            // Kalau belum ada settingan, bikin default (OFF)
+            config = new Config({ key: 'maintenance', isActive: false });
+            await config.save();
+        }
+        res.json(config);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/maintenance', async (req, res) => {
+    try {
+        const { isActive } = req.body;
+        let config = await Config.findOne({ key: 'maintenance' });
+
+        if (!config) {
+            config = new Config({ key: 'maintenance', isActive: isActive });
+        } else {
+            config.isActive = isActive;
+        }
+
+        await config.save();
+        res.json({ success: true, status: config.isActive ? "MAINTENANCE ON" : "WEBSITE ONLINE" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // --- ROUTE PENYELAMAT ---
