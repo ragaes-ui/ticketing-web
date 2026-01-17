@@ -25,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 // ⚠️ UPDATE PENTING: Biar Vercel gak bingung cari folder public
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // --- KONFIGURASI SESSION & PASSPORT (WAJIB BUAT GOOGLE) ---
 app.use(session({
@@ -482,7 +482,7 @@ app.get('*', (req, res) => {
         return res.status(404).json({ error: 'Not Found' });
     }
     // Sisanya (Halaman Web) kasih index.html
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
