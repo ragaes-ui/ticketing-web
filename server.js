@@ -151,72 +151,39 @@ app.post('/api/payment-token', async (req, res) => {
     } catch (error) { console.log("Midtrans Error:", error); res.status(500).json({ message: error.message }); }
 });
 
-// ✅ REVISI WEBHOOK (HAPUS DATA KALAU GAGAL)
 app.post('/api/payment-notification', async (req, res) => {
     try {
         const statusResponse = await snap.transaction.notification(req.body);
         let orderId = statusResponse.order_id;
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
-
         const order = await Order.findOne({ orderIdMidtrans: orderId });
         if (!order) return res.status(404).json({message: "Order not found"});
 
-        if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
-            // JIKA SUKSES
-            if (fraudStatus == 'challenge') {
-                order.status = 'pending';
-                await order.save();
-            } else {
-                order.status = 'valid';
-                const event = await Event.findById(order.eventId);
-                if(event) { event.availableSeats -= 1; await event.save(); }
-                await order.save();
-            }
-        } 
-        else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-            // JIKA GAGAL -> HAPUS DARI DATABASE
-            await Order.findOneAndDelete({ orderIdMidtrans: orderId });
-            console.log(`Order ${orderId} dihapus otomatis karena pembayaran gagal/batal.`);
-        } 
-        else if (transactionStatus == 'pending'){
+        if (transactionStatus == 'capture'){
+            if (fraudStatus == 'challenge') order.status = 'pending';
+            else if (fraudStatus == 'accept') order.status = 'valid';
+        } else if (transactionStatus == 'settlement'){
+            order.status = 'valid';
+            const event = await Event.findById(order.eventId);
+            if(event) { event.availableSeats -= 1; await event.save(); }
+        } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
+            order.status = 'failed';
+        } else if (transactionStatus == 'pending'){
             order.status = 'pending';
-            await order.save();
         }
-        
+        await order.save();
         res.status(200).send('OK');
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ✅ REVISI VALIDASI (CEGAH TIKET BELUM BAYAR MASUK)
 app.post('/api/validate', async (req, res) => {
     try {
         const ticket = await Order.findOne({ ticketCode: req.body.ticketCode.trim() }).populate('eventId');
-        
         if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
-
-        // Cek apakah tiket sudah dibayar
-        if (ticket.status === 'pending') {
-             return res.status(400).json({ valid: false, message: "TIKET BELUM DIBAYAR! 💰" });
-        }
-        if (ticket.status === 'failed') {
-             return res.status(400).json({ valid: false, message: "PEMBAYARAN TIKET GAGAL! 🚫" });
-        }
-        
-        // Cek apakah tiket sudah dipakai
-        if (ticket.status === 'used') {
-            return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
-        }
-
-        // Kalau lolos semua validasi -> Set Used
-        ticket.status = 'used'; 
-        await ticket.save();
-        
-        res.json({ 
-            valid: true, 
-            message: "TIKET VALID! SILAKAN MASUK ✅", 
-            data: { name: ticket.customerName, event: ticket.eventId?.name } 
-        });
+        if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
+        ticket.status = 'used'; await ticket.save();
+        res.json({ valid: true, message: "TIKET VALID! SILAKAN MASUK ✅", data: { name: ticket.customerName, event: ticket.eventId?.name } });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
