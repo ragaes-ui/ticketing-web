@@ -292,28 +292,23 @@
                     <a href="#" class="footer-link">Panduan</a>
                     <a href="login.html" class="footer-link text-warning">Login Admin</a>
                 </div>
-<div class="col-lg-3">
-    <div class="footer-head">Ikuti Kami</div>
-    <div class="mb-3">
-        
-        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn" title="Instagram">
-            <i class="bi bi-instagram"></i>
-        </a>
-        
-        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn" title="Twitter">
-            <i class="bi bi-twitter-x"></i>
-        </a>
-        
-        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn" title="YouTube">
-            <i class="bi bi-youtube"></i>
-        </a>
-        
-        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn" title="TikTok">
-            <i class="bi bi-tiktok"></i>
-        </a>
-
-    </div>
-</div>
+                <div class="col-lg-3">
+                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="mb-3">
+                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn" title="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn" title="TikTok">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
                 <div class="col-lg-3">
                     <small class="text-white-50">&copy; 2026 Rcelltech inc Global created with love.</small>
                 </div>
@@ -522,7 +517,7 @@
             filterCategory('All');
         }
 
-        // --- FUNGSI BELI TIKET (FIX: PANGGIL API /api/payment-token) ---
+        // --- FUNGSI BELI TIKET DENGAN FITUR AUTO-DELETE ---
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
@@ -547,7 +542,7 @@
                 Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 try {
-                    // Panggil API Backend YANG BENAR (payment-token)
+                    // 1. Minta Token & Order ID
                     const res = await fetch('/api/payment-token', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
@@ -559,10 +554,10 @@
                     });
                     const data = await res.json();
                     
-                    Swal.close(); // Tutup loading
+                    Swal.close(); 
 
                     if (res.ok && data.token) {
-                        // BUKA POPUP MIDTRANS
+                        // 2. Munculkan Popup Midtrans
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
                                 console.log('success', result);
@@ -578,10 +573,23 @@
                                 console.log('error', result);
                                 Swal.fire('Gagal', 'Pembayaran gagal atau dibatalkan.', 'error');
                             },
+                            // --- BAGIAN PENTING: KALAU USER KLIK SILANG (CLOSE) ---
                             onClose: function(){
-                                console.log('customer closed the popup without finishing the payment');
-                                Swal.fire('Dibatalkan', 'Anda menutup halaman pembayaran.', 'warning');
+                                console.log('User menutup popup, menghapus order...');
+                                
+                                // Panggil API untuk hapus data sampah di database
+                                fetch('/api/cancel-order', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orderId: data.orderId })
+                                })
+                                .then(r => r.json())
+                                .then(delRes => {
+                                    console.log("Order cleanup:", delRes);
+                                    Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran. Tiket dihapus.', 'info');
+                                });
                             }
+                            // -----------------------------------------------------
                         });
                     } else { 
                         Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat membuat pesanan.', 'error'); 
