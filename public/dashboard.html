@@ -13,50 +13,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        :root {
-            --primary-color: #0064d2;
-            --bg-color: #f0f2f5;
-            --text-dark: #1f2937;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            font-family: 'Inter', sans-serif;
-            padding-top: 80px;
-        }
-
+        :root { --primary-color: #0064d2; --bg-color: #f0f2f5; --text-dark: #1f2937; }
+        body { background-color: var(--bg-color); color: var(--text-dark); font-family: 'Inter', sans-serif; padding-top: 80px; }
         .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
         .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
 
         /* Card Profil */
-        .profile-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
-            border: 1px solid #e5e7eb;
-        }
+        .profile-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid #e5e7eb; }
 
         /* Card Tiket */
-        .ticket-card {
-            background: white; border: none; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; height: 100%; display: flex; flex-direction: column;
-        }
+        .ticket-card { background: white; border: none; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; height: 100%; display: flex; flex-direction: column; }
         .ticket-header { background: linear-gradient(135deg, #0064d2, #55aaff); color: white; padding: 15px 20px; position: relative; }
+        
+        /* Warna Header Khusus Streaming (Hijau) */
+        .ticket-header.streaming { background: linear-gradient(135deg, #11998e, #38ef7d); }
+
         .ticket-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; border-top: 2px dashed #e5e7eb; position: relative; }
         .ticket-body::before, .ticket-body::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%; }
         .ticket-body::before { left: -10px; } .ticket-body::after { right: -10px; }
+        
+        /* Style QR & Akun */
         .qr-container { padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; margin: 15px 0; background: #fff; }
+        .account-box { background: #f0fff4; border: 1px solid #c6f6d5; color: #2f855a; width: 100%; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 15px; word-break: break-all; }
+
         .ticket-code-badge { font-family: monospace; background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; font-weight: 600; border: 1px dashed #d1d5db; }
         .status-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         
-        /* Modal Style */
         .modal-content { border-radius: 16px; border: none; }
-        .modal-header { border-bottom: 1px solid #f0f0f0; }
-        .modal-footer { border-top: 1px solid #f0f0f0; }
     </style>
 </head>
 <body>
@@ -64,80 +48,48 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/>
-                </svg>
+                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/></svg>
                 RCELLFEST
             </a>
             <div class="d-flex align-items-center gap-2">
                 <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none d-md-block">Beranda</a>
-                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3">
-                    <i class="bi bi-box-arrow-right"></i> Keluar
-                </button>
+                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-box-arrow-right"></i> Keluar</button>
             </div>
         </div>
     </nav>
 
     <div class="container pb-5">
-        
         <div class="profile-card">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px;">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0" id="userNameDisplay">Loading...</h5>
-                            <small class="text-secondary" id="userEmailDisplay">...</small>
-                        </div>
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px;"><i class="bi bi-person"></i></div>
+                        <div><h5 class="fw-bold mb-0" id="userNameDisplay">Loading...</h5><small class="text-secondary" id="userEmailDisplay">...</small></div>
                     </div>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <button onclick="openNameModal()" class="btn btn-outline-primary btn-sm rounded-pill me-2">
-                        <i class="bi bi-pencil-square"></i> Ubah Nama
-                    </button>
-                    <button onclick="openPassModal()" class="btn btn-outline-dark btn-sm rounded-pill">
-                        <i class="bi bi-key"></i> Ganti Password
-                    </button>
+                    <button onclick="openNameModal()" class="btn btn-outline-primary btn-sm rounded-pill me-2"><i class="bi bi-pencil-square"></i> Ubah Nama</button>
+                    <button onclick="openPassModal()" class="btn btn-outline-dark btn-sm rounded-pill"><i class="bi bi-key"></i> Ganti Password</button>
                 </div>
             </div>
         </div>
 
         <div class="row mb-4 align-items-center">
-            <div class="col-6">
-                <h4 class="fw-bold text-dark m-0">Tiket Saya</h4>
-            </div>
-            <div class="col-6 text-end">
-                <a href="index.html" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                    <i class="bi bi-plus-lg"></i> Beli Baru
-                </a>
-            </div>
+            <div class="col-6"><h4 class="fw-bold text-dark m-0">Aset Digital & Tiket</h4></div>
+            <div class="col-6 text-end"><a href="index.html" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-plus-lg"></i> Beli Baru</a></div>
         </div>
 
         <div id="ticketList" class="row g-4">
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-secondary">Sedang memuat tiket...</p>
-            </div>
+            <div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-secondary">Sedang memuat data...</p></div>
         </div>
     </div>
 
     <div class="modal fade" id="nameModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Ubah Nama Lengkap</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label small text-secondary">Nama Lengkap Baru</label>
-                    <input type="text" id="inputNewName" class="form-control" placeholder="Contoh: Raga Admin Ganteng">
-                </div>
-                <div class="modal-footer border-0">
-                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button onclick="saveName()" class="btn btn-primary">Simpan</button>
-                </div>
+                <div class="modal-header"><h5 class="modal-title fw-bold">Ubah Nama Lengkap</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><input type="text" id="inputNewName" class="form-control" placeholder="Nama Lengkap Baru"></div>
+                <div class="modal-footer border-0"><button onclick="saveName()" class="btn btn-primary">Simpan</button></div>
             </div>
         </div>
     </div>
@@ -145,24 +97,12 @@
     <div class="modal fade" id="passModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Ganti Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                <div class="modal-header"><h5 class="modal-title fw-bold">Ganti Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Password Lama</label>
-                        <input type="password" id="oldPass" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-secondary">Password Baru</label>
-                        <input type="password" id="newPass" class="form-control">
-                    </div>
+                    <input type="password" id="oldPass" class="form-control mb-3" placeholder="Password Lama">
+                    <input type="password" id="newPass" class="form-control" placeholder="Password Baru">
                 </div>
-                <div class="modal-footer border-0">
-                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button onclick="savePassword()" class="btn btn-dark">Update Password</button>
-                </div>
+                <div class="modal-footer border-0"><button onclick="savePassword()" class="btn btn-dark">Update Password</button></div>
             </div>
         </div>
     </div>
@@ -171,95 +111,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. INIT DATA USER
+        // 1. INIT DATA
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
-        // Tampilkan Nama & Email di Profil Card (PRIORITAS: FULL NAME)
         function renderProfile() {
-            // Ambil fullName dulu, kalau kosong baru username
             const displayName = user.fullName || user.username || 'User';
             document.getElementById('userNameDisplay').innerText = displayName;
             document.getElementById('userEmailDisplay').innerText = user.email;
         }
         renderProfile();
 
-        // --- 2. LOGIC UBAH NAMA ---
-        const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
-
-        function openNameModal() {
-            document.getElementById('inputNewName').value = user.fullName || user.username;
-            nameModal.show();
-        }
-
-        async function saveName() {
-            const newName = document.getElementById('inputNewName').value;
-            if(!newName) return Swal.fire('Error', 'Nama tidak boleh kosong', 'warning');
-
-            try {
-                const res = await fetch('/api/user/update-name', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: user.id, newName: newName }) 
-                });
-                const data = await res.json();
-
-                if(res.ok) {
-                    // Update Local Storage biar langsung berubah tanpa refresh
-                    user.fullName = newName;
-                    user.username = newName; // Update juga username biar sinkron
-                    localStorage.setItem('userData', JSON.stringify(user));
-                    
-                    renderProfile(); 
-                    // Reload tiket biar nama di tiket juga berubah
-                    loadTickets();
-                    
-                    nameModal.hide();
-                    Swal.fire('Berhasil', 'Nama profil berhasil diubah!', 'success');
-                } else {
-                    Swal.fire('Gagal', data.message, 'error');
-                }
-            } catch(err) { console.error(err); }
-        }
-
-        // --- 3. LOGIC GANTI PASSWORD ---
-        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
-
-        function openPassModal() {
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
-            passModal.show();
-        }
-
-        async function savePassword() {
-            const oldPass = document.getElementById('oldPass').value;
-            const newPass = document.getElementById('newPass').value;
-
-            if(!oldPass || !newPass) return Swal.fire('Warning', 'Isi semua kolom password', 'warning');
-
-            try {
-                const res = await fetch('/api/user/change-password', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: user.id, oldPassword: oldPass, newPassword: newPass })
-                });
-                const data = await res.json();
-
-                if(res.ok) {
-                    passModal.hide();
-                    Swal.fire({
-                        title: 'Password Diubah',
-                        text: 'Silakan login ulang demi keamanan.',
-                        icon: 'success',
-                        confirmButtonText: 'Login Ulang'
-                    }).then(() => { logout(); });
-                } else {
-                    Swal.fire('Gagal', data.message, 'error');
-                }
-            } catch(err) { console.error(err); }
-        }
-
-        // --- 4. LOAD TIKET (PERBAIKAN NAMA PEMESAN) ---
+        // 2. LOAD TIKET & LOGIKA STREAMING vs KONSER
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             try {
@@ -272,44 +135,67 @@
 
                 list.innerHTML = '';
                 if(tickets.length === 0) {
-                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Belum ada tiket.</p></div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Belum ada tiket atau akun.</p></div>`;
                     return;
                 }
 
                 tickets.forEach(t => {
-                    const eventName = t.eventId ? t.eventId.name : 'Event Tidak Tersedia';
-                    
-                    let eventDateStr = "Tanggal Belum Ditentukan";
-                    if(t.eventId && t.eventId.date) {
-                        eventDateStr = new Date(t.eventId.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                    
-                    // 🔥 UPDATE PENTING:
-                    // Kita Prioritaskan Nama Lengkap dari Profil (user.fullName)
-                    // Jadi walaupun di database tiketnya masih username lama, tampilannya tetap Nama Lengkap Abang.
-                    const namaPemesan = user.fullName || t.customerName || user.username || "Pengunjung";
-                    
-                    const isUsed = t.status === 'used';
-                    const statusBadge = isUsed 
-                        ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
-                        : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
-                    const cardOpacity = isUsed ? 'opacity-75' : '';
+                    const event = t.eventId;
+                    if(!event) return; // Skip jika event terhapus
 
+                    const namaPemesan = user.fullName || t.customerName || user.username;
+                    
+                    // --- DETEKSI KATEGORI (Case Insensitive) ---
+                    const category = event.category || 'General';
+                    const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream') || category.toLowerCase().includes('akun');
+                    
+                    // HEADER STYLE
+                    const headerClass = isStreaming ? 'streaming' : '';
+                    const iconHeader = isStreaming ? '<i class="bi bi-camera-reels me-1"></i>' : '<i class="bi bi-ticket-perforated me-1"></i>';
+                    const labelHeader = isStreaming ? 'AKUN PREMIUM' : 'TIKET EVENT';
+
+                    // ISI KONTEN (Credentials VS QR Code)
+                    let mainContent = '';
+
+                    if (isStreaming) {
+                        // TAMPILKAN EMAIL/PASSWORD
+                        const credentials = event.description || "Detail akun tidak tersedia.";
+                        mainContent = `
+                            <div class="account-box">
+                                <label class="small fw-bold text-success mb-1"><i class="bi bi-lock-fill"></i> AKUN ANDA:</label>
+                                <div class="font-monospace fs-6 text-dark fw-bold" style="white-space: pre-wrap;">${credentials}</div>
+                            </div>
+                            <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                                <i class="bi bi-clipboard"></i> Salin Akun
+                            </button>
+                        `;
+                    } else {
+                        // TAMPILKAN QR CODE (Untuk Konser)
+                        const statusBadge = t.status === 'used' 
+                            ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
+                            : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
+                        
+                        mainContent = `
+                            <small class="text-secondary fw-bold mb-2">SCAN QR DI LOKASI</small>
+                            <div class="qr-container shadow-sm"><div id="qrcode-${t._id}"></div></div>
+                            <div class="mb-2">${statusBadge}</div>
+                        `;
+                    }
+
+                    // RENDER HTML KARTU
                     list.innerHTML += `
                         <div class="col-md-6 col-lg-4">
-                            <div class="ticket-card ${cardOpacity}">
-                                <div class="ticket-header">
-                                    <h5 class="fw-bold mb-1 text-truncate">${eventName}</h5>
-                                    <small class="opacity-100 fw-bold"><i class="bi bi-calendar-check me-1"></i> ${eventDateStr}</small>
+                            <div class="ticket-card shadow-sm">
+                                <div class="ticket-header ${headerClass}">
+                                    <h5 class="fw-bold mb-1 text-truncate">${iconHeader} ${event.name}</h5>
+                                    <small class="opacity-75 fw-bold">${labelHeader}</small>
                                 </div>
                                 <div class="ticket-body text-center">
-                                    <small class="text-secondary fw-bold mb-2">SCAN QR DI PINTU MASUK</small>
-                                    <div class="qr-container shadow-sm"><div id="qrcode-${t._id}"></div></div>
-                                    <div class="ticket-code-badge mb-3">${t.ticketCode}</div>
-                                    <div class="mb-2">${statusBadge}</div>
+                                    ${mainContent}
                                     
+                                    <div class="ticket-code-badge mt-3 mb-2">${t.ticketCode}</div>
                                     <small class="text-muted d-block mt-2 border-top pt-2 w-100">
-                                        Pemesan: <b class="text-dark">${namaPemesan}</b>
+                                        Milik: <b class="text-dark">${namaPemesan}</b>
                                     </small>
                                 </div>
                             </div>
@@ -317,61 +203,73 @@
                     `;
                 });
 
-                // Generate QR Code
+                // GENERATE QR CODE (Hanya untuk yang BUKAN Streaming)
                 tickets.forEach(t => {
-                    const container = document.getElementById(`qrcode-${t._id}`);
-                    if(container) {
-                        container.innerHTML = ""; 
-                        new QRCode(container, { text: t.ticketCode, width: 150, height: 150 });
+                    const category = t.eventId.category || 'General';
+                    const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
+
+                    if (!isStreaming) {
+                        const container = document.getElementById(`qrcode-${t._id}`);
+                        if(container) {
+                            container.innerHTML = ""; 
+                            new QRCode(container, { text: t.ticketCode, width: 140, height: 140 });
+                        }
                     }
                 });
+
             } catch (err) { console.error(err); }
         }
 
-        function logout() {
-            localStorage.removeItem('userData');
-            localStorage.removeItem('userToken');
-            window.location.href = 'user-login.html';
+        // Helper Copy
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                Toast.fire({ icon: 'success', title: 'Akun disalin!' });
+            });
         }
 
+        // Logic Modal Nama
+        const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
+        function openNameModal() { document.getElementById('inputNewName').value = user.fullName || user.username; nameModal.show(); }
+        async function saveName() {
+            const newName = document.getElementById('inputNewName').value;
+            if(!newName) return;
+            try {
+                await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
+                user.fullName = newName; user.username = newName;
+                localStorage.setItem('userData', JSON.stringify(user));
+                renderProfile(); loadTickets(); nameModal.hide(); Swal.fire('Sukses', 'Nama diubah', 'success');
+            } catch(e) { Swal.fire('Error', 'Gagal update', 'error'); }
+        }
+
+        // Logic Modal Password
+        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
+        function openPassModal() { passModal.show(); }
+        async function savePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+            if(!oldPass || !newPass) return;
+            try {
+                const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, oldPassword:oldPass, newPassword:newPass}) });
+                if(res.ok) { passModal.hide(); Swal.fire('Sukses', 'Silakan login ulang', 'success').then(()=>logout()); }
+                else { Swal.fire('Gagal', 'Password salah', 'error'); }
+            } catch(e) {}
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'user-login.html'; }
+        
         loadTickets();
     </script>
 
     <script>
         (async function() {
             try {
-                const res = await fetch('/api/maintenance');
-                const data = await res.json();
-                const isAdmin = localStorage.getItem('adminToken'); 
-
+                const res = await fetch('/api/maintenance'); const data = await res.json();
+                const isAdmin = localStorage.getItem('adminToken');
                 if (data.isActive && !isAdmin) {
-                    document.body.innerHTML = `
-                        <style>
-                            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-                            body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                            @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-                            .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }
-                            .floating-illustration { font-size: 80px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); }
-                            @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } 100% { transform: translateY(0px) rotate(0deg); } }
-                            h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                            p { color: #d1d5db; font-size: 1rem; line-height: 1.6; margin-bottom: 30px; }
-                            .btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); }
-                            .btn-retry:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4); }
-                            .btn-retry:active { transform: scale(0.95); }
-                            .bubble { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1); animation: rise 10s infinite ease-in; bottom: -50px; }
-                            @keyframes rise { 0% { bottom: -50px; transform: translateX(0); } 50% { transform: translateX(50px); } 100% { bottom: 120%; transform: translateX(-50px); } }
-                        </style>
-                        <div class="glass-card">
-                            <div class="floating-illustration">👾🛠️</div>
-                            <h1>Lagi Didandanin! ✨</h1>
-                            <p>Sstt... Dashboard kamu lagi istirahat sebentar. <br>Tim IT kami lagi ngopi sambil benerin kabel yang kusut.<br><br><b>Coba balik lagi nanti ya!</b></p>
-                            <button onclick="location.reload()" class="btn-retry">Cek Lagi Dong ↻</button>
-                        </div>
-                    `;
+                    document.body.innerHTML = `<style>body{background:#0e1e3b;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center}</style><div><h1>Maintenance 🛠️</h1><p>Sedang diperbaiki.</p><button onclick="location.reload()">Refresh</button></div>`;
                 }
-            } catch (err) {
-                console.log("Gagal cek maintenance status, mungkin API error atau offline.");
-            }
+            } catch (e) {}
         })();
     </script>
 </body>
