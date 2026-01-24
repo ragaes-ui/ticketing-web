@@ -4,18 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | RCELLFEST</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script>const token = localStorage.getItem('adminToken'); if (!token) window.location.href = 'login.html';</script>
-    <style>body{background-color:#f0f2f5;padding-top:80px} .card{border:none;border-radius:12px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}</style>
+    
+    <script>
+        const token = localStorage.getItem('adminToken');
+        if (!token) window.location.href = 'login.html';
+    </script>
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --text-color: #ffffff;
+            --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+        }
+
+        body {
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            padding-top: 90px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Blobs (Background Decoration) */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
+        .blob-3 { top: 40%; left: 40%; width: 300px; height: 300px; background: #ff0055; animation: float 6s ease-in-out infinite; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            padding: 25px;
+            color: white;
+        }
+
+        .navbar {
+            background: rgba(15, 12, 41, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px 0;
+        }
+
+        /* Custom Inputs */
+        .form-control, .form-select {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white !important;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-color: #00c6ff;
+            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+        }
+        ::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
+        label { font-weight: 500; font-size: 0.9rem; margin-bottom: 5px; color: #ccc; }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+            transition: 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
+
+        /* Table Styling */
+        .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.1); }
+        .table th { font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .table td { vertical-align: middle; }
+        .table-hover tbody tr:hover { background: rgba(255,255,255,0.05); }
+
+        /* Modal */
+        .modal-content {
+            background: rgba(28, 28, 45, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            color: white;
+        }
+        .modal-header, .modal-footer { border-color: rgba(255,255,255,0.1); }
+        .btn-close { filter: invert(1); }
+
+        /* Maintenance Switch */
+        .form-check-input {
+            height: 1.8em; width: 3.5em;
+            background-color: rgba(255,255,255,0.2);
+            border: none;
+        }
+        .form-check-input:checked { background-color: #ff0055; }
+    </style>
 </head>
 <body class="pb-5">
-    <nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold text-primary" href="#">ADMIN PORTAL</a>
+            <a class="navbar-brand fw-bold text-white d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-shield-lock-fill text-info"></i> ADMIN PORTAL
+            </a>
             <div class="d-flex gap-3">
-                <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill" target="_blank">Lihat Website</a>
-                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill">Logout</button>
+                <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3" target="_blank">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Website
+                </a>
+                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-4">
+                    <i class="bi bi-power"></i> Logout
+                </button>
             </div>
         </div>
     </nav>
@@ -23,10 +152,18 @@
     <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card border-warning">
-                    <div class="card-body d-flex justify-content-between align-items-center bg-warning-subtle">
-                        <div><h5 class="fw-bold mb-0">Maintenance Mode</h5></div>
-                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="switchMaintenance"></div>
+                <div class="glass-card d-flex justify-content-between align-items-center" style="border-left: 5px solid #ff9800;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning bg-opacity-25 p-3 rounded-circle text-warning">
+                            <i class="bi bi-cone-striped fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Maintenance Mode</h5>
+                            <small class="text-white-50">Matikan akses publik sementara.</small>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="switchMaintenance">
                     </div>
                 </div>
             </div>
@@ -34,44 +171,76 @@
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="card sticky-top" style="top: 100px;">
-                    <div class="card-header fw-bold">Tambah Event / Produk</div>
-                    <div class="card-body">
-                        <form id="formEvent">
-                            <div class="mb-3">
-                                <label class="form-label">Kategori</label>
-                                <select id="category" class="form-select" onchange="checkCategory(this)">
-                                    <option value="General">General</option>
-                                    <option value="Konser">Konser Musik</option>
-                                    <option value="Olahraga">Olahraga</option>
-                                    <option value="Streaming" class="fw-bold text-primary">🎥 Akun Streaming</option>
-                                </select>
-                            </div>
-                            <div class="mb-3"><label class="form-label">Nama</label><input type="text" id="name" class="form-control" required></div>
-                            <div class="mb-3"><label class="form-label">Lokasi/Platform</label><input type="text" id="location" class="form-control" required></div>
-                            <div class="mb-3"><label class="form-label">Tanggal</label><input type="datetime-local" id="date" class="form-control" required></div>
-                            <div class="mb-3">
-                                <label class="form-label">Deskripsi / Akun</label>
-                                <textarea id="description" class="form-control" rows="4"></textarea>
-                                <small class="text-muted" id="descHint"></small>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-6 mb-3"><label class="form-label">Harga</label><input type="number" id="price" class="form-control" required></div>
-                                <div class="col-6 mb-3"><label class="form-label">Stok</label><input type="number" id="capacity" class="form-control" required></div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Publish</button>
-                        </form>
+                <div class="glass-card sticky-top" style="top: 110px; z-index: 10;">
+                    <div class="d-flex align-items-center gap-2 mb-4 border-bottom border-secondary pb-3">
+                        <i class="bi bi-plus-circle-fill text-info fs-5"></i>
+                        <h5 class="fw-bold m-0">Tambah Produk</h5>
                     </div>
+                    
+                    <form id="formEvent">
+                        <div class="mb-3">
+                            <label class="form-label">Kategori</label>
+                            <select id="category" class="form-select" onchange="checkCategory(this)">
+                                <option value="General">General</option>
+                                <option value="Konser">Konser Musik</option>
+                                <option value="Olahraga">Olahraga</option>
+                                <option value="Streaming" class="fw-bold text-info">🎥 Akun Streaming</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Event/Produk</label>
+                            <input type="text" id="name" class="form-control" placeholder="Contoh: Netflix 1 Bulan" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lokasi / Platform</label>
+                            <input type="text" id="location" class="form-control" placeholder="TBA / Aplikasi" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal / Expired</label>
+                            <input type="datetime-local" id="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi / Akun</label>
+                            <textarea id="description" class="form-control" rows="4" placeholder="Detail..."></textarea>
+                            <small class="text-info fst-italic" id="descHint"></small>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Harga (IDR)</label>
+                                <input type="number" id="price" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Stok</label>
+                                <input type="number" id="capacity" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-2">
+                            <i class="bi bi-rocket-takeoff me-2"></i> Publish Sekarang
+                        </button>
+                    </form>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between"><span>Database Event</span><button class="btn btn-sm btn-light border" onclick="loadTable()">Refresh</button></div>
+                <div class="glass-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0"><i class="bi bi-database-fill me-2 text-primary"></i> Database Item</h5>
+                        <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                        </button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th class="text-end">Aksi</th></tr></thead>
-                            <tbody id="tableBody"></tbody>
+                            <thead>
+                                <tr>
+                                    <th>Produk Info</th>
+                                    <th>Harga</th>
+                                    <th class="text-center">Sisa Stok</th>
+                                    <th class="text-end">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -82,23 +251,56 @@
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">Edit Data</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
                     <form id="formEdit">
                         <input type="hidden" id="editId">
-                        <div class="mb-2"><label>Nama</label><input type="text" id="editName" class="form-control"></div>
-                        <div class="mb-2"><label>Kategori</label><select id="editCategory" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Streaming">Streaming</option></select></div>
-                        <div class="mb-2"><label>Lokasi</label><input type="text" id="editLocation" class="form-control"></div>
-                        <div class="mb-2"><label>Tanggal</label><input type="datetime-local" id="editDate" class="form-control"></div>
-                        <div class="mb-2"><label>Deskripsi/Akun</label><textarea id="editDescription" class="form-control" rows="3"></textarea></div>
-                        <div class="row">
-                            <div class="col-6"><label>Harga</label><input type="number" id="editPrice" class="form-control"></div>
-                            <div class="col-6"><label>Stok Sisa</label><input type="number" id="editStock" class="form-control text-danger"></div>
+                        <div class="mb-3">
+                            <label>Nama Event</label>
+                            <input type="text" id="editName" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label>Kategori</label>
+                            <select id="editCategory" class="form-select">
+                                <option value="General">General</option>
+                                <option value="Konser">Konser</option>
+                                <option value="Streaming">Streaming</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label>Lokasi</label>
+                                <input type="text" id="editLocation" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label>Tanggal</label>
+                                <input type="datetime-local" id="editDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Deskripsi / Kredensial Akun</label>
+                            <textarea id="editDescription" class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label>Harga</label>
+                                <input type="number" id="editPrice" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="text-warning">Update Stok Sisa</label>
+                                <input type="number" id="editStock" class="form-control border-warning">
+                            </div>
                             <input type="hidden" id="editCapacity">
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer"><button onclick="saveEdit()" class="btn btn-primary">Simpan</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Batal</button>
+                    <button onclick="saveEdit()" class="btn btn-primary px-4">Simpan Perubahan</button>
+                </div>
             </div>
         </div>
     </div>
@@ -114,9 +316,9 @@
             const desc = document.getElementById('description');
             if (select.value === 'Streaming') {
                 desc.placeholder = "Format: Email | Password | Expired\nContoh: user@gmail.com | pass123 | 30 Hari";
-                document.getElementById('descHint').innerText = "Info: Masukkan kredensial akun di sini.";
+                document.getElementById('descHint').innerText = "💡 Info: Masukkan kredensial akun di sini agar user bisa melihatnya setelah bayar.";
             } else {
-                desc.placeholder = "Deskripsi Event...";
+                desc.placeholder = "Deskripsi lengkap event...";
                 document.getElementById('descHint').innerText = "";
             }
         }
@@ -128,7 +330,11 @@
         if(switchMaint) {
             switchMaint.addEventListener('change', async function() {
                 const isActive = this.checked;
-                try { await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive }) }); Swal.fire('Sukses', 'Status berubah', 'success'); } catch (err) { this.checked = !isActive; }
+                try { 
+                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive }) }); 
+                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
+                    Toast.fire({ icon: 'success', title: isActive ? 'Maintenance Aktif 🔴' : 'Website Online 🟢' });
+                } catch (err) { this.checked = !isActive; }
             });
         }
         
@@ -136,9 +342,29 @@
             try {
                 const res = await fetch('/api/events'); eventsData = await res.json();
                 const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
+                
+                if(eventsData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-white-50">Belum ada data event/produk.</td></tr>`;
+                    return;
+                }
+
                 eventsData.forEach(ev => {
-                    let icon = ev.category === 'Streaming' ? '🎥' : '🎫';
-                    tbody.innerHTML += `<tr><td><div>${icon} ${ev.name}</div><small class="text-muted">${ev.category}</small></td><td>${ev.price}</td><td>${ev.availableSeats}</td><td class="text-end"><button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-light">Edit</button><button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-danger ms-1">Hapus</button></td></tr>`;
+                    let icon = ev.category === 'Streaming' ? '<span class="badge bg-info text-dark me-2">STREAM</span>' : '<span class="badge bg-primary me-2">EVENT</span>';
+                    let stokClass = ev.availableSeats < 5 ? 'text-danger fw-bold' : 'text-success';
+                    
+                    tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div class="fw-bold">${icon} ${ev.name}</div>
+                            <small class="text-white-50"><i class="bi bi-geo-alt"></i> ${ev.location}</small>
+                        </td>
+                        <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
+                        <td class="text-center ${stokClass}" style="font-size: 1.1rem;">${ev.availableSeats}</td>
+                        <td class="text-end">
+                            <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-pencil-fill"></i></button>
+                            <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>`;
                 });
             } catch (err) {}
         }
@@ -165,11 +391,13 @@
                 availableSeats: document.getElementById('editStock').value, capacity: document.getElementById('editCapacity').value
             };
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            editModal.hide(); loadTable(); Swal.fire('Sukses', 'Data update', 'success');
+            editModal.hide(); loadTable(); 
+            Swal.fire({ title: 'Berhasil!', text: 'Data telah diperbarui.', icon: 'success', background: '#1c1c2d', color: '#fff' });
         }
 
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button'); btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value,
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
@@ -177,12 +405,22 @@
                 description: document.getElementById('description').value
             };
             await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            loadTable(); e.target.reset(); Swal.fire('Sukses', 'Tersimpan', 'success');
+            loadTable(); e.target.reset(); 
+            btn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i> Publish Sekarang';
+            Swal.fire({ title: 'Sukses!', text: 'Produk berhasil ditambahkan.', icon: 'success', background: '#1c1c2d', color: '#fff' });
         });
 
-        async function hapusKonser(id) { if((await Swal.fire({ title:'Hapus?', showCancelButton:true })).isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); } }
+        async function hapusKonser(id) { 
+            const result = await Swal.fire({ title:'Hapus Data?', text: "Data tidak bisa dikembalikan!", icon:'warning', showCancelButton:true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', background: '#1c1c2d', color: '#fff' });
+            if(result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); } 
+        }
+        
         function logout() { localStorage.removeItem('adminToken'); window.location.href = 'login.html'; }
-        loadTable(); checkMaintenanceStatus(); checkCategory(document.getElementById('category'));
+        
+        // Init
+        loadTable(); 
+        checkMaintenanceStatus(); 
+        checkCategory(document.getElementById('category'));
     </script>
 </body>
 </html>
