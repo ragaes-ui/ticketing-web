@@ -5,107 +5,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Saya | RCELLFEST</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
     
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
+
     <style>
-        :root { --primary-color: #0064d2; --bg-color: #f0f2f5; --text-dark: #1f2937; }
-        body { background-color: var(--bg-color); color: var(--text-dark); font-family: 'Inter', sans-serif; padding-top: 80px; }
-        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
-        .nav-icon-svg { width: 24px; height: 24px; fill: var(--primary-color); }
-
-        /* Card Profil */
-        .profile-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid #e5e7eb; }
-
-        /* Card Tiket */
-        .ticket-card { background: white; border: none; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; height: 100%; display: flex; flex-direction: column; }
-        .ticket-header { background: linear-gradient(135deg, #0064d2, #55aaff); color: white; padding: 15px 20px; position: relative; }
-        
-        /* Warna Header Khusus Streaming (Hijau) */
-        .ticket-header.streaming { background: linear-gradient(135deg, #11998e, #38ef7d); }
-
-        .ticket-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; border-top: 2px dashed #e5e7eb; position: relative; }
-        .ticket-body::before, .ticket-body::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%; }
-        .ticket-body::before { left: -10px; } .ticket-body::after { right: -10px; }
-        
-        /* Style QR & Akun */
-        .qr-container { 
-            padding: 10px; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 12px; 
-            margin: 15px 0; 
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Style Gambar QR Code dari API */
-        .qr-image {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            display: block; /* Pastikan muncul */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --text-color: #ffffff;
+            --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
         }
 
-        .account-box { background: #f0fff4; border: 1px solid #c6f6d5; color: #2f855a; width: 100%; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 15px; word-break: break-all; }
+        body {
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
 
-        .ticket-code-badge { font-family: monospace; background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; font-weight: 600; border: 1px dashed #d1d5db; }
-        .status-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Blobs */
+        .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
+
+        /* Navbar Glass */
+        .navbar {
+            background: rgba(15, 12, 41, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px 0;
+        }
+        .navbar-brand { font-weight: 700; background: linear-gradient(to right, #fff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            padding: 25px;
+            color: white;
+            transition: 0.3s;
+        }
+
+        /* Profile Card */
+        .profile-img { width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; box-shadow: 0 0 15px rgba(0, 198, 255, 0.5); }
+
+        /* Ticket Card */
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        .ticket-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: rgba(255, 255, 255, 0.3); }
+
+        .ticket-header {
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            padding: 15px 20px;
+            color: white;
+            position: relative;
+        }
+        .ticket-header.streaming { background: linear-gradient(90deg, #11998e, #38ef7d); }
+
+        .ticket-body { padding: 25px; text-align: center; }
+
+        /* QR Code Container */
+        .qr-container {
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 15px 0;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        .qr-image { width: 140px; height: 140px; object-fit: contain; }
+
+        /* Account Box (Streaming) */
+        .account-box {
+            background: rgba(0, 255, 127, 0.1);
+            border: 1px solid rgba(0, 255, 127, 0.3);
+            color: #00ff7f;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 15px;
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        .ticket-code {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* Buttons */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: 0.3s;
+        }
+        .btn-glass:hover { background: rgba(255, 255, 255, 0.2); color: white; transform: scale(1.05); }
         
-        .modal-content { border-radius: 16px; border: none; }
+        .btn-primary-neon {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 114, 255, 0.5);
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: 0.3s;
+        }
+        .btn-primary-neon:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0, 114, 255, 0.8); color: white; }
+
+        /* Modal Glass */
+        .modal-content {
+            background: rgba(20, 20, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            color: white;
+        }
+        .modal-header, .modal-footer { border-color: rgba(255, 255, 255, 0.1); }
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .form-control:focus { background: rgba(255, 255, 255, 0.1); color: white; border-color: #00c6ff; box-shadow: none; }
+        .btn-close { filter: invert(1); }
     </style>
 </head>
 <body>
 
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <svg class="nav-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 18h20v2H2v-2zm0-4h20v2H2v-2zm16-6H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2zm-5-6h-2c-1.1 0-2 .9-2 2v2h6V4c0-1.1-.9-2-2-2z"/></svg>
-                RCELLFEST
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                <i class="bi bi-ticket-perforated-fill text-info"></i> RCELLFEST
             </a>
-            <div class="d-flex align-items-center gap-2">
-                <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none d-md-block">Beranda</a>
-                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.html" class="btn btn-glass btn-sm d-none d-md-block">
+                    <i class="bi bi-house-door me-1"></i> Home
+                </a>
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                    <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="container pb-5">
-        <div class="profile-card">
+    <div class="container pb-5 mt-4">
+        
+        <div class="glass-card mb-5">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px;"><i class="bi bi-person"></i></div>
-                        <div><h5 class="fw-bold mb-0" id="userNameDisplay">Loading...</h5><small class="text-secondary" id="userEmailDisplay">...</small></div>
+                        <div class="profile-img">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0 text-white" id="userNameDisplay">Loading...</h4>
+                            <small class="text-white-50" id="userEmailDisplay">...</small>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <button onclick="openNameModal()" class="btn btn-outline-primary btn-sm rounded-pill me-2"><i class="bi bi-pencil-square"></i> Ubah Nama</button>
-                    <button onclick="openPassModal()" class="btn btn-outline-dark btn-sm rounded-pill"><i class="bi bi-key"></i> Ganti Password</button>
+                    <button onclick="openNameModal()" class="btn btn-glass me-2">
+                        <i class="bi bi-pencil-square"></i> Edit Profil
+                    </button>
+                    <button onclick="openPassModal()" class="btn btn-glass">
+                        <i class="bi bi-key"></i> Password
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="row mb-4 align-items-center">
-            <div class="col-6"><h4 class="fw-bold text-dark m-0">Aset Digital & Tiket</h4></div>
-            <div class="col-6 text-end"><a href="index.html" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-plus-lg"></i> Beli Baru</a></div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-white mb-0"><i class="bi bi-collection-play me-2 text-info"></i> Aset Digital Saya</h4>
+            <a href="index.html" class="btn btn-primary-neon btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Beli Baru
+            </a>
         </div>
 
         <div id="ticketList" class="row g-4">
-            <div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-secondary">Sedang memuat data...</p></div>
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-info" role="status"></div>
+                <p class="mt-3 text-white-50">Mengambil data tiket...</p>
+            </div>
         </div>
     </div>
 
     <div class="modal fade" id="nameModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title fw-bold">Ubah Nama Lengkap</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body"><input type="text" id="inputNewName" class="form-control" placeholder="Nama Lengkap Baru"></div>
-                <div class="modal-footer border-0"><button onclick="saveName()" class="btn btn-primary">Simpan</button></div>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Ubah Nama</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="text-white-50 mb-2">Nama Lengkap Baru</label>
+                    <input type="text" id="inputNewName" class="form-control" placeholder="Masukkan nama...">
+                </div>
+                <div class="modal-footer">
+                    <button onclick="saveName()" class="btn btn-primary-neon w-100">Simpan Perubahan</button>
+                </div>
             </div>
         </div>
     </div>
@@ -113,12 +246,23 @@
     <div class="modal fade" id="passModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title fw-bold">Ganti Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
-                    <input type="password" id="oldPass" class="form-control mb-3" placeholder="Password Lama">
-                    <input type="password" id="newPass" class="form-control" placeholder="Password Baru">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Ganti Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-footer border-0"><button onclick="savePassword()" class="btn btn-dark">Update Password</button></div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="text-white-50 mb-2">Password Lama</label>
+                        <input type="password" id="oldPass" class="form-control">
+                    </div>
+                    <div>
+                        <label class="text-white-50 mb-2">Password Baru</label>
+                        <input type="password" id="newPass" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="savePassword()" class="btn btn-primary-neon w-100">Update Password</button>
+                </div>
             </div>
         </div>
     </div>
@@ -127,30 +271,28 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. INIT DATA
+        // INIT
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
 
         function renderProfile() {
-            const displayName = user.fullName || user.username || 'User';
-            document.getElementById('userNameDisplay').innerText = displayName;
+            document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
             document.getElementById('userEmailDisplay').innerText = user.email;
         }
         renderProfile();
 
-        // 2. LOAD TIKET (METODE BARU: API GAMBAR)
+        // LOAD TICKETS (API GAMBAR QR)
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             try {
                 const res = await fetch('/api/my-tickets', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
                 });
                 const tickets = await res.json();
 
                 if(tickets.length === 0) {
-                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Belum ada tiket atau akun.</p></div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-white-50">Belum ada tiket atau aset digital.</p></div>`;
                     return;
                 }
 
@@ -158,64 +300,58 @@
 
                 tickets.forEach(t => {
                     const event = t.eventId;
-                    if(!event) return; 
+                    if(!event) return;
 
-                    const namaPemesan = user.fullName || t.customerName || user.username;
-                    
-                    // --- DETEKSI KATEGORI ---
                     const category = event.category || 'General';
                     const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream') || category.toLowerCase().includes('akun');
                     
-                    // HEADER STYLE
+                    // Style
                     const headerClass = isStreaming ? 'streaming' : '';
-                    const iconHeader = isStreaming ? '<i class="bi bi-camera-reels me-1"></i>' : '<i class="bi bi-ticket-perforated me-1"></i>';
-                    const labelHeader = isStreaming ? 'AKUN PREMIUM' : 'TIKET EVENT';
+                    const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
+                    const labelHeader = isStreaming ? 'AKUN PREMIUM' : 'TIKET MASUK';
 
-                    // ISI KONTEN
                     let mainContent = '';
 
                     if (isStreaming) {
-                        const credentials = event.description || "Detail akun tidak tersedia.";
+                        const credentials = event.description || "Detail tidak tersedia.";
                         mainContent = `
                             <div class="account-box">
-                                <label class="small fw-bold text-success mb-1"><i class="bi bi-lock-fill"></i> AKUN ANDA:</label>
-                                <div class="font-monospace fs-6 text-dark fw-bold" style="white-space: pre-wrap;">${credentials}</div>
+                                <small class="d-block mb-1 text-white-50">CREDENTIALS:</small>
+                                <div class="fw-bold">${credentials}</div>
                             </div>
                             <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
-                                <i class="bi bi-clipboard"></i> Salin Akun
+                                <i class="bi bi-copy me-1"></i> Salin Akun
                             </button>
                         `;
                     } else {
-                        const statusBadge = t.status === 'used' 
-                            ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
-                            : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
-                        
-                        // --- SOLUSI ANTI GAGAL: PAKE API GAMBAR ---
-                        // Kita tidak generate pake JS lagi, tapi langsung minta gambar ke server QR
+                        // QR Code API
                         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${t.ticketCode}&bgcolor=ffffff`;
-
                         mainContent = `
-                            <small class="text-secondary fw-bold mb-2">SCAN QR DI LOKASI</small>
-                            <div class="qr-container shadow-sm">
+                            <small class="text-white-50 fw-bold mb-2 d-block">SCAN DI LOKASI</small>
+                            <div class="qr-container">
                                 <img src="${qrUrl}" alt="QR Code" class="qr-image">
                             </div>
-                            <div class="mb-2 mt-2">${statusBadge}</div>
+                            <div class="mt-2">
+                                <span class="badge ${t.status === 'used' ? 'bg-secondary' : 'bg-success'} rounded-pill">
+                                    ${t.status === 'used' ? 'SUDAH DIPAKAI' : 'TIKET AKTIF'}
+                                </span>
+                            </div>
                         `;
                     }
 
                     htmlContent += `
                         <div class="col-md-6 col-lg-4">
-                            <div class="ticket-card shadow-sm">
+                            <div class="ticket-card h-100">
                                 <div class="ticket-header ${headerClass}">
-                                    <h5 class="fw-bold mb-1 text-truncate">${iconHeader} ${event.name}</h5>
-                                    <small class="opacity-75 fw-bold">${labelHeader}</small>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">${event.name}</h5>
+                                        <span class="badge bg-white text-dark bg-opacity-75">${labelHeader}</span>
+                                    </div>
+                                    <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
                                 </div>
-                                <div class="ticket-body text-center">
+                                <div class="ticket-body">
                                     ${mainContent}
-                                    <div class="ticket-code-badge mt-3 mb-2">${t.ticketCode}</div>
-                                    <small class="text-muted d-block mt-2 border-top pt-2 w-100">
-                                        Milik: <b class="text-dark">${namaPemesan}</b>
-                                    </small>
+                                    <div class="ticket-code text-white">${t.ticketCode}</div>
                                 </div>
                             </div>
                         </div>
@@ -227,13 +363,14 @@
             } catch (err) { console.error(err); }
         }
 
+        // Helper
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                Toast.fire({ icon: 'success', title: 'Akun disalin!' });
-            });
+            navigator.clipboard.writeText(text);
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' });
+            Toast.fire({ icon: 'success', title: 'Berhasil disalin!' });
         }
 
+        // Modal Logic
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
         function openNameModal() { document.getElementById('inputNewName').value = user.fullName || user.username; nameModal.show(); }
         async function saveName() {
@@ -241,10 +378,9 @@
             if(!newName) return;
             try {
                 await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
-                user.fullName = newName; user.username = newName;
-                localStorage.setItem('userData', JSON.stringify(user));
-                renderProfile(); loadTickets(); nameModal.hide(); Swal.fire('Sukses', 'Nama diubah', 'success');
-            } catch(e) { Swal.fire('Error', 'Gagal update', 'error'); }
+                user.fullName = newName; user.username = newName; localStorage.setItem('userData', JSON.stringify(user));
+                renderProfile(); nameModal.hide(); Swal.fire({ title: 'Sukses', text: 'Nama diperbarui', icon: 'success', background: '#1c1c2d', color: '#fff' });
+            } catch(e) {}
         }
 
         const passModal = new bootstrap.Modal(document.getElementById('passModal'));
@@ -255,8 +391,8 @@
             if(!oldPass || !newPass) return;
             try {
                 const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, oldPassword:oldPass, newPassword:newPass}) });
-                if(res.ok) { passModal.hide(); Swal.fire('Sukses', 'Silakan login ulang', 'success').then(()=>logout()); }
-                else { Swal.fire('Gagal', 'Password salah', 'error'); }
+                if(res.ok) { passModal.hide(); Swal.fire({ title: 'Sukses', text: 'Silakan login ulang', icon: 'success', background: '#1c1c2d', color: '#fff' }).then(()=>logout()); }
+                else { Swal.fire({ title: 'Gagal', text: 'Password salah', icon: 'error', background: '#1c1c2d', color: '#fff' }); }
             } catch(e) {}
         }
 
@@ -271,10 +407,11 @@
                 const res = await fetch('/api/maintenance'); const data = await res.json();
                 const isAdmin = localStorage.getItem('adminToken');
                 if (data.isActive && !isAdmin) {
-                    document.body.innerHTML = `<style>body{background:#0e1e3b;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center}</style><div><h1>Maintenance 🛠️</h1><p>Sedang diperbaiki.</p><button onclick="location.reload()">Refresh</button></div>`;
+                    document.body.innerHTML = `<style>body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(-45deg,#0e1e3b,#2b1055,#0049CC,#4facfe);background-size:400% 400%;animation:gradientBG 15s ease infinite;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}@keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.glass-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(255,255,255,0.1);padding:50px 40px;text-align:center;color:white}h1{font-size:2rem;font-weight:800;margin-bottom:10px;background:linear-gradient(to right,#fff,#b0c0d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.btn-retry{background:white;color:#0e1e3b;border:none;padding:12px 35px;border-radius:50px;font-weight:700;cursor:pointer}</style><div class="glass-card"><h1>Maintenance 🛠️</h1><p>Dashboard sedang diperbaiki.</p><button onclick="location.reload()" class="btn-retry">Cek Lagi</button></div>`;
                 }
             } catch (e) {}
         })();
     </script>
 </body>
 </html>
+q
