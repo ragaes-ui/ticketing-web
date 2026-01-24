@@ -3,67 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login | RCELLFEST</title>
+    <title>Login | RCELLFEST</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        body { background: #0f0c29; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; overflow: hidden; }
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; width: 100%; max-width: 400px; color: white; box-shadow: 0 0 30px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .form-control { background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; }
-        .form-control:focus { background: rgba(0,0,0,0.5); color: white; box-shadow: 0 0 10px #ff0080; border-color: #ff0080; }
-        .btn-neon { background: linear-gradient(90deg, #ff0080, #7928ca); border: none; color: white; font-weight: bold; width: 100%; padding: 10px; border-radius: 10px; margin-top: 10px; }
-        .btn-neon:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,0,128,0.6); color: white; }
-        .toggle-link { color: #00f2ff; cursor: pointer; text-decoration: underline; }
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+        }
+
+        body {
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Blobs (Background) */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
+        .blob-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background: #ff0055; animation: pulse 6s infinite; }
+
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.07) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white !important;
+            border-radius: 12px;
+            padding: 12px 15px;
+            backdrop-filter: blur(5px);
+        }
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: #00c6ff;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.3);
+        }
+        ::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
+        label { font-size: 0.85rem; margin-bottom: 6px; color: #ddd; font-weight: 500; }
+
+        .btn-neon {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-neon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+        }
+
+        .toggle-link {
+            color: #00c6ff;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .toggle-link:hover { color: #fff; text-shadow: 0 0 10px #00c6ff; }
+
+        .brand-logo { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; background: linear-gradient(to right, #fff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .glass-card::-webkit-scrollbar { width: 5px; }
-        .glass-card::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+        /* Scrollbar Halus */
+        .glass-card { max-height: 85vh; overflow-y: auto; scrollbar-width: none; }
+        .glass-card::-webkit-scrollbar { width: 0; }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
-        <h3 class="text-center mb-4 fw-bold" id="formTitle">LOGIN USER</h3>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="glass-card text-center">
+        <div class="mb-4">
+            <i class="bi bi-person-circle fs-1 text-white opacity-75"></i>
+            <div class="brand-logo mt-2">RCELLFEST</div>
+            <small class="text-white-50" id="subTitle">Selamat Datang Kembali</small>
+        </div>
         
-        <form id="authForm">
+        <form id="authForm" class="text-start">
             <div class="mb-3">
-                <label id="lblIdentifier">Email / Username</label>
-                <input type="text" id="identifier" class="form-control" required>
+                <label id="lblIdentifier"><i class="bi bi-envelope me-2"></i>Email / Username</label>
+                <input type="text" id="identifier" class="form-control" placeholder="Masukkan ID Anda" required>
             </div>
             
             <div id="registerFields" class="d-none">
                 <div class="mb-3">
-                    <label>Nama Lengkap</label>
+                    <label><i class="bi bi-person-vcard me-2"></i>Nama Lengkap</label>
                     <input type="text" id="fullName" class="form-control" placeholder="Nama sesuai KTP">
                 </div>
                 
                 <div class="mb-3">
-                    <label>Nomor Telepon (WhatsApp)</label>
+                    <label><i class="bi bi-whatsapp me-2"></i>Nomor WhatsApp</label>
                     <input type="number" id="phone" class="form-control" placeholder="08xxxxxxxx">
                 </div>
 
                 <div class="mb-3">
-                    <label>Email Address</label>
-                    <input type="email" id="email" class="form-control">
+                    <label><i class="bi bi-at me-2"></i>Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="nama@email.com">
                 </div>
             </div>
 
             <div class="mb-3">
-                <label>Password</label>
-                <input type="password" id="password" class="form-control" required>
+                <label><i class="bi bi-key me-2"></i>Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required style="border-radius: 12px;">
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-neon" id="btnSubmit">MASUK</button>
+            <button type="submit" class="btn btn-neon" id="btnSubmit">
+                MASUK <i class="bi bi-box-arrow-in-right ms-2"></i>
+            </button>
         </form>
 
-        <p class="mt-4 text-center small text-secondary">
-            <span id="textInfo">Belum punya akun?</span> 
-            <span class="toggle-link" onclick="toggleMode()">Daftar di sini</span>
-        </p>
-        <div class="text-center mt-3">
-             <a href="index.html" class="text-secondary small text-decoration-none">← Kembali ke Home</a>
+        <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <p class="small text-white-50 mb-2">
+                <span id="textInfo">Belum punya akun?</span> 
+                <span class="toggle-link ms-1" onclick="toggleMode()">Daftar Sekarang</span>
+            </p>
+            <a href="index.html" class="text-white-50 small text-decoration-none hover-white">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
+            </a>
         </div>
     </div>
 
@@ -72,36 +184,33 @@
 
         function toggleMode() {
             isLogin = !isLogin;
-            const title = document.getElementById('formTitle');
+            const subTitle = document.getElementById('subTitle');
             const btn = document.getElementById('btnSubmit');
             const info = document.getElementById('textInfo');
             const link = document.querySelector('.toggle-link');
-            
             const registerFields = document.getElementById('registerFields');
             const lblIdentifier = document.getElementById('lblIdentifier');
 
             if (isLogin) {
                 // MODE LOGIN
-                title.innerText = "LOGIN USER";
-                btn.innerText = "MASUK";
+                subTitle.innerText = "Selamat Datang Kembali";
+                btn.innerHTML = 'MASUK <i class="bi bi-box-arrow-in-right ms-2"></i>';
                 info.innerText = "Belum punya akun?";
-                link.innerText = "Daftar di sini";
-                
+                link.innerText = "Daftar Sekarang";
                 registerFields.classList.add('d-none'); 
-                lblIdentifier.innerText = "Email / Username";
+                lblIdentifier.innerHTML = '<i class="bi bi-envelope me-2"></i>Email / Username';
                 
                 document.getElementById('fullName').removeAttribute('required');
                 document.getElementById('phone').removeAttribute('required');
                 document.getElementById('email').removeAttribute('required');
             } else {
                 // MODE REGISTER
-                title.innerText = "DAFTAR BARU";
-                btn.innerText = "DAFTAR SEKARANG";
+                subTitle.innerText = "Buat Akun Baru";
+                btn.innerHTML = 'DAFTAR <i class="bi bi-person-plus ms-2"></i>';
                 info.innerText = "Sudah punya akun?";
-                link.innerText = "Login di sini";
-                
+                link.innerText = "Login Aja";
                 registerFields.classList.remove('d-none'); 
-                lblIdentifier.innerText = "Username"; 
+                lblIdentifier.innerHTML = '<i class="bi bi-person me-2"></i>Username Unik'; 
                 
                 document.getElementById('fullName').setAttribute('required', 'true');
                 document.getElementById('phone').setAttribute('required', 'true');
@@ -111,34 +220,25 @@
 
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const originalText = btn.innerHTML;
             
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Loading...';
+
             const identifier = document.getElementById('identifier').value;
             const password = document.getElementById('password').value;
-            
             const fullName = document.getElementById('fullName').value;
             const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
 
             const url = isLogin ? '/api/login' : '/api/register';
-            
-            let payload = {};
-            if (isLogin) {
-                payload = { identifier, password };
-            } else {
-                payload = { 
-                    username: identifier, 
-                    email: email, 
-                    password: password, 
-                    fullName: fullName, 
-                    phone: phone,
-                    role: 'user' 
-                };
-            }
+            let payload = isLogin ? { identifier, password } : { username: identifier, email, password, fullName, phone, role: 'user' };
 
             try {
                 const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -147,24 +247,21 @@
                     if (isLogin) {
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
-                        
-                        Swal.fire({
-                            icon: 'success', title: 'Login Berhasil!',
-                            showConfirmButton: false, timer: 1500
-                        }).then(() => {
-                            if(data.user.role === 'admin') window.location.href = 'admin.html';
-                            else window.location.href = 'index.html'; 
+                        Swal.fire({ icon: 'success', title: 'Login Berhasil!', timer: 1500, showConfirmButton: false, background: '#1c1c2d', color: '#fff' }).then(() => {
+                            window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
                         });
                     } else {
-                        Swal.fire('Sukses', 'Akun berhasil dibuat! Silakan login.', 'success');
-                        toggleMode(); 
+                        Swal.fire({ icon: 'success', title: 'Akun Dibuat!', text: 'Silakan login sekarang.', background: '#1c1c2d', color: '#fff' });
+                        toggleMode();
                     }
                 } else {
-                    Swal.fire('Gagal', data.message, 'error');
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff' });
                 }
             } catch (err) {
-                console.error(err);
-                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal koneksi ke server', background: '#1c1c2d', color: '#fff' });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     </script>
@@ -172,148 +269,12 @@
     <script>
         (async function() {
             try {
-                const res = await fetch('/api/maintenance');
-                const data = await res.json();
-                
-                // Cek Admin Token
+                const res = await fetch('/api/maintenance'); const data = await res.json();
                 const isAdmin = localStorage.getItem('adminToken'); 
-
-                // Jika maintenance aktif DAN bukan admin, tampilkan layar maintenance
                 if (data.isActive && !isAdmin) {
-                    // Kita inject Style CSS + HTML baru
-                    document.body.innerHTML = `
-                        <style>
-                            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-                            
-                            body {
-                                margin: 0;
-                                padding: 0;
-                                font-family: 'Poppins', sans-serif;
-                                background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe);
-                                background-size: 400% 400%;
-                                animation: gradientBG 15s ease infinite;
-                                height: 100vh;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                overflow: hidden;
-                            }
-
-                            /* Background Animation */
-                            @keyframes gradientBG {
-                                0% { background-position: 0% 50%; }
-                                50% { background-position: 100% 50%; }
-                                100% { background-position: 0% 50%; }
-                            }
-
-                            .glass-card {
-                                background: rgba(255, 255, 255, 0.05);
-                                backdrop-filter: blur(20px);
-                                -webkit-backdrop-filter: blur(20px);
-                                border-radius: 24px;
-                                border: 1px solid rgba(255, 255, 255, 0.1);
-                                padding: 50px 40px;
-                                text-align: center;
-                                max-width: 500px;
-                                width: 90%;
-                                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-                                color: white;
-                                position: relative;
-                                overflow: hidden;
-                            }
-
-                            .floating-illustration {
-                                font-size: 80px;
-                                margin-bottom: 20px;
-                                display: inline-block;
-                                animation: float 3s ease-in-out infinite;
-                                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-                            }
-
-                            @keyframes float {
-                                0% { transform: translateY(0px) rotate(0deg); }
-                                50% { transform: translateY(-20px) rotate(5deg); }
-                                100% { transform: translateY(0px) rotate(0deg); }
-                            }
-
-                            h1 {
-                                font-size: 2rem;
-                                font-weight: 800;
-                                margin-bottom: 10px;
-                                background: linear-gradient(to right, #fff, #b0c0d6);
-                                -webkit-background-clip: text;
-                                -webkit-text-fill-color: transparent;
-                            }
-
-                            p {
-                                color: #d1d5db;
-                                font-size: 1rem;
-                                line-height: 1.6;
-                                margin-bottom: 30px;
-                            }
-
-                            .btn-retry {
-                                background: white;
-                                color: #0e1e3b;
-                                border: none;
-                                padding: 12px 35px;
-                                border-radius: 50px;
-                                font-weight: 700;
-                                font-size: 1rem;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-                            }
-
-                            .btn-retry:hover {
-                                transform: scale(1.05);
-                                box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
-                            }
-
-                            .btn-retry:active {
-                                transform: scale(0.95);
-                            }
-
-                            /* Hiasan bubbles */
-                            .bubble {
-                                position: absolute;
-                                border-radius: 50%;
-                                background: rgba(255, 255, 255, 0.1);
-                                animation: rise 10s infinite ease-in;
-                                bottom: -50px;
-                            }
-                            @keyframes rise {
-                                0% { bottom: -50px; transform: translateX(0); }
-                                50% { transform: translateX(50px); }
-                                100% { bottom: 120%; transform: translateX(-50px); }
-                            }
-                        </style>
-
-                        <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 8s;"></div>
-                        <div class="bubble" style="width: 40px; height: 40px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
-                        <div class="bubble" style="width: 80px; height: 80px; left: 70%; animation-duration: 15s; animation-delay: 1s;"></div>
-                        <div class="bubble" style="width: 30px; height: 30px; left: 90%; animation-duration: 10s; animation-delay: 4s;"></div>
-
-                        <div class="glass-card">
-                            <div class="floating-illustration">
-                                👾🛠️
-                            </div>
-                            <h1>Lagi Didandanin! ✨</h1>
-                            <p>
-                                Sstt... Halaman Login lagi istirahat sebentar. <br>
-                                Tim IT kami lagi ngopi sambil benerin kabel yang kusut.
-                                <br><br>
-                                <b>Coba balik lagi nanti ya!</b>
-                            </p>
-                            <button onclick="location.reload()" class="btn-retry">
-                                Cek Lagi Dong ↻
-                            </button>
-                        </div>
-                    `;
+                    document.body.innerHTML = `<style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(-45deg,#0e1e3b,#2b1055,#0049CC,#4facfe);background-size:400% 400%;animation:gradientBG 15s ease infinite;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}@keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.glass-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(255,255,255,0.1);padding:50px 40px;text-align:center;max-width:500px;width:90%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);color:white}h1{font-size:2rem;font-weight:800;margin-bottom:10px;background:linear-gradient(to right,#fff,#b0c0d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}p{color:#d1d5db;font-size:1rem;line-height:1.6;margin-bottom:30px}.btn-retry{background:white;color:#0e1e3b;border:none;padding:12px 35px;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;transition:all 0.3s ease}.btn-retry:hover{transform:scale(1.05)}.floating-illustration{font-size:80px;margin-bottom:20px;display:inline-block;animation:float 3s ease-in-out infinite}@keyframes float{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-20px) rotate(5deg)}100%{transform:translateY(0) rotate(0)}}</style><div class="glass-card"><div class="floating-illustration">👾🛠️</div><h1>Lagi Didandanin! ✨</h1><p>Halaman Login sedang maintenance.<br><b>Coba balik lagi nanti ya!</b></p><button onclick="location.reload()" class="btn-retry">Cek Lagi Dong ↻</button></div>`;
                 }
-            } catch (err) {
-                console.log("Gagal cek maintenance status, mungkin API error atau offline.");
-            }
+            } catch (err) {}
         })();
     </script>
 </body>
