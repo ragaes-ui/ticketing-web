@@ -287,9 +287,18 @@
                 <div class="col-lg-3">
                     <div class="footer-head">Ikuti Kami</div>
                     <div class="mb-3">
-                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn" title="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn" title="TikTok">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -472,8 +481,6 @@
             document.getElementById('modalVenue').innerText = event.location || "TBA";
 
             // --- LOGIKA KEAMANAN PENTING ---
-            // Jika kategori adalah Streaming, JANGAN tampilkan deskripsi asli (krn isinya password).
-            // Tampilkan pesan placeholder saja.
             let safeDescription = event.description || "Deskripsi lengkap belum tersedia.";
             let iconModal = "bi-ticket-perforated-fill";
 
@@ -488,8 +495,7 @@
 
             document.getElementById('modalDesc').innerText = safeDescription;
             document.getElementById('modalIcon').className = `bi ${iconModal}`;
-            // ---------------------------------
-
+            
             const btnBuy = document.getElementById('btnModalBuy');
             const isSoldOut = event.availableSeats <= 0;
             
@@ -524,7 +530,6 @@
             if (e.key === "Enter") searchEvent();
         });
 
-        // --- FUNGSI BELI TIKET ---
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
