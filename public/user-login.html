@@ -115,7 +115,6 @@
 
         .brand-logo { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; background: linear-gradient(to right, #fff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Scrollbar Halus */
         .glass-card { max-height: 85vh; overflow-y: auto; scrollbar-width: none; }
         .glass-card::-webkit-scrollbar { width: 0; }
     </style>
@@ -182,6 +181,21 @@
     <script>
         let isLogin = true;
 
+        // DEFINISI TOAST STYLE ADMIN
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            background: '#1c1c2d', // Tema Gelap Admin
+            color: '#fff',
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
         function toggleMode() {
             isLogin = !isLogin;
             const subTitle = document.getElementById('subTitle');
@@ -192,7 +206,6 @@
             const lblIdentifier = document.getElementById('lblIdentifier');
 
             if (isLogin) {
-                // MODE LOGIN
                 subTitle.innerText = "Selamat Datang Kembali";
                 btn.innerHTML = 'MASUK <i class="bi bi-box-arrow-in-right ms-2"></i>';
                 info.innerText = "Belum punya akun?";
@@ -204,7 +217,6 @@
                 document.getElementById('phone').removeAttribute('required');
                 document.getElementById('email').removeAttribute('required');
             } else {
-                // MODE REGISTER
                 subTitle.innerText = "Buat Akun Baru";
                 btn.innerHTML = 'DAFTAR <i class="bi bi-person-plus ms-2"></i>';
                 info.innerText = "Sudah punya akun?";
@@ -223,7 +235,6 @@
             const btn = document.getElementById('btnSubmit');
             const originalText = btn.innerHTML;
             
-            // Loading State
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Loading...';
 
@@ -247,18 +258,24 @@
                     if (isLogin) {
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
-                        Swal.fire({ icon: 'success', title: 'Login Berhasil!', timer: 1500, showConfirmButton: false, background: '#1c1c2d', color: '#fff' }).then(() => {
+                        
+                        // --- NOTIFIKASI GAYA TOAST (POJOK KANAN ATAS) ---
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Login Berhasil!'
+                        }).then(() => {
                             window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
                         });
+
                     } else {
-                        Swal.fire({ icon: 'success', title: 'Akun Dibuat!', text: 'Silakan login sekarang.', background: '#1c1c2d', color: '#fff' });
+                        Toast.fire({ icon: 'success', title: 'Akun Dibuat! Silakan Login.' });
                         toggleMode();
                     }
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff' });
+                    Toast.fire({ icon: 'error', title: data.message || 'Gagal' });
                 }
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal koneksi ke server', background: '#1c1c2d', color: '#fff' });
+                Toast.fire({ icon: 'error', title: 'Koneksi Gagal' });
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
