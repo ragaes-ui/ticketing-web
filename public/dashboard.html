@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
     
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root { --primary-color: #0064d2; --bg-color: #f0f2f5; --text-dark: #1f2937; }
@@ -33,8 +33,20 @@
         .ticket-body::before, .ticket-body::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background: var(--bg-color); border-radius: 50%; }
         .ticket-body::before { left: -10px; } .ticket-body::after { right: -10px; }
         
-        /* Style QR & Akun */
-        .qr-container { padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; margin: 15px 0; background: #fff; }
+        /* Style QR & Akun - FIX BULET */
+        .qr-container { 
+            padding: 10px; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            margin: 15px 0; 
+            background: #fff;
+            min-height: 150px; /* Mencegah kotak menyusut jadi bulat */
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .account-box { background: #f0fff4; border: 1px solid #c6f6d5; color: #2f855a; width: 100%; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 15px; word-break: break-all; }
 
         .ticket-code-badge { font-family: monospace; background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; font-weight: 600; border: 1px dashed #d1d5db; }
@@ -107,6 +119,192 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // 1. INIT DATA
+        const user = JSON.parse(localStorage.getItem('userData'));
+        if (!user) window.location.href = 'user-login.html';
+
+        function renderProfile() {
+            const displayName = user.fullName || user.username || 'User';
+            document.getElementById('userNameDisplay').innerText = displayName;
+            document.getElementById('userEmailDisplay').innerText = user.email;
+        }
+        renderProfile();
+
+        // 2. LOAD TIKET & LOGIKA STREAMING vs KONSER
+        async function loadTickets() {
+            const list = document.getElementById('ticketList');
+            try {
+                const res = await fetch('/api/my-tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email })
+                });
+                const tickets = await res.json();
+
+                if(tickets.length === 0) {
+                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">Belum ada tiket atau akun.</p></div>`;
+                    return;
+                }
+
+                // --- OPTIMASI RENDER (Bangun HTML dulu baru inject) ---
+                let htmlContent = '';
+
+                tickets.forEach(t => {
+                    const event = t.eventId;
+                    if(!event) return; // Skip jika event terhapus
+
+                    const namaPemesan = user.fullName || t.customerName || user.username;
+                    
+                    // --- DETEKSI KATEGORI (Case Insensitive) ---
+                    const category = event.category || 'General';
+                    const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream') || category.toLowerCase().includes('akun');
+                    
+                    // HEADER STYLE
+                    const headerClass = isStreaming ? 'streaming' : '';
+                    const iconHeader = isStreaming ? '<i class="bi bi-camera-reels me-1"></i>' : '<i class="bi bi-ticket-perforated me-1"></i>';
+                    const labelHeader = isStreaming ? 'AKUN PREMIUM' : 'TIKET EVENT';
+
+                    // ISI KONTEN (Credentials VS QR Code)
+                    let mainContent = '';
+
+                    if (isStreaming) {
+                        // TAMPILKAN EMAIL/PASSWORD
+                        const credentials = event.description || "Detail akun tidak tersedia.";
+                        mainContent = `
+                            <div class="account-box">
+                                <label class="small fw-bold text-success mb-1"><i class="bi bi-lock-fill"></i> AKUN ANDA:</label>
+                                <div class="font-monospace fs-6 text-dark fw-bold" style="white-space: pre-wrap;">${credentials}</div>
+                            </div>
+                            <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                                <i class="bi bi-clipboard"></i> Salin Akun
+                            </button>
+                        `;
+                    } else {
+                        // TAMPILKAN QR CODE (Untuk Konser)
+                        const statusBadge = t.status === 'used' 
+                            ? '<span class="badge bg-secondary status-badge">SUDAH DIGUNAKAN</span>' 
+                            : '<span class="badge bg-success status-badge">TIKET AKTIF / VALID</span>';
+                        
+                        // Perhatikan id="qrcode-${t._id}" di bawah ini
+                        mainContent = `
+                            <small class="text-secondary fw-bold mb-2">SCAN QR DI LOKASI</small>
+                            <div class="qr-container shadow-sm">
+                                <div id="qrcode-${t._id}"></div>
+                            </div>
+                            <div class="mb-2 mt-2">${statusBadge}</div>
+                        `;
+                    }
+
+                    // KUMPULKAN HTML
+                    htmlContent += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="ticket-card shadow-sm">
+                                <div class="ticket-header ${headerClass}">
+                                    <h5 class="fw-bold mb-1 text-truncate">${iconHeader} ${event.name}</h5>
+                                    <small class="opacity-75 fw-bold">${labelHeader}</small>
+                                </div>
+                                <div class="ticket-body text-center">
+                                    ${mainContent}
+                                    
+                                    <div class="ticket-code-badge mt-3 mb-2">${t.ticketCode}</div>
+                                    <small class="text-muted d-block mt-2 border-top pt-2 w-100">
+                                        Milik: <b class="text-dark">${namaPemesan}</b>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // INJECT HTML KE HALAMAN
+                list.innerHTML = htmlContent;
+
+                // --- GENERATE QR CODE DENGAN DELAY (FIX MASALAH BULET) ---
+                setTimeout(() => {
+                    tickets.forEach(t => {
+                        const category = t.eventId.category || 'General';
+                        const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
+
+                        if (!isStreaming) {
+                            const container = document.getElementById(`qrcode-${t._id}`);
+                            if(container) {
+                                container.innerHTML = ""; // Bersihkan isi lama
+                                try {
+                                    new QRCode(container, { 
+                                        text: t.ticketCode, 
+                                        width: 128, 
+                                        height: 128,
+                                        correctLevel : QRCode.CorrectLevel.H
+                                    });
+                                } catch (e) {
+                                    console.error("Gagal generate QR", e);
+                                }
+                            }
+                        }
+                    });
+                }, 300); // Delay 300ms agar HTML siap dirender
+
+            } catch (err) { console.error(err); }
+        }
+
+        // Helper Copy
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                Toast.fire({ icon: 'success', title: 'Akun disalin!' });
+            });
+        }
+
+        // Logic Modal Nama
+        const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
+        function openNameModal() { document.getElementById('inputNewName').value = user.fullName || user.username; nameModal.show(); }
+        async function saveName() {
+            const newName = document.getElementById('inputNewName').value;
+            if(!newName) return;
+            try {
+                await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
+                user.fullName = newName; user.username = newName;
+                localStorage.setItem('userData', JSON.stringify(user));
+                renderProfile(); loadTickets(); nameModal.hide(); Swal.fire('Sukses', 'Nama diubah', 'success');
+            } catch(e) { Swal.fire('Error', 'Gagal update', 'error'); }
+        }
+
+        // Logic Modal Password
+        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
+        function openPassModal() { passModal.show(); }
+        async function savePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+            if(!oldPass || !newPass) return;
+            try {
+                const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, oldPassword:oldPass, newPassword:newPass}) });
+                if(res.ok) { passModal.hide(); Swal.fire('Sukses', 'Silakan login ulang', 'success').then(()=>logout()); }
+                else { Swal.fire('Gagal', 'Password salah', 'error'); }
+            } catch(e) {}
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'user-login.html'; }
+        
+        loadTickets();
+    </script>
+
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('/api/maintenance'); const data = await res.json();
+                const isAdmin = localStorage.getItem('adminToken');
+                if (data.isActive && !isAdmin) {
+                    document.body.innerHTML = `<style>body{background:#0e1e3b;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center}</style><div><h1>Maintenance 🛠️</h1><p>Sedang diperbaiki.</p><button onclick="location.reload()">Refresh</button></div>`;
+                }
+            } catch (e) {}
+        })();
+    </script>
+</body>
+</html>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
