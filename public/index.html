@@ -161,31 +161,17 @@
         .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
         .modal-desc-text { color: #555; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
 
-        /* TOMBOL BANTUAN MELAYANG (BULET) */
+        /* TOMBOL BANTUAN MELAYANG */
         .btn-help-floating {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;  /* Lebar Fix */
-            height: 60px; /* Tinggi Fix */
-            background: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            border-radius: 50%; /* Bulat Sempurna */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
-            z-index: 9999;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 1.5rem; /* Icon Besar */
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
+            z-index: 9999; transition: all 0.3s; font-size: 1.5rem;
         }
         .btn-help-floating:hover {
-            transform: translateY(-5px) rotate(10deg) scale(1.1); /* Efek Muter Dikit */
-            box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
-            background: var(--primary-blue);
-            color: white;
+            transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
+            background: var(--primary-blue); color: white;
         }
     </style>
 </head>
@@ -256,6 +242,14 @@
                     <div class="cat-text">Workshop</div>
                 </div>
             </div>
+            
+            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')">
+                <div class="category-item" id="btn-cat-Streaming">
+                    <div class="icon-circle"><i class="bi bi-camera-reels"></i></div>
+                    <div class="cat-text">Streaming</div>
+                </div>
+            </div>
+
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
@@ -271,9 +265,7 @@
         </div>
     </div>
 
-    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST"
-       class="btn-help-floating"
-       title="Kirim Email ke Admin">
+    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin">
         <i class="bi bi-envelope-heart-fill"></i>
     </a>
 
@@ -295,18 +287,9 @@
                 <div class="col-lg-3">
                     <div class="footer-head">Ikuti Kami</div>
                     <div class="mb-3">
-                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn" title="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn" title="Twitter">
-                            <i class="bi bi-twitter-x"></i>
-                        </a>
-                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn" title="YouTube">
-                            <i class="bi bi-youtube"></i>
-                        </a>
-                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn" title="TikTok">
-                            <i class="bi bi-tiktok"></i>
-                        </a>
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -320,8 +303,8 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="position-relative">
-                    <div class="modal-header-img">
-                        <i class="bi bi-ticket-perforated-fill"></i>
+                    <div class="modal-header-img" id="modalHeaderImg">
+                        <i class="bi bi-ticket-perforated-fill" id="modalIcon"></i>
                     </div>
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -340,13 +323,12 @@
                     
                     <hr>
                     
-                    <h6 class="fw-bold">Deskripsi Event</h6>
-                    <p class="modal-desc-text" id="modalDesc">
-                    </p>
+                    <h6 class="fw-bold">Deskripsi & Info</h6>
+                    <p class="modal-desc-text" id="modalDesc"></p>
 
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="text-secondary d-block">Harga Tiket</small>
+                            <small class="text-secondary d-block">Harga</small>
                             <div class="modal-price-tag" id="modalPrice">Rp 0</div>
                         </div>
                         <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">
@@ -411,7 +393,9 @@
 
         function filterCategory(category) {
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`btn-cat-${category}`).classList.add('active');
+            // Cek jika elemen ada sebelum add class active
+            const btn = document.getElementById(`btn-cat-${category}`);
+            if(btn) btn.classList.add('active');
 
             if (category === 'All') {
                 renderEvents(allEvents);
@@ -438,11 +422,19 @@
                 const catName = event.category || 'General'; 
                 const locationName = event.location || 'Lokasi TBA';
 
+                // LOGIKA VISUAL STREAMING
+                let iconClass = 'bi-ticket-perforated';
+                let btnText = isSoldOut ? 'HABIS' : 'BELI';
+                if (catName === 'Streaming') {
+                    iconClass = 'bi-camera-reels'; // Ikon beda untuk Streaming
+                    if(!isSoldOut) btnText = 'BELI AKUN';
+                }
+
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card-event" onclick="showDetail('${event._id}')">
                             <div class="card-img-top">
-                                <i class="bi bi-ticket-perforated fs-1 opacity-50"></i>
+                                <i class="${iconClass} fs-1 opacity-50"></i>
                                 <span class="category-badge-img">${catName}</span>
                                 <div class="date-float">${dateStr}</div>
                             </div>
@@ -455,7 +447,7 @@
                                 
                                 <div class="price-val">Rp ${harga}</div>
                                 <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
-                                    ${isSoldOut ? 'HABIS' : 'BELI'}
+                                    ${btnText}
                                 </button>
                             </div>
                         </div>
@@ -464,6 +456,7 @@
             });
         }
 
+        // --- FUNGSI SHOW DETAIL (MODIFIKASI KEAMANAN) ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -471,23 +464,42 @@
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
             const dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
             
+            // Set Data Dasar
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
             document.getElementById('modalCategory').innerText = event.category || "Event";
             document.getElementById('modalVenue').innerText = event.location || "TBA";
-            document.getElementById('modalDesc').innerText = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
+
+            // --- LOGIKA KEAMANAN PENTING ---
+            // Jika kategori adalah Streaming, JANGAN tampilkan deskripsi asli (krn isinya password).
+            // Tampilkan pesan placeholder saja.
+            let safeDescription = event.description || "Deskripsi lengkap belum tersedia.";
+            let iconModal = "bi-ticket-perforated-fill";
+
+            if (event.category === 'Streaming') {
+                safeDescription = "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n" + 
+                                  "✅ Akun Private / Sharing Bergaransi\n" + 
+                                  "✅ Email & Password akan otomatis muncul di menu 'Tiket Saya' setelah pembayaran berhasil.\n" +
+                                  "✅ 100% Aman & Legal.\n\n" +
+                                  "Klik 'Beli Akun' untuk memproses pesanan.";
+                iconModal = "bi-camera-reels-fill";
+            }
+
+            document.getElementById('modalDesc').innerText = safeDescription;
+            document.getElementById('modalIcon').className = `bi ${iconModal}`;
+            // ---------------------------------
 
             const btnBuy = document.getElementById('btnModalBuy');
             const isSoldOut = event.availableSeats <= 0;
             
             if (isSoldOut) {
-                btnBuy.innerText = "TIKET HABIS";
+                btnBuy.innerText = "STOK HABIS";
                 btnBuy.classList.add('disabled', 'btn-secondary');
                 btnBuy.classList.remove('btn-primary');
                 btnBuy.removeAttribute('onclick');
             } else {
-                btnBuy.innerText = "Beli Tiket Sekarang";
+                btnBuy.innerText = (event.category === 'Streaming') ? "Beli Akun Sekarang" : "Beli Tiket Sekarang";
                 btnBuy.classList.remove('disabled', 'btn-secondary');
                 btnBuy.classList.add('btn-primary');
                 btnBuy.onclick = function() {
@@ -511,17 +523,12 @@
         document.getElementById('searchInput').addEventListener("keypress", function(e) {
             if (e.key === "Enter") searchEvent();
         });
-        
-        function resetSearch() {
-            document.getElementById('searchInput').value = '';
-            filterCategory('All');
-        }
 
-        // --- FUNGSI BELI TIKET DENGAN FITUR AUTO-DELETE ---
+        // --- FUNGSI BELI TIKET ---
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
-                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
+                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
                 return;
             }
             const user = JSON.parse(userRaw);
@@ -530,7 +537,7 @@
 
             const confirm = await Swal.fire({
                 title: 'Konfirmasi Pembelian',
-                html: `Beli tiket <b>${event ? event.name : ''}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b><br><small>Metode Pembayaran: Midtrans</small>`,
+                html: `Beli <b>${event ? event.name : ''}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b><br><small>Metode Pembayaran: Midtrans</small>`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0049CC',
@@ -542,7 +549,6 @@
                 Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 try {
-                    // 1. Minta Token & Order ID
                     const res = await fetch('/api/payment-token', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
@@ -557,42 +563,29 @@
                     Swal.close(); 
 
                     if (res.ok && data.token) {
-                        // 2. Munculkan Popup Midtrans
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
-                                console.log('success', result);
-                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Tiket sudah aktif.', 'success').then(() => {
+                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Cek menu dashboard Anda.', 'success').then(() => {
                                     window.location.href = 'dashboard.html';
                                 });
                             },
                             onPending: function(result){
-                                console.log('pending', result);
                                 Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda.', 'info');
                             },
                             onError: function(result){
-                                console.log('error', result);
-                                Swal.fire('Gagal', 'Pembayaran gagal atau dibatalkan.', 'error');
+                                Swal.fire('Gagal', 'Pembayaran gagal.', 'error');
                             },
-                            // --- BAGIAN PENTING: KALAU USER KLIK SILANG (CLOSE) ---
                             onClose: function(){
-                                console.log('User menutup popup, menghapus order...');
-                                
-                                // Panggil API untuk hapus data sampah di database
                                 fetch('/api/cancel-order', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ orderId: data.orderId })
-                                })
-                                .then(r => r.json())
-                                .then(delRes => {
-                                    console.log("Order cleanup:", delRes);
-                                    Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran. Tiket dihapus.', 'info');
                                 });
+                                Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran.', 'info');
                             }
-                            // -----------------------------------------------------
                         });
                     } else { 
-                        Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat membuat pesanan.', 'error'); 
+                        Swal.fire('Gagal', data.message || 'Error membuat pesanan.', 'error'); 
                     }
                 } catch (err) { 
                     console.error(err);
@@ -611,29 +604,9 @@
 
                 if (data.isActive && !isAdmin) {
                     document.body.innerHTML = `
-                        <style>
-                            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-                            body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                            @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-                            .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }
-                            .floating-illustration { font-size: 80px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; }
-                            @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
-                            h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                            p { color: #d1d5db; margin-bottom: 30px; }
-                            .btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-                            .btn-retry:hover { transform: scale(1.05); }
-                        </style>
-                        <div class="glass-card">
-                            <div class="floating-illustration">👾🛠️</div>
-                            <h1>Lagi Didandanin! ✨</h1>
-                            <p>Sstt... Servernya lagi istirahat sebentar biar nanti makin ngebut. <br><br><b>Coba balik lagi nanti ya!</b></p>
-                            <button onclick="location.reload()" class="btn-retry">Cek Lagi Dong ↻</button>
-                        </div>
-                    `;
+                        <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }.glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }p { color: #d1d5db; margin-bottom: 30px; }.btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }.btn-retry:hover { transform: scale(1.05); }</style><div class="glass-card"><h1>Lagi Didandanin! ✨</h1><p>Website sedang maintenance. Silakan kembali lagi nanti.</p><button onclick="location.reload()" class="btn-retry">Cek Lagi</button></div>`;
                 }
-            } catch (err) {
-                console.log("Gagal cek maintenance status.");
-            }
+            } catch (err) { console.log("Gagal cek maintenance status."); }
         })();
     </script>
 </body>
