@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 // ==========================================
-// 🛠️ FIX KONEKSI DATABASE (TEKNIK CACHING VERCEL)
+// 🛠️ FIX KONEKSI DATABASE
 // ==========================================
 let cached = global.mongoose;
 if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
@@ -28,7 +28,6 @@ async function connectDB() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     const opts = { bufferCommands: false, serverSelectionTimeoutMS: 5000 };
-    // Ganti URI ini dengan punya Abang
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       console.log('✅ DATABASE BARU AJA KONEK!');
@@ -55,8 +54,20 @@ let snap = new midtransClient.Snap({
 
 // --- ROUTES API ---
 
+// 🔒 API PUBLIC: SENSOR DESKRIPSI STREAMING
 app.get('/api/events', async (req, res) => {
-    try { const events = await Event.find(); res.json(events); } 
+    try { 
+        const events = await Event.find(); 
+        const publicEvents = events.map(ev => {
+            const eventObj = ev.toObject();
+            // SENSOR PASSWORD DI SINI
+            if (eventObj.category === 'Streaming') {
+                eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
+            }
+            return eventObj;
+        });
+        res.json(publicEvents); 
+    } 
     catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -103,7 +114,6 @@ app.post('/api/login', async (req, res) => {
         const { identifier, password } = req.body;
         const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
-        if (!user.password) return res.status(400).json({ success: false, message: "Akun Google tidak bisa login manual." });
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
         res.json({ success: true, token: "token-rahasia-" + user._id, user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone } });
@@ -116,6 +126,29 @@ app.post('/api/my-tickets', async (req, res) => {
 });
 
 // --- PAYMENT & ORDER ---
+
+// ✅ API PRIVATE: LIHAT DETAIL ORDER (TERMASUK PASSWORD)
+app.get('/api/orders/:orderId', async (req, res) => {
+    try {
+        const order = await Order.findOne({ orderIdMidtrans: req.params.orderId }).populate('eventId');
+        if (!order) return res.status(404).json({ message: "Order tidak ditemukan" });
+
+        let responseData = {
+            status: order.status,
+            productName: order.eventId?.name,
+            customerName: order.customerName,
+            credentials: null 
+        };
+
+        // HANYA JIKA LUNAS, KIRIM PASSWORD ASLI
+        if (order.status === 'valid' || order.status === 'used') {
+            responseData.credentials = order.eventId?.description;
+        }
+
+        res.json(responseData);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/payment-token', async (req, res) => {
     try {
         const { eventId, customerName, customerEmail, quantity } = req.body;
@@ -134,7 +167,6 @@ app.post('/api/payment-token', async (req, res) => {
 
         const transaction = await snap.createTransaction(parameter);
 
-        // TIKET CODE PANJANG
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
@@ -147,37 +179,18 @@ app.post('/api/payment-token', async (req, res) => {
             orderIdMidtrans: orderId 
         });
         await newOrder.save();
-        // Kirim balik orderId ke frontend biar bisa dihapus kalau dicancel
         res.json({ token: transaction.token, orderId: orderId });
     } catch (error) { console.log("Midtrans Error:", error); res.status(500).json({ message: error.message }); }
 });
 
-// ✅ TAMBAHAN BARU: API UNTUK HAPUS ORDER SAAT KLIK 'X' (CLOSE)
 app.post('/api/cancel-order', async (req, res) => {
     try {
         const { orderId } = req.body;
-        if (!orderId) return res.status(400).json({ message: "Order ID diperlukan" });
-
-        // Cari dan hapus order yang masih pending
-        const deletedOrder = await Order.findOneAndDelete({ 
-            orderIdMidtrans: orderId,
-            status: 'pending' // Safety: Cuma hapus yang pending
-        });
-
-        if (deletedOrder) {
-            console.log(`❌ Order ${orderId} dibatalkan user (Klik X). Data dihapus.`);
-            return res.json({ success: true, message: "Order dibatalkan & dihapus" });
-        } else {
-            // Bisa jadi sudah terhapus atau statusnya sudah valid (jangan dihapus)
-            return res.status(404).json({ message: "Order tidak ditemukan atau status bukan pending" });
-        }
-    } catch (error) {
-        console.error("Gagal cancel order:", error);
-        res.status(500).json({ error: error.message });
-    }
+        await Order.findOneAndDelete({ orderIdMidtrans: orderId, status: 'pending' });
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ✅ REVISI WEBHOOK (HAPUS DATA KALAU GAGAL/EXPIRE)
 app.post('/api/payment-notification', async (req, res) => {
     try {
         const statusResponse = await snap.transaction.notification(req.body);
@@ -189,7 +202,6 @@ app.post('/api/payment-notification', async (req, res) => {
         if (!order) return res.status(404).json({message: "Order not found"});
 
         if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
-            // JIKA SUKSES
             if (fraudStatus == 'challenge') {
                 order.status = 'pending';
                 await order.save();
@@ -201,73 +213,48 @@ app.post('/api/payment-notification', async (req, res) => {
             }
         } 
         else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-            // JIKA GAGAL -> HAPUS DARI DATABASE
             await Order.findOneAndDelete({ orderIdMidtrans: orderId });
-            console.log(`Order ${orderId} dihapus otomatis karena pembayaran gagal/batal.`);
         } 
         else if (transactionStatus == 'pending'){
             order.status = 'pending';
             await order.save();
         }
-        
         res.status(200).send('OK');
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ✅ REVISI VALIDASI (CEGAH TIKET BELUM BAYAR MASUK)
 app.post('/api/validate', async (req, res) => {
     try {
         const ticket = await Order.findOne({ ticketCode: req.body.ticketCode.trim() }).populate('eventId');
-        
-        if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN! ❌" });
+        if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN!" });
+        if (ticket.status === 'pending') return res.status(400).json({ valid: false, message: "BELUM DIBAYAR!" });
+        if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "SUDAH DIPAKAI!" });
 
-        // Cek apakah tiket sudah dibayar
-        if (ticket.status === 'pending') {
-             return res.status(400).json({ valid: false, message: "TIKET BELUM DIBAYAR! 💰" });
-        }
-        if (ticket.status === 'failed') {
-             return res.status(400).json({ valid: false, message: "PEMBAYARAN TIKET GAGAL! 🚫" });
-        }
-        
-        // Cek apakah tiket sudah dipakai
-        if (ticket.status === 'used') {
-            return res.status(400).json({ valid: false, message: "TIKET SUDAH DIPAKAI! ⚠️", detail: `Oleh: ${ticket.customerName}` });
-        }
-
-        // Kalau lolos semua validasi -> Set Used
         ticket.status = 'used'; 
         await ticket.save();
-        
-        res.json({ 
-            valid: true, 
-            message: "TIKET VALID! SILAKAN MASUK ✅", 
-            data: { name: ticket.customerName, event: ticket.eventId?.name } 
-        });
+        res.json({ valid: true, message: "TIKET VALID! ✅", data: { name: ticket.customerName, event: ticket.eventId?.name } });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.put('/api/user/update-name', async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
-        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
         user.username = req.body.newName; if(user.fullName) user.fullName = req.body.newName;
-        await user.save(); res.json({ success: true, message: "Nama berhasil diubah" });
-    } catch (error) { res.status(500).json({ message: "Gagal update", error: error.message }); }
+        await user.save(); res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.put('/api/user/change-password', async (req, res) => {
     try {
         const { userId, oldPassword, newPassword } = req.body;
         const user = await User.findById(userId);
-        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "Password lama salah!" });
         user.password = await bcrypt.hash(newPassword, 10); await user.save();
-        res.json({ success: true, message: "Password berhasil diganti" });
-    } catch (error) { res.status(500).json({ message: "Gagal ganti pass", error: error.message }); }
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- MAINTENANCE ---
 app.get('/api/maintenance', async (req, res) => {
     try {
         let config = await Config.findOne({ key: 'maintenance' });
@@ -278,11 +265,10 @@ app.get('/api/maintenance', async (req, res) => {
 
 app.post('/api/maintenance', async (req, res) => {
     try {
-        const { isActive } = req.body;
         let config = await Config.findOne({ key: 'maintenance' });
-        if (!config) config = new Config({ key: 'maintenance', isActive: isActive }); else config.isActive = isActive;
+        if (!config) config = new Config({ key: 'maintenance', isActive: req.body.isActive }); else config.isActive = req.body.isActive;
         await config.save();
-        res.json({ success: true, status: config.isActive ? "MAINTENANCE ON" : "WEBSITE ONLINE" });
+        res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
