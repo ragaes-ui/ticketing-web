@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gatekeeper Scanner</title>
+    <title>Gatekeeper Scanner + Camera</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
         /* Gaya Hacker Matrix */
@@ -18,8 +19,9 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
+            min-height: 100vh; /* Ganti height jadi min-height biar scrollable kalau kamera nyala */
             margin: 0;
+            padding: 20px 0;
         }
         .scanner-box { 
             border: 2px solid #0f0; 
@@ -59,6 +61,33 @@
             color: #555;
             cursor: not-allowed;
         }
+
+        /* Styling Khusus untuk Area Kamera */
+        #reader {
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px dashed #0f0;
+            display: none; /* Sembunyikan defaultnya */
+        }
+        /* Override CSS bawaan library html5-qrcode biar sesuai tema hacker */
+        #reader__dashboard_section_csr span, #reader__dashboard_section_swaplink {
+            display: none !important; /* Hapus teks bawaan yg ganggu */
+        }
+        #reader button {
+            background: #222;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+        }
+        #reader select {
+            background: #222;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -67,92 +96,165 @@
         <h1 class="mb-2">🕵️‍♂️ GATE CONTROL</h1>
         <p class="mb-4 text-secondary small">SYSTEM READY...</p>
         
+        <button type="button" id="btnToggleCam" class="btn btn-outline-success w-100 mb-3 btn-sm">
+            📷 SCAN VIA KAMERA
+        </button>
+
+        <div id="reader"></div>
+
         <form id="scanForm">
             <div class="mb-4">
                 <input type="text" id="ticketCode" class="form-control py-3" placeholder="SCAN / INPUT CODE" autocomplete="off" required>
             </div>
             <button type="submit" id="btnSubmit" class="btn btn-scan w-100 py-3">
-                SCAN TICKET
+                CHECK TICKET
             </button>
         </form>
     </div>
 
     <script>
-        // Cek apakah SweetAlert berhasil di-load
+        // --- LOGIKA UTAMA ---
+        
+        // Cek Library
         window.onload = function() {
-            if (typeof Swal === 'undefined') {
-                alert("GAWAT! Library Notifikasi (SweetAlert) gagal dimuat. Cek koneksi internet Abang!");
-            }
+            if (typeof Swal === 'undefined') alert("Error: SweetAlert belum dimuat.");
+            if (typeof Html5QrcodeScanner === 'undefined') alert("Error: html5-qrcode belum dimuat.");
         };
 
+        // --- 1. CONFIG SCANNER KAMERA ---
+        let html5QrcodeScanner = null;
+        const btnToggleCam = document.getElementById('btnToggleCam');
+        const readerDiv = document.getElementById('reader');
+
+        btnToggleCam.addEventListener('click', () => {
+            // Jika scanner belum aktif, nyalakan
+            if (!html5QrcodeScanner) {
+                readerDiv.style.display = "block"; // Munculkan div
+                btnToggleCam.innerText = "❌ TUTUP KAMERA";
+                btnToggleCam.classList.replace('btn-outline-success', 'btn-outline-danger');
+
+                // Inisialisasi Scanner
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", 
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    /* verbose= */ false
+                );
+                
+                // Render (Mulai Scan)
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            
+            } else {
+                // Matikan Scanner
+                stopScanner();
+            }
+        });
+
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().then(() => {
+                    readerDiv.style.display = "none";
+                    btnToggleCam.innerText = "📷 SCAN VIA KAMERA";
+                    btnToggleCam.classList.replace('btn-outline-danger', 'btn-outline-success');
+                    html5QrcodeScanner = null;
+                }).catch(error => {
+                    console.error("Gagal mematikan kamera.", error);
+                });
+            }
+        }
+
+        // Callback Jika Sukses Scan
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Scan result: ${decodedText}`, decodedResult);
+            
+            // 1. Isi input dengan hasil scan
+            const inputCode = document.getElementById('ticketCode');
+            inputCode.value = decodedText;
+
+            // 2. Bunyi Bip (Opsional, efek keren)
+            // new Audio('beep.mp3').play().catch(()=>{}); 
+
+            // 3. Matikan kamera otomatis biar gak berat
+            stopScanner();
+
+            // 4. Otomatis klik tombol submit
+            document.getElementById('btnSubmit').click();
+        }
+
+        function onScanFailure(error) {
+            // Biarkan kosong agar console tidak penuh spam error saat mencari QR
+            // console.warn(`Code scan error = ${error}`);
+        }
+
+
+        // --- 2. LOGIKA SUBMIT FORM (Sama seperti sebelumnya) ---
         document.getElementById('scanForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const inputCode = document.getElementById('ticketCode');
             const btn = document.getElementById('btnSubmit');
-            const code = inputCode.value.trim(); // Hapus spasi gak penting
+            const code = inputCode.value.trim();
 
             if (!code) return;
 
-            // 1. Ubah Tombol jadi Loading (Biar tau kodenya jalan)
             const originalText = btn.innerText;
             btn.innerText = "SEARCHING DATABASE...";
             btn.disabled = true;
 
-            console.log("Mengirim request untuk kode:", code); // Cek di Console
+            console.log("Mengirim request untuk kode:", code);
 
             try {
-                // 2. Tembak ke Server
+                // SIMULASI API (Ganti URL ini dengan API aslimu '/api/validate')
+                // Untuk demo ini saya pakai delay pura-pura
+                // const res = await fetch('/api/validate', { ... });
+                
+                // --- MOCKUP TESTING (Hapus bagian ini jika sudah connect backend) ---
+                await new Promise(r => setTimeout(r, 1000)); 
+                const data = { valid: true, data: { event: 'HACKER MEETUP 2024', name: 'NEO ANDERSON' } }; 
+                // -------------------------------------------------------------------
+
+                // Jika pakai fetch asli, uncomment di bawah:
+                /*
                 const res = await fetch('/api/validate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticketCode: code })
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({ ticketCode: code })
                 });
-
                 const data = await res.json();
-                console.log("Balasan Server:", data); // Cek di Console
+                */
 
-                // 3. Tampilkan Notif Berdasarkan Hasil
                 if (data.valid) {
-                    // --- TIKET VALID (HIJAU) ---
-                    // Mainkan Suara (Opsional)
-                    // new Audio('https://www.soundjay.com/buttons/beep-01a.mp3').play().catch(e => console.log(e));
-                    
                     await Swal.fire({
                         title: '✅ ACCESS GRANTED',
                         html: `<h3 style="color:#fff">${data.data.event}</h3><p>Guest: <b>${data.data.name}</b></p>`,
                         icon: 'success',
                         background: '#000',
-                        color: '#0f0', // Teks Hijau
+                        color: '#0f0',
                         confirmButtonColor: '#0f0',
                         confirmButtonText: 'MASUK BOS!',
-                        timer: 3000 // Otomatis nutup dalam 3 detik
+                        timer: 3000
                     });
                 } else {
-                    // --- TIKET INVALID / SUDAH DIPAKAI (MERAH) ---
                     await Swal.fire({
                         title: '⛔ ACCESS DENIED',
-                        html: `<h4 style="color:#fff">${data.message}</h4><p class="text-secondary">${data.detail || ''}</p>`,
+                        html: `<h4 style="color:#fff">${data.message || 'Tiket Tidak Valid'}</h4>`,
                         icon: 'error',
                         background: '#000',
-                        color: '#f44', // Teks Merah
+                        color: '#f44',
                         confirmButtonColor: '#f44',
                         confirmButtonText: 'TOLAK'
                     });
                 }
 
             } catch (err) {
-                console.error("Error Fetch:", err);
-                // Notif kalau Server Mati / Error Coding
+                console.error("Error:", err);
                 Swal.fire({
                     title: 'SYSTEM ERROR',
-                    text: 'Gagal menghubungi server. Cek terminal VS Code!',
+                    text: 'Gagal menghubungi server.',
                     icon: 'warning',
                     background: '#000',
                     color: 'orange'
                 });
             } finally {
-                // 4. Balikin Tombol & Kosongkan Input
                 btn.innerText = originalText;
                 btn.disabled = false;
                 inputCode.value = '';
