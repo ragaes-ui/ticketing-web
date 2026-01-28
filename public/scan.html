@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gatekeeper Matrix v2</title>
+    <title>Gatekeeper Logic v3</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
-        /* --- GAYA HACKER MATRIX --- */
+        /* --- TEMA HACKER MATRIX (SAMA SEPERTI SEBELUMNYA) --- */
         body { 
             background: #000; 
             color: #0f0; 
@@ -52,19 +52,17 @@
         }
         .btn-scan:hover { background: #fff; box-shadow: 0 0 20px #fff; }
         
-        /* --- AREA KAMERA CUSTOM (FIX UI) --- */
         #camera-wrapper {
             width: 100%;
-            height: 300px; /* Tinggi kamera fix agar layout tidak lompat */
+            height: 300px;
             background: #000;
             border: 1px dashed #0f0;
             margin-bottom: 20px;
-            display: none; /* Default sembunyi */
+            display: none;
             overflow: hidden;
             position: relative;
             border-radius: 5px;
         }
-        /* Memaksa video agar fit di dalam kotak */
         #reader video {
             width: 100% !important;
             height: 100% !important;
@@ -75,7 +73,10 @@
 <body>
 
     <div class="scanner-box text-center">
-        <h2 class="mb-2">🕵️‍♂️ GATE CONTROL</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="m-0">🕵️‍♂️ GATE CONTROL</h2>
+            <button onclick="resetData()" class="btn btn-sm btn-outline-danger" style="font-size: 0.7rem;">RESET DATA</button>
+        </div>
         <p class="mb-4 text-secondary small">SYSTEM READY...</p>
         
         <button type="button" id="btnToggleCam" class="btn btn-outline-success w-100 mb-3 btn-sm">
@@ -97,150 +98,137 @@
     </div>
 
     <script>
-        // --- LOGIKA BARU (Direct Camera Mode) ---
+        // --- 1. SIMULASI DATABASE (Logic Baru Disini) ---
+        // Kita pakai localStorage browser biar datanya tersimpan walaupun di-refresh
+        
+        function cekTiket(kode) {
+            // Ambil data tiket yg sudah terpakai dari memori browser
+            let usedTickets = JSON.parse(localStorage.getItem('usedTickets')) || [];
 
+            // LOGIC UTAMA:
+            if (usedTickets.includes(kode)) {
+                // Jika kode sudah ada di list -> GAGAL
+                return { status: false, msg: 'TIKET SUDAH DIGUNAKAN!', time: 'Jam: ' + new Date().toLocaleTimeString() };
+            } else {
+                // Jika belum ada -> SUKSES & Simpan ke list
+                usedTickets.push(kode);
+                localStorage.setItem('usedTickets', JSON.stringify(usedTickets));
+                return { status: true, msg: 'ACCESS GRANTED', guest: 'TAMU VIP' };
+            }
+        }
+
+        function resetData() {
+            localStorage.removeItem('usedTickets');
+            Swal.fire('Reset Berhasil', 'Semua tiket dianggap baru lagi.', 'success');
+        }
+
+
+        // --- 2. CONFIG KAMERA (Sama seperti sebelumnya) ---
         const btnToggleCam = document.getElementById('btnToggleCam');
         const cameraWrapper = document.getElementById('camera-wrapper');
         const inputCode = document.getElementById('ticketCode');
-        
-        let html5QrCode = null; // Instance scanner
-        let isCameraOn = false; // Status kamera
+        let html5QrCode = null; 
+        let isCameraOn = false;
 
-        // 1. Tombol Klik Kamera
         btnToggleCam.addEventListener('click', async () => {
-            if (!isCameraOn) {
-                startCamera();
-            } else {
-                stopCamera();
-            }
+            if (!isCameraOn) startCamera();
+            else stopCamera();
         });
 
-        // 2. Fungsi Menyalakan Kamera
         async function startCamera() {
             try {
-                // Munculkan Wadah
                 cameraWrapper.style.display = "block";
-                btnToggleCam.innerText = "⏳ MEMUAT KAMERA...";
+                btnToggleCam.innerText = "⏳ MEMUAT...";
                 btnToggleCam.disabled = true;
 
-                // Inisialisasi Library Mode Manual
                 html5QrCode = new Html5Qrcode("reader");
-
-                const config = { 
-                    fps: 10, 
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0 
-                };
-
-                // Mulai Scanning (Kamera Belakang / Environment)
                 await html5QrCode.start(
                     { facingMode: "environment" }, 
-                    config, 
+                    { fps: 10, qrbox: { width: 250, height: 250 } }, 
                     onScanSuccess, 
                     onScanFailure
                 );
 
-                // Jika berhasil nyala:
                 isCameraOn = true;
                 btnToggleCam.innerText = "❌ TUTUP KAMERA";
                 btnToggleCam.classList.replace('btn-outline-success', 'btn-outline-danger');
                 btnToggleCam.disabled = false;
-
             } catch (err) {
-                console.error("Gagal start kamera:", err);
+                console.error(err);
                 cameraWrapper.style.display = "none";
                 btnToggleCam.innerText = "📷 AKTIFKAN KAMERA";
                 btnToggleCam.disabled = false;
-
-                // Notifikasi Error
-                Swal.fire({
-                    title: 'KAMERA GAGAL',
-                    text: 'Pastikan izin kamera aktif dan dibuka via HTTPS/Localhost.',
-                    icon: 'error',
-                    background: '#000',
-                    color: '#f44'
-                });
+                Swal.fire({ title: 'KAMERA ERROR', text: 'Cek izin browser / HTTPS.', icon: 'error', background:'#000', color:'#f44' });
             }
         }
 
-        // 3. Fungsi Mematikan Kamera
         async function stopCamera() {
             if (html5QrCode) {
                 try {
                     await html5QrCode.stop();
                     html5QrCode.clear();
-                    
-                    // Reset Tampilan
                     cameraWrapper.style.display = "none";
                     btnToggleCam.innerText = "📷 AKTIFKAN KAMERA";
                     btnToggleCam.classList.replace('btn-outline-danger', 'btn-outline-success');
                     isCameraOn = false;
-                } catch (err) {
-                    console.log("Error stop:", err);
-                }
+                } catch (err) {}
             }
         }
 
-        // 4. Jika Scan Berhasil
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log(`Code Scanned: ${decodedText}`);
-            
-            // Isi Input
+        function onScanSuccess(decodedText) {
             inputCode.value = decodedText;
-
-            // Matikan kamera agar hemat baterai
             stopCamera();
-
-            // Auto Submit Form
             document.getElementById('btnSubmit').click();
         }
 
-        // 5. Jika Scan Gagal (Looping terus mencari QR)
-        function onScanFailure(error) {
-            // Biarkan kosong agar console bersih
-        }
+        function onScanFailure(error) {}
 
 
-        // --- LOGIKA FORM & MOCKUP API (Sama seperti sebelumnya) ---
+        // --- 3. HANDLE SUBMIT (Diupdate pakai Logic Database) ---
         document.getElementById('scanForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
             const code = inputCode.value.trim();
-
             if (!code) return;
 
             const originalText = btn.innerText;
-            btn.innerText = "SEARCHING...";
+            btn.innerText = "CHECKING DATABASE...";
             btn.disabled = true;
 
-            try {
-                // --- MOCKUP / SIMULASI API ---
-                await new Promise(r => setTimeout(r, 800)); // Delay
-                const data = { valid: true, data: { event: 'HACKER MEETUP', name: 'GUEST USER' } };
-                // -----------------------------
+            // Simulasi delay server
+            await new Promise(r => setTimeout(r, 600));
 
-                if (data.valid) {
-                    await Swal.fire({
-                        title: '✅ ACCESS GRANTED',
-                        html: `<h3 style="color:#fff">${data.data.event}</h3>Code: <b>${code}</b>`,
-                        icon: 'success',
-                        background: '#000',
-                        color: '#0f0',
-                        confirmButtonColor: '#0f0',
-                        timer: 2000
-                    });
-                } else {
-                    await Swal.fire({ title: '⛔ DENIED', icon: 'error', background: '#000', color: '#f44' });
-                }
+            // PANGGIL LOGIC CEK TIKET
+            const result = cekTiket(code);
 
-            } catch (err) {
-                console.error(err);
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-                inputCode.value = '';
-                inputCode.focus();
+            if (result.status) {
+                // --- SUKSES (HIJAU) ---
+                await Swal.fire({
+                    title: '✅ ' + result.msg,
+                    html: `<h3 style="color:#fff">${result.guest}</h3>Code: <b>${code}</b>`,
+                    icon: 'success',
+                    background: '#000',
+                    color: '#0f0',
+                    confirmButtonColor: '#0f0',
+                    timer: 2000
+                });
+            } else {
+                // --- GAGAL / SUDAH DIPAKAI (MERAH) ---
+                await Swal.fire({
+                    title: '⛔ ACCESS DENIED',
+                    html: `<h4 style="color:#f44">${result.msg}</h4><p class="text-secondary small">Tiket ini sudah discan sebelumnya.</p>`,
+                    icon: 'error',
+                    background: '#000',
+                    color: '#f44',
+                    confirmButtonColor: '#f44',
+                    confirmButtonText: 'TOLAK'
+                });
             }
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+            inputCode.value = '';
+            inputCode.focus();
         });
     </script>
 </body>
