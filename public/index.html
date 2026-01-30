@@ -138,7 +138,7 @@
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
 
         /* Footer */
-        .footer-loket { background-color: var(--dark-navy); color: white; padding: 50px 0 30px 0; margin-top: 60px; font-size: 0.85rem; }
+        .footer-loket { background-color: var(--dark-navy); color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
         .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
         .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
         .footer-link:hover { color: white; text-decoration: underline; }
@@ -172,6 +172,45 @@
         .btn-help-floating:hover {
             transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
             background: var(--primary-blue); color: white;
+        }
+
+        /* --- BAGIAN PARTNER / PAYMENT LOGO (BARU) --- */
+        .partner-section {
+            background-color: #f8f9fa; /* Latar abu sangat muda */
+            border-top: 1px solid #eee;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        .partner-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+        .partner-logo-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px 50px;
+        }
+        .partner-img {
+            height: 30px;
+            width: auto;
+            object-fit: contain;
+            filter: grayscale(100%) opacity(0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .partner-img:hover {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.1);
+        }
+        @media (max-width: 768px) {
+            .partner-img { height: 25px; }
+            .partner-logo-wrapper { gap: 20px 30px; }
         }
     </style>
 </head>
@@ -264,6 +303,30 @@
             </div>
         </div>
     </div>
+
+    <section class="partner-section text-center">
+        <div class="container">
+            <p class="partner-title">Metode Pembayaran Resmi</p>
+            
+            <div class="partner-logo-wrapper">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="partner-img" title="GoPay">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay" class="partner-img" title="ShopeePay">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO" class="partner-img" title="OVO">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="partner-img" title="DANA">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="partner-img" title="Visa">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="partner-img" title="Mastercard">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" class="partner-img" title="Bank BCA">
+                
+                <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI" class="partner-img" title="Bank BNI">
+            </div>
+        </div>
+    </section>
 
     <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin">
         <i class="bi bi-envelope-heart-fill"></i>
@@ -402,7 +465,6 @@
 
         function filterCategory(category) {
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
-            // Cek jika elemen ada sebelum add class active
             const btn = document.getElementById(`btn-cat-${category}`);
             if(btn) btn.classList.add('active');
 
