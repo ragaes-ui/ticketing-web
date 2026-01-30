@@ -174,12 +174,13 @@
             background: var(--primary-blue); color: white;
         }
 
-        /* --- BAGIAN PARTNER / PAYMENT LOGO (BARU) --- */
+        /* --- LOGO SLIDER ANIMATION (MARQUEE) --- */
         .partner-section {
-            background-color: #f8f9fa; /* Latar abu sangat muda */
+            background-color: #f8f9fa;
             border-top: 1px solid #eee;
             padding: 40px 0;
             margin-top: 60px;
+            overflow: hidden; /* Penting untuk animasi */
         }
         .partner-title {
             font-size: 0.85rem;
@@ -188,29 +189,55 @@
             color: #888;
             text-transform: uppercase;
             margin-bottom: 25px;
+            text-align: center;
         }
-        .partner-logo-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 30px 50px;
+        
+        /* Container Animasi */
+        .logos-slider {
+            white-space: nowrap;
+            position: relative;
         }
-        .partner-img {
-            height: 30px;
-            width: auto;
-            object-fit: contain;
-            filter: grayscale(100%) opacity(0.5);
+        
+        /* Grup Logo yang bergerak */
+        .logos-slide-track {
+            display: inline-block;
+            animation: 35s slide-infinite linear infinite;
+        }
+        
+        /* Style Gambar Logo */
+        .logos-slide-track img {
+            height: 35px;
+            margin: 0 40px; /* Jarak antar logo */
+            filter: grayscale(100%) opacity(0.6);
             transition: all 0.3s ease;
             cursor: pointer;
+            vertical-align: middle;
         }
-        .partner-img:hover {
+        
+        /* Efek Hover */
+        .logos-slide-track img:hover {
             filter: grayscale(0%) opacity(1);
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
+
+        /* Berhenti saat hover area slider */
+        .logos-slider:hover .logos-slide-track {
+            animation-play-state: paused;
+        }
+
+        /* Keyframes Gerakan */
+        @keyframes slide-infinite {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Responsive Mobile */
         @media (max-width: 768px) {
-            .partner-img { height: 25px; }
-            .partner-logo-wrapper { gap: 20px 30px; }
+            .logos-slide-track img { height: 25px; margin: 0 20px; }
         }
     </style>
 </head>
@@ -304,32 +331,50 @@
         </div>
     </div>
 
-    <section class="partner-section text-center">
-        <div class="container">
-            <p class="partner-title">Metode Pembayaran Resmi</p>
+    <section class="partner-section">
+        <div class="container-fluid p-0">
+            <p class="partner-title">Partner Pembayaran Resmi</p>
             
-                <div class="partner-logo-wrapper">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="partner-img" title="QRIS" style="height: 35px;">
+            <div class="logos-slider">
+                <div class="logos-slide-track">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
+                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Bank_CIMB_Niaga_logo.svg" alt="CIMB">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PermataBank_logo_2004.svg" alt="Permata">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png" alt="Indomaret">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg" alt="Alfamart">
+                </div>
 
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="partner-img" title="GoPay">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay" class="partner-img" title="ShopeePay">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO" class="partner-img" title="OVO">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="partner-img" title="DANA">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja" class="partner-img" title="LinkAja">
-                
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" class="partner-img" title="Bank BCA">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri" class="partner-img" title="Bank Mandiri">
-                <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI" class="partner-img" title="Bank BNI">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI" class="partner-img" title="Bank BRI">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Bank_CIMB_Niaga_logo.svg" alt="CIMB" class="partner-img" title="CIMB Niaga">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PermataBank_logo_2004.svg" alt="Permata" class="partner-img" title="Permata Bank">
-
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="partner-img" title="Visa">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="partner-img" title="Mastercard">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB" class="partner-img" title="JCB">
-
-                <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png" alt="Indomaret" class="partner-img" title="Indomaret">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg" alt="Alfamart" class="partner-img" title="Alfamart">
+                <div class="logos-slide-track">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
+                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Bank_CIMB_Niaga_logo.svg" alt="CIMB">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PermataBank_logo_2004.svg" alt="Permata">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png" alt="Indomaret">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg" alt="Alfamart">
+                </div>
             </div>
         </div>
     </section>
