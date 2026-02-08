@@ -11,8 +11,8 @@
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
-    
     <script>
+        // Cek Login
         const token = localStorage.getItem('adminToken');
         if (!token) window.location.href = 'login.html';
     </script>
@@ -110,6 +110,11 @@
         .table td { vertical-align: middle; }
         .table-hover tbody tr:hover { background: rgba(255,255,255,0.05); }
 
+        /* Thumbnail di Tabel */
+        .table-thumb {
+            width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #333;
+        }
+
         /* Modal */
         .modal-content {
             background: rgba(28, 28, 45, 0.95);
@@ -120,6 +125,16 @@
         }
         .modal-header, .modal-footer { border-color: rgba(255,255,255,0.1); }
         .btn-close { filter: invert(1); }
+
+        /* Preview Image Box */
+        .img-preview-box {
+            width: 100%; height: 150px; 
+            border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; margin-top: 10px; background: rgba(0,0,0,0.2);
+        }
+        .img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .img-preview-box span { color: #555; font-size: 0.8rem; }
 
         /* Maintenance Switch */
         .form-check-input {
@@ -182,11 +197,21 @@
                     
                     <form id="formEvent">
                         <div class="mb-3">
+                            <label class="form-label">Link Gambar / Thumbnail</label>
+                            <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview', 'addPreviewText')">
+                            <div class="img-preview-box">
+                                <span id="addPreviewText">Preview Gambar</span>
+                                <img id="addPreview" src="" alt="Preview">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Kategori</label>
                             <select id="category" class="form-select" onchange="checkCategory(this)">
                                 <option value="General">General</option>
                                 <option value="Konser">Konser Musik</option>
                                 <option value="Olahraga">Olahraga</option>
+                                <option value="Workshop">Workshop</option>
                                 <option value="Streaming" class="fw-bold text-info">🎥 Akun Streaming</option>
                             </select>
                         </div>
@@ -204,8 +229,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Deskripsi / Akun</label>
-                            <textarea id="description" class="form-control" rows="4" placeholder="Detail..."></textarea>
-                            <small class="text-info fst-italic" id="descHint"></small>
+                            <textarea id="description" class="form-control" rows="3" placeholder="Detail..."></textarea>
+                            <small class="text-info fst-italic" id="descHint" style="font-size: 0.75rem;"></small>
                         </div>
                         <div class="row g-2">
                             <div class="col-6 mb-3">
@@ -228,17 +253,21 @@
                 <div class="glass-card h-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold m-0"><i class="bi bi-database-fill me-2 text-primary"></i> Database Item</h5>
-                        <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                        </button>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="searchBox" class="form-control form-control-sm" placeholder="Cari..." style="width: 150px;" onkeyup="filterTable()">
+                            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
+                                    <th width="60">Cover</th>
                                     <th>Produk Info</th>
                                     <th>Harga</th>
-                                    <th class="text-center">Sisa Stok</th>
+                                    <th class="text-center">Stok</th>
                                     <th class="text-end">Aksi</th>
                                 </tr>
                             </thead>
@@ -261,6 +290,16 @@
                 <div class="modal-body p-4">
                     <form id="formEdit">
                         <input type="hidden" id="editId">
+                        
+                        <div class="mb-3">
+                            <label>Link Gambar</label>
+                            <input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview', 'editPreviewText')">
+                            <div class="img-preview-box" style="height: 120px;">
+                                <span id="editPreviewText">Preview</span>
+                                <img id="editPreview" src="" alt="Preview">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label>Nama Event</label>
                             <input type="text" id="editName" class="form-control">
@@ -270,6 +309,8 @@
                             <select id="editCategory" class="form-select">
                                 <option value="General">General</option>
                                 <option value="Konser">Konser</option>
+                                <option value="Olahraga">Olahraga</option>
+                                <option value="Workshop">Workshop</option>
                                 <option value="Streaming">Streaming</option>
                             </select>
                         </div>
@@ -284,8 +325,8 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label>Deskripsi / Kredensial Akun</label>
-                            <textarea id="editDescription" class="form-control" rows="4"></textarea>
+                            <label>Deskripsi</label>
+                            <textarea id="editDescription" class="form-control" rows="3"></textarea>
                         </div>
                         <div class="row g-2">
                             <div class="col-6">
@@ -310,10 +351,36 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
         let eventsData = []; 
         const switchMaint = document.getElementById('switchMaintenance');
+
+        // Fungsi Preview Gambar Live
+        function previewImage(url, imgId, textId) {
+            const imgEl = document.getElementById(imgId);
+            const textEl = document.getElementById(textId);
+            
+            if (url && url.length > 5) {
+                imgEl.src = url;
+                imgEl.style.display = 'block';
+                if(textEl) textEl.style.display = 'none';
+            } else {
+                imgEl.style.display = 'none';
+                if(textEl) textEl.style.display = 'block';
+            }
+        }
+
+        // Search Filter
+        function filterTable() {
+            const term = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
 
         function checkCategory(select) {
             const desc = document.getElementById('description');
@@ -334,7 +401,7 @@
             switchMaint.addEventListener('change', async function() {
                 const isActive = this.checked;
                 try { 
-                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive }) }); 
+                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ isActive }) }); 
                     const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
                     Toast.fire({ icon: 'success', title: isActive ? 'Maintenance Aktif 🔴' : 'Website Online 🟢' });
                 } catch (err) { this.checked = !isActive; }
@@ -343,79 +410,134 @@
         
         async function loadTable() {
             try {
-                const res = await fetch('/api/events'); eventsData = await res.json();
-                const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
+                const res = await fetch('/api/events'); 
+                eventsData = await res.json();
+                const tbody = document.getElementById('tableBody'); 
+                tbody.innerHTML = '';
                 
                 if(eventsData.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-white-50">Belum ada data event/produk.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-white-50">Belum ada data event/produk.</td></tr>`;
                     return;
                 }
 
                 eventsData.forEach(ev => {
-                    let icon = ev.category === 'Streaming' ? '<span class="badge bg-info text-dark me-2">STREAM</span>' : '<span class="badge bg-primary me-2">EVENT</span>';
+                    let icon = ev.category === 'Streaming' ? '<span class="badge bg-info text-dark me-2" style="font-size:0.6rem">STREAM</span>' : '<span class="badge bg-primary me-2" style="font-size:0.6rem">EVENT</span>';
                     let stokClass = ev.availableSeats < 5 ? 'text-danger fw-bold' : 'text-success';
                     
+                    // Gambar default jika kosong
+                    let imgUrl = ev.image ? ev.image : "https://placehold.co/100x100?text=No+Img";
+
                     tbody.innerHTML += `
                     <tr>
                         <td>
-                            <div class="fw-bold">${icon} ${ev.name}</div>
-                            <small class="text-white-50"><i class="bi bi-geo-alt"></i> ${ev.location}</small>
+                            <img src="${imgUrl}" class="table-thumb" alt="Thumb">
+                        </td>
+                        <td>
+                            <div class="fw-bold text-truncate" style="max-width: 200px;">${ev.name}</div>
+                            <small class="text-white-50 d-flex align-items-center gap-1">${icon} <i class="bi bi-geo-alt" style="font-size:0.7rem"></i> ${ev.location}</small>
                         </td>
                         <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
-                        <td class="text-center ${stokClass}" style="font-size: 1.1rem;">${ev.availableSeats}</td>
+                        <td class="text-center ${stokClass}">${ev.availableSeats}</td>
                         <td class="text-end">
                             <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-pencil-fill"></i></button>
                             <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
                         </td>
                     </tr>`;
                 });
-            } catch (err) {}
+            } catch (err) { console.error(err); }
         }
 
+        // BUKA EDIT
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if (ev) {
-                document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
-                document.getElementById('editCategory').value = ev.category; document.getElementById('editLocation').value = ev.location;
+                document.getElementById('editId').value = ev._id; 
+                document.getElementById('editName').value = ev.name;
+                document.getElementById('editCategory').value = ev.category; 
+                document.getElementById('editLocation').value = ev.location;
+                
+                // Isi Gambar & Trigger Preview
+                document.getElementById('editImage').value = ev.image || '';
+                previewImage(ev.image || '', 'editPreview', 'editPreviewText');
+
                 const d = new Date(ev.date); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
                 document.getElementById('editDate').value = d.toISOString().slice(0,16);
-                document.getElementById('editPrice').value = ev.price; document.getElementById('editStock').value = ev.availableSeats;
-                document.getElementById('editCapacity').value = ev.totalCapacity; document.getElementById('editDescription').value = ev.description;
+                
+                document.getElementById('editPrice').value = ev.price; 
+                document.getElementById('editStock').value = ev.availableSeats;
+                document.getElementById('editCapacity').value = ev.totalCapacity; 
+                document.getElementById('editDescription').value = ev.description;
+                
                 editModal.show();
             }
         }
 
+        // SIMPAN EDIT
         async function saveEdit() {
             const id = document.getElementById('editId').value;
             const data = {
-                name: document.getElementById('editName').value, category: document.getElementById('editCategory').value,
-                location: document.getElementById('editLocation').value, date: document.getElementById('editDate').value,
-                price: document.getElementById('editPrice').value, description: document.getElementById('editDescription').value,
-                availableSeats: document.getElementById('editStock').value, capacity: document.getElementById('editCapacity').value
+                name: document.getElementById('editName').value, 
+                category: document.getElementById('editCategory').value,
+                location: document.getElementById('editLocation').value, 
+                date: document.getElementById('editDate').value,
+                price: document.getElementById('editPrice').value, 
+                description: document.getElementById('editDescription').value,
+                availableSeats: document.getElementById('editStock').value, 
+                capacity: document.getElementById('editCapacity').value,
+                image: document.getElementById('editImage').value // Save Gambar
             };
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            editModal.hide(); loadTable(); 
+            
+            await fetch(`/api/events/${id}`, { 
+                method: 'PUT', 
+                headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, 
+                body: JSON.stringify(data) 
+            });
+            
+            editModal.hide(); 
+            loadTable(); 
             Swal.fire({ title: 'Berhasil!', text: 'Data telah diperbarui.', icon: 'success', background: '#1c1c2d', color: '#fff' });
         }
 
+        // TAMBAH BARU
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button'); btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+            const btn = e.target.querySelector('button'); 
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+            
             const data = {
-                name: document.getElementById('name').value, category: document.getElementById('category').value,
-                location: document.getElementById('location').value, date: document.getElementById('date').value,
-                price: document.getElementById('price').value, capacity: document.getElementById('capacity').value,
-                description: document.getElementById('description').value
+                name: document.getElementById('name').value, 
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value, 
+                date: document.getElementById('date').value,
+                price: document.getElementById('price').value, 
+                capacity: document.getElementById('capacity').value,
+                description: document.getElementById('description').value,
+                image: document.getElementById('image').value // Kirim Gambar
             };
-            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            loadTable(); e.target.reset(); 
+
+            await fetch('/api/events', { 
+                method: 'POST', 
+                headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, 
+                body: JSON.stringify(data) 
+            });
+            
+            loadTable(); 
+            e.target.reset(); 
+            
+            // Reset preview
+            document.getElementById('addPreview').style.display = 'none';
+            document.getElementById('addPreviewText').style.display = 'block';
+
             btn.innerHTML = '<i class="bi bi-rocket-takeoff me-2"></i> Publish Sekarang';
             Swal.fire({ title: 'Sukses!', text: 'Produk berhasil ditambahkan.', icon: 'success', background: '#1c1c2d', color: '#fff' });
         });
 
         async function hapusKonser(id) { 
             const result = await Swal.fire({ title:'Hapus Data?', text: "Data tidak bisa dikembalikan!", icon:'warning', showCancelButton:true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', background: '#1c1c2d', color: '#fff' });
-            if(result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); } 
+            if(result.isConfirmed) { 
+                await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); 
+                loadTable(); 
+            } 
         }
         
         function logout() { localStorage.removeItem('adminToken'); window.location.href = 'login.html'; }
