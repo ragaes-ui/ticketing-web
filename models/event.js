@@ -49,7 +49,14 @@ const eventSchema = new mongoose.Schema({
     location: { 
         type: String, 
         default: 'TBA' 
+    }, 
+      // --- TAMBAHKAN BARIS INI ---
+    image: { 
+        type: String, 
+        default: "" 
     }
+    
+    // ---------------------------
     
 }, { timestamps: true });
 
