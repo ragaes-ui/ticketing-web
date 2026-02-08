@@ -101,7 +101,7 @@
         }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: #555; }
 
-        /* Event Card */
+        /* Event Card UPDATED FOR THUMBNAIL */
         .card-event {
             border: 1px solid #eee; border-radius: 16px; overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s; background: white; height: 100%;
@@ -110,16 +110,36 @@
         .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: transparent; }
         
         .card-img-top {
-            height: 160px; background: linear-gradient(135deg, #0049CC, #4facfe);
-            position: relative; display: flex; align-items: center; justify-content: center; color: white;
+            height: 180px; /* Sedikit lebih tinggi untuk thumbnail */
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative; 
+            display: flex; 
+            align-items: flex-start; /* Ubah ke start agar badge ada di atas */
+            justify-content: flex-end; /* Badge di kanan */
+            padding: 10px;
         }
+        
+        /* Overlay gradien halus agar teks putih terbaca jika ada */
+        .card-img-top::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            pointer-events: none;
+        }
+
         .category-badge-img {
-            position: absolute; top: 10px; right: 10px;
-            background: rgba(0,0,0,0.5); color: white; font-size: 0.7rem; 
-            padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px);
+            position: relative; z-index: 2;
+            background: rgba(0, 73, 204, 0.9); color: white; font-size: 0.7rem; 
+            padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: 600;
         }
+        
         .date-float {
-            position: absolute; bottom: 10px; left: 10px;
+            position: absolute; bottom: 10px; left: 10px; z-index: 2;
             background: white; color: #333; padding: 4px 10px; border-radius: 8px;
             font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -149,14 +169,24 @@
         }
         .social-btn:hover { background: white; color: var(--dark-navy); }
 
-        /* MODAL STYLING */
+        /* MODAL STYLING UPDATED */
         .modal-header-img {
-            height: 200px;
-            background: linear-gradient(135deg, #0049CC, #4facfe);
-            display: flex; align-items: center; justify-content: center;
+            height: 250px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+            display: flex; align-items: flex-end; justify-content: flex-start;
             color: white; font-size: 3rem;
             border-radius: 12px 12px 0 0;
+            padding: 20px;
+            position: relative;
         }
+        .modal-header-img::before {
+            content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
         .modal-content { border-radius: 16px; border: none; }
         .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
         .modal-desc-text { color: #555; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
@@ -439,8 +469,7 @@
             <div class="modal-content">
                 <div class="position-relative">
                     <div class="modal-header-img" id="modalHeaderImg">
-                        <i class="bi bi-ticket-perforated-fill" id="modalIcon"></i>
-                    </div>
+                        </div>
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -539,6 +568,22 @@
             }
         }
 
+        // --- FUNGSI HELPER UNTUK GAMBAR FALLBACK ---
+        function getEventImage(event) {
+            // Jika ada field 'image' dari database, pakai itu
+            if (event.image && event.image !== "") return event.image;
+            
+            // Jika tidak ada, gunakan gambar random dari Unsplash berdasarkan kategori
+            const cat = event.category || "Event";
+            if(cat === 'Konser') return "https://images.unsplash.com/photo-1459749411177-05be25b15fbc?q=80&w=800&auto=format&fit=crop";
+            if(cat === 'Olahraga') return "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=crop";
+            if(cat === 'Workshop') return "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=800&auto=format&fit=crop";
+            if(cat === 'Streaming') return "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800&auto=format&fit=crop";
+            
+            // Default umum
+            return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
+        }
+
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
@@ -555,20 +600,17 @@
                 
                 const catName = event.category || 'General'; 
                 const locationName = event.location || 'Lokasi TBA';
+                
+                // DAPATKAN IMAGE
+                const imageUrl = getEventImage(event);
 
-                // LOGIKA VISUAL STREAMING
-                let iconClass = 'bi-ticket-perforated';
                 let btnText = isSoldOut ? 'HABIS' : 'BELI';
-                if (catName === 'Streaming') {
-                    iconClass = 'bi-camera-reels'; // Ikon beda untuk Streaming
-                    if(!isSoldOut) btnText = 'BELI AKUN';
-                }
+                if (catName === 'Streaming' && !isSoldOut) btnText = 'BELI AKUN';
 
                 container.innerHTML += `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card-event" onclick="showDetail('${event._id}')">
-                            <div class="card-img-top">
-                                <i class="${iconClass} fs-1 opacity-50"></i>
+                            <div class="card-img-top" style="background-image: url('${imageUrl}');">
                                 <span class="category-badge-img">${catName}</span>
                                 <div class="date-float">${dateStr}</div>
                             </div>
@@ -590,7 +632,7 @@
             });
         }
 
-        // --- FUNGSI SHOW DETAIL (MODIFIKASI KEAMANAN) ---
+        // --- FUNGSI SHOW DETAIL UPDATED ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -605,9 +647,11 @@
             document.getElementById('modalCategory').innerText = event.category || "Event";
             document.getElementById('modalVenue').innerText = event.location || "TBA";
 
-            // --- LOGIKA KEAMANAN PENTING ---
+            // Set Image pada Header Modal
+            const imageUrl = getEventImage(event);
+            document.getElementById('modalHeaderImg').style.backgroundImage = `url('${imageUrl}')`;
+
             let safeDescription = event.description || "Deskripsi lengkap belum tersedia.";
-            let iconModal = "bi-ticket-perforated-fill";
 
             if (event.category === 'Streaming') {
                 safeDescription = "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n" + 
@@ -615,11 +659,9 @@
                                   "✅ Email & Password akan otomatis muncul di menu 'Tiket Saya' setelah pembayaran berhasil.\n" +
                                   "✅ 100% Aman & Legal.\n\n" +
                                   "Klik 'Beli Akun' untuk memproses pesanan.";
-                iconModal = "bi-camera-reels-fill";
             }
 
             document.getElementById('modalDesc').innerText = safeDescription;
-            document.getElementById('modalIcon').className = `bi ${iconModal}`;
             
             const btnBuy = document.getElementById('btnModalBuy');
             const isSoldOut = event.availableSeats <= 0;
