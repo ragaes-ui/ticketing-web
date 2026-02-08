@@ -101,7 +101,7 @@
         }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: #555; }
 
-        /* Event Card UPDATED FOR THUMBNAIL */
+        /* --- Event Card Thumbnail --- */
         .card-event {
             border: 1px solid #eee; border-radius: 16px; overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s; background: white; height: 100%;
@@ -110,38 +110,40 @@
         .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: transparent; }
         
         .card-img-top {
-            height: 180px; /* Sedikit lebih tinggi untuk thumbnail */
-            background-color: #ddd;
+            height: 180px; 
+            width: 100%;
+            background-color: #ddd; /* Warna cadangan jika gambar gagal load */
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
             position: relative; 
             display: flex; 
-            align-items: flex-start; /* Ubah ke start agar badge ada di atas */
-            justify-content: flex-end; /* Badge di kanan */
-            padding: 10px;
+            align-items: flex-start; 
+            justify-content: flex-end; 
+            padding: 12px;
         }
         
-        /* Overlay gradien halus agar teks putih terbaca jika ada */
+        /* Overlay gradien GELA agar teks putih pasti terbaca */
         .card-img-top::after {
             content: '';
             position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Gradien dari atas (gelap dikit) ke bawah (lebih gelap) */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
             pointer-events: none;
         }
 
         .category-badge-img {
             position: relative; z-index: 2;
-            background: rgba(0, 73, 204, 0.9); color: white; font-size: 0.7rem; 
-            padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-weight: 600;
+            background: rgba(0, 73, 204, 0.95); color: white; font-size: 0.7rem; 
+            padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: 700; letter-spacing: 0.5px;
         }
         
         .date-float {
-            position: absolute; bottom: 10px; left: 10px; z-index: 2;
-            background: white; color: #333; padding: 4px 10px; border-radius: 8px;
-            font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: absolute; bottom: 12px; left: 12px; z-index: 2;
+            background: white; color: var(--primary-blue); padding: 5px 12px; border-radius: 8px;
+            font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
@@ -169,7 +171,7 @@
         }
         .social-btn:hover { background: white; color: var(--dark-navy); }
 
-        /* MODAL STYLING UPDATED */
+        /* MODAL STYLING */
         .modal-header-img {
             height: 250px;
             background-color: #ddd;
@@ -468,8 +470,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="position-relative">
-                    <div class="modal-header-img" id="modalHeaderImg">
-                        </div>
+                    <div class="modal-header-img" id="modalHeaderImg"></div>
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -549,10 +550,14 @@
 
         async function loadEvents() {
             try {
+                // Ganti dengan endpoint API Anda yang sebenarnya
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
                 renderEvents(allEvents);
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error("Gagal memuat event:", err);
+                document.getElementById('event-list').innerHTML = `<div class="col-12 text-center text-danger py-5">Gagal memuat data event. Periksa koneksi atau coba lagi nanti.</div>`;
+            }
         }
 
         function filterCategory(category) {
@@ -563,25 +568,44 @@
             if (category === 'All') {
                 renderEvents(allEvents);
             } else {
-                const filtered = allEvents.filter(e => e.category === category);
+                const filtered = allEvents.filter(e => (e.category || 'General') === category);
                 renderEvents(filtered);
             }
         }
 
-        // --- FUNGSI HELPER UNTUK GAMBAR FALLBACK ---
+        // --- FUNGSI BARU: GET IMAGE DENGAN PLACEHOLDER YANG LEBIH BAIK ---
         function getEventImage(event) {
-            // Jika ada field 'image' dari database, pakai itu
-            if (event.image && event.image !== "") return event.image;
-            
-            // Jika tidak ada, gunakan gambar random dari Unsplash berdasarkan kategori
-            const cat = event.category || "Event";
-            if(cat === 'Konser') return "https://images.unsplash.com/photo-1459749411177-05be25b15fbc?q=80&w=800&auto=format&fit=crop";
-            if(cat === 'Olahraga') return "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=crop";
-            if(cat === 'Workshop') return "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=800&auto=format&fit=crop";
-            if(cat === 'Streaming') return "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800&auto=format&fit=crop";
-            
-            // Default umum
-            return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
+            // 1. Prioritas UTAMA: Jika di database sudah ada link gambar yang valid (dimulai http), pakai itu.
+            // Pastikan nanti saat input data event, Anda mengisi field 'image' dengan URL poster asli.
+            if (event.image && event.image.startsWith("http")) {
+                return event.image;
+            }
+
+            // 2. Fallback: Jika tidak ada gambar di database, gunakan gambar default berkualitas berdasarkan KATEGORI.
+            // Saya pilihkan gambar yang lebih 'aman' dan umum agar terlihat profesional.
+            const cat = (event.category || "General").toLowerCase();
+
+            switch (cat) {
+                case 'konser':
+                case 'music':
+                    // Gambar panggung konser yang megah (kualitas tinggi)
+                    return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
+                case 'olahraga':
+                case 'sports':
+                    // Gambar stadion/kompetisi umum
+                    return "https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=800&auto=format&fit=crop";
+                case 'workshop':
+                case 'seminar':
+                    // Gambar orang berdiskusi/belajar modern
+                    return "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
+                case 'streaming':
+                case 'digital':
+                    // Gambar setup nonton/headphone yang bersih
+                    return "https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?q=80&w=800&auto=format&fit=crop";
+                default:
+                    // Gambar default yang aman (suasana event abstrak)
+                    return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
+            }
         }
 
         function renderEvents(data) {
@@ -596,12 +620,19 @@
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isSoldOut = event.availableSeats <= 0;
-                const dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                
+                // Validasi tanggal agar tidak error jika data tanggal kosong/salah
+                let dateStr = "Tanggal TBA";
+                if (event.date) {
+                    try {
+                        dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                    } catch (e) { dateStr = event.date; }
+                }
                 
                 const catName = event.category || 'General'; 
                 const locationName = event.location || 'Lokasi TBA';
                 
-                // DAPATKAN IMAGE
+                // DAPATKAN IMAGE YANG SUDAH DIPERBAIKI
                 const imageUrl = getEventImage(event);
 
                 let btnText = isSoldOut ? 'HABIS' : 'BELI';
@@ -632,33 +663,40 @@
             });
         }
 
-        // --- FUNGSI SHOW DETAIL UPDATED ---
+        // --- FUNGSI SHOW DETAIL ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
 
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
-            const dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+            
+            let dateStr = "Tanggal TBA";
+            if (event.date) {
+                 try {
+                    dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+                 } catch (e) { dateStr = event.date; }
+            }
             
             // Set Data Dasar
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
-            document.getElementById('modalCategory').innerText = event.category || "Event";
+            const catName = event.category || "General";
+            document.getElementById('modalCategory').innerText = catName;
             document.getElementById('modalVenue').innerText = event.location || "TBA";
 
-            // Set Image pada Header Modal
+            // Set Image pada Header Modal menggunakan fungsi yang sama
             const imageUrl = getEventImage(event);
             document.getElementById('modalHeaderImg').style.backgroundImage = `url('${imageUrl}')`;
 
-            let safeDescription = event.description || "Deskripsi lengkap belum tersedia.";
+            let safeDescription = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
 
-            if (event.category === 'Streaming') {
+            if (catName === 'Streaming') {
                 safeDescription = "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n" + 
                                   "✅ Akun Private / Sharing Bergaransi\n" + 
                                   "✅ Email & Password akan otomatis muncul di menu 'Tiket Saya' setelah pembayaran berhasil.\n" +
                                   "✅ 100% Aman & Legal.\n\n" +
-                                  "Klik 'Beli Akun' untuk memproses pesanan.";
+                                  "Klik 'Beli Akun' untuk memproses pesanan otomatis.";
             }
 
             document.getElementById('modalDesc').innerText = safeDescription;
@@ -672,7 +710,7 @@
                 btnBuy.classList.remove('btn-primary');
                 btnBuy.removeAttribute('onclick');
             } else {
-                btnBuy.innerText = (event.category === 'Streaming') ? "Beli Akun Sekarang" : "Beli Tiket Sekarang";
+                btnBuy.innerText = (catName === 'Streaming') ? "Beli Akun Sekarang" : "Beli Tiket Sekarang";
                 btnBuy.classList.remove('disabled', 'btn-secondary');
                 btnBuy.classList.add('btn-primary');
                 btnBuy.onclick = function() {
@@ -700,7 +738,7 @@
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
-                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
+                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket/akun ini.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
                 return;
             }
             const user = JSON.parse(userRaw);
@@ -718,16 +756,18 @@
             });
 
             if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar, sedang menghubungi gateway pembayaran.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 try {
+                    // Ganti dengan endpoint API Anda
                     const res = await fetch('/api/payment-token', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                             eventId, 
                             quantity: 1, 
                             customerName: namaPemesan, 
-                            customerEmail: user.email 
+                            customerEmail: user.email,
+                            userId: user.id // Asumsi ada user ID
                         })
                     });
                     const data = await res.json();
@@ -737,40 +777,45 @@
                     if (res.ok && data.token) {
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
-                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Cek menu dashboard Anda.', 'success').then(() => {
+                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Tiket/Akun sudah aktif di menu dashboard Anda.', 'success').then(() => {
                                     window.location.href = 'dashboard.html';
                                 });
                             },
                             onPending: function(result){
-                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda.', 'info');
+                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda melalui instruksi yang diberikan.', 'info');
                             },
                             onError: function(result){
-                                Swal.fire('Gagal', 'Pembayaran gagal.', 'error');
+                                Swal.fire('Gagal', 'Pembayaran gagal atau ditolak.', 'error');
                             },
                             onClose: function(){
-                                fetch('/api/cancel-order', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
+                                // Opsional: Panggil API untuk membatalkan order jika ditutup
+                                /* fetch('/api/cancel-order', {
+                                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ orderId: data.orderId })
-                                });
-                                Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran.', 'info');
+                                }); */
+                                Swal.fire('Dibatalkan', 'Anda menutup jendela pembayaran sebelum selesai.', 'info');
                             }
                         });
                     } else { 
-                        Swal.fire('Gagal', data.message || 'Error membuat pesanan.', 'error'); 
+                        Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat membuat pesanan.', 'error'); 
                     }
                 } catch (err) { 
                     console.error(err);
-                    Swal.fire('Error', 'Gagal koneksi ke server.', 'error'); 
+                    Swal.close();
+                    Swal.fire('Error Koneksi', 'Gagal menghubungi server. Cek koneksi internet Anda.', 'error'); 
                 }
             }
         }
     </script>
     
     <script>
+        // Script Maintenance Sederhana
         (async function() {
             try {
+                // Ganti dengan endpoint API maintenance Anda
                 const res = await fetch('/api/maintenance'); 
+                if (!res.ok) return; // Skip jika API tidak ada
+                
                 const data = await res.json();
                 const isAdmin = localStorage.getItem('adminToken'); 
 
@@ -778,7 +823,7 @@
                     document.body.innerHTML = `
                         <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }.glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }p { color: #d1d5db; margin-bottom: 30px; }.btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }.btn-retry:hover { transform: scale(1.05); }</style><div class="glass-card"><h1>Lagi Didandanin! ✨</h1><p>Website sedang maintenance. Silakan kembali lagi nanti.</p><button onclick="location.reload()" class="btn-retry">Cek Lagi</button></div>`;
                 }
-            } catch (err) { console.log("Gagal cek maintenance status."); }
+            } catch (err) { /* Abaikan error jika endpoint tidak ada */ }
         })();
     </script>
 </body>
