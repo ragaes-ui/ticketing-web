@@ -14,19 +14,23 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        :root {
-            --primary-blue: #0049CC;
-            --dark-navy: #0e1e3b;
-            --bg-light: #f8f9fa;
-            --text-dark: #333;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: white;
-            color: var(--text-dark);
+            color: #333;
             padding-top: 76px;
             overflow-x: hidden;
+            
+            /* PENTING: Sembunyikan dulu isinya */
+            opacity: 0; 
+            transition: opacity 0.5s ease-in;
+            pointer-events: none; /* Cegah klik sebelum loading selesai */
+        }
+
+        /* Kelas ini akan ditambahkan JS jika website aman (tidak maintenance) */
+        body.site-loaded {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         /* Navbar Clean */
@@ -38,13 +42,13 @@
         }
         .navbar-brand {
             font-weight: 800;
-            color: var(--primary-blue) !important;
+            color: #0049CC !important;
             font-size: 1.4rem;
             letter-spacing: -0.5px;
             display: flex; align-items: center; gap: 8px;
         }
         .nav-link { font-weight: 500; color: #555; margin: 0 10px; }
-        .nav-link:hover { color: var(--primary-blue); }
+        .nav-link:hover { color: #0049CC; }
 
         /* Hero Banner */
         .hero-section {
@@ -84,7 +88,7 @@
         }
         .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; }
         .btn-search {
-            background: var(--primary-blue); color: white; border: none; padding: 10px 25px;
+            background: #0049CC; color: white; border: none; padding: 10px 25px;
             border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap;
         }
         .btn-search:hover { background: #003db3; }
@@ -92,16 +96,16 @@
         /* Icon Categories */
         .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
         .category-item:hover, .category-item.active { background: #f0f7ff; transform: scale(1.05); }
-        .category-item.active .cat-text { color: var(--primary-blue); font-weight: 800; }
+        .category-item.active .cat-text { color: #0049CC; font-weight: 800; }
         
         .icon-circle {
-            width: 45px; height: 45px; background: #e6f0ff; color: var(--primary-blue);
+            width: 45px; height: 45px; background: #e6f0ff; color: #0049CC;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; margin: 0 auto 8px auto;
         }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: #555; }
 
-        /* --- Event Card Thumbnail --- */
+        /* Event Card */
         .card-event {
             border: 1px solid #eee; border-radius: 16px; overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s; background: white; height: 100%;
@@ -112,7 +116,7 @@
         .card-img-top {
             height: 180px; 
             width: 100%;
-            background-color: #ddd; /* Warna cadangan jika gambar gagal load */
+            background-color: #ddd; 
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
@@ -123,12 +127,10 @@
             padding: 12px;
         }
         
-        /* Overlay gradien GELA agar teks putih pasti terbaca */
         .card-img-top::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Gradien dari atas (gelap dikit) ke bawah (lebih gelap) */
             background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
             pointer-events: none;
         }
@@ -142,7 +144,7 @@
         
         .date-float {
             position: absolute; bottom: 12px; left: 12px; z-index: 2;
-            background: white; color: var(--primary-blue); padding: 5px 12px; border-radius: 8px;
+            background: white; color: #0049CC; padding: 5px 12px; border-radius: 8px;
             font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
@@ -152,15 +154,15 @@
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
         
         .btn-outline-book {
-            border: 1px solid var(--primary-blue); color: var(--primary-blue); font-weight: 600;
+            border: 1px solid #0049CC; color: #0049CC; font-weight: 600;
             padding: 8px; border-radius: 8px; background: white; width: 100%; margin-top: auto; font-size: 0.9rem;
             position: relative; z-index: 2;
         }
-        .btn-outline-book:hover { background: var(--primary-blue); color: white; }
+        .btn-outline-book:hover { background: #0049CC; color: white; }
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
 
         /* Footer */
-        .footer-loket { background-color: var(--dark-navy); color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
         .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
         .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
         .footer-link:hover { color: white; text-decoration: underline; }
@@ -169,7 +171,7 @@
             display: inline-flex; align-items: center; justify-content: center;
             color: white; margin-right: 8px; text-decoration: none;
         }
-        .social-btn:hover { background: white; color: var(--dark-navy); }
+        .social-btn:hover { background: white; color: #0e1e3b; }
 
         /* MODAL STYLING */
         .modal-header-img {
@@ -188,7 +190,6 @@
             background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
             border-radius: 12px 12px 0 0;
         }
-        
         .modal-content { border-radius: 16px; border: none; }
         .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
         .modal-desc-text { color: #555; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
@@ -196,82 +197,98 @@
         /* TOMBOL BANTUAN MELAYANG */
         .btn-help-floating {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: white; color: var(--primary-blue); border: 2px solid var(--primary-blue);
+            background: white; color: #0049CC; border: 2px solid #0049CC;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
             z-index: 9999; transition: all 0.3s; font-size: 1.5rem;
         }
         .btn-help-floating:hover {
             transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
-            background: var(--primary-blue); color: white;
+            background: #0049CC; color: white;
         }
 
-        /* --- LOGO SLIDER ANIMATION (MARQUEE) --- */
+        /* --- LOGO SLIDER ANIMATION --- */
         .partner-section {
             background-color: #f8f9fa;
             border-top: 1px solid #eee;
             padding: 40px 0;
             margin-top: 60px;
-            overflow: hidden; /* Penting untuk animasi */
+            overflow: hidden; 
         }
         .partner-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 25px;
-            text-align: center;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; color: #888;
+            text-transform: uppercase; margin-bottom: 25px; text-align: center;
         }
-        
-        /* Container Animasi */
-        .logos-slider {
-            white-space: nowrap;
-            position: relative;
-        }
-        
-        /* Grup Logo yang bergerak */
-        .logos-slide-track {
-            display: inline-block;
-            animation: 35s slide-infinite linear infinite;
-        }
-        
-        /* Style Gambar Logo */
+        .logos-slider { white-space: nowrap; position: relative; }
+        .logos-slide-track { display: inline-block; animation: 35s slide-infinite linear infinite; }
         .logos-slide-track img {
-            height: 35px;
-            margin: 0 40px; /* Jarak antar logo */
-            filter: grayscale(100%) opacity(0.6);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            vertical-align: middle;
+            height: 35px; margin: 0 40px; filter: grayscale(100%) opacity(0.6);
+            transition: all 0.3s ease; cursor: pointer; vertical-align: middle;
         }
-        
-        /* Efek Hover */
-        .logos-slide-track img:hover {
-            filter: grayscale(0%) opacity(1);
-            transform: scale(1.15);
-        }
-
-        /* Berhenti saat hover area slider */
-        .logos-slider:hover .logos-slide-track {
-            animation-play-state: paused;
-        }
-
-        /* Keyframes Gerakan */
-        @keyframes slide-infinite {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(-100%);
-            }
-        }
-
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            .logos-slide-track img { height: 25px; margin: 0 20px; }
-        }
+        .logos-slide-track img:hover { filter: grayscale(0%) opacity(1); transform: scale(1.15); }
+        .logos-slider:hover .logos-slide-track { animation-play-state: paused; }
+        @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @media (max-width: 768px) { .logos-slide-track img { height: 25px; margin: 0 20px; } }
     </style>
+
+    <script>
+        (async function() {
+            try {
+                // Panggil API Maintenance
+                const res = await fetch('/api/maintenance'); 
+                const data = await res.json();
+                
+                // Cek apakah user adalah admin (agar admin tetap bisa akses)
+                const isAdmin = localStorage.getItem('adminToken'); 
+
+                // LOGIKA: Jika Maintenance Aktif DAN User BUKAN Admin
+                if (data.isActive && !isAdmin) {
+                    // GANTI TOTAL TAMPILAN WEBSITE
+                    document.documentElement.innerHTML = `
+                        <head>
+                            <title>Maintenance | RCELLFEST</title>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+                                body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; 
+                                background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); 
+                                background-size: 400% 400%; animation: gradientBG 15s ease infinite; 
+                                height: 100vh; display: flex; align-items: center; justify-content: center; 
+                                overflow: hidden; color: white; text-align: center; }
+                                @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+                                .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+                                h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+                                p { color: #d1d5db; margin-bottom: 30px; }
+                                .btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; }
+                                .btn-retry:hover { transform: scale(1.05); }
+                                .admin-link { margin-top: 20px; display: block; color: rgba(255,255,255,0.5); font-size: 0.8rem; text-decoration: none; }
+                                .admin-link:hover { color: white; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="glass-card">
+                                <h1>Lagi Didandanin! ✨</h1>
+                                <p>Website sedang dalam perbaikan rutin. Silakan kembali lagi nanti ya!</p>
+                                <button onclick="location.reload()" class="btn-retry">Coba Refresh</button>
+                                <a href="user-login.html" class="admin-link">Login Staff</a>
+                            </div>
+                        </body>
+                    `;
+                } else {
+                    // JIKA TIDAK MAINTENANCE, Munculkan Website Asli
+                    document.addEventListener("DOMContentLoaded", () => {
+                        document.body.classList.add('site-loaded');
+                    });
+                }
+            } catch (err) { 
+                // Jika error cek maintenance (misal server mati), tetap coba load site
+                console.log("Skipping maintenance check...");
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add('site-loaded');
+                });
+            }
+        })();
+    </script>
 </head>
 <body>
 
@@ -363,10 +380,9 @@
         </div>
     </div>
 
-<section class="partner-section">
+    <section class="partner-section">
         <div class="container-fluid p-0">
             <p class="partner-title">Partner Pembayaran Resmi</p>
-            
             <div class="logos-slider">
                 <div class="logos-slide-track">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
@@ -375,49 +391,26 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
-                    
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/CIMB_Niaga_Logo.svg" alt="CIMB">
-                    
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/PermataBank.svg" alt="Permata">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png" alt="Indomaret">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg" alt="Alfamart">
                 </div>
-
                 <div class="logos-slide-track">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
+                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
-                    
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/CIMB_Niaga_Logo.svg" alt="CIMB">
-                    
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/PermataBank.svg" alt="Permata">
-                    
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png" alt="Indomaret">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg" alt="Alfamart">
                 </div>
             </div>
         </div>
@@ -550,7 +543,6 @@
 
         async function loadEvents() {
             try {
-                // Ganti dengan endpoint API Anda yang sebenarnya
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
                 renderEvents(allEvents);
@@ -573,38 +565,15 @@
             }
         }
 
-        // --- FUNGSI BARU: GET IMAGE DENGAN PLACEHOLDER YANG LEBIH BAIK ---
         function getEventImage(event) {
-            // 1. Prioritas UTAMA: Jika di database sudah ada link gambar yang valid (dimulai http), pakai itu.
-            // Pastikan nanti saat input data event, Anda mengisi field 'image' dengan URL poster asli.
-            if (event.image && event.image.startsWith("http")) {
-                return event.image;
-            }
-
-            // 2. Fallback: Jika tidak ada gambar di database, gunakan gambar default berkualitas berdasarkan KATEGORI.
-            // Saya pilihkan gambar yang lebih 'aman' dan umum agar terlihat profesional.
+            if (event.image && event.image.startsWith("http")) { return event.image; }
             const cat = (event.category || "General").toLowerCase();
-
             switch (cat) {
-                case 'konser':
-                case 'music':
-                    // Gambar panggung konser yang megah (kualitas tinggi)
-                    return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
-                case 'olahraga':
-                case 'sports':
-                    // Gambar stadion/kompetisi umum
-                    return "https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=800&auto=format&fit=crop";
-                case 'workshop':
-                case 'seminar':
-                    // Gambar orang berdiskusi/belajar modern
-                    return "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
-                case 'streaming':
-                case 'digital':
-                    // Gambar setup nonton/headphone yang bersih
-                    return "https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?q=80&w=800&auto=format&fit=crop";
-                default:
-                    // Gambar default yang aman (suasana event abstrak)
-                    return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
+                case 'konser': return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
+                case 'olahraga': return "https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=800&auto=format&fit=crop";
+                case 'workshop': return "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
+                case 'streaming': return "https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?q=80&w=800&auto=format&fit=crop";
+                default: return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
             }
         }
 
@@ -620,21 +589,12 @@
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isSoldOut = event.availableSeats <= 0;
-                
-                // Validasi tanggal agar tidak error jika data tanggal kosong/salah
                 let dateStr = "Tanggal TBA";
-                if (event.date) {
-                    try {
-                        dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                    } catch (e) { dateStr = event.date; }
-                }
+                if (event.date) { try { dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}); } catch (e) { dateStr = event.date; } }
                 
                 const catName = event.category || 'General'; 
                 const locationName = event.location || 'Lokasi TBA';
-                
-                // DAPATKAN IMAGE YANG SUDAH DIPERBAIKI
                 const imageUrl = getEventImage(event);
-
                 let btnText = isSoldOut ? 'HABIS' : 'BELI';
                 if (catName === 'Streaming' && !isSoldOut) btnText = 'BELI AKUN';
 
@@ -647,11 +607,7 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="event-title text-truncate">${event.name}</h5>
-                                
-                                <div class="event-venue text-truncate">
-                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
-                                </div>
-                                
+                                <div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}</div>
                                 <div class="price-val">Rp ${harga}</div>
                                 <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
                                     ${btnText}
@@ -663,42 +619,27 @@
             });
         }
 
-        // --- FUNGSI SHOW DETAIL ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
 
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
-            
             let dateStr = "Tanggal TBA";
-            if (event.date) {
-                 try {
-                    dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
-                 } catch (e) { dateStr = event.date; }
-            }
+            if (event.date) { try { dateStr = new Date(event.date).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); } catch (e) { dateStr = event.date; } }
             
-            // Set Data Dasar
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
             const catName = event.category || "General";
             document.getElementById('modalCategory').innerText = catName;
             document.getElementById('modalVenue').innerText = event.location || "TBA";
-
-            // Set Image pada Header Modal menggunakan fungsi yang sama
             const imageUrl = getEventImage(event);
             document.getElementById('modalHeaderImg').style.backgroundImage = `url('${imageUrl}')`;
 
             let safeDescription = event.description || "Deskripsi lengkap belum tersedia untuk event ini.";
-
             if (catName === 'Streaming') {
-                safeDescription = "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n" + 
-                                  "✅ Akun Private / Sharing Bergaransi\n" + 
-                                  "✅ Email & Password akan otomatis muncul di menu 'Tiket Saya' setelah pembayaran berhasil.\n" +
-                                  "✅ 100% Aman & Legal.\n\n" +
-                                  "Klik 'Beli Akun' untuk memproses pesanan otomatis.";
+                safeDescription = "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal.";
             }
-
             document.getElementById('modalDesc').innerText = safeDescription;
             
             const btnBuy = document.getElementById('btnModalBuy');
@@ -713,32 +654,23 @@
                 btnBuy.innerText = (catName === 'Streaming') ? "Beli Akun Sekarang" : "Beli Tiket Sekarang";
                 btnBuy.classList.remove('disabled', 'btn-secondary');
                 btnBuy.classList.add('btn-primary');
-                btnBuy.onclick = function() {
-                    detailModal.hide();
-                    buyTicket(eventId);
-                };
+                btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId); };
             }
-
             detailModal.show();
         }
 
         function searchEvent() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allEvents.filter(e => 
-                e.name.toLowerCase().includes(keyword) || 
-                (e.location && e.location.toLowerCase().includes(keyword))
-            );
+            const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
             renderEvents(filtered);
         }
 
-        document.getElementById('searchInput').addEventListener("keypress", function(e) {
-            if (e.key === "Enter") searchEvent();
-        });
+        document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
 
         async function buyTicket(eventId) {
             const userRaw = localStorage.getItem('userData');
             if (!userRaw) {
-                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli tiket/akun ini.', icon: 'info', confirmButtonText: 'Ke Halaman Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
+                Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli.', icon: 'info', confirmButtonText: 'Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
                 return;
             }
             const user = JSON.parse(userRaw);
@@ -746,85 +678,47 @@
             const namaPemesan = user.fullName ? user.fullName : user.username;
 
             const confirm = await Swal.fire({
-                title: 'Konfirmasi Pembelian',
-                html: `Beli <b>${event ? event.name : ''}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b><br><small>Metode Pembayaran: Midtrans</small>`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0049CC',
-                cancelButtonText: 'Batal',
-                confirmButtonText: 'Bayar Sekarang'
+                title: 'Konfirmasi',
+                html: `Beli <b>${event.name}</b>?<br>Harga: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b>`,
+                icon: 'question', showCancelButton: true, confirmButtonColor: '#0049CC', confirmButtonText: 'Bayar'
             });
 
             if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Menyiapkan Pembayaran...', text: 'Mohon tunggu sebentar, sedang menghubungi gateway pembayaran.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: 'Menyiapkan Pembayaran...', didOpen: () => { Swal.showLoading(); } });
 
                 try {
-                    // Ganti dengan endpoint API Anda
                     const res = await fetch('/api/payment-token', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            eventId, 
-                            quantity: 1, 
-                            customerName: namaPemesan, 
-                            customerEmail: user.email,
-                            userId: user.id // Asumsi ada user ID
-                        })
+                        body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email, userId: user.id })
                     });
                     const data = await res.json();
-                    
                     Swal.close(); 
 
                     if (res.ok && data.token) {
+                        // --- PERBAIKAN LOGIKA CANCEL DI SINI ---
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
-                                Swal.fire('Berhasil!', 'Pembayaran berhasil! Tiket/Akun sudah aktif di menu dashboard Anda.', 'success').then(() => {
-                                    window.location.href = 'dashboard.html';
-                                });
+                                Swal.fire('Berhasil!', 'Pembayaran berhasil!', 'success').then(() => { window.location.href = 'dashboard.html'; });
                             },
                             onPending: function(result){
-                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda melalui instruksi yang diberikan.', 'info');
+                                Swal.fire('Menunggu Pembayaran', 'Selesaikan pembayaran Anda.', 'info');
                             },
                             onError: function(result){
-                                Swal.fire('Gagal', 'Pembayaran gagal atau ditolak.', 'error');
+                                Swal.fire('Gagal', 'Pembayaran gagal.', 'error');
                             },
                             onClose: function(){
-                                // Opsional: Panggil API untuk membatalkan order jika ditutup
-                                /* fetch('/api/cancel-order', {
+                                // PENTING: Hapus Order dari Database jika dicancel
+                                fetch('/api/cancel-order', {
                                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ orderId: data.orderId })
-                                }); */
-                                Swal.fire('Dibatalkan', 'Anda menutup jendela pembayaran sebelum selesai.', 'info');
+                                    body: JSON.stringify({ orderId: data.orderId }) // Backend harus kirim orderId
+                                });
+                                Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran.', 'info');
                             }
                         });
-                    } else { 
-                        Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat membuat pesanan.', 'error'); 
-                    }
-                } catch (err) { 
-                    console.error(err);
-                    Swal.close();
-                    Swal.fire('Error Koneksi', 'Gagal menghubungi server. Cek koneksi internet Anda.', 'error'); 
-                }
+                    } else { Swal.fire('Gagal', data.message || 'Error.', 'error'); }
+                } catch (err) { Swal.fire('Error', 'Gagal koneksi.', 'error'); }
             }
         }
-    </script>
-    
-    <script>
-        // Script Maintenance Sederhana
-        (async function() {
-            try {
-                // Ganti dengan endpoint API maintenance Anda
-                const res = await fetch('/api/maintenance'); 
-                if (!res.ok) return; // Skip jika API tidak ada
-                
-                const data = await res.json();
-                const isAdmin = localStorage.getItem('adminToken'); 
-
-                if (data.isActive && !isAdmin) {
-                    document.body.innerHTML = `
-                        <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0e1e3b, #2b1055, #0049CC, #4facfe); background-size: 400% 400%; animation: gradientBG 15s ease infinite; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }.glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); color: white; }h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #fff, #b0c0d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }p { color: #d1d5db; margin-bottom: 30px; }.btn-retry { background: white; color: #0e1e3b; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }.btn-retry:hover { transform: scale(1.05); }</style><div class="glass-card"><h1>Lagi Didandanin! ✨</h1><p>Website sedang maintenance. Silakan kembali lagi nanti.</p><button onclick="location.reload()" class="btn-retry">Cek Lagi</button></div>`;
-                }
-            } catch (err) { /* Abaikan error jika endpoint tidak ada */ }
-        })();
     </script>
 </body>
 </html>
