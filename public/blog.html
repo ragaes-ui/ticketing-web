@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog & Berita | RCELLFEST</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding-top: 76px;
+        }
+
+        /* Navbar Clean */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            padding: 12px 0;
+            height: 76px;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: #0049CC !important;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-link { font-weight: 500; color: #555; margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover { color: #0049CC; font-weight: 700; }
+
+        /* Blog Header */
+        .blog-header {
+            background-color: white;
+            padding: 60px 0 40px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 40px;
+        }
+        .section-title { font-weight: 800; font-size: 2.5rem; letter-spacing: -1px; }
+
+        /* Featured Post */
+        .featured-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            color: white;
+            margin-bottom: 50px;
+            cursor: pointer;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .featured-img {
+            width: 100%; height: 450px; object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .featured-card:hover .featured-img { transform: scale(1.05); }
+        .featured-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 40px;
+        }
+
+        /* Standard Blog Card */
+        .blog-card {
+            background: white; border: none; border-radius: 16px; overflow: hidden;
+            transition: 0.3s; height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        .blog-card:hover {
+            transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 73, 204, 0.1);
+        }
+        .blog-thumb {
+            height: 200px; width: 100%; object-fit: cover; background-color: #eee;
+        }
+        .blog-body { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; }
+        .blog-cat {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            color: #0049CC; margin-bottom: 10px; letter-spacing: 0.5px;
+        }
+        .blog-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; line-height: 1.4; }
+        .blog-title a { text-decoration: none; color: #333; transition: 0.2s; }
+        .blog-title a:hover { color: #0049CC; }
+        .blog-meta { font-size: 0.85rem; color: #888; margin-top: auto; padding-top: 15px; }
+
+        /* Newsletter */
+        .newsletter-section {
+            background: #0049CC; color: white; padding: 60px 0; border-radius: 24px; margin-top: 60px;
+            text-align: center;
+        }
+        .form-control-newsletter {
+            border-radius: 50px; padding: 12px 20px; border: none;
+        }
+        .btn-newsletter {
+            background: #ffce33; color: #333; font-weight: 700; border-radius: 50px; padding: 12px 30px;
+        }
+
+        /* Footer */
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; font-size: 0.85rem; margin-top: 80px; }
+        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+        .footer-link:hover { color: white; text-decoration: underline; }
+        .social-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; margin-right: 8px; text-decoration: none;
+        }
+        .social-btn:hover { background: white; color: #0e1e3b; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Jelajah</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="blog.html">Blog</a></li>
+                </ul>
+            </div>
+
+            <div id="navUserArea">
+                <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+                <div>
+                    <h1 class="section-title">Cerita & Berita</h1>
+                    <p class="text-secondary mb-0">Update terbaru seputar konser, event, dan gaya hidup.</p>
+                </div>
+                <div style="width: 100%; max-width: 300px;">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-end-0 rounded-start-pill ps-3" placeholder="Cari artikel...">
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill pe-3" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="featured-card" onclick="location.href='#'">
+            <img src="https://images.unsplash.com/photo-1459749411177-0473ef716175?q=80&w=1200&auto=format&fit=crop" class="featured-img" alt="Featured">
+            <div class="featured-overlay">
+                <span class="badge bg-warning text-dark mb-2">HOT NEWS</span>
+                <h2 class="fw-bold display-6">Cara Menang 'War Tiket' Konser Internasional 2026</h2>
+                <p class="mb-0 opacity-75 d-none d-md-block">Simak tips jitu dari para veteran konser untuk mengamankan tiket impianmu tanpa drama calo.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 1">
+                    <div class="blog-body">
+                        <div class="blog-cat">Tips & Trik</div>
+                        <h3 class="blog-title"><a href="#">5 Barang Wajib Bawa Saat Nonton Festival Musik Outdoor</a></h3>
+                        <p class="text-secondary small mb-0">Jangan sampai salah kostum atau kepanasan. Cek checklist ini sebelum berangkat.</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 8 Feb 2026 &bull; Oleh Admin
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 2">
+                    <div class="blog-body">
+                        <div class="blog-cat">Review</div>
+                        <h3 class="blog-title"><a href="#">Recap Keseruan Java Jazz Festival Hari Ke-2</a></h3>
+                        <p class="text-secondary small mb-0">Penampilan memukau dari sang legenda jazz membuat penonton histeris semalam.</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 5 Feb 2026 &bull; Oleh Raga Esa
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1551818255-e6e10975bc17?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 3">
+                    <div class="blog-body">
+                        <div class="blog-cat">Update Sistem</div>
+                        <h3 class="blog-title"><a href="#">Fitur Baru RCELLFEST: Transfer Tiket ke Teman</a></h3>
+                        <p class="text-secondary small mb-0">Kini kamu bisa membelikan tiket untuk teman dan mengirimkannya langsung ke akun mereka.</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 1 Feb 2026 &bull; Oleh Tim Tech
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 4">
+                    <div class="blog-body">
+                        <div class="blog-cat">Musik</div>
+                        <h3 class="blog-title"><a href="#">Prediksi Lineup Headliner Festival Musim Panas</a></h3>
+                        <p class="text-secondary small mb-0">Rumor beredar bahwa band rock legendaris ini akan mampir ke Indonesia.</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 28 Jan 2026 &bull; Oleh Music Editor
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1583244532610-2a234e7c3eca?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 5">
+                    <div class="blog-body">
+                        <div class="blog-cat">Lifestyle</div>
+                        <h3 class="blog-title"><a href="#">OOTD Konser K-Pop: Nyaman tapi Tetap Stylish</a></h3>
+                        <p class="text-secondary small mb-0">Inspirasi gaya berpakaian untuk kamu yang mau nonton konser bias kesayangan.</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 20 Jan 2026 &bull; Oleh Fashion Stylist
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="blog-card">
+                    <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 6">
+                    <div class="blog-body">
+                        <div class="blog-cat">Komunitas</div>
+                        <h3 class="blog-title"><a href="#">Meetup Komunitas RCELLFEST Regional Bogor</a></h3>
+                        <p class="text-secondary small mb-0">Dokumentasi keseruan gathering member bulan lalu. Ada kamu gak?</p>
+                        <div class="blog-meta">
+                            <i class="bi bi-calendar3"></i> 15 Jan 2026 &bull; Oleh Community Mgr
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled"><a class="page-link rounded-pill me-2" href="#">Prev</a></li>
+                <li class="page-item active"><a class="page-link rounded-pill me-2 bg-primary border-primary" href="#">1</a></li>
+                <li class="page-item"><a class="page-link rounded-pill me-2 text-dark" href="#">2</a></li>
+                <li class="page-item"><a class="page-link rounded-pill me-2 text-dark" href="#">3</a></li>
+                <li class="page-item"><a class="page-link rounded-pill text-dark" href="#">Next</a></li>
+            </ul>
+        </nav>
+
+        <div class="newsletter-section">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-8 px-4">
+                    <h3 class="fw-bold mb-2">Jangan Ketinggalan Info Konser!</h3>
+                    <p class="opacity-75 mb-4">Dapatkan info presale tiket dan promo eksklusif langsung di emailmu.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control form-control-newsletter" placeholder="Masukkan alamat email kamu">
+                        <button class="btn btn-newsletter" type="button">Langganan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-loket">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Tentang</div>
+                    <a href="about.html" class="footer-link">Tentang Kami</a>
+                    <a href="blog.html" class="footer-link text-white">Blog</a>
+                    <a href="career.html" class="footer-link">Karir</a>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Penyelenggara</div>
+                    <a href="create-event.html" class="footer-link">Buat Event</a>
+                    <a href="guide.html" class="footer-link">Panduan</a>
+                    <a href="login.html" class="footer-link text-warning">Login Admin</a>
+                </div>
+                <div class="col-lg-3">
+                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="mb-3">
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Cek Login untuk Navbar
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+
+            if (userRaw) {
+                const user = JSON.parse(userRaw);
+                navArea.innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-primary"></i> 
+                            <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
