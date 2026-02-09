@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan & Bantuan | RCELLFEST</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding-top: 76px;
+        }
+        /* Navbar Clean */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            padding: 12px 0;
+            height: 76px;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: #0049CC !important;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-link { font-weight: 500; color: #555; margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover { color: #0049CC; font-weight: 700; }
+
+        /* Header Guide */
+        .guide-header {
+            background: #0049CC; color: white; padding: 60px 0; text-align: center; margin-bottom: 40px;
+        }
+
+        /* Custom Accordion */
+        .accordion-item { border: none; margin-bottom: 15px; border-radius: 12px !important; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .accordion-button { font-weight: 600; color: #333; padding: 20px; background: white; }
+        .accordion-button:not(.collapsed) { background-color: #e6f0ff; color: #0049CC; box-shadow: none; }
+        .accordion-button:focus { box-shadow: none; border-color: rgba(0,73,204,0.1); }
+        .accordion-body { font-size: 0.95rem; line-height: 1.6; color: #555; background: white; padding: 20px; }
+
+        /* Contact Box */
+        .contact-box {
+            background: white; padding: 30px; border-radius: 16px; text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-top: 40px;
+        }
+        .icon-help { font-size: 3rem; color: #0049CC; margin-bottom: 15px; }
+
+        /* Footer */
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; font-size: 0.85rem; margin-top: 60px; }
+        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+        .footer-link:hover { color: white; text-decoration: underline; }
+        .social-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; margin-right: 8px; text-decoration: none;
+        }
+        .social-btn:hover { background: white; color: #0e1e3b; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Jelajah</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="guide.html">Panduan</a></li>
+                </ul>
+            </div>
+            <div id="navUserArea">
+                <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="guide-header">
+        <div class="container">
+            <h1 class="fw-bold">Pusat Bantuan</h1>
+            <p class="opacity-75">Temukan jawaban atas pertanyaanmu seputar pembelian tiket.</p>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 800px;">
+        <h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-cart-check-fill me-2"></i>Pembelian & Tiket</h5>
+        
+        <div class="accordion" id="accordionFAQ">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Bagaimana cara membeli tiket?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                    <div class="accordion-body">
+                        1. Pilih event yang diinginkan di halaman utama.<br>
+                        2. Klik tombol "Beli Tiket". (Pastikan Anda sudah Login).<br>
+                        3. Lakukan pembayaran via metode yang tersedia (QRIS, VA, E-Wallet).<br>
+                        4. Setelah sukses, tiket akan otomatis muncul di menu "Tiket Saya" dan dikirim ke email.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Saya sudah bayar, tapi tiket belum masuk email?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                    <div class="accordion-body">
+                        Mohon cek folder <strong>Spam / Junk</strong> di email Anda. Terkadang email tiket masuk ke sana.<br><br>
+                        Jika tetap tidak ada, silakan cek menu <strong>Tiket Saya</strong> di dashboard akun RCELLFEST Anda. Tiket juga tersimpan di sana.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Apakah tiket bisa di-refund (dibatalkan)?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                    <div class="accordion-body">
+                        Secara umum, tiket yang sudah dibeli <strong>tidak dapat dikembalikan (non-refundable)</strong>, kecuali jika event dibatalkan oleh penyelenggara. Kebijakan ini tertulis pada Syarat & Ketentuan setiap event.
+                    </div>
+                </div>
+            </div>
+            
+             <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        Bagaimana cara menukarkan E-Ticket di lokasi?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                    <div class="accordion-body">
+                        Cukup tunjukkan <strong>Barcode / QR Code</strong> yang ada di E-Ticket (melalui HP) kepada petugas di gerbang masuk. Petugas akan memindai kode tersebut untuk validasi. Jangan bagikan kode tiket Anda kepada orang lain!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <i class="bi bi-headset icon-help"></i>
+            <h4 class="fw-bold">Masih butuh bantuan?</h4>
+            <p class="text-secondary">Tim support kami siap membantu kendala Anda.</p>
+            <a href="mailto:support@rcellfest.shop" class="btn btn-primary rounded-pill px-4 fw-bold">Hubungi Kami</a>
+        </div>
+
+    </div>
+
+    <footer class="footer-loket">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Tentang</div>
+                    <a href="about.html" class="footer-link">Tentang Kami</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="career.html" class="footer-link">Karir</a>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Penyelenggara</div>
+                    <a href="create-event.html" class="footer-link">Buat Event</a>
+                    <a href="guide.html" class="footer-link text-white">Panduan</a>
+                    <a href="login.html" class="footer-link text-warning">Login Admin</a>
+                </div>
+                <div class="col-lg-3">
+                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="mb-3">
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { checkLoginStatus(); });
+        function checkLoginStatus() {
+            const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+            if (userRaw) {
+                const user = JSON.parse(userRaw);
+                navArea.innerHTML = `<div class="dropdown"><button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle text-primary"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span></button><ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3"><li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li><li><hr class="dropdown-divider"></li><li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li></ul></div>`;
+            } else {
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
+            }
+        }
+        function logout() { localStorage.removeItem('userData'); window.location.reload(); }
+    </script>
+</body>
+</html>
