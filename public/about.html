@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang Kami | RCELLFEST</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            color: #333;
+            padding-top: 76px;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Clean (Sama dengan Home) */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            padding: 12px 0;
+            height: 76px;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: #0049CC !important;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-link { font-weight: 500; color: #555; margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: #0049CC; font-weight: 700; }
+
+        /* Hero About */
+        .hero-about {
+            background: linear-gradient(135deg, #0e1e3b 0%, #0049CC 100%);
+            padding: 80px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-about::before {
+            content: ''; position: absolute; top: -50%; left: -20%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-title { font-weight: 800; font-size: 2.5rem; margin-bottom: 20px; }
+        .hero-subtitle { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        /* Content Sections */
+        .section-padding { padding: 80px 0; }
+        .text-primary-custom { color: #0049CC; }
+        .bg-light-custom { background-color: #f8faff; }
+
+        .feature-box {
+            background: white; padding: 30px; border-radius: 16px;
+            border: 1px solid #eee; transition: all 0.3s; height: 100%;
+        }
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 73, 204, 0.1);
+            border-color: transparent;
+        }
+        .icon-box {
+            width: 60px; height: 60px; background: #e6f0ff; color: #0049CC;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 20px;
+        }
+
+        /* Stats */
+        .stat-card { text-align: center; padding: 20px; }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: #0049CC; }
+        .stat-label { font-weight: 600; color: #666; }
+
+        /* Footer (Sama dengan Home) */
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; font-size: 0.85rem; }
+        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+        .footer-link:hover { color: white; text-decoration: underline; }
+        .social-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; margin-right: 8px; text-decoration: none;
+        }
+        .social-btn:hover { background: white; color: #0e1e3b; }
+
+        /* Image Styling */
+        .img-rounded-custom { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Jelajah</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Tentang Kami</a></li>
+                </ul>
+            </div>
+
+            <div id="navUserArea">
+                <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-about text-center">
+        <div class="container position-relative z-1">
+            <h1 class="hero-title">Lebih Dari Sekadar Tiket.</h1>
+            <p class="hero-subtitle">Kami menghubungkanmu dengan pengalaman tak terlupakan. Dari konser megah hingga workshop inspiratif, semua dimulai dari satu klik di RCELLFEST.</p>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=1000&auto=format&fit=crop" alt="Meeting Team" class="img-fluid img-rounded-custom">
+                </div>
+                <div class="col-lg-6">
+                    <h5 class="text-primary-custom fw-bold text-uppercase mb-3">Cerita Kami</h5>
+                    <h2 class="fw-bold mb-4">Mengapa RCELLFEST Ada?</h2>
+                    <p class="text-secondary mb-4" style="line-height: 1.8;">
+                        Berawal dari kesulitan mendapatkan tiket konser favorit yang sering habis dalam hitungan detik atau terjebak calo dengan harga selangit, kami memutuskan untuk membuat perubahan.
+                    </p>
+                    <p class="text-secondary mb-4" style="line-height: 1.8;">
+                        Didirikan pada tahun 2024, <strong>RCELLFEST</strong> (bagian dari RCELLTECH ID) hadir sebagai solusi platform *ticketing* modern yang mengutamakan keamanan, kemudahan akses, dan harga yang transparan. Kami tidak hanya menjual tiket; kami menjual akses menuju memori terbaik dalam hidup Anda.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <div>
+                            <i class="bi bi-check-circle-fill text-primary-custom"></i> 100% Resmi
+                        </div>
+                        <div>
+                            <i class="bi bi-check-circle-fill text-primary-custom"></i> Transaksi Instan
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-light-custom py-5 border-top border-bottom">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-4 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">50k+</div>
+                        <div class="stat-label">Tiket Terjual</div>
+                    </div>
+                </div>
+                <div class="col-4 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Event Partner</div>
+                    </div>
+                </div>
+                <div class="col-4 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">Rating User</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Kenapa Memilih Kami?</h2>
+                <p class="text-secondary">Komitmen kami untuk memberikan pengalaman terbaik bagi Anda.</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <div class="icon-box"><i class="bi bi-shield-lock-fill"></i></div>
+                        <h4 class="fw-bold mb-3">Jaminan Aman</h4>
+                        <p class="text-secondary">Sistem keamanan berlapis dan anti-bot memastikan tiket yang Anda beli 100% valid dan data pribadi terlindungi enkripsi.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <div class="icon-box"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <h4 class="fw-bold mb-3">Proses Kilat</h4>
+                        <p class="text-secondary">Teknologi server berkecepatan tinggi. Pesan tiket, bayar, dan terima E-Ticket hanya dalam waktu kurang dari 2 menit.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <div class="icon-box"><i class="bi bi-headset"></i></div>
+                        <h4 class="fw-bold mb-3">Support 24/7</h4>
+                        <p class="text-secondary">Bingung cara redeem? Ada kendala pembayaran? Tim support kami siap membantu kapanpun Anda butuh via Email & Chat.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" style="background-color: #0049CC;">
+        <div class="container text-center text-white">
+            <h2 class="fw-bold mb-3">Siap Untuk Bersenang-senang?</h2>
+            <p class="mb-4 opacity-75">Jangan sampai kehabisan tiket event impianmu.</p>
+            <a href="index.html" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary">Cari Event Sekarang</a>
+        </div>
+    </section>
+
+    <footer class="footer-loket">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Tentang</div>
+                    <a href="about.html" class="footer-link text-white">Tentang Kami</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="#" class="footer-link">Karir</a>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head">Penyelenggara</div>
+                    <a href="#" class="footer-link">Buat Event</a>
+                    <a href="#" class="footer-link">Panduan</a>
+                    <a href="login.html" class="footer-link text-warning">Login Admin</a>
+                </div>
+                <div class="col-lg-3">
+                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="mb-3">
+                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn"><i class="bi bi-youtube"></i></a>
+                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn"><i class="bi bi-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+
+            if (userRaw) {
+                const user = JSON.parse(userRaw);
+                navArea.innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-primary"></i> 
+                            <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('userToken');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
