@@ -344,6 +344,7 @@
             const t = translations[lang];
 
             try {
+                // Fetch hanya ke backend asli
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
@@ -451,7 +452,7 @@
             }
         }
 
-        // --- PDF GENERATOR (Dengan Waktu Tunggu) ---
+        // --- PDF GENERATOR (Fix Blank + Delay) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -459,15 +460,19 @@
 
             Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
 
+            // Buat Elemen Virtual
             const element = document.createElement('div');
             document.body.appendChild(element);
-            element.style.cssText = 'width: 450px; position: absolute; left: -9999px; top: 0; background: white; color: black; font-family: sans-serif;';
+            
+            // TEKNIK Z-INDEX FIX: Elemen ada di layar tapi tertutup background, jadi browser tetap merendernya
+            element.style.cssText = 'width: 450px; position: fixed; top: 0; left: 0; z-index: -9999; background: white; color: black; font-family: sans-serif;';
 
             let contentMiddle = '';
             let labelType = data.isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
             
             if (data.isStreaming) {
-                const desc = data.desc ? data.desc : "Detail tidak tersedia.";
+                // Style Khusus Streaming agar teks deskripsi tidak hilang
+                const desc = data.desc ? data.desc : "Detail akun tidak tersedia.";
                 contentMiddle = `
                     <div style="border: 2px solid #000; padding: 15px; margin: 20px 0; text-align: left; background-color: #f8f9fa;">
                         <p style="margin:0; font-size: 12px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
@@ -482,6 +487,7 @@
                     </div>`;
             }
 
+            // HTML Structure PDF
             element.innerHTML = `
                 <div style="padding: 30px; border: 1px solid #ddd;">
                     <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -504,7 +510,7 @@
                 </div>
             `;
 
-            // PENUNGGU GAMBAR
+            // Tunggu Gambar Loading
             const imgs = element.querySelectorAll('img');
             const promises = Array.from(imgs).map(img => {
                 if (img.complete) return Promise.resolve();
@@ -512,7 +518,7 @@
             });
             await Promise.all(promises);
 
-            // JEDA 1 DETIK (Penting agar QR tidak blank)
+            // Jeda 1 Detik agar render sempurna
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             const opt = { 
