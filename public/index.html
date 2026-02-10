@@ -14,6 +14,97 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
+        /* --- DARK MODE VARIABLES --- */
+:root {
+    /* Warna Default (Light Mode) */
+    --bg-body: #ffffff;
+    --bg-nav: #ffffff;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-section: #f8f9fa;
+    --text-main: #333333;
+    --text-muted: #6c757d;
+    --border-color: #eeeeee;
+    --shadow-color: rgba(0,0,0,0.05);
+    --hover-cat: #f0f7ff;
+}
+
+[data-theme="dark"] {
+    /* Warna Dark Mode */
+    --bg-body: #0f172a;      /* Biru gelap mendekati hitam */
+    --bg-nav: #1e293b;       /* Biru keabuan */
+    --bg-card: #1e293b;
+    --bg-input: #334155;
+    --bg-section: #020617;
+    --text-main: #f8f9fa;    /* Putih terang */
+    --text-muted: #cbd5e1;
+    --border-color: #334155;
+    --shadow-color: rgba(0,0,0,0.5);
+    --hover-cat: #334155;
+}
+
+/* --- TERAPKAN VARIABLE KE ELEMENT --- */
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar {
+    background-color: var(--bg-nav) !important;
+    transition: background-color 0.3s;
+}
+
+.search-box {
+    background: var(--bg-card);
+    box-shadow: 0 8px 25px var(--shadow-color);
+}
+.search-input {
+    background: transparent;
+    color: var(--text-main);
+}
+/* Placeholder warna di dark mode */
+[data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
+
+.card-event {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+.event-title { color: var(--text-main); }
+.event-venue { color: var(--text-muted) !important; }
+.btn-outline-book {
+    background: transparent;
+}
+.date-float {
+    background: var(--bg-card);
+    color: #0049CC;
+}
+
+/* Kategori Icon */
+.category-item:hover, .category-item.active { background: var(--hover-cat); }
+[data-theme="dark"] .cat-text { color: #cbd5e1; }
+[data-theme="dark"] .category-item.active .cat-text { color: #60a5fa; }
+
+/* Modal */
+.modal-content {
+    background-color: var(--bg-nav);
+    color: var(--text-main);
+}
+[data-theme="dark"] .modal-desc-text { color: #cbd5e1; }
+[data-theme="dark"] .bg-light { background-color: #334155 !important; }
+[data-theme="dark"] .text-dark { color: #fff !important; }
+[data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+/* Partner Section */
+.partner-section {
+    background-color: var(--bg-section);
+    border-top: 1px solid var(--border-color);
+}
+/* Agar logo partner terlihat jelas di background gelap */
+[data-theme="dark"] .logos-slide-track img {
+    filter: brightness(0) invert(1) opacity(0.8);
+}
+
         /* PERBAIKAN: Opacity dihapus agar website langsung muncul */
         body {
             font-family: 'Inter', sans-serif;
@@ -281,7 +372,9 @@
                     <li class="nav-item"><a class="nav-link" href="guide.html">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-
+<button onclick="toggleTheme()" class="btn rounded-circle me-2" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);">
+    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+</button>
             <div id="navUserArea">
                 <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
             </div>
@@ -484,11 +577,50 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
+           // --- SCRIPT DARK MODE ---
             checkLoginStatus();
-            loadEvents();
-        });
+loadEvents();
+           }); 
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
 
-        function checkLoginStatus() {
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    const btn = document.getElementById('theme-btn');
+    
+    if (theme === 'dark') {
+        icon.classList.remove('bi-moon-stars-fill');
+        icon.classList.add('bi-sun-fill');
+        icon.style.color = "#FFD700"; // Warna kuning matahari
+        btn.classList.add('btn-dark');
+        btn.classList.remove('btn-light');
+    } else {
+        icon.classList.remove('bi-sun-fill');
+        icon.classList.add('bi-moon-stars-fill');
+        icon.style.color = ""; // Reset warna
+        btn.classList.add('btn-light');
+        btn.classList.remove('btn-dark');
+    }
+}
+
+// Cek preferensi tersimpan saat load
+(function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    // Kita perlu menunggu DOM loaded untuk update icon, jadi kita panggil nanti
+    document.addEventListener('DOMContentLoaded', () => {
+        updateThemeIcon(savedTheme);
+})(); 
+
+
+       function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
 
