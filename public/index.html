@@ -5,6 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RCELLFEST | Beli Tiket Konser & Event Online</title>
     
+    <script>
+        (async function() {
+            try {
+                // 1. Cek status maintenance dari backend
+                const res = await fetch('/api/maintenance'); 
+                const data = await res.json();
+                
+                // 2. Cek apakah user adalah admin (punya token admin)
+                const isAdmin = localStorage.getItem('adminToken'); 
+
+                // 3. Logika: Jika Maintenance AKTIF dan user BUKAN Admin
+                if (data.isActive && !isAdmin) {
+                    document.documentElement.innerHTML = `
+                        <head>
+                            <title>Maintenance | RCELLFEST</title>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                                body { margin: 0; padding: 0; font-family: sans-serif; 
+                                background: #0e1e3b; height: 100vh; display: flex; flex-direction: column;
+                                align-items: center; justify-content: center; color: white; text-align: center; }
+                                h1 { font-size: 2.5rem; margin-bottom: 10px; }
+                                p { color: #ccc; margin-bottom: 30px; }
+                                .btn { background: white; color: #0e1e3b; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; text-decoration: none; transition: 0.3s; }
+                                .btn:hover { transform: scale(1.05); }
+                            </style>
+                        </head>
+                        <body>
+                            <div>
+                                <h1 style="font-size: 3rem;">🚧</h1>
+                                <h1>Lagi Didandanin! ✨</h1>
+                                <p>Website sedang dalam perbaikan rutin. Silakan kembali lagi nanti ya!</p>
+                                <button onclick="location.reload()" class="btn">Coba Refresh</button>
+                                <br><br>
+                                <a href="login.html" style="color: #555; font-size: 0.8rem; text-decoration: none;">Login Admin</a>
+                            </div>
+                        </body>
+                    `;
+                } else if (data.isActive && isAdmin) {
+                    console.log("🔓 Maintenance Mode AKTIF (Admin Bypass)");
+                    // Optional: Tanda visual untuk admin
+                    window.addEventListener('DOMContentLoaded', () => {
+                        const badge = document.createElement('div');
+                        badge.innerHTML = 'MAINTENANCE MODE (Admin View)';
+                        badge.style.cssText = 'position:fixed;bottom:10px;left:10px;background:red;color:white;padding:5px 10px;z-index:9999;border-radius:5px;font-size:12px;font-weight:bold;pointer-events:none;';
+                        document.body.appendChild(badge);
+                    });
+                }
+            } catch (err) { 
+                console.log("⚠️ Gagal cek maintenance (mungkin offline), lanjut load website...");
+            }
+        })();
+    </script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
