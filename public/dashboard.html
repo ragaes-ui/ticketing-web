@@ -379,6 +379,11 @@
                     const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
                     const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
                     
+                    // STATUS BADGE
+                    const statusBadge = ticket.status === 'used' 
+                        ? `<span class="badge bg-secondary rounded-pill">${t.status_used}</span>` 
+                        : `<span class="badge bg-success rounded-pill">${t.status_active}</span>`;
+
                     // Deskripsi untuk PDF
                     let descText = event.description || "";
                     let descClean = descText.replace(/\n/g, " | "); 
@@ -437,7 +442,8 @@
                                 <div class="ticket-body">
                                     <span class="ticket-date"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
                                     ${mainContent}
-                                    <div class="ticket-code text-white mt-3">${ticket.ticketCode}</div>
+                                    <div class="mt-3">${statusBadge}</div>
+                                    <div class="ticket-code text-white mt-2">${ticket.ticketCode}</div>
                                 </div>
                             </div>
                         </div>
@@ -452,7 +458,7 @@
             }
         }
 
-        // --- PDF GENERATOR (Fix Blank + Delay) ---
+        // --- PDF GENERATOR (Fix Blank + Delay + Z-Index) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -460,18 +466,16 @@
 
             Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
 
-            // Buat Elemen Virtual
             const element = document.createElement('div');
             document.body.appendChild(element);
             
-            // TEKNIK Z-INDEX FIX: Elemen ada di layar tapi tertutup background, jadi browser tetap merendernya
+            // TEKNIK Z-INDEX FIX: Elemen ada di layar tapi tertutup background
             element.style.cssText = 'width: 450px; position: fixed; top: 0; left: 0; z-index: -9999; background: white; color: black; font-family: sans-serif;';
 
             let contentMiddle = '';
             let labelType = data.isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
             
             if (data.isStreaming) {
-                // Style Khusus Streaming agar teks deskripsi tidak hilang
                 const desc = data.desc ? data.desc : "Detail akun tidak tersedia.";
                 contentMiddle = `
                     <div style="border: 2px solid #000; padding: 15px; margin: 20px 0; text-align: left; background-color: #f8f9fa;">
@@ -487,7 +491,6 @@
                     </div>`;
             }
 
-            // HTML Structure PDF
             element.innerHTML = `
                 <div style="padding: 30px; border: 1px solid #ddd;">
                     <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
