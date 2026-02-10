@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
@@ -310,15 +312,20 @@
                 lbl_scan: "SCAN DI LOKASI",
                 lbl_credentials: "CREDENTIALS:",
                 btn_copy: "Salin Akun",
+                btn_pdf: "Simpan PDF",
                 status_used: "SUDAH DIPAKAI",
                 status_active: "TIKET AKTIF",
                 txt_date_tba: "Tanggal TBA",
                 toast_copy: "Berhasil disalin!",
+                toast_pdf_gen: "Sedang membuat PDF...",
                 alert_success_title: "Sukses",
                 alert_name_updated: "Nama diperbarui",
                 alert_relogin: "Silakan login ulang",
                 alert_fail_title: "Gagal",
-                alert_pass_wrong: "Password salah"
+                alert_pass_wrong: "Password salah",
+                pdf_header: "E-TICKET RCELLFEST",
+                pdf_info: "Tunjukkan QR Code ini di pintu masuk.",
+                pdf_footer: "Terima kasih telah memesan di Rcellfest."
             },
             en: {
                 nav_home: "Home",
@@ -341,15 +348,20 @@
                 lbl_scan: "SCAN AT VENUE",
                 lbl_credentials: "CREDENTIALS:",
                 btn_copy: "Copy Account",
+                btn_pdf: "Save PDF",
                 status_used: "USED",
                 status_active: "ACTIVE TICKET",
                 txt_date_tba: "Date TBA",
                 toast_copy: "Copied successfully!",
+                toast_pdf_gen: "Generating PDF...",
                 alert_success_title: "Success",
                 alert_name_updated: "Name updated",
                 alert_relogin: "Please login again",
                 alert_fail_title: "Failed",
-                alert_pass_wrong: "Incorrect password"
+                alert_pass_wrong: "Incorrect password",
+                pdf_header: "RCELLFEST E-TICKET",
+                pdf_info: "Show this QR Code at the entrance.",
+                pdf_footer: "Thank you for booking with Rcellfest."
             }
         };
 
@@ -383,7 +395,6 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(t[key]) {
-                    // Cek jika elemen punya icon, jangan ditimpa iconnya
                     if(el.querySelector('i')) {
                         const icon = el.querySelector('i').outerHTML;
                         el.innerHTML = `${icon} ${t[key]}`;
@@ -412,21 +423,6 @@
             const t = translations[lang];
 
             try {
-                // Gunakan Data Dummy JIKA API gagal/maintenance (opsional, bisa dihapus jika API sudah ready)
-                /* const tickets = [
-                    {
-                        ticketCode: 'RCELL-12345',
-                        status: 'active',
-                        eventId: {
-                            name: 'Konser Musik Kemerdekaan',
-                            category: 'Konser',
-                            date: '2025-08-17', // Format YYYY-MM-DD
-                        }
-                    }
-                ]; 
-                */
-                
-                // Fetch API Asli
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
@@ -453,10 +449,7 @@
                         try {
                             const dateObj = new Date(event.date);
                             dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {
-                                weekday: 'long', 
-                                day: 'numeric', 
-                                month: 'long', 
-                                year: 'numeric'
+                                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
                             });
                         } catch (e) { dateStr = event.date; }
                     }
@@ -467,6 +460,17 @@
                     const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
 
                     let mainContent = '';
+                    
+                    // Data untuk PDF (Encoded JSON)
+                    const ticketData = encodeURIComponent(JSON.stringify({
+                        eventName: event.name,
+                        date: dateStr,
+                        location: event.location || 'TBA',
+                        code: ticket.ticketCode,
+                        isStreaming: isStreaming,
+                        desc: event.description,
+                        userName: user.fullName || user.username
+                    }));
 
                     if (isStreaming) {
                         const credentials = event.description || "Detail tidak tersedia.";
@@ -475,9 +479,14 @@
                                 <small class="d-block mb-1 text-white-50">${t.lbl_credentials}</small>
                                 <div class="fw-bold">${credentials}</div>
                             </div>
-                            <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
-                                <i class="bi bi-copy me-1"></i> ${t.btn_copy}
-                            </button>
+                            <div class="d-flex gap-2 w-100">
+                                <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                                    <i class="bi bi-copy me-1"></i> ${t.btn_copy}
+                                </button>
+                                <button onclick="downloadTicket('${ticketData}')" class="btn btn-glass btn-sm w-100 rounded-pill">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                                </button>
+                            </div>
                         `;
                     } else {
                         // QR Code API
@@ -487,10 +496,10 @@
                             <div class="qr-container">
                                 <img src="${qrUrl}" alt="QR Code" class="qr-image">
                             </div>
-                            <div class="mt-2">
-                                <span class="badge ${ticket.status === 'used' ? 'bg-secondary' : 'bg-success'} rounded-pill">
-                                    ${ticket.status === 'used' ? t.status_used : t.status_active}
-                                </span>
+                            <div class="mt-3">
+                                <button onclick="downloadTicket('${ticketData}')" class="btn btn-primary-neon btn-sm w-100">
+                                    <i class="bi bi-download me-2"></i> ${t.btn_pdf}
+                                </button>
                             </div>
                         `;
                     }
@@ -508,7 +517,7 @@
                                 <div class="ticket-body">
                                     <span class="ticket-date"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
                                     ${mainContent}
-                                    <div class="ticket-code text-white">${ticket.ticketCode}</div>
+                                    <div class="ticket-code text-white mt-3">${ticket.ticketCode}</div>
                                 </div>
                             </div>
                         </div>
@@ -518,6 +527,94 @@
                 list.innerHTML = htmlContent;
 
             } catch (err) { console.error(err); }
+        }
+
+        // --- FUNGSI GENERATE PDF ---
+        function downloadTicket(dataString) {
+            const data = JSON.parse(decodeURIComponent(dataString));
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            Swal.fire({
+                title: t.toast_pdf_gen,
+                didOpen: () => Swal.showLoading(),
+                background: '#1c1c2d', color: '#fff'
+            });
+
+            // 1. Buat Elemen HTML Sementara (Desain Tiket Putih Bersih)
+            const element = document.createElement('div');
+            
+            // Tentukan konten berdasarkan tipe (Event vs Streaming)
+            let contentMiddle = '';
+            let labelType = '';
+            
+            if (data.isStreaming) {
+                labelType = t.lbl_account_premium;
+                contentMiddle = `
+                    <div style="background: #f0fdf4; border: 1px dashed #16a34a; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                        <p style="margin:0; font-size: 12px; color: #166534; font-weight: bold;">AKUN / CREDENTIALS:</p>
+                        <p style="margin:5px 0 0 0; font-size: 16px; font-family: monospace; color: #15803d; word-break: break-all;">${data.desc || '-'}</p>
+                    </div>
+                `;
+            } else {
+                labelType = t.lbl_ticket_entry;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${data.code}&bgcolor=ffffff`;
+                contentMiddle = `
+                    <div style="margin: 20px 0;">
+                        <img src="${qrUrl}" style="width: 180px; height: 180px; border: 4px solid #333; padding: 5px; border-radius: 10px;">
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">${t.pdf_info}</p>
+                    </div>
+                `;
+            }
+
+            // Template HTML Tiket (Mirip Tiket Pesawat/Konser Fisik)
+            element.innerHTML = `
+                <div style="padding: 30px; font-family: sans-serif; background: #fff; color: #000; width: 450px; border: 1px solid #ddd;">
+                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin:0; color: #0049CC;">RCELLFEST</h2>
+                        <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <h1 style="margin: 0; font-size: 22px; line-height: 1.2;">${data.eventName}</h1>
+                        <p style="margin: 5px 0; color: #555; font-size: 14px;">
+                            ${data.date} | ${data.location}
+                        </p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        ${contentMiddle}
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 10px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin:0; font-size: 10px; color: #999;">BOOKING ID / TICKET CODE</p>
+                        <p style="margin:0; font-size: 18px; font-weight: bold; letter-spacing: 2px; font-family: monospace;">${data.code}</p>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <p style="margin:0;">Ordered by: ${data.userName}</p>
+                        <p style="margin:2px 0;">${t.pdf_footer}</p>
+                        <p style="margin:0;">www.rcellfest.shop</p>
+                    </div>
+                </div>
+            `;
+
+            // Konfigurasi html2pdf
+            const opt = {
+                margin:       10,
+                filename:     `Tiket-${data.eventName.replace(/\s+/g, '-')}-${data.code}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // useCORS penting agar gambar QR code terload
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+
+            // Generate & Download
+            html2pdf().set(opt).from(element).save().then(() => {
+                Swal.close();
+            }).catch(err => {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal membuat PDF.', background: '#1c1c2d', color: '#fff' });
+            });
         }
 
         // Helper Copy
