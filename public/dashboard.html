@@ -75,6 +75,9 @@
             overflow: hidden;
             transition: transform 0.3s;
             position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .ticket-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: rgba(255, 255, 255, 0.3); }
 
@@ -86,7 +89,7 @@
         }
         .ticket-header.streaming { background: linear-gradient(90deg, #11998e, #38ef7d); }
 
-        .ticket-body { padding: 25px; text-align: center; }
+        .ticket-body { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
 
         /* QR Code Container */
         .qr-container {
@@ -121,6 +124,14 @@
             letter-spacing: 2px;
             display: inline-block;
             margin-top: 10px;
+        }
+
+        .ticket-date {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
         }
 
         /* Buttons */
@@ -173,11 +184,16 @@
             <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
                 <i class="bi bi-ticket-perforated-fill text-info"></i> RCELLFEST
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="btn btn-glass btn-sm d-none d-md-block">
+            
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-light rounded-pill fw-bold" id="lang-btn" style="min-width: 40px;">
+                    ID
+                </button>
+
+                <a href="index.html" class="btn btn-glass btn-sm d-none d-md-block" data-i18n="nav_home">
                     <i class="bi bi-house-door me-1"></i> Home
                 </a>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-4" data-i18n="nav_logout">
                     <i class="bi bi-box-arrow-right me-1"></i> Keluar
                 </button>
             </div>
@@ -201,26 +217,26 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <button onclick="openNameModal()" class="btn btn-glass me-2">
-                        <i class="bi bi-pencil-square"></i> Edit Profil
+                        <i class="bi bi-pencil-square"></i> <span data-i18n="btn_edit_profile">Edit Profil</span>
                     </button>
                     <button onclick="openPassModal()" class="btn btn-glass">
-                        <i class="bi bi-key"></i> Password
+                        <i class="bi bi-key"></i> <span data-i18n="btn_password">Password</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-white mb-0"><i class="bi bi-collection-play me-2 text-info"></i> Aset Digital Saya</h4>
+            <h4 class="fw-bold text-white mb-0"><i class="bi bi-collection-play me-2 text-info"></i> <span data-i18n="section_assets">Aset Digital Saya</span></h4>
             <a href="index.html" class="btn btn-primary-neon btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> Beli Baru
+                <i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span>
             </a>
         </div>
 
         <div id="ticketList" class="row g-4">
             <div class="col-12 text-center py-5">
                 <div class="spinner-border text-info" role="status"></div>
-                <p class="mt-3 text-white-50">Mengambil data tiket...</p>
+                <p class="mt-3 text-white-50" data-i18n="loading_tickets">Mengambil data tiket...</p>
             </div>
         </div>
     </div>
@@ -229,15 +245,15 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Ubah Nama</h5>
+                    <h5 class="modal-title fw-bold" data-i18n="modal_name_title">Ubah Nama</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <label class="text-white-50 mb-2">Nama Lengkap Baru</label>
-                    <input type="text" id="inputNewName" class="form-control" placeholder="Masukkan nama...">
+                    <label class="text-white-50 mb-2" data-i18n="modal_name_label">Nama Lengkap Baru</label>
+                    <input type="text" id="inputNewName" class="form-control" placeholder="...">
                 </div>
                 <div class="modal-footer">
-                    <button onclick="saveName()" class="btn btn-primary-neon w-100">Simpan Perubahan</button>
+                    <button onclick="saveName()" class="btn btn-primary-neon w-100" data-i18n="btn_save">Simpan Perubahan</button>
                 </div>
             </div>
         </div>
@@ -247,21 +263,21 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Ganti Password</h5>
+                    <h5 class="modal-title fw-bold" data-i18n="modal_pass_title">Ganti Password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="text-white-50 mb-2">Password Lama</label>
+                        <label class="text-white-50 mb-2" data-i18n="modal_pass_old">Password Lama</label>
                         <input type="password" id="oldPass" class="form-control">
                     </div>
                     <div>
-                        <label class="text-white-50 mb-2">Password Baru</label>
+                        <label class="text-white-50 mb-2" data-i18n="modal_pass_new">Password Baru</label>
                         <input type="password" id="newPass" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button onclick="savePassword()" class="btn btn-primary-neon w-100">Update Password</button>
+                    <button onclick="savePassword()" class="btn btn-primary-neon w-100" data-i18n="btn_update_pass">Update Password</button>
                 </div>
             </div>
         </div>
@@ -271,9 +287,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // --- KAMUS BAHASA ---
+        const translations = {
+            id: {
+                nav_home: "Home",
+                nav_logout: "Keluar",
+                btn_edit_profile: "Edit Profil",
+                btn_password: "Password",
+                section_assets: "Aset Digital Saya",
+                btn_buy_new: "Beli Baru",
+                loading_tickets: "Mengambil data tiket...",
+                empty_tickets: "Belum ada tiket atau aset digital.",
+                modal_name_title: "Ubah Nama",
+                modal_name_label: "Nama Lengkap Baru",
+                btn_save: "Simpan Perubahan",
+                modal_pass_title: "Ganti Password",
+                modal_pass_old: "Password Lama",
+                modal_pass_new: "Password Baru",
+                btn_update_pass: "Update Password",
+                lbl_account_premium: "AKUN PREMIUM",
+                lbl_ticket_entry: "TIKET MASUK",
+                lbl_scan: "SCAN DI LOKASI",
+                lbl_credentials: "CREDENTIALS:",
+                btn_copy: "Salin Akun",
+                status_used: "SUDAH DIPAKAI",
+                status_active: "TIKET AKTIF",
+                txt_date_tba: "Tanggal TBA",
+                toast_copy: "Berhasil disalin!",
+                alert_success_title: "Sukses",
+                alert_name_updated: "Nama diperbarui",
+                alert_relogin: "Silakan login ulang",
+                alert_fail_title: "Gagal",
+                alert_pass_wrong: "Password salah"
+            },
+            en: {
+                nav_home: "Home",
+                nav_logout: "Logout",
+                btn_edit_profile: "Edit Profile",
+                btn_password: "Password",
+                section_assets: "My Digital Assets",
+                btn_buy_new: "Buy New",
+                loading_tickets: "Loading tickets...",
+                empty_tickets: "No tickets or digital assets found.",
+                modal_name_title: "Change Name",
+                modal_name_label: "New Full Name",
+                btn_save: "Save Changes",
+                modal_pass_title: "Change Password",
+                modal_pass_old: "Old Password",
+                modal_pass_new: "New Password",
+                btn_update_pass: "Update Password",
+                lbl_account_premium: "PREMIUM ACCOUNT",
+                lbl_ticket_entry: "ENTRY TICKET",
+                lbl_scan: "SCAN AT VENUE",
+                lbl_credentials: "CREDENTIALS:",
+                btn_copy: "Copy Account",
+                status_used: "USED",
+                status_active: "ACTIVE TICKET",
+                txt_date_tba: "Date TBA",
+                toast_copy: "Copied successfully!",
+                alert_success_title: "Success",
+                alert_name_updated: "Name updated",
+                alert_relogin: "Please login again",
+                alert_fail_title: "Failed",
+                alert_pass_wrong: "Incorrect password"
+            }
+        };
+
         // INIT
         const user = JSON.parse(localStorage.getItem('userData'));
         if (!user) window.location.href = 'user-login.html';
+        
+        // Init Language
+        const savedLang = localStorage.getItem('lang') || 'id';
+        updateLanguage(savedLang);
 
         function renderProfile() {
             document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
@@ -281,10 +367,66 @@
         }
         renderProfile();
 
-        // LOAD TICKETS (API GAMBAR QR)
+        // --- SCRIPT BAHASA ---
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLanguage(newLang);
+            loadTickets(); // Reload tiket agar bahasa di kartu berubah
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            
+            // Update Text Statis
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) {
+                    // Cek jika elemen punya icon, jangan ditimpa iconnya
+                    if(el.querySelector('i')) {
+                        const icon = el.querySelector('i').outerHTML;
+                        el.innerHTML = `${icon} ${t[key]}`;
+                    } else {
+                        el.innerHTML = t[key];
+                    }
+                }
+            });
+
+            // Update Tombol Bahasa
+            const langBtn = document.getElementById('lang-btn');
+            langBtn.innerText = lang.toUpperCase();
+            if(lang === 'en') {
+                langBtn.classList.remove('btn-outline-light');
+                langBtn.classList.add('btn-light');
+            } else {
+                langBtn.classList.add('btn-outline-light');
+                langBtn.classList.remove('btn-light');
+            }
+        }
+
+        // LOAD TICKETS
         async function loadTickets() {
             const list = document.getElementById('ticketList');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
             try {
+                // Gunakan Data Dummy JIKA API gagal/maintenance (opsional, bisa dihapus jika API sudah ready)
+                /* const tickets = [
+                    {
+                        ticketCode: 'RCELL-12345',
+                        status: 'active',
+                        eventId: {
+                            name: 'Konser Musik Kemerdekaan',
+                            category: 'Konser',
+                            date: '2025-08-17', // Format YYYY-MM-DD
+                        }
+                    }
+                ]; 
+                */
+                
+                // Fetch API Asli
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
@@ -292,23 +434,37 @@
                 const tickets = await res.json();
 
                 if(tickets.length === 0) {
-                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-white-50">Belum ada tiket atau aset digital.</p></div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5"><p class="text-white-50">${t.empty_tickets}</p></div>`;
                     return;
                 }
 
                 let htmlContent = '';
 
-                tickets.forEach(t => {
-                    const event = t.eventId;
+                tickets.forEach(ticket => {
+                    const event = ticket.eventId;
                     if(!event) return;
 
                     const category = event.category || 'General';
                     const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream') || category.toLowerCase().includes('akun');
                     
-                    // Style
+                    // Format Tanggal
+                    let dateStr = t.txt_date_tba;
+                    if (event.date) {
+                        try {
+                            const dateObj = new Date(event.date);
+                            dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {
+                                weekday: 'long', 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric'
+                            });
+                        } catch (e) { dateStr = event.date; }
+                    }
+
+                    // Style & Labels
                     const headerClass = isStreaming ? 'streaming' : '';
                     const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
-                    const labelHeader = isStreaming ? 'AKUN PREMIUM' : 'TIKET MASUK';
+                    const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
 
                     let mainContent = '';
 
@@ -316,24 +472,24 @@
                         const credentials = event.description || "Detail tidak tersedia.";
                         mainContent = `
                             <div class="account-box">
-                                <small class="d-block mb-1 text-white-50">CREDENTIALS:</small>
+                                <small class="d-block mb-1 text-white-50">${t.lbl_credentials}</small>
                                 <div class="fw-bold">${credentials}</div>
                             </div>
                             <button onclick="copyToClipboard('${credentials.replace(/\n/g, ' ')}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
-                                <i class="bi bi-copy me-1"></i> Salin Akun
+                                <i class="bi bi-copy me-1"></i> ${t.btn_copy}
                             </button>
                         `;
                     } else {
                         // QR Code API
-                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${t.ticketCode}&bgcolor=ffffff`;
+                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
                         mainContent = `
-                            <small class="text-white-50 fw-bold mb-2 d-block">SCAN DI LOKASI</small>
+                            <small class="text-white-50 fw-bold mb-2 d-block">${t.lbl_scan}</small>
                             <div class="qr-container">
                                 <img src="${qrUrl}" alt="QR Code" class="qr-image">
                             </div>
                             <div class="mt-2">
-                                <span class="badge ${t.status === 'used' ? 'bg-secondary' : 'bg-success'} rounded-pill">
-                                    ${t.status === 'used' ? 'SUDAH DIPAKAI' : 'TIKET AKTIF'}
+                                <span class="badge ${ticket.status === 'used' ? 'bg-secondary' : 'bg-success'} rounded-pill">
+                                    ${ticket.status === 'used' ? t.status_used : t.status_active}
                                 </span>
                             </div>
                         `;
@@ -345,13 +501,14 @@
                                 <div class="ticket-header ${headerClass}">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h5 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">${event.name}</h5>
-                                        <span class="badge bg-white text-dark bg-opacity-75">${labelHeader}</span>
+                                        <span class="badge bg-white text-dark bg-opacity-75" style="font-size: 0.7rem;">${labelHeader}</span>
                                     </div>
                                     <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
                                 </div>
                                 <div class="ticket-body">
+                                    <span class="ticket-date"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
                                     ${mainContent}
-                                    <div class="ticket-code text-white">${t.ticketCode}</div>
+                                    <div class="ticket-code text-white">${ticket.ticketCode}</div>
                                 </div>
                             </div>
                         </div>
@@ -363,36 +520,45 @@
             } catch (err) { console.error(err); }
         }
 
-        // Helper
+        // Helper Copy
         function copyToClipboard(text) {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            
             navigator.clipboard.writeText(text);
             const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' });
-            Toast.fire({ icon: 'success', title: 'Berhasil disalin!' });
+            Toast.fire({ icon: 'success', title: t.toast_copy });
         }
 
         // Modal Logic
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
         function openNameModal() { document.getElementById('inputNewName').value = user.fullName || user.username; nameModal.show(); }
         async function saveName() {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
             const newName = document.getElementById('inputNewName').value;
             if(!newName) return;
             try {
                 await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
                 user.fullName = newName; user.username = newName; localStorage.setItem('userData', JSON.stringify(user));
-                renderProfile(); nameModal.hide(); Swal.fire({ title: 'Sukses', text: 'Nama diperbarui', icon: 'success', background: '#1c1c2d', color: '#fff' });
+                renderProfile(); nameModal.hide(); Swal.fire({ title: t.alert_success_title, text: t.alert_name_updated, icon: 'success', background: '#1c1c2d', color: '#fff' });
             } catch(e) {}
         }
 
         const passModal = new bootstrap.Modal(document.getElementById('passModal'));
         function openPassModal() { passModal.show(); }
         async function savePassword() {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
             const oldPass = document.getElementById('oldPass').value;
             const newPass = document.getElementById('newPass').value;
             if(!oldPass || !newPass) return;
             try {
                 const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, oldPassword:oldPass, newPassword:newPass}) });
-                if(res.ok) { passModal.hide(); Swal.fire({ title: 'Sukses', text: 'Silakan login ulang', icon: 'success', background: '#1c1c2d', color: '#fff' }).then(()=>logout()); }
-                else { Swal.fire({ title: 'Gagal', text: 'Password salah', icon: 'error', background: '#1c1c2d', color: '#fff' }); }
+                if(res.ok) { passModal.hide(); Swal.fire({ title: t.alert_success_title, text: t.alert_relogin, icon: 'success', background: '#1c1c2d', color: '#fff' }).then(()=>logout()); }
+                else { Swal.fire({ title: t.alert_fail_title, text: t.alert_pass_wrong, icon: 'error', background: '#1c1c2d', color: '#fff' }); }
             } catch(e) {}
         }
 
