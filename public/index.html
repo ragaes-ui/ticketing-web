@@ -8,62 +8,20 @@
     <script>
         (async function() {
             try {
-                // 1. Cek status maintenance dari backend
                 const res = await fetch('/api/maintenance'); 
                 const data = await res.json();
-                
-                // 2. Cek apakah user adalah admin (punya token admin)
                 const isAdmin = localStorage.getItem('adminToken'); 
-
-                // 3. Logika: Jika Maintenance AKTIF dan user BUKAN Admin
                 if (data.isActive && !isAdmin) {
-                    document.documentElement.innerHTML = `
-                        <head>
-                            <title>Maintenance | RCELLFEST</title>
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <style>
-                                body { margin: 0; padding: 0; font-family: sans-serif; 
-                                background: #0e1e3b; height: 100vh; display: flex; flex-direction: column;
-                                align-items: center; justify-content: center; color: white; text-align: center; }
-                                h1 { font-size: 2.5rem; margin-bottom: 10px; }
-                                p { color: #ccc; margin-bottom: 30px; }
-                                .btn { background: white; color: #0e1e3b; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; text-decoration: none; transition: 0.3s; }
-                                .btn:hover { transform: scale(1.05); }
-                            </style>
-                        </head>
-                        <body>
-                            <div>
-                                <h1 style="font-size: 3rem;">🚧</h1>
-                                <h1>Lagi Didandanin! ✨</h1>
-                                <p>Website sedang dalam perbaikan rutin. Silakan kembali lagi nanti ya!</p>
-                                <button onclick="location.reload()" class="btn">Coba Refresh</button>
-                                <br><br>
-                                <a href="login.html" style="color: #555; font-size: 0.8rem; text-decoration: none;">Login Admin</a>
-                            </div>
-                        </body>
-                    `;
-                } else if (data.isActive && isAdmin) {
-                    console.log("🔓 Maintenance Mode AKTIF (Admin Bypass)");
-                    // Optional: Tanda visual untuk admin
-                    window.addEventListener('DOMContentLoaded', () => {
-                        const badge = document.createElement('div');
-                        badge.innerHTML = 'MAINTENANCE MODE (Admin View)';
-                        badge.style.cssText = 'position:fixed;bottom:10px;left:10px;background:red;color:white;padding:5px 10px;z-index:9999;border-radius:5px;font-size:12px;font-weight:bold;pointer-events:none;';
-                        document.body.appendChild(badge);
-                    });
+                    document.documentElement.innerHTML = `<head><title>Maintenance</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:0;font-family:sans-serif;background:#0e1e3b;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center}.btn{background:white;color:#0e1e3b;border:none;padding:10px 25px;border-radius:50px;cursor:pointer;font-weight:bold}</style></head><body><h1>🚧 Lagi Didandanin! ✨</h1><p>Website sedang maintenance rutin.</p><button onclick="location.reload()" class="btn">Refresh</button></body>`;
                 }
-            } catch (err) { 
-                console.log("⚠️ Gagal cek maintenance (mungkin offline), lanjut load website...");
-            }
+            } catch (err) {}
         })();
     </script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
-    
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
@@ -98,6 +56,29 @@
             --cat-text-active: #60a5fa;
         }
 
+        /* --- PRELOADER CSS (BARU) --- */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-body);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .preloader-icon {
+            font-size: 3rem; color: #0049CC; animation: bounce 1.5s infinite;
+        }
+        .preloader-text {
+            margin-top: 15px; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(135deg, #0049CC, #00c6ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hide-loader { opacity: 0; visibility: hidden; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
         /* --- GLOBAL STYLES --- */
         body {
             font-family: 'Inter', sans-serif;
@@ -109,113 +90,47 @@
         }
 
         /* Navbar */
-        .navbar {
-            background-color: var(--bg-nav) !important;
-            box-shadow: 0 1px 10px var(--shadow-color);
-            padding: 12px 0;
-            height: 76px;
-            transition: background-color 0.3s;
-        }
-        .navbar-brand {
-            font-weight: 800;
-            color: #0049CC !important;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
+        .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
         .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
         .nav-link:hover { color: #0049CC; }
         [data-theme="dark"] .nav-link { color: #e2e8f0; }
         [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
         /* Hero */
-        .hero-section {
-            background: linear-gradient(135deg, #0049CC 0%, #007bff 100%);
-            padding: 60px 0 100px 0;
-            color: white;
-            position: relative;
-            width: 100%;
-            margin: 0;
-        }
+        .hero-section { background: linear-gradient(135deg, #0049CC 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; width: 100%; margin: 0; }
         .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
-        @media (max-width: 768px) {
-            .hero-section { padding: 40px 0 90px 0; }
-            .hero-title { font-size: 2rem; }
-            .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; }
-        }
-        @media (min-width: 769px) {
-            .hero-title { font-size: 3.5rem; }
-            .hero-lead { font-size: 1.2rem; }
-        }
-        .hero-bg-circle {
-            position: absolute; width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%; top: -50px; right: -50px; pointer-events: none;
-        }
+        @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
+        @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
+        .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
         
         /* Search */
         .search-wrapper { margin-top: -45px; position: relative; z-index: 10; padding: 0 15px; }
-        .search-box {
-            background: var(--bg-card); padding: 8px; border-radius: 50px;
-            box-shadow: 0 8px 25px var(--shadow-color);
-            display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto;
-        }
-        .search-input { 
-            border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%;
-            background: transparent; color: var(--text-main); 
-        }
+        .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 8px 25px var(--shadow-color); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; }
+        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
         [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
-        .btn-search {
-            background: #0049CC; color: white; border: none; padding: 10px 25px;
-            border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap;
-        }
+        .btn-search { background: #0049CC; color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
         .btn-search:hover { background: #003db3; }
 
         /* Categories */
         .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
         .category-item:hover, .category-item.active { background: var(--hover-cat); transform: scale(1.05); }
         .category-item.active .cat-text { color: var(--cat-text-active); font-weight: 800; }
-        .icon-circle {
-            width: 45px; height: 45px; background: #e6f0ff; color: #0049CC;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin: 0 auto 8px auto;
-        }
+        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: var(--cat-text-color); }
 
         /* Cards */
-        .card-event {
-            border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s; background: var(--bg-card); height: 100%;
-            display: flex; flex-direction: column; cursor: pointer;
-        }
+        .card-event { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; background: var(--bg-card); height: 100%; display: flex; flex-direction: column; cursor: pointer; }
         .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--shadow-color); border-color: transparent; }
-        .card-img-top {
-            height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center;
-            position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px;
-        }
-        .card-img-top::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none;
-        }
-        .category-badge-img {
-            position: relative; z-index: 2; background: rgba(0, 73, 204, 0.95); color: white; 
-            font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-weight: 700; letter-spacing: 0.5px;
-        }
-        .date-float {
-            position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); 
-            color: #0049CC; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+        .card-img-top { height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px; }
+        .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
+        .category-badge-img { position: relative; z-index: 2; background: rgba(0, 73, 204, 0.95); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
+        .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: #0049CC; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
         .event-venue { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
-        .btn-outline-book {
-            border: 1px solid #0049CC; color: #0049CC; font-weight: 600; padding: 8px; 
-            border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem;
-            position: relative; z-index: 2;
-        }
+        .btn-outline-book { border: 1px solid #0049CC; color: #0049CC; font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
         .btn-outline-book:hover { background: #0049CC; color: white; }
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
 
@@ -224,24 +139,12 @@
         .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
         .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
         .footer-link:hover { color: white; text-decoration: underline; }
-        .social-btn {
-            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            display: inline-flex; align-items: center; justify-content: center;
-            color: white; margin-right: 8px; text-decoration: none;
-        }
+        .social-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 8px; text-decoration: none; }
         .social-btn:hover { background: white; color: #0e1e3b; }
 
         /* Modal */
-        .modal-header-img {
-            height: 250px; background-color: #ddd; background-size: cover; background-position: center;
-            display: flex; align-items: flex-end; justify-content: flex-start; color: white; font-size: 3rem;
-            border-radius: 12px 12px 0 0; padding: 20px; position: relative;
-        }
-        .modal-header-img::before {
-            content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
-            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
-            border-radius: 12px 12px 0 0;
-        }
+        .modal-header-img { height: 250px; background-color: #ddd; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: flex-start; color: white; font-size: 3rem; border-radius: 12px 12px 0 0; padding: 20px; position: relative; }
+        .modal-header-img::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%); border-radius: 12px 12px 0 0; }
         .modal-content { border-radius: 16px; border: none; background-color: var(--bg-nav); color: var(--text-main); }
         .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
         .modal-desc-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
@@ -250,17 +153,8 @@
         [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
         /* Floating Help */
-        .btn-help-floating {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: white; color: #0049CC; border: 2px solid #0049CC;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2);
-            z-index: 9999; transition: all 0.3s; font-size: 1.5rem;
-        }
-        .btn-help-floating:hover {
-            transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3);
-            background: #0049CC; color: white;
-        }
+        .btn-help-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: white; color: #0049CC; border: 2px solid #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2); z-index: 9999; transition: all 0.3s; font-size: 1.5rem; }
+        .btn-help-floating:hover { transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3); background: #0049CC; color: white; }
 
         /* Partners */
         .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; overflow: hidden; }
@@ -275,6 +169,14 @@
     </style>
 </head>
 <body>
+
+    <div id="preloader">
+        <i class="bi bi-ticket-detailed-fill preloader-icon"></i>
+        <div class="preloader-text">RCELLFEST</div>
+        <div class="spinner-border text-primary mt-3" role="status" style="width: 2rem; height: 2rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
@@ -324,42 +226,11 @@
 
     <div class="container">
         <div class="row justify-content-center mb-5 g-2 px-2">
-            
-            <div class="col-3 col-md-2" onclick="filterCategory('All')">
-                <div class="category-item" id="btn-cat-All">
-                    <div class="icon-circle"><i class="bi bi-grid-fill"></i></div>
-                    <div class="cat-text" data-i18n="cat_all">Semua</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Konser')">
-                <div class="category-item" id="btn-cat-Konser">
-                    <div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div>
-                    <div class="cat-text" data-i18n="cat_concert">Konser</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')">
-                <div class="category-item" id="btn-cat-Olahraga">
-                    <div class="icon-circle"><i class="bi bi-trophy-fill"></i></div>
-                    <div class="cat-text" data-i18n="cat_sports">Olahraga</div>
-                </div>
-            </div>
-
-            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')">
-                <div class="category-item" id="btn-cat-Workshop">
-                    <div class="icon-circle"><i class="bi bi-palette-fill"></i></div>
-                    <div class="cat-text" data-i18n="cat_workshop">Workshop</div>
-                </div>
-            </div>
-            
-            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')">
-                <div class="category-item" id="btn-cat-Streaming">
-                    <div class="icon-circle"><i class="bi bi-camera-reels"></i></div>
-                    <div class="cat-text" data-i18n="cat_streaming">Streaming</div>
-                </div>
-            </div>
-
+            <div class="col-3 col-md-2" onclick="filterCategory('All')"><div class="category-item" id="btn-cat-All"><div class="icon-circle"><i class="bi bi-grid-fill"></i></div><div class="cat-text" data-i18n="cat_all">Semua</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Konser')"><div class="category-item" id="btn-cat-Konser"><div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div><div class="cat-text" data-i18n="cat_concert">Konser</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')"><div class="category-item" id="btn-cat-Olahraga"><div class="icon-circle"><i class="bi bi-trophy-fill"></i></div><div class="cat-text" data-i18n="cat_sports">Olahraga</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')"><div class="category-item" id="btn-cat-Workshop"><div class="icon-circle"><i class="bi bi-palette-fill"></i></div><div class="cat-text" data-i18n="cat_workshop">Workshop</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')"><div class="category-item" id="btn-cat-Streaming"><div class="icon-circle"><i class="bi bi-camera-reels"></i></div><div class="cat-text" data-i18n="cat_streaming">Streaming</div></div></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
@@ -380,32 +251,10 @@
             <p class="partner-title" data-i18n="partner_title">Partner Pembayaran Resmi</p>
             <div class="logos-slider">
                 <div class="logos-slide-track">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
-                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
                 </div>
                 <div class="logos-slide-track">
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
-                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
                 </div>
             </div>
         </div>
@@ -440,7 +289,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (Version 3.1).</small>
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
                 </div>
             </div>
         </div>
@@ -492,129 +341,67 @@
         let allEvents = [];
         let detailModal; 
         
-        // --- KAMUS BAHASA (DICTIONARY) ---
         const translations = {
             id: {
-                nav_explore: "Jelajah",
-                nav_about: "Tentang Kami",
-                nav_guide: "Panduan & Bantuan",
-                nav_login: "Masuk / Daftar",
-                nav_my_ticket: "Tiket Saya",
-                nav_logout: "Keluar",
-                hero_title: "Satu sentuhan,<br>Untuk semua solusi event anda.",
-                hero_subtitle: "Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.",
-                search_placeholder: "Cari konser, artis, atau lokasi...",
-                btn_search: "Cari",
-                cat_all: "Semua",
-                cat_concert: "Konser",
-                cat_sports: "Olahraga",
-                cat_workshop: "Workshop",
-                cat_streaming: "Streaming",
-                section_hot: "Pilihan Hari Ini",
-                link_view_all: "Lihat Semua",
-                loading_text: "Memuat event...",
-                partner_title: "Partner Pembayaran Resmi",
-                footer_about: "Tentang",
-                footer_organizer: "Penyelenggara",
-                footer_career: "Karir",
-                footer_create: "Buat Event",
-                footer_guide: "Panduan",
-                footer_follow: "Ikuti Kami",
-                modal_desc_title: "Deskripsi & Info",
-                modal_price_label: "Harga",
-                btn_buy_ticket: "Beli Tiket",
-                btn_buy_account: "Beli Akun",
-                btn_sold_out: "HABIS",
-                btn_buy_short: "BELI",
-                txt_tba: "Lokasi TBA",
-                txt_date_tba: "Tanggal TBA",
-                alert_login_title: "Login Dulu",
-                alert_login_text: "Silakan login member untuk membeli.",
-                alert_confirm_title: "Konfirmasi",
-                alert_pay_btn: "Bayar"
+                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan & Bantuan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar",
+                hero_title: "Satu sentuhan,<br>Untuk semua solusi event anda.", hero_subtitle: "Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.",
+                search_placeholder: "Cari konser, artis, atau lokasi...", btn_search: "Cari",
+                cat_all: "Semua", cat_concert: "Konser", cat_sports: "Olahraga", cat_workshop: "Workshop", cat_streaming: "Streaming",
+                section_hot: "Pilihan Hari Ini", link_view_all: "Lihat Semua", loading_text: "Memuat event...",
+                partner_title: "Partner Pembayaran Resmi", footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_guide: "Panduan", footer_follow: "Ikuti Kami",
+                modal_desc_title: "Deskripsi & Info", modal_price_label: "Harga", btn_buy_ticket: "Beli Tiket", btn_buy_account: "Beli Akun", btn_sold_out: "HABIS", btn_buy_short: "BELI",
+                txt_tba: "Lokasi TBA", txt_date_tba: "Tanggal TBA", alert_login_title: "Login Dulu", alert_login_text: "Silakan login member untuk membeli.", alert_confirm_title: "Konfirmasi", alert_pay_btn: "Bayar"
             },
             en: {
-                nav_explore: "Explore",
-                nav_about: "About Us",
-                nav_guide: "Help & Guide",
-                nav_login: "Login / Register",
-                nav_my_ticket: "My Tickets",
-                nav_logout: "Logout",
-                hero_title: "One touch,<br>For all your event solutions.",
-                hero_subtitle: "Explore thousands of exciting events, streaming accounts & music concerts. Book your ticket Now.",
-                search_placeholder: "Search concerts, artists, or venue...",
-                btn_search: "Search",
-                cat_all: "All",
-                cat_concert: "Concerts",
-                cat_sports: "Sports",
-                cat_workshop: "Workshop",
-                cat_streaming: "Streaming",
-                section_hot: "Today's Picks",
-                link_view_all: "View All",
-                loading_text: "Loading events...",
-                partner_title: "Official Payment Partners",
-                footer_about: "About",
-                footer_organizer: "Organizer",
-                footer_career: "Career",
-                footer_create: "Create Event",
-                footer_guide: "Guide",
-                footer_follow: "Follow Us",
-                modal_desc_title: "Description & Info",
-                modal_price_label: "Price",
-                btn_buy_ticket: "Buy Ticket",
-                btn_buy_account: "Buy Account",
-                btn_sold_out: "SOLD OUT",
-                btn_buy_short: "BUY",
-                txt_tba: "Venue TBA",
-                txt_date_tba: "Date TBA",
-                alert_login_title: "Login Required",
-                alert_login_text: "Please login to purchase.",
-                alert_confirm_title: "Confirm",
-                alert_pay_btn: "Pay Now"
+                nav_explore: "Explore", nav_about: "About Us", nav_guide: "Help & Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout",
+                hero_title: "One touch,<br>For all your event solutions.", hero_subtitle: "Explore thousands of exciting events, streaming accounts & music concerts. Book your ticket Now.",
+                search_placeholder: "Search concerts, artists, or venue...", btn_search: "Search",
+                cat_all: "All", cat_concert: "Concerts", cat_sports: "Sports", cat_workshop: "Workshop", cat_streaming: "Streaming",
+                section_hot: "Today's Picks", link_view_all: "View All", loading_text: "Loading events...",
+                partner_title: "Official Payment Partners", footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_guide: "Guide", footer_follow: "Follow Us",
+                modal_desc_title: "Description & Info", modal_price_label: "Price", btn_buy_ticket: "Buy Ticket", btn_buy_account: "Buy Account", btn_sold_out: "SOLD OUT", btn_buy_short: "BUY",
+                txt_tba: "Venue TBA", txt_date_tba: "Date TBA", alert_login_title: "Login Required", alert_login_text: "Please login to purchase.", alert_confirm_title: "Confirm", alert_pay_btn: "Pay Now"
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- LOADING LOGIC ---
+        document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
-            // Init Dark Mode
+            // Init Settings
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
-
-            // Init Language
             const savedLang = localStorage.getItem('lang') || 'id';
             updateLanguage(savedLang);
 
             checkLoginStatus();
-            loadEvents();
+            
+            // TUNGGU DATA SELESAI DILOAD
+            await loadEvents();
+
+            // MATIKAN PRELOADER
+            const loader = document.getElementById('preloader');
+            if(loader) loader.classList.add('hide-loader');
         });
 
-        // --- SCRIPT BAHASA ---
+        // --- FUNCTIONS ---
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
             localStorage.setItem('lang', newLang);
             updateLanguage(newLang);
-            
-            // Re-render event list agar teks tombol berubah
             if(allEvents.length > 0) renderEvents(allEvents);
         }
 
         function updateLanguage(lang) {
             const t = translations[lang];
-            
-            // Update Text di elemen ber-atribut data-i18n
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(t[key]) el.innerHTML = t[key];
             });
-
-            // Update Placeholder Input
             const searchInput = document.getElementById('searchInput');
             if(searchInput) searchInput.placeholder = t.search_placeholder;
-
-            // Update Tombol Bahasa
             const langBtn = document.getElementById('lang-btn');
             langBtn.innerText = lang.toUpperCase();
             if(lang === 'en') {
@@ -626,12 +413,10 @@
             }
         }
 
-        // --- SCRIPT DARK MODE ---
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeIcon(newTheme);
@@ -640,7 +425,6 @@
         function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             const btn = document.getElementById('theme-btn');
-            
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
@@ -690,7 +474,6 @@
 
         async function loadEvents() {
             try {
-                // Fetch data dari API asli
                 const res = await fetch('/api/events');
                 allEvents = await res.json();
                 renderEvents(allEvents);
@@ -706,13 +489,7 @@
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
             const btn = document.getElementById(`btn-cat-${category}`);
             if(btn) btn.classList.add('active');
-
-            if (category === 'All') {
-                renderEvents(allEvents);
-            } else {
-                const filtered = allEvents.filter(e => (e.category || 'General') === category);
-                renderEvents(filtered);
-            }
+            if (category === 'All') { renderEvents(allEvents); } else { const filtered = allEvents.filter(e => (e.category || 'General') === category); renderEvents(filtered); }
         }
 
         function getEventImage(event) {
@@ -730,8 +507,6 @@
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
-
-            // Cek Bahasa
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
@@ -745,63 +520,28 @@
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isSoldOut = event.availableSeats <= 0;
-                
-                // Format Tanggal sesuai bahasa
                 let dateStr = t.txt_date_tba;
                 if (event.date) { 
-                    try { 
-                        const dateObj = new Date(event.date);
-                        dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
-                    } catch (e) { dateStr = event.date; } 
+                    try { const dateObj = new Date(event.date); dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); } catch (e) { dateStr = event.date; } 
                 }
-                
                 const catName = event.category || 'General'; 
                 const locationName = event.location || t.txt_tba;
                 const imageUrl = getEventImage(event);
-                
-                // Text Tombol Dinamis
                 let btnText = isSoldOut ? t.btn_sold_out : t.btn_buy_short;
-                if (catName === 'Streaming' && !isSoldOut) {
-                   btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC';
-                }
+                if (catName === 'Streaming' && !isSoldOut) { btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; }
 
-                container.innerHTML += `
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card-event" onclick="showDetail('${event._id}')">
-                            <div class="card-img-top" style="background-image: url('${imageUrl}');">
-                                <span class="category-badge-img">${catName}</span>
-                                <div class="date-float">${dateStr}</div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="event-title text-truncate">${event.name}</h5>
-                                <div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}</div>
-                                <div class="price-val">Rp ${harga}</div>
-                                <button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
-                                    ${btnText}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                container.innerHTML += `<div class="col-6 col-md-4 col-lg-3"><div class="card-event" onclick="showDetail('${event._id}')"><div class="card-img-top" style="background-image: url('${imageUrl}');"><span class="category-badge-img">${catName}</span><div class="date-float">${dateStr}</div></div><div class="card-body"><h5 class="event-title text-truncate">${event.name}</h5><div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}</div><div class="price-val">Rp ${harga}</div><button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">${btnText}</button></div></div></div>`;
             });
         }
 
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
-
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
             let dateStr = t.txt_date_tba;
-            if (event.date) { 
-                try { 
-                    const dateObj = new Date(event.date);
-                    dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); 
-                } catch (e) { dateStr = event.date; } 
-            }
-            
+            if (event.date) { try { const dateObj = new Date(event.date); dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); } catch (e) { dateStr = event.date; } }
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
@@ -810,29 +550,12 @@
             document.getElementById('modalVenue').innerText = event.location || t.txt_tba;
             const imageUrl = getEventImage(event);
             document.getElementById('modalHeaderImg').style.backgroundImage = `url('${imageUrl}')`;
-
             let safeDescription = event.description || (lang === 'id' ? "Deskripsi lengkap belum tersedia." : "Full description not available yet.");
-            if (catName === 'Streaming') {
-                safeDescription = lang === 'id' 
-                    ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal."
-                    : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal.";
-            }
+            if (catName === 'Streaming') { safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; }
             document.getElementById('modalDesc').innerText = safeDescription;
-            
             const btnBuy = document.getElementById('btnModalBuy');
             const isSoldOut = event.availableSeats <= 0;
-            
-            if (isSoldOut) {
-                btnBuy.innerText = t.btn_sold_out;
-                btnBuy.classList.add('disabled', 'btn-secondary');
-                btnBuy.classList.remove('btn-primary');
-                btnBuy.removeAttribute('onclick');
-            } else {
-                btnBuy.innerText = (catName === 'Streaming') ? t.btn_buy_account : t.btn_buy_ticket;
-                btnBuy.classList.remove('disabled', 'btn-secondary');
-                btnBuy.classList.add('btn-primary');
-                btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId); };
-            }
+            if (isSoldOut) { btnBuy.innerText = t.btn_sold_out; btnBuy.classList.add('disabled', 'btn-secondary'); btnBuy.classList.remove('btn-primary'); btnBuy.removeAttribute('onclick'); } else { btnBuy.innerText = (catName === 'Streaming') ? t.btn_buy_account : t.btn_buy_ticket; btnBuy.classList.remove('disabled', 'btn-secondary'); btnBuy.classList.add('btn-primary'); btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId); }; }
             detailModal.show();
         }
 
@@ -841,59 +564,24 @@
             const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
             renderEvents(filtered);
         }
-
         document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
 
         async function buyTicket(eventId) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-
             const userRaw = localStorage.getItem('userData');
-            if (!userRaw) {
-                Swal.fire({ title: t.alert_login_title, text: t.alert_login_text, icon: 'info', confirmButtonText: 'Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
-                return;
-            }
+            if (!userRaw) { Swal.fire({ title: t.alert_login_title, text: t.alert_login_text, icon: 'info', confirmButtonText: 'Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; }); return; }
             const user = JSON.parse(userRaw);
             const event = allEvents.find(e => e._id === eventId);
             const namaPemesan = user.fullName ? user.fullName : user.username;
-
-            const confirm = await Swal.fire({
-                title: t.alert_confirm_title,
-                html: `${lang === 'id' ? 'Beli' : 'Buy'} <b>${event.name}</b>?<br>${t.modal_price_label}: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b>`,
-                icon: 'question', showCancelButton: true, confirmButtonColor: '#0049CC', confirmButtonText: t.alert_pay_btn
-            });
-
+            const confirm = await Swal.fire({ title: t.alert_confirm_title, html: `${lang === 'id' ? 'Beli' : 'Buy'} <b>${event.name}</b>?<br>${t.modal_price_label}: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b>`, icon: 'question', showCancelButton: true, confirmButtonColor: '#0049CC', confirmButtonText: t.alert_pay_btn });
             if (confirm.isConfirmed) {
                 Swal.fire({ title: 'Processing...', didOpen: () => { Swal.showLoading(); } });
-
                 try {
-                    const res = await fetch('/api/payment-token', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email, userId: user.id })
-                    });
+                    const res = await fetch('/api/payment-token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email, userId: user.id }) });
                     const data = await res.json();
                     Swal.close(); 
-
-                    if (res.ok && data.token) {
-                        window.snap.pay(data.token, {
-                            onSuccess: function(result){
-                                Swal.fire('Success!', 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; });
-                            },
-                            onPending: function(result){
-                                Swal.fire('Pending', 'Please complete your payment.', 'info');
-                            },
-                            onError: function(result){
-                                Swal.fire('Failed', 'Payment failed.', 'error');
-                            },
-                            onClose: function(){
-                                fetch('/api/cancel-order', {
-                                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ orderId: data.orderId })
-                                });
-                                Swal.fire('Cancelled', 'You cancelled the payment.', 'info');
-                            }
-                        });
-                    } else { Swal.fire('Error', data.message || 'Error.', 'error'); }
+                    if (res.ok && data.token) { window.snap.pay(data.token, { onSuccess: function(result){ Swal.fire('Success!', 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; }); }, onPending: function(result){ Swal.fire('Pending', 'Please complete your payment.', 'info'); }, onError: function(result){ Swal.fire('Failed', 'Payment failed.', 'error'); }, onClose: function(){ fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); Swal.fire('Cancelled', 'You cancelled the payment.', 'info'); } }); } else { Swal.fire('Error', data.message || 'Error.', 'error'); }
                 } catch (err) { Swal.fire('Error', 'Connection failed.', 'error'); }
             }
         }
