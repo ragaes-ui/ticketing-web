@@ -25,7 +25,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        /* --- DARK MODE VARIABLES --- */
+        /* --- VARIABLES --- */
         :root {
             --bg-body: #ffffff;
             --bg-nav: #ffffff;
@@ -56,39 +56,74 @@
             --cat-text-active: #60a5fa;
         }
 
-        /* --- PRELOADER CSS (BARU) --- */
+        /* --- ✨ PREMIUM PRELOADER ✨ --- */
         #preloader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--bg-body);
             z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.8s;
         }
-        .preloader-icon {
-            font-size: 3rem; color: #0049CC; animation: bounce 1.5s infinite;
+
+        /* Ikon Tengah dengan Efek Pulse */
+        .loader-icon-box {
+            position: relative; width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
         }
-        .preloader-text {
-            margin-top: 15px; font-weight: 800; letter-spacing: 1px;
+        .loader-icon-main {
+            font-size: 3rem; 
             background: linear-gradient(135deg, #0049CC, #00c6ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            z-index: 2; position: relative;
+            animation: icon-float 2s ease-in-out infinite;
         }
-        .hide-loader { opacity: 0; visibility: hidden; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* Cincin Berdenyut di Belakang Ikon */
+        .pulse-ring {
+            position: absolute; width: 100%; height: 100%;
+            border-radius: 50%; border: 2px solid rgba(0, 73, 204, 0.5);
+            opacity: 0; animation: pulse-ripple 2s linear infinite;
+        }
+        .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+
+        /* Teks dengan Efek Mengkilap */
+        .loader-text {
+            font-size: 1.5rem; font-weight: 900; letter-spacing: 4px;
+            background: linear-gradient(90deg, #333, #aaa, #333);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: text-shimmer 3s linear infinite;
+        }
+        [data-theme="dark"] .loader-text { 
+            background: linear-gradient(90deg, #fff, #888, #fff); 
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Loading Bar Tipis */
+        .loader-bar-container {
+            width: 120px; height: 3px; background: rgba(128, 128, 128, 0.2);
+            border-radius: 3px; margin-top: 15px; overflow: hidden;
+        }
+        .loader-bar-fill {
+            height: 100%; width: 0%; background: #0049CC;
+            animation: fill-bar 1.5s ease-in-out infinite;
+        }
+
+        /* Animasi Keyframes */
+        @keyframes pulse-ripple {
+            0% { transform: scale(0.8); opacity: 0.8; border-width: 2px; }
+            100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
+        }
+        @keyframes icon-float { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes text-shimmer { to { background-position: 200% center; } }
+        @keyframes fill-bar { 0% { width: 0%; transform: translateX(-100%); } 50% { width: 100%; transform: translateX(0); } 100% { width: 100%; transform: translateX(100%); } }
+
+        .hide-loader { opacity: 0; visibility: hidden; transform: scale(1.1); }
 
         /* --- GLOBAL STYLES --- */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            padding-top: 76px;
-            overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 76px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
         /* Navbar */
         .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
         .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
@@ -171,10 +206,14 @@
 <body>
 
     <div id="preloader">
-        <i class="bi bi-ticket-detailed-fill preloader-icon"></i>
-        <div class="preloader-text">RCELLFEST</div>
-        <div class="spinner-border text-primary mt-3" role="status" style="width: 2rem; height: 2rem;">
-            <span class="visually-hidden">Loading...</span>
+        <div class="loader-icon-box">
+            <i class="bi bi-ticket-detailed-fill loader-icon-main"></i>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+        </div>
+        <div class="loader-text">RCELLFEST</div>
+        <div class="loader-bar-container">
+            <div class="loader-bar-fill"></div>
         </div>
     </div>
 
@@ -183,7 +222,6 @@
             <a class="navbar-brand" href="#">
                 <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
             </a>
-            
             <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav_explore">Jelajah</a></li>
@@ -191,16 +229,9 @@
                     <li class="nav-item"><a class="nav-link" href="guide.html" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-
             <div class="d-flex align-items-center gap-2">
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">
-                    ID
-                </button>
-
-                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);">
-                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-                </button>
-                
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
+                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
                 <div id="navUserArea">
                     <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
                 </div>
@@ -260,9 +291,7 @@
         </div>
     </section>
     
-    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin">
-        <i class="bi bi-envelope-heart-fill"></i>
-    </a>
+    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin"><i class="bi bi-envelope-heart-fill"></i></a>
 
     <footer class="footer-loket">
         <div class="container">
@@ -289,7 +318,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (version 3.1).</small>
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
                 </div>
             </div>
         </div>
@@ -307,27 +336,21 @@
                         <div>
                             <span class="badge bg-primary mb-2" id="modalCategory">General</span>
                             <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
-                            
                             <div class="text-secondary small mt-2">
                                 <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
                                 &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
                             </div>
                         </div>
                     </div>
-                    
                     <hr>
-                    
                     <h6 class="fw-bold" data-i18n="modal_desc_title">Deskripsi & Info</h6>
                     <p class="modal-desc-text" id="modalDesc"></p>
-
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-secondary d-block" data-i18n="modal_price_label">Harga</small>
                             <div class="modal-price-tag" id="modalPrice">Rp 0</div>
                         </div>
-                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">
-                            Beli Tiket
-                        </button>
+                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">Beli Tiket</button>
                     </div>
                 </div>
             </div>
@@ -380,7 +403,7 @@
             // TUNGGU DATA SELESAI DILOAD
             await loadEvents();
 
-            // MATIKAN PRELOADER
+            // MATIKAN PRELOADER SETELAH DATA READY
             const loader = document.getElementById('preloader');
             if(loader) loader.classList.add('hide-loader');
         });
