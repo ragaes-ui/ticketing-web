@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,22 +9,51 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-nav: #ffffff;
+            --bg-header: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #333333;
+            --text-muted: #555555;
+            --border-color: #eeeeee;
+            --shadow-color: rgba(0,0,0,0.05);
+            --bg-news: #0049CC;
+            --text-news: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-nav: #1e293b;
+            --bg-header: #1e293b;
+            --bg-card: #1e293b;
+            --text-main: #f8f9fa;
+            --text-muted: #cbd5e1;
+            --border-color: #334155;
+            --shadow-color: rgba(0,0,0,0.5);
+            --bg-news: #1e293b;
+            --text-news: #f8f9fa;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             padding-top: 76px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* Navbar Clean */
         .navbar {
-            background-color: white;
-            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            background-color: var(--bg-nav);
+            box-shadow: 0 1px 10px var(--shadow-color);
             padding: 12px 0;
             height: 76px;
+            transition: background-color 0.3s;
         }
         .navbar-brand {
             font-weight: 800;
@@ -33,72 +62,70 @@
             letter-spacing: -0.5px;
             display: flex; align-items: center; gap: 8px;
         }
-        .nav-link { font-weight: 500; color: #555; margin: 0 10px; transition: 0.3s; }
+        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; transition: 0.3s; }
         .nav-link:hover { color: #0049CC; font-weight: 700; }
+        [data-theme="dark"] .nav-link { color: #cbd5e1; }
+        [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
         /* Blog Header */
         .blog-header {
-            background-color: white;
+            background-color: var(--bg-header);
             padding: 60px 0 40px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 40px;
+            transition: background-color 0.3s;
         }
-        .section-title { font-weight: 800; font-size: 2.5rem; letter-spacing: -1px; }
+        .section-title { font-weight: 800; font-size: 2.5rem; letter-spacing: -1px; color: var(--text-main); }
+
+        /* Search Input */
+        .form-control {
+            background-color: var(--bg-body); color: var(--text-main); border-color: var(--border-color);
+        }
+        .form-control:focus {
+            background-color: var(--bg-body); color: var(--text-main); border-color: #0049CC; box-shadow: none;
+        }
+        [data-theme="dark"] .form-control::placeholder { color: #64748b; }
 
         /* Featured Post */
         .featured-card {
-            border: none;
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            color: white;
-            margin-bottom: 50px;
-            cursor: pointer;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: none; border-radius: 20px; overflow: hidden; position: relative;
+            color: white; margin-bottom: 50px; cursor: pointer; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
-        .featured-img {
-            width: 100%; height: 450px; object-fit: cover;
-            transition: transform 0.5s;
-        }
+        .featured-img { width: 100%; height: 450px; object-fit: cover; transition: transform 0.5s; }
         .featured-card:hover .featured-img { transform: scale(1.05); }
         .featured-overlay {
             position: absolute; bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            padding: 40px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 40px;
         }
 
         /* Standard Blog Card */
         .blog-card {
-            background: white; border: none; border-radius: 16px; overflow: hidden;
-            transition: 0.3s; height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            background: var(--bg-card); border: none; border-radius: 16px; overflow: hidden;
+            transition: 0.3s; height: 100%; box-shadow: 0 5px 15px var(--shadow-color);
         }
-        .blog-card:hover {
-            transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 73, 204, 0.1);
-        }
-        .blog-thumb {
-            height: 200px; width: 100%; object-fit: cover; background-color: #eee;
-        }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--shadow-color); }
+        .blog-thumb { height: 200px; width: 100%; object-fit: cover; background-color: #eee; }
         .blog-body { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; }
         .blog-cat {
             font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
             color: #0049CC; margin-bottom: 10px; letter-spacing: 0.5px;
         }
+        [data-theme="dark"] .blog-cat { color: #60a5fa; }
+        
         .blog-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; line-height: 1.4; }
-        .blog-title a { text-decoration: none; color: #333; transition: 0.2s; }
+        .blog-title a { text-decoration: none; color: var(--text-main); transition: 0.2s; }
         .blog-title a:hover { color: #0049CC; }
-        .blog-meta { font-size: 0.85rem; color: #888; margin-top: auto; padding-top: 15px; }
+        [data-theme="dark"] .blog-title a:hover { color: #60a5fa; }
+        
+        .blog-meta { font-size: 0.85rem; color: var(--text-muted); margin-top: auto; padding-top: 15px; }
 
         /* Newsletter */
         .newsletter-section {
-            background: #0049CC; color: white; padding: 60px 0; border-radius: 24px; margin-top: 60px;
-            text-align: center;
+            background: var(--bg-news); color: var(--text-news); padding: 60px 0; 
+            border-radius: 24px; margin-top: 60px; text-align: center; border: 1px solid var(--border-color);
         }
-        .form-control-newsletter {
-            border-radius: 50px; padding: 12px 20px; border: none;
-        }
-        .btn-newsletter {
-            background: #ffce33; color: #333; font-weight: 700; border-radius: 50px; padding: 12px 30px;
-        }
+        .form-control-newsletter { border-radius: 50px; padding: 12px 20px; border: none; }
+        .btn-newsletter { background: #ffce33; color: #333; font-weight: 700; border-radius: 50px; padding: 12px 30px; }
 
         /* Footer */
         .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; font-size: 0.85rem; margin-top: 80px; }
@@ -111,6 +138,10 @@
             color: white; margin-right: 8px; text-decoration: none;
         }
         .social-btn:hover { background: white; color: #0e1e3b; }
+        
+        /* Pagination */
+        .page-link { background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color); }
+        .page-item.disabled .page-link { background-color: var(--bg-body); color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -121,20 +152,26 @@
                 <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Jelajah</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="blog.html">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav_explore">Jelajah</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html" data-i18n="nav_about">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold text-primary" href="#" data-i18n="nav_blog">Blog</a></li>
                 </ul>
             </div>
 
-            <div id="navUserArea">
-                <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">
+                    ID
+                </button>
+
+                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
+
+                <div id="navUserArea">
+                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -143,12 +180,12 @@
         <div class="container">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
                 <div>
-                    <h1 class="section-title">Cerita & Berita</h1>
-                    <p class="text-secondary mb-0">Update terbaru seputar konser, event, dan gaya hidup.</p>
+                    <h1 class="section-title" data-i18n="header_title">Cerita & Berita</h1>
+                    <p class="text-secondary mb-0" data-i18n="header_subtitle">Update terbaru seputar konser, event, dan gaya hidup.</p>
                 </div>
                 <div style="width: 100%; max-width: 300px;">
                     <div class="input-group">
-                        <input type="text" class="form-control border-end-0 rounded-start-pill ps-3" placeholder="Cari artikel...">
+                        <input type="text" class="form-control border-end-0 rounded-start-pill ps-3" id="searchBlog" placeholder="Cari artikel...">
                         <button class="btn btn-outline-secondary border-start-0 rounded-end-pill pe-3" type="button">
                             <i class="bi bi-search"></i>
                         </button>
@@ -164,8 +201,8 @@
             <img src="https://images.unsplash.com/photo-1459749411177-0473ef716175?q=80&w=1200&auto=format&fit=crop" class="featured-img" alt="Featured">
             <div class="featured-overlay">
                 <span class="badge bg-warning text-dark mb-2">HOT NEWS</span>
-                <h2 class="fw-bold display-6">Cara Menang 'War Tiket' Konser Internasional 2026</h2>
-                <p class="mb-0 opacity-75 d-none d-md-block">Simak tips jitu dari para veteran konser untuk mengamankan tiket impianmu tanpa drama calo.</p>
+                <h2 class="fw-bold display-6" data-i18n="feat_title">Cara Menang 'War Tiket' Konser Internasional 2026</h2>
+                <p class="mb-0 opacity-75 d-none d-md-block" data-i18n="feat_desc">Simak tips jitu dari para veteran konser untuk mengamankan tiket impianmu tanpa drama calo.</p>
             </div>
         </div>
 
@@ -175,9 +212,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 1">
                     <div class="blog-body">
-                        <div class="blog-cat">Tips & Trik</div>
-                        <h3 class="blog-title"><a href="#">5 Barang Wajib Bawa Saat Nonton Festival Musik Outdoor</a></h3>
-                        <p class="text-secondary small mb-0">Jangan sampai salah kostum atau kepanasan. Cek checklist ini sebelum berangkat.</p>
+                        <div class="blog-cat" data-i18n="cat_tips">Tips & Trik</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_1_title">5 Barang Wajib Bawa Saat Nonton Festival Musik Outdoor</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_1_desc">Jangan sampai salah kostum atau kepanasan. Cek checklist ini sebelum berangkat.</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 8 Feb 2026 &bull; Oleh Admin
                         </div>
@@ -189,9 +226,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 2">
                     <div class="blog-body">
-                        <div class="blog-cat">Review</div>
-                        <h3 class="blog-title"><a href="#">Recap Keseruan Java Jazz Festival Hari Ke-2</a></h3>
-                        <p class="text-secondary small mb-0">Penampilan memukau dari sang legenda jazz membuat penonton histeris semalam.</p>
+                        <div class="blog-cat" data-i18n="cat_review">Review</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_2_title">Recap Keseruan Java Jazz Festival Hari Ke-2</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_2_desc">Penampilan memukau dari sang legenda jazz membuat penonton histeris semalam.</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 5 Feb 2026 &bull; Oleh Raga Esa
                         </div>
@@ -203,9 +240,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1551818255-e6e10975bc17?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 3">
                     <div class="blog-body">
-                        <div class="blog-cat">Update Sistem</div>
-                        <h3 class="blog-title"><a href="#">Fitur Baru RCELLFEST: Transfer Tiket ke Teman</a></h3>
-                        <p class="text-secondary small mb-0">Kini kamu bisa membelikan tiket untuk teman dan mengirimkannya langsung ke akun mereka.</p>
+                        <div class="blog-cat" data-i18n="cat_update">Update Sistem</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_3_title">Fitur Baru RCELLFEST: Transfer Tiket ke Teman</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_3_desc">Kini kamu bisa membelikan tiket untuk teman dan mengirimkannya langsung ke akun mereka.</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 1 Feb 2026 &bull; Oleh Tim Tech
                         </div>
@@ -217,9 +254,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 4">
                     <div class="blog-body">
-                        <div class="blog-cat">Musik</div>
-                        <h3 class="blog-title"><a href="#">Prediksi Lineup Headliner Festival Musim Panas</a></h3>
-                        <p class="text-secondary small mb-0">Rumor beredar bahwa band rock legendaris ini akan mampir ke Indonesia.</p>
+                        <div class="blog-cat" data-i18n="cat_music">Musik</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_4_title">Prediksi Lineup Headliner Festival Musim Panas</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_4_desc">Rumor beredar bahwa band rock legendaris ini akan mampir ke Indonesia.</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 28 Jan 2026 &bull; Oleh Music Editor
                         </div>
@@ -231,9 +268,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1583244532610-2a234e7c3eca?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 5">
                     <div class="blog-body">
-                        <div class="blog-cat">Lifestyle</div>
-                        <h3 class="blog-title"><a href="#">OOTD Konser K-Pop: Nyaman tapi Tetap Stylish</a></h3>
-                        <p class="text-secondary small mb-0">Inspirasi gaya berpakaian untuk kamu yang mau nonton konser bias kesayangan.</p>
+                        <div class="blog-cat" data-i18n="cat_lifestyle">Lifestyle</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_5_title">OOTD Konser K-Pop: Nyaman tapi Tetap Stylish</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_5_desc">Inspirasi gaya berpakaian untuk kamu yang mau nonton konser bias kesayangan.</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 20 Jan 2026 &bull; Oleh Fashion Stylist
                         </div>
@@ -245,9 +282,9 @@
                 <div class="blog-card">
                     <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600&auto=format&fit=crop" class="blog-thumb" alt="Blog 6">
                     <div class="blog-body">
-                        <div class="blog-cat">Komunitas</div>
-                        <h3 class="blog-title"><a href="#">Meetup Komunitas RCELLFEST Regional Bogor</a></h3>
-                        <p class="text-secondary small mb-0">Dokumentasi keseruan gathering member bulan lalu. Ada kamu gak?</p>
+                        <div class="blog-cat" data-i18n="cat_community">Komunitas</div>
+                        <h3 class="blog-title"><a href="#" data-i18n="blog_6_title">Meetup Komunitas RCELLFEST Regional Bogor</a></h3>
+                        <p class="text-secondary small mb-0" data-i18n="blog_6_desc">Dokumentasi keseruan gathering member bulan lalu. Ada kamu gak?</p>
                         <div class="blog-meta">
                             <i class="bi bi-calendar3"></i> 15 Jan 2026 &bull; Oleh Community Mgr
                         </div>
@@ -261,20 +298,20 @@
             <ul class="pagination justify-content-center">
                 <li class="page-item disabled"><a class="page-link rounded-pill me-2" href="#">Prev</a></li>
                 <li class="page-item active"><a class="page-link rounded-pill me-2 bg-primary border-primary" href="#">1</a></li>
-                <li class="page-item"><a class="page-link rounded-pill me-2 text-dark" href="#">2</a></li>
-                <li class="page-item"><a class="page-link rounded-pill me-2 text-dark" href="#">3</a></li>
-                <li class="page-item"><a class="page-link rounded-pill text-dark" href="#">Next</a></li>
+                <li class="page-item"><a class="page-link rounded-pill me-2" href="#">2</a></li>
+                <li class="page-item"><a class="page-link rounded-pill me-2" href="#">3</a></li>
+                <li class="page-item"><a class="page-link rounded-pill" href="#">Next</a></li>
             </ul>
         </nav>
 
         <div class="newsletter-section">
             <div class="row justify-content-center align-items-center">
                 <div class="col-md-8 px-4">
-                    <h3 class="fw-bold mb-2">Jangan Ketinggalan Info Konser!</h3>
-                    <p class="opacity-75 mb-4">Dapatkan info presale tiket dan promo eksklusif langsung di emailmu.</p>
+                    <h3 class="fw-bold mb-2" data-i18n="news_title">Jangan Ketinggalan Info Konser!</h3>
+                    <p class="opacity-75 mb-4" data-i18n="news_desc">Dapatkan info presale tiket dan promo eksklusif langsung di emailmu.</p>
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control form-control-newsletter" placeholder="Masukkan alamat email kamu">
-                        <button class="btn btn-newsletter" type="button">Langganan</button>
+                        <input type="email" class="form-control form-control-newsletter" id="emailInput" placeholder="Masukkan alamat email kamu">
+                        <button class="btn btn-newsletter" type="button" data-i18n="btn_sub">Langganan</button>
                     </div>
                 </div>
             </div>
@@ -286,22 +323,24 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-6 col-lg-3">
-                    <div class="footer-head">Tentang</div>
-                    <a href="about.html" class="footer-link">Tentang Kami</a>
-                    <a href="blog.html" class="footer-link text-white">Blog</a>
-                    <a href="career.html" class="footer-link">Karir</a>
+                    <div class="footer-head" data-i18n="footer_about">Tentang</div>
+                    <a href="about.html" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
+                    <a href="blog.html" class="footer-link text-white" data-i18n="nav_blog">Blog</a>
+                    <a href="career.html" class="footer-link" data-i18n="footer_career">Karir</a>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="footer-head">Penyelenggara</div>
-                    <a href="create-event.html" class="footer-link">Buat Event</a>
-                    <a href="guide.html" class="footer-link">Panduan</a>
+                    <div class="footer-head" data-i18n="footer_organizer">Penyelenggara</div>
+                    <a href="create-event.html" class="footer-link" data-i18n="footer_create">Buat Event</a>
+                    <a href="guide.html" class="footer-link" data-i18n="nav_guide">Panduan</a>
                     <a href="login.html" class="footer-link text-warning">Login Admin</a>
                 </div>
                 <div class="col-lg-3">
-                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="footer-head" data-i18n="footer_follow">Ikuti Kami</div>
                     <div class="mb-3">
-                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn"><i class="bi bi-youtube"></i></a>
+                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -314,39 +353,138 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Cek Login untuk Navbar
+        // --- KAMUS BAHASA ---
+        const translations = {
+            id: {
+                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_blog: "Blog", nav_guide: "Panduan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar",
+                header_title: "Cerita & Berita", header_subtitle: "Update terbaru seputar konser, event, dan gaya hidup.",
+                feat_title: "Cara Menang 'War Tiket' Konser Internasional 2026", feat_desc: "Simak tips jitu dari para veteran konser untuk mengamankan tiket impianmu tanpa drama calo.",
+                cat_tips: "Tips & Trik", cat_review: "Review", cat_update: "Update Sistem", cat_music: "Musik", cat_lifestyle: "Lifestyle", cat_community: "Komunitas",
+                blog_1_title: "5 Barang Wajib Bawa Saat Nonton Festival Musik Outdoor", blog_1_desc: "Jangan sampai salah kostum atau kepanasan. Cek checklist ini sebelum berangkat.",
+                blog_2_title: "Recap Keseruan Java Jazz Festival Hari Ke-2", blog_2_desc: "Penampilan memukau dari sang legenda jazz membuat penonton histeris semalam.",
+                blog_3_title: "Fitur Baru RCELLFEST: Transfer Tiket ke Teman", blog_3_desc: "Kini kamu bisa membelikan tiket untuk teman dan mengirimkannya langsung ke akun mereka.",
+                blog_4_title: "Prediksi Lineup Headliner Festival Musim Panas", blog_4_desc: "Rumor beredar bahwa band rock legendaris ini akan mampir ke Indonesia.",
+                blog_5_title: "OOTD Konser K-Pop: Nyaman tapi Tetap Stylish", blog_5_desc: "Inspirasi gaya berpakaian untuk kamu yang mau nonton konser bias kesayangan.",
+                blog_6_title: "Meetup Komunitas RCELLFEST Regional Bogor", blog_6_desc: "Dokumentasi keseruan gathering member bulan lalu. Ada kamu gak?",
+                news_title: "Jangan Ketinggalan Info Konser!", news_desc: "Dapatkan info presale tiket dan promo eksklusif langsung di emailmu.", btn_sub: "Langganan",
+                footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_follow: "Ikuti Kami",
+                search_ph: "Cari artikel..."
+            },
+            en: {
+                nav_explore: "Explore", nav_about: "About Us", nav_blog: "Blog", nav_guide: "Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout",
+                header_title: "Stories & News", header_subtitle: "Latest updates on concerts, events, and lifestyle.",
+                feat_title: "How to Win International Concert 'Ticket War' 2026", feat_desc: "Check out these pro tips from concert veterans to secure your dream tickets without scalper drama.",
+                cat_tips: "Tips & Tricks", cat_review: "Review", cat_update: "System Update", cat_music: "Music", cat_lifestyle: "Lifestyle", cat_community: "Community",
+                blog_1_title: "5 Must-Have Items for Outdoor Music Festivals", blog_1_desc: "Don't wear the wrong outfit or get overheated. Check this checklist before you go.",
+                blog_2_title: "Recap: The Excitement of Java Jazz Festival Day 2", blog_2_desc: "A mesmerizing performance from the jazz legend made the audience hysterical last night.",
+                blog_3_title: "New Feature: Transfer Tickets to Friends", blog_3_desc: "Now you can buy tickets for friends and send them directly to their accounts.",
+                blog_4_title: "Summer Festival Headliner Lineup Predictions", blog_4_desc: "Rumors are circulating that this legendary rock band will stop by Indonesia.",
+                blog_5_title: "K-Pop Concert OOTD: Comfy yet Stylish", blog_5_desc: "Outfit inspiration for those of you who want to watch your favorite bias concert.",
+                blog_6_title: "RCELLFEST Bogor Regional Community Meetup", blog_6_desc: "Documentation of last month's member gathering fun. Were you there?",
+                news_title: "Don't Miss Concert Info!", news_desc: "Get ticket presale info and exclusive promos directly to your email.", btn_sub: "Subscribe",
+                footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_follow: "Follow Us",
+                search_ph: "Search articles..."
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Init Settings
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            const savedLang = localStorage.getItem('lang') || 'id';
+            updateLanguage(savedLang);
+
             checkLoginStatus();
         });
+
+        // --- LANGUAGE LOGIC ---
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLanguage(newLang);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            
+            // Update Text Statis
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerHTML = t[key];
+            });
+
+            // Update Placeholder
+            const searchInput = document.getElementById('searchBlog');
+            if(searchInput) searchInput.placeholder = t.search_ph;
+
+            // Update Tombol
+            const langBtn = document.getElementById('lang-btn');
+            langBtn.innerText = lang.toUpperCase();
+            if(lang === 'en') {
+                langBtn.classList.add('btn-primary');
+                langBtn.classList.remove('btn-outline-secondary');
+            } else {
+                langBtn.classList.add('btn-outline-secondary');
+                langBtn.classList.remove('btn-primary');
+            }
+        }
+
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            const btn = document.getElementById('theme-btn');
+            if (theme === 'dark') {
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
+                icon.style.color = "#FFD700";
+                btn.classList.add('btn-dark');
+                btn.classList.remove('btn-light');
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
+                icon.style.color = "";
+                btn.classList.add('btn-light');
+                btn.classList.remove('btn-dark');
+            }
+        }
 
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
 
             if (userRaw) {
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
                     <div class="dropdown">
                         <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle text-primary"></i> 
-                            <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                            <i class="bi bi-person-circle text-primary"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
-                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li>
+                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li>
+                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
                         </ul>
-                    </div>
-                `;
+                    </div>`;
             } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">${t.nav_login}</a>`;
             }
         }
 
-        function logout() {
-            localStorage.removeItem('userData');
-            window.location.reload();
-        }
+        function logout() { localStorage.removeItem('userData'); localStorage.removeItem('userToken'); window.location.reload(); }
     </script>
 </body>
 </html>
