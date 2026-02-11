@@ -11,6 +11,7 @@ const User = require('./models/users');
 const Order = require('./models/order'); 
 const Event = require('./models/event');
 const Config = require('./models/config');
+const LoginHistory = require('./models/history'); // <--- TAMBAHKAN INI ✅
 
 // --- MODEL BARU: RIWAYAT LOGIN ---
 const historySchema = new mongoose.Schema({
