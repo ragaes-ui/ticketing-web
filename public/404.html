@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found | RCELLFEST</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        /* --- VARIABLES (Sama dengan Dashboard) --- */
+        :root {
+            --bg-body: #ffffff;
+            --text-main: #333333;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --primary-color: #0049CC;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f0c29;
+            --text-main: #ffffff;
+            --text-muted: #adb5bd;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --primary-color: #00c6ff;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        /* Background Animation (Dark Mode Only) */
+        [data-theme="dark"] body {
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+
+        /* Blobs */
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.6; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--glass-border);
+            border-radius: 30px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 404 Text */
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .error-icon { font-size: 4rem; color: var(--text-muted); margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        .btn-home {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .btn-home:hover { transform: translateY(-3px) scale(1.05); color: white; box-shadow: 0 8px 25px rgba(0, 114, 255, 0.6); }
+
+        /* Top Bar */
+        .top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 20; }
+        .btn-control { border: 1px solid var(--text-muted); color: var(--text-main); background: transparent; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .btn-control:hover { background: var(--primary-color); color: white; border-color: transparent; }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="top-controls">
+        <button onclick="toggleLanguage()" class="btn-control fw-bold fs-6" id="lang-btn">ID</button>
+        <button onclick="toggleTheme()" class="btn-control"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
+    </div>
+
+    <div class="glass-card">
+        <div class="error-icon">
+            <i class="bi bi-robot"></i>
+        </div>
+        <div class="error-code">404</div>
+        <h2 class="fw-bold mb-3" data-i18n="title">Oops! Salah Jalan?</h2>
+        <p class="text-muted mb-4" data-i18n="desc">Halaman yang kamu cari sepertinya sudah pindah ke planet lain atau tidak pernah ada.</p>
+        
+        <a href="index.html" class="btn-home">
+            <i class="bi bi-arrow-left me-2"></i> <span data-i18n="btn_back">Kembali ke Home</span>
+        </a>
+    </div>
+
+    <script>
+        // --- SETUP BAHASA & TEMA ---
+        
+        // 1. KAMUS BAHASA
+        const translations = {
+            id: {
+                title: "Oops! Salah Jalan?",
+                desc: "Halaman yang kamu cari sepertinya sudah pindah ke planet lain atau tidak pernah ada.",
+                btn_back: "Kembali ke Home"
+            },
+            en: {
+                title: "Oops! Wrong Turn?",
+                desc: "The page you are looking for seems to have moved to another planet or never existed.",
+                btn_back: "Back to Home"
+            }
+        };
+
+        // 2. INIT SAAT LOAD
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cek Tema
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            // Cek Bahasa
+            const savedLang = localStorage.getItem('lang') || 'id';
+            updateLanguage(savedLang);
+        });
+
+        // 3. FUNGSI GANTI BAHASA
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLanguage(newLang);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            const btn = document.getElementById('lang-btn');
+            
+            // Update Tombol
+            if(btn) btn.innerText = lang.toUpperCase();
+
+            // Update Teks Halaman
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+        }
+
+        // 4. FUNGSI GANTI TEMA
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
+            }
+        }
+    </script>
+</body>
+</html>
