@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,20 +11,49 @@
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
-
     <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-nav: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #333333;
+            --text-muted: #555555;
+            --bg-accordion: #ffffff;
+            --bg-accordion-active: #e6f0ff;
+            --text-accordion-active: #0049CC;
+            --border-color: rgba(0,0,0,0.05);
+            --shadow-color: rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-nav: #1e293b;
+            --bg-card: #1e293b;
+            --text-main: #f8f9fa;
+            --text-muted: #cbd5e1;
+            --bg-accordion: #1e293b;
+            --bg-accordion-active: #334155;
+            --text-accordion-active: #60a5fa;
+            --border-color: #334155;
+            --shadow-color: rgba(0,0,0,0.5);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             padding-top: 76px;
+            transition: background-color 0.3s, color 0.3s;
         }
+
         /* Navbar Clean */
         .navbar {
-            background-color: white;
-            box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+            background-color: var(--bg-nav);
+            box-shadow: 0 1px 10px var(--shadow-color);
             padding: 12px 0;
             height: 76px;
+            transition: background-color 0.3s;
         }
         .navbar-brand {
             font-weight: 800;
@@ -33,25 +62,46 @@
             letter-spacing: -0.5px;
             display: flex; align-items: center; gap: 8px;
         }
-        .nav-link { font-weight: 500; color: #555; margin: 0 10px; transition: 0.3s; }
+        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; transition: 0.3s; }
         .nav-link:hover { color: #0049CC; font-weight: 700; }
+        [data-theme="dark"] .nav-link { color: #cbd5e1; }
+        [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
         /* Header Guide */
         .guide-header {
-            background: #0049CC; color: white; padding: 60px 0; text-align: center; margin-bottom: 40px;
+            background: linear-gradient(135deg, #0049CC, #007bff);
+            color: white; padding: 60px 0; text-align: center; margin-bottom: 40px;
         }
 
         /* Custom Accordion */
-        .accordion-item { border: none; margin-bottom: 15px; border-radius: 12px !important; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .accordion-button { font-weight: 600; color: #333; padding: 20px; background: white; }
-        .accordion-button:not(.collapsed) { background-color: #e6f0ff; color: #0049CC; box-shadow: none; }
-        .accordion-button:focus { box-shadow: none; border-color: rgba(0,73,204,0.1); }
-        .accordion-body { font-size: 0.95rem; line-height: 1.6; color: #555; background: white; padding: 20px; }
+        .accordion-item { 
+            border: none; margin-bottom: 15px; border-radius: 12px !important; overflow: hidden; 
+            box-shadow: 0 2px 5px var(--shadow-color);
+            background-color: var(--bg-accordion);
+        }
+        .accordion-button { 
+            font-weight: 600; color: var(--text-main); padding: 20px; 
+            background-color: var(--bg-accordion);
+        }
+        .accordion-button:not(.collapsed) { 
+            background-color: var(--bg-accordion-active); 
+            color: var(--text-accordion-active); 
+            box-shadow: none; 
+        }
+        .accordion-button:focus { box-shadow: none; }
+        .accordion-button::after { filter: grayscale(100%); }
+        [data-theme="dark"] .accordion-button::after { filter: invert(1); }
+        
+        .accordion-body { 
+            font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); 
+            background-color: var(--bg-accordion); padding: 20px; 
+        }
 
         /* Contact Box */
         .contact-box {
-            background: white; padding: 30px; border-radius: 16px; text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-top: 40px;
+            background: var(--bg-card); padding: 30px; border-radius: 16px; text-align: center;
+            box-shadow: 0 5px 20px var(--shadow-color); margin-top: 40px;
+            color: var(--text-main);
         }
         .icon-help { font-size: 3rem; color: #0049CC; margin-bottom: 15px; }
 
@@ -75,41 +125,50 @@
             <a class="navbar-brand" href="index.html">
                 <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            
+            <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Jelajah</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="guide.html">Panduan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav_explore">Jelajah</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html" data-i18n="nav_about">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold text-primary" href="guide.html" data-i18n="nav_guide">Panduan</a></li>
                 </ul>
             </div>
-            <div id="navUserArea">
-                <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>
+
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">
+                    ID
+                </button>
+
+                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
+
+                <div id="navUserArea">
+                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
+                </div>
             </div>
         </div>
     </nav>
 
     <div class="guide-header">
         <div class="container">
-            <h1 class="fw-bold">Pusat Bantuan</h1>
-            <p class="opacity-75">Temukan jawaban atas pertanyaanmu seputar pembelian tiket.</p>
+            <h1 class="fw-bold" data-i18n="header_title">Pusat Bantuan</h1>
+            <p class="opacity-75" data-i18n="header_subtitle">Temukan jawaban atas pertanyaanmu seputar pembelian tiket.</p>
         </div>
     </div>
 
     <div class="container" style="max-width: 800px;">
-        <h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-cart-check-fill me-2"></i>Pembelian & Tiket</h5>
+        <h5 class="fw-bold mb-3" style="color: var(--text-main);"><i class="bi bi-cart-check-fill me-2 text-primary"></i> <span data-i18n="section_purchase">Pembelian & Tiket</span></h5>
         
         <div class="accordion" id="accordionFAQ">
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                        Bagaimana cara membeli tiket?
+                        <span data-i18n="faq_1_q">Bagaimana cara membeli tiket?</span>
                     </button>
                 </h2>
                 <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-                    <div class="accordion-body">
+                    <div class="accordion-body" data-i18n="faq_1_a">
                         1. Pilih event yang diinginkan di halaman utama.<br>
                         2. Klik tombol "Beli Tiket". (Pastikan Anda sudah Login).<br>
                         3. Lakukan pembayaran via metode yang tersedia (QRIS, VA, E-Wallet).<br>
@@ -121,11 +180,11 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                        Saya sudah bayar, tapi tiket belum masuk email?
+                        <span data-i18n="faq_2_q">Saya sudah bayar, tapi tiket belum masuk email?</span>
                     </button>
                 </h2>
                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-                    <div class="accordion-body">
+                    <div class="accordion-body" data-i18n="faq_2_a">
                         Mohon cek folder <strong>Spam / Junk</strong> di email Anda. Terkadang email tiket masuk ke sana.<br><br>
                         Jika tetap tidak ada, silakan cek menu <strong>Tiket Saya</strong> di dashboard akun RCELLFEST Anda. Tiket juga tersimpan di sana.
                     </div>
@@ -135,11 +194,11 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                        Apakah tiket bisa di-refund (dibatalkan)?
+                        <span data-i18n="faq_3_q">Apakah tiket bisa di-refund (dibatalkan)?</span>
                     </button>
                 </h2>
                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-                    <div class="accordion-body">
+                    <div class="accordion-body" data-i18n="faq_3_a">
                         Secara umum, tiket yang sudah dibeli <strong>tidak dapat dikembalikan (non-refundable)</strong>, kecuali jika event dibatalkan oleh penyelenggara. Kebijakan ini tertulis pada Syarat & Ketentuan setiap event.
                     </div>
                 </div>
@@ -148,11 +207,11 @@
              <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                        Bagaimana cara menukarkan E-Ticket di lokasi?
+                        <span data-i18n="faq_4_q">Bagaimana cara menukarkan E-Ticket di lokasi?</span>
                     </button>
                 </h2>
                 <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-                    <div class="accordion-body">
+                    <div class="accordion-body" data-i18n="faq_4_a">
                         Cukup tunjukkan <strong>Barcode / QR Code</strong> yang ada di E-Ticket (melalui HP) kepada petugas di gerbang masuk. Petugas akan memindai kode tersebut untuk validasi. Jangan bagikan kode tiket Anda kepada orang lain!
                     </div>
                 </div>
@@ -161,9 +220,9 @@
 
         <div class="contact-box">
             <i class="bi bi-headset icon-help"></i>
-            <h4 class="fw-bold">Masih butuh bantuan?</h4>
-            <p class="text-secondary">Tim support kami siap membantu kendala Anda.</p>
-            <a href="mailto:ragaes.dev@rcellfest.shop" class="btn btn-primary rounded-pill px-4 fw-bold">Hubungi Kami</a>
+            <h4 class="fw-bold" data-i18n="contact_title">Masih butuh bantuan?</h4>
+            <p class="text-secondary" data-i18n="contact_desc">Tim support kami siap membantu kendala Anda.</p>
+            <a href="mailto:ragaes.dev@rcellfest.shop" class="btn btn-primary rounded-pill px-4 fw-bold" data-i18n="btn_contact">Hubungi Kami</a>
         </div>
 
     </div>
@@ -172,19 +231,19 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-6 col-lg-3">
-                    <div class="footer-head">Tentang</div>
-                    <a href="about.html" class="footer-link">Tentang Kami</a>
+                    <div class="footer-head" data-i18n="footer_about">Tentang</div>
+                    <a href="about.html" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
                     <a href="blog.html" class="footer-link">Blog</a>
-                    <a href="career.html" class="footer-link">Karir</a>
+                    <a href="career.html" class="footer-link" data-i18n="footer_career">Karir</a>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="footer-head">Penyelenggara</div>
-                    <a href="create-event.html" class="footer-link">Buat Event</a>
-                    <a href="guide.html" class="footer-link text-white">Panduan</a>
+                    <div class="footer-head" data-i18n="footer_organizer">Penyelenggara</div>
+                    <a href="create-event.html" class="footer-link" data-i18n="footer_create">Buat Event</a>
+                    <a href="guide.html" class="footer-link text-white" data-i18n="nav_guide">Panduan</a>
                     <a href="login.html" class="footer-link text-warning">Login Admin</a>
                 </div>
                 <div class="col-lg-3">
-                    <div class="footer-head">Ikuti Kami</div>
+                    <div class="footer-head" data-i18n="footer_follow">Ikuti Kami</div>
                     <div class="mb-3">
                         <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
                         <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
@@ -199,18 +258,126 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => { checkLoginStatus(); });
+        // --- KAMUS BAHASA ---
+        const translations = {
+            id: {
+                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar",
+                header_title: "Pusat Bantuan", header_subtitle: "Temukan jawaban atas pertanyaanmu seputar pembelian tiket.",
+                section_purchase: "Pembelian & Tiket",
+                faq_1_q: "Bagaimana cara membeli tiket?", faq_1_a: "1. Pilih event yang diinginkan di halaman utama.<br>2. Klik tombol 'Beli Tiket'. (Pastikan Anda sudah Login).<br>3. Lakukan pembayaran via metode yang tersedia (QRIS, VA, E-Wallet).<br>4. Setelah sukses, tiket akan otomatis muncul di menu 'Tiket Saya' dan dikirim ke email.",
+                faq_2_q: "Saya sudah bayar, tapi tiket belum masuk email?", faq_2_a: "Mohon cek folder <strong>Spam / Junk</strong> di email Anda. Terkadang email tiket masuk ke sana.<br><br>Jika tetap tidak ada, silakan cek menu <strong>Tiket Saya</strong> di dashboard akun RCELLFEST Anda. Tiket juga tersimpan di sana.",
+                faq_3_q: "Apakah tiket bisa di-refund (dibatalkan)?", faq_3_a: "Secara umum, tiket yang sudah dibeli <strong>tidak dapat dikembalikan (non-refundable)</strong>, kecuali jika event dibatalkan oleh penyelenggara. Kebijakan ini tertulis pada Syarat & Ketentuan setiap event.",
+                faq_4_q: "Bagaimana cara menukarkan E-Ticket di lokasi?", faq_4_a: "Cukup tunjukkan <strong>Barcode / QR Code</strong> yang ada di E-Ticket (melalui HP) kepada petugas di gerbang masuk. Petugas akan memindai kode tersebut untuk validasi. Jangan bagikan kode tiket Anda kepada orang lain!",
+                contact_title: "Masih butuh bantuan?", contact_desc: "Tim support kami siap membantu kendala Anda.", btn_contact: "Hubungi Kami",
+                footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_follow: "Ikuti Kami"
+            },
+            en: {
+                nav_explore: "Explore", nav_about: "About Us", nav_guide: "Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout",
+                header_title: "Help Center", header_subtitle: "Find answers to your questions about ticket purchases.",
+                section_purchase: "Purchase & Tickets",
+                faq_1_q: "How to buy a ticket?", faq_1_a: "1. Choose the desired event on the main page.<br>2. Click 'Buy Ticket'. (Ensure you are logged in).<br>3. Complete payment via available methods (QRIS, VA, E-Wallet).<br>4. Once successful, the ticket will automatically appear in 'My Tickets' and be sent to your email.",
+                faq_2_q: "I paid, but the ticket hasn't arrived in my email?", faq_2_a: "Please check your email's <strong>Spam / Junk</strong> folder. Sometimes tickets land there.<br><br>If still missing, check the <strong>My Tickets</strong> menu in your RCELLFEST dashboard. Tickets are also stored there.",
+                faq_3_q: "Can tickets be refunded?", faq_3_a: "Generally, purchased tickets are <strong>non-refundable</strong>, unless the event is cancelled by the organizer. This policy is stated in the Terms & Conditions of each event.",
+                faq_4_q: "How to redeem E-Ticket at the venue?", faq_4_a: "Simply show the <strong>Barcode / QR Code</strong> on your E-Ticket (via phone) to the staff at the entrance gate. Staff will scan the code for validation. Do not share your ticket code with others!",
+                contact_title: "Still need help?", contact_desc: "Our support team is ready to assist you.", btn_contact: "Contact Us",
+                footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_follow: "Follow Us"
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init Settings
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            const savedLang = localStorage.getItem('lang') || 'id';
+            updateLanguage(savedLang);
+
+            checkLoginStatus();
+        });
+
+        // --- LANGUAGE LOGIC ---
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLanguage(newLang);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            
+            // Update Text Statis
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerHTML = t[key];
+            });
+
+            // Update Tombol
+            const langBtn = document.getElementById('lang-btn');
+            langBtn.innerText = lang.toUpperCase();
+            if(lang === 'en') {
+                langBtn.classList.add('btn-primary');
+                langBtn.classList.remove('btn-outline-secondary');
+            } else {
+                langBtn.classList.add('btn-outline-secondary');
+                langBtn.classList.remove('btn-primary');
+            }
+        }
+
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            const btn = document.getElementById('theme-btn');
+            if (theme === 'dark') {
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
+                icon.style.color = "#FFD700";
+                btn.classList.add('btn-dark');
+                btn.classList.remove('btn-light');
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
+                icon.style.color = "";
+                btn.classList.add('btn-light');
+                btn.classList.remove('btn-dark');
+            }
+        }
+
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
             if (userRaw) {
                 const user = JSON.parse(userRaw);
-                navArea.innerHTML = `<div class="dropdown"><button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle text-primary"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span></button><ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3"><li><a class="dropdown-item rounded-2 small" href="dashboard.html">Tiket Saya</a></li><li><hr class="dropdown-divider"></li><li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">Keluar</button></li></ul></div>`;
+                navArea.innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-primary"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
+                        </ul>
+                    </div>`;
             } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">${t.nav_login}</a>`;
             }
         }
-        function logout() { localStorage.removeItem('userData'); window.location.reload(); }
+
+        function logout() { localStorage.removeItem('userData'); localStorage.removeItem('userToken'); window.location.reload(); }
     </script>
 </body>
 </html>
