@@ -12,6 +12,15 @@ const Order = require('./models/order');
 const Event = require('./models/event');
 const Config = require('./models/config');
 
+// --- MODEL BARU: RIWAYAT LOGIN ---
+const historySchema = new mongoose.Schema({
+    userId: String,
+    device: String,
+    ip: String,
+    timestamp: { type: Date, default: Date.now }
+});
+const LoginHistory = mongoose.model('LoginHistory', historySchema);
+
 const app = express();
 
 app.use(cors());
@@ -28,9 +37,10 @@ async function connectDB() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     const opts = { bufferCommands: false, serverSelectionTimeoutMS: 5000 };
+    // Pastikan URI DB Benar
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
-      console.log('✅ DATABASE BARU AJA KONEK!');
+      console.log('✅ DATABASE TERHUBUNG!');
       return mongoose;
     });
   }
@@ -60,7 +70,6 @@ app.get('/api/events', async (req, res) => {
         const events = await Event.find(); 
         const publicEvents = events.map(ev => {
             const eventObj = ev.toObject();
-            // SENSOR PASSWORD DI SINI
             if (eventObj.category === 'Streaming') {
                 eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
             }
@@ -96,7 +105,8 @@ app.delete('/api/events/:id', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API AUTHENTICATION ---
+// --- API AUTHENTICATION & HISTORY ---
+
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
@@ -114,9 +124,32 @@ app.post('/api/login', async (req, res) => {
         const { identifier, password } = req.body;
         const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
+        
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
-        res.json({ success: true, token: "token-rahasia-" + user._id, user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone } });
+
+        // --- UPDATE: SIMPAN RIWAYAT LOGIN ---
+        await LoginHistory.create({
+            userId: user._id,
+            device: req.headers['user-agent'] || "Unknown Device",
+            ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
+        });
+        // ------------------------------------
+
+        res.json({ 
+            success: true, 
+            token: "token-rahasia-" + user._id, 
+            user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone } 
+        });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// --- API TARIK RIWAYAT LOGIN ---
+app.post('/api/history', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const logs = await LoginHistory.find({ userId }).sort({ timestamp: -1 }).limit(10);
+        res.json(logs);
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
@@ -127,7 +160,6 @@ app.post('/api/my-tickets', async (req, res) => {
 
 // --- PAYMENT & ORDER ---
 
-// ✅ API PRIVATE: LIHAT DETAIL ORDER (TERMASUK PASSWORD)
 app.get('/api/orders/:orderId', async (req, res) => {
     try {
         const order = await Order.findOne({ orderIdMidtrans: req.params.orderId }).populate('eventId');
@@ -140,7 +172,6 @@ app.get('/api/orders/:orderId', async (req, res) => {
             credentials: null 
         };
 
-        // HANYA JIKA LUNAS, KIRIM PASSWORD ASLI
         if (order.status === 'valid' || order.status === 'used') {
             responseData.credentials = order.eventId?.description;
         }
@@ -175,7 +206,7 @@ app.post('/api/payment-token', async (req, res) => {
             eventId: eventId,
             customerName: customerName,
             email: customerEmail,
-            status: 'pending',       
+            status: 'pending',        
             orderIdMidtrans: orderId 
         });
         await newOrder.save();
@@ -272,11 +303,13 @@ app.post('/api/maintenance', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ROUTE HANDLER TERAKHIR
 app.get('*', (req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
-// Handler untuk 404 (Taruh Paling Bawah)
+
+// 404 Handler
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
