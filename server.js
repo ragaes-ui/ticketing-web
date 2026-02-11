@@ -276,6 +276,10 @@ app.get('*', (req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
+// Handler untuk 404 (Taruh Paling Bawah)
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
