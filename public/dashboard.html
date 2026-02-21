@@ -11,6 +11,10 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     
+    <script type="text/javascript"
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="SB-Mid-client-B0QVtPjOdqXMklFX"></script>
+
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
@@ -173,6 +177,18 @@
         }
         .form-control:focus { background: rgba(128, 128, 128, 0.1); color: var(--text-main); border-color: #00c6ff; box-shadow: none; }
         [data-theme="dark"] .btn-close { filter: invert(1); }
+        
+        /* Saldo Box */
+        .saldo-box {
+            background: rgba(0, 198, 255, 0.1);
+            border: 1px solid rgba(0, 198, 255, 0.3);
+            border-radius: 50px;
+            padding: 6px 15px;
+            font-weight: 700;
+            color: #00c6ff;
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -207,7 +223,7 @@
         
         <div class="glass-card mb-5">
             <div class="row align-items-center">
-                <div class="col-md-6 mb-3 mb-md-0">
+                <div class="col-md-5 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
                         <div class="profile-img">
                             <i class="bi bi-person-fill"></i>
@@ -218,18 +234,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <button onclick="openNameModal()" class="btn btn-glass me-2">
-                        <i class="bi bi-pencil-square"></i> <span data-i18n="btn_edit_profile">Edit Profil</span>
+                
+                <div class="col-md-7 text-md-end d-flex flex-wrap justify-content-md-end align-items-center gap-2">
+                    
+                    <div class="saldo-box me-2" title="Saldo Saya">
+                        <i class="bi bi-wallet2 me-2"></i> Rp <span id="saldoDisplay" class="ms-1">0</span>
+                    </div>
+
+                    <button onclick="openTopupModal()" class="btn btn-primary-neon btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i> <span data-i18n="btn_topup">Top Up</span>
                     </button>
-                    <button onclick="openPassModal()" class="btn btn-glass">
-                        <i class="bi bi-key"></i> <span data-i18n="btn_password">Password</span>
+                    
+                    <button onclick="openNameModal()" class="btn btn-glass btn-sm" title="Edit Profil">
+                        <i class="bi bi-pencil-square"></i>
                     </button>
-                    <a href="history.html" class="btn btn-glass ms-2">
-                        <i class="bi bi-clock-history"></i> <span data-i18n="btn_history">Riwayat</span>
+                    <button onclick="openPassModal()" class="btn btn-glass btn-sm" title="Ganti Password">
+                        <i class="bi bi-key"></i>
+                    </button>
+                    <a href="history.html" class="btn btn-glass btn-sm" title="Riwayat">
+                        <i class="bi bi-clock-history"></i>
                     </a>
                 </div>
-            </div>
+                </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -289,6 +315,29 @@
         </div>
     </div>
 
+    <div class="modal fade" id="topupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" data-i18n="modal_topup_title">Isi Saldo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="text-muted mb-2" data-i18n="lbl_amount">Nominal Top Up</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-transparent text-muted">Rp</span>
+                        <input type="number" id="topupAmount" class="form-control" placeholder="10000" min="10000">
+                    </div>
+                    <small class="text-muted">Minimal top up Rp 10.000</small>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="processTopup()" class="btn btn-primary-neon w-100" id="btnPayTopup" data-i18n="btn_pay_topup">
+                        Lanjutkan Pembayaran
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -310,6 +359,7 @@
 
             renderProfile();
             loadTickets();
+            fetchLatestProfile(); // Panggil Saldo Terbaru
         });
 
         // --- KAMUS BAHASA ---
@@ -318,6 +368,7 @@
                 nav_home: "Home", nav_logout: "Keluar",
                 btn_edit_profile: "Edit Profil", btn_password: "Password", btn_history: "Riwayat",
                 section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
+                btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
                 loading_tickets: "Mengambil data tiket...", empty_tickets: "Belum ada tiket yang dibeli.",
                 modal_name_title: "Ubah Nama", modal_name_label: "Nama Lengkap Baru", btn_save: "Simpan Perubahan",
                 modal_pass_title: "Ganti Password", modal_pass_old: "Password Lama", modal_pass_new: "Password Baru",
@@ -334,6 +385,7 @@
                 nav_home: "Home", nav_logout: "Logout",
                 btn_edit_profile: "Edit Profile", btn_password: "Password", btn_history: "History",
                 section_assets: "My Digital Assets", btn_buy_new: "Buy New",
+                btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
                 loading_tickets: "Loading tickets...", empty_tickets: "No purchased tickets found.",
                 modal_name_title: "Change Name", modal_name_label: "New Full Name", btn_save: "Save Changes",
                 modal_pass_title: "Change Password", modal_pass_old: "Old Password", modal_pass_new: "New Password",
@@ -352,6 +404,88 @@
             if(user) {
                 document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
                 document.getElementById('userEmailDisplay').innerText = user.email;
+                if(user.saldo !== undefined) {
+                    document.getElementById('saldoDisplay').innerText = user.saldo.toLocaleString('id-ID');
+                }
+            }
+        }
+
+        // --- FETCH SALDO TERBARU DARI DB ---
+        async function fetchLatestProfile() {
+            if(!user || !user.id) return;
+            try {
+                const res = await fetch(`/api/user/profile/${user.id}`);
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('saldoDisplay').innerText = data.saldo.toLocaleString('id-ID');
+                    user.saldo = data.saldo;
+                    localStorage.setItem('userData', JSON.stringify(user));
+                }
+            } catch(e) {
+                console.error("Gagal menarik data saldo", e);
+            }
+        }
+
+        // --- FUNGSI TOP UP ---
+        const topupModal = new bootstrap.Modal(document.getElementById('topupModal'));
+        function openTopupModal() {
+            document.getElementById('topupAmount').value = '';
+            topupModal.show();
+        }
+
+        async function processTopup() {
+            const amount = parseInt(document.getElementById('topupAmount').value);
+            const btnPay = document.getElementById('btnPayTopup');
+            const lang = localStorage.getItem('lang') || 'id';
+            
+            if (!amount || amount < 10000) {
+                Swal.fire({icon: 'error', title: 'Oops...', text: 'Minimal top up Rp 10.000', background: '#1c1c2d', color: '#fff'});
+                return;
+            }
+
+            btnPay.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...`;
+            btnPay.disabled = true;
+
+            try {
+                const res = await fetch('/api/topup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        userId: user.id, 
+                        email: user.email,
+                        name: user.fullName || user.username,
+                        amount: amount 
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.token) {
+                    topupModal.hide();
+                    window.snap.pay(data.token, {
+                        onSuccess: function(result) {
+                            Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Top Up sukses! Saldo sedang diproses.', background: '#1c1c2d', color: '#fff'})
+                            .then(() => fetchLatestProfile()); 
+                        },
+                        onPending: function(result) {
+                            Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di instruksi Midtrans.', background: '#1c1c2d', color: '#fff'});
+                        },
+                        onError: function(result) {
+                            Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.', background: '#1c1c2d', color: '#fff'});
+                        },
+                        onClose: function() {
+                            Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup popup pembayaran.', background: '#1c1c2d', color: '#fff'})
+                            .then(() => fetchLatestProfile()); 
+                        }
+                    });
+                } else {
+                    throw new Error(data.message || 'Gagal mendapatkan token transaksi');
+                }
+            } catch (err) {
+                Swal.fire({icon: 'error', title: 'Error', text: err.message, background: '#1c1c2d', color: '#fff'});
+            } finally {
+                btnPay.innerHTML = translations[lang].btn_pay_topup;
+                btnPay.disabled = false;
             }
         }
 
