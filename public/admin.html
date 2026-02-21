@@ -157,7 +157,7 @@
                 <i class="bi bi-shield-lock-fill text-info"></i> ADMIN PORTAL
             </a>
             
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-light rounded-pill fw-bold me-2" id="lang-btn" style="min-width: 40px;">
                     ID
                 </button>
@@ -165,6 +165,11 @@
                 <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3" target="_blank">
                     <i class="bi bi-box-arrow-up-right me-1"></i> <span data-i18n="nav_website">Website</span>
                 </a>
+                
+                <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                    <i class="bi bi-key me-1"></i> <span data-i18n="nav_password">Password</span>
+                </button>
+
                 <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-4">
                     <i class="bi bi-power"></i> <span data-i18n="nav_logout">Logout</span>
                 </button>
@@ -354,18 +359,49 @@
         </div>
     </div>
 
+    <div class="modal fade" id="adminPassModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-warning"><i class="bi bi-shield-lock me-2"></i> <span data-i18n="modal_admin_pass_title">Ganti Password Admin</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label data-i18n="lbl_old_pass">Password Lama</label>
+                        <input type="password" id="adminOldPass" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label data-i18n="lbl_new_pass">Password Baru</label>
+                        <input type="password" id="adminNewPass" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label>
+                        <input type="password" id="adminConfirmPass" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button>
+                    <button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        const adminPassModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
         let eventsData = []; 
         const switchMaint = document.getElementById('switchMaintenance');
 
         // --- KAMUS BAHASA ---
         const translations = {
             id: {
-                nav_website: "Website", nav_logout: "Keluar", maint_title: "Maintenance Mode", maint_desc: "Matikan akses publik sementara.",
+                nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password",
+                maint_title: "Maintenance Mode", maint_desc: "Matikan akses publik sementara.",
                 form_title: "Tambah Produk", lbl_image: "Link Gambar / Thumbnail", txt_preview: "Preview Gambar", lbl_category: "Kategori",
                 lbl_name: "Nama Event/Produk", lbl_location: "Lokasi / Platform", lbl_date: "Tanggal / Expired", lbl_desc: "Deskripsi / Akun",
                 lbl_price: "Harga (IDR)", lbl_stock: "Stok", btn_publish: "Publish Sekarang", table_title: "Database Item",
@@ -376,10 +412,14 @@
                 ph_desc_default: "Deskripsi lengkap event...", toast_maint_on: "Maintenance Aktif 🔴", toast_maint_off: "Website Online 🟢",
                 alert_success_title: "Berhasil!", alert_success_add: "Produk berhasil ditambahkan.", alert_success_edit: "Data telah diperbarui.",
                 alert_del_title: "Hapus Data?", alert_del_text: "Data tidak bisa dikembalikan!", btn_confirm_del: "Ya, Hapus!", btn_cancel_del: "Batal",
-                empty_table: "Belum ada data event/produk."
+                empty_table: "Belum ada data event/produk.",
+                modal_admin_pass_title: "Ganti Password Admin", lbl_old_pass: "Password Lama", lbl_new_pass: "Password Baru", lbl_confirm_pass: "Konfirmasi Password Baru",
+                btn_save_pass: "Update Password", err_pass_match: "Password baru tidak cocok!", err_pass_empty: "Harap isi semua kolom password!",
+                success_pass: "Password berhasil diubah! Silakan login kembali."
             },
             en: {
-                nav_website: "Website", nav_logout: "Logout", maint_title: "Maintenance Mode", maint_desc: "Disable public access temporarily.",
+                nav_website: "Website", nav_logout: "Logout", nav_password: "Change Password",
+                maint_title: "Maintenance Mode", maint_desc: "Disable public access temporarily.",
                 form_title: "Add Product", lbl_image: "Image Link / Thumbnail", txt_preview: "Image Preview", lbl_category: "Category",
                 lbl_name: "Event/Product Name", lbl_location: "Location / Platform", lbl_date: "Date / Expired", lbl_desc: "Description / Account",
                 lbl_price: "Price (IDR)", lbl_stock: "Stock", btn_publish: "Publish Now", table_title: "Items Database",
@@ -390,7 +430,10 @@
                 ph_desc_default: "Full event description...", toast_maint_on: "Maintenance Active 🔴", toast_maint_off: "Website Online 🟢",
                 alert_success_title: "Success!", alert_success_add: "Product added successfully.", alert_success_edit: "Data has been updated.",
                 alert_del_title: "Delete Data?", alert_del_text: "Data cannot be recovered!", btn_confirm_del: "Yes, Delete!", btn_cancel_del: "Cancel",
-                empty_table: "No events/products data found."
+                empty_table: "No events/products data found.",
+                modal_admin_pass_title: "Change Admin Password", lbl_old_pass: "Old Password", lbl_new_pass: "New Password", lbl_confirm_pass: "Confirm New Password",
+                btn_save_pass: "Update Password", err_pass_match: "New passwords do not match!", err_pass_empty: "Please fill in all password fields!",
+                success_pass: "Password changed successfully! Please login again."
             }
         };
 
@@ -513,7 +556,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // --- FIX DATE LOGIC ---
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if (ev) {
@@ -522,10 +564,9 @@
                 document.getElementById('editCategory').value = ev.category;
                 document.getElementById('editLocation').value = ev.location;
                 
-                // Convert UTC (DB) to Local Input (HTML)
                 if (ev.date) {
                     const d = new Date(ev.date);
-                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // Adjust timezone
+                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
                     document.getElementById('editDate').value = d.toISOString().slice(0, 16);
                 } else {
                     document.getElementById('editDate').value = '';
@@ -549,7 +590,6 @@
             const t = translations[lang];
             const id = document.getElementById('editId').value;
             
-            // Convert Input Local to ISO (DB)
             const rawDate = document.getElementById('editDate').value;
             const isoDate = rawDate ? new Date(rawDate).toISOString() : null;
 
@@ -557,7 +597,7 @@
                 name: document.getElementById('editName').value, 
                 category: document.getElementById('editCategory').value,
                 location: document.getElementById('editLocation').value, 
-                date: isoDate, // Send proper ISO format
+                date: isoDate,
                 price: document.getElementById('editPrice').value, 
                 description: document.getElementById('editDescription').value,
                 availableSeats: document.getElementById('editStock').value, 
@@ -635,8 +675,63 @@
                 loadTable(); 
             } 
         }
+
+        // --- LOGIKA GANTI PASSWORD ADMIN ---
+        function openAdminPassModal() {
+            document.getElementById('adminOldPass').value = '';
+            document.getElementById('adminNewPass').value = '';
+            document.getElementById('adminConfirmPass').value = '';
+            adminPassModal.show();
+        }
+
+        async function saveAdminPassword() {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            const oldPass = document.getElementById('adminOldPass').value;
+            const newPass = document.getElementById('adminNewPass').value;
+            const confirmPass = document.getElementById('adminConfirmPass').value;
+
+            if (!oldPass || !newPass || !confirmPass) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'});
+            }
+
+            if (newPass !== confirmPass) {
+                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'});
+            }
+
+            try {
+                // Di sini kita asumsikan ID Admin disimpan di localStorage atau server membaca dari token.
+                // Jika kamu menyimpan user data admin di localStorage, bisa diambil id nya, misalnya:
+                const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+                const adminId = adminData.id || '';
+
+                // Memanggil endpoint backend kamu (sesuaikan /api/user/change-password atau endpoint khusus admin)
+                const res = await fetch('/api/user/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    adminPassModal.hide();
+                    Swal.fire({
+                        icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff'
+                    }).then(() => {
+                        logout(); // Paksa login ulang
+                    });
+                } else {
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah password', background: '#1c1c2d', color: '#fff'});
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'});
+            }
+        }
         
-        function logout() { localStorage.removeItem('adminToken'); window.location.href = 'login.html'; }
+        function logout() { localStorage.removeItem('adminToken'); localStorage.removeItem('adminData'); window.location.href = 'login.html'; }
         
         // Init
         loadTable(); 
