@@ -684,7 +684,7 @@
             adminPassModal.show();
         }
 
-async function saveAdminPassword() {
+        async function saveAdminPassword() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
@@ -745,39 +745,8 @@ async function saveAdminPassword() {
                         logout(); // Paksa login ulang untuk keamanan
                     });
                 } else {
-                    // Tampilkan pesan error spesifik dari backend (misal: "Password lama salah!")
+                    // Tampilkan pesan error spesifik dari backend
                     Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah atau terjadi kesalahan.', background: '#1c1c2d', color: '#fff'});
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'});
-            }
-        }
-
-            try {
-                // Di sini kita asumsikan ID Admin disimpan di localStorage atau server membaca dari token.
-                // Jika kamu menyimpan user data admin di localStorage, bisa diambil id nya, misalnya:
-                const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
-                const adminId = adminData.id || '';
-
-                // Memanggil endpoint backend kamu (sesuaikan /api/user/change-password atau endpoint khusus admin)
-                const res = await fetch('/api/user/change-password', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass })
-                });
-
-                const data = await res.json();
-
-                if (res.ok && data.success) {
-                    adminPassModal.hide();
-                    Swal.fire({
-                        icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff'
-                    }).then(() => {
-                        logout(); // Paksa login ulang
-                    });
-                } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah password', background: '#1c1c2d', color: '#fff'});
                 }
             } catch (error) {
                 console.error(error);
