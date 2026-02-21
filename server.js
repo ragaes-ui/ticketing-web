@@ -12,7 +12,7 @@ const Order = require('./models/order');
 const Event = require('./models/event');
 const Config = require('./models/config');
 
-// --- MODEL BARU: RIWAYAT LOGIN ---
+// --- MODEL: RIWAYAT LOGIN ---
 const historySchema = new mongoose.Schema({
     userId: String,
     device: String,
@@ -21,6 +21,16 @@ const historySchema = new mongoose.Schema({
 });
 const LoginHistory = mongoose.model('LoginHistory', historySchema);
 
+// --- MODEL BARU: RIWAYAT TOP UP SALDO ---
+const topupSchema = new mongoose.Schema({
+    userId: String,
+    orderId: String,
+    amount: Number,
+    status: { type: String, default: 'pending' },
+    timestamp: { type: Date, default: Date.now }
+});
+const Topup = mongoose.model('Topup', topupSchema);
+
 const app = express();
 
 app.use(cors());
@@ -28,7 +38,7 @@ app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 // ==========================================
-// 🛠️ FIX KONEKSI DATABASE
+// 🛠️ KONEKSI DATABASE
 // ==========================================
 let cached = global.mongoose;
 if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
@@ -37,7 +47,6 @@ async function connectDB() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     const opts = { bufferCommands: false, serverSelectionTimeoutMS: 5000 };
-    // Pastikan URI DB Benar
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       console.log('✅ DATABASE TERHUBUNG!');
@@ -62,7 +71,9 @@ let snap = new midtransClient.Snap({
     serverKey : 'SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg' 
 });
 
+// ==========================================
 // --- ROUTES API ---
+// ==========================================
 
 // 🔒 API PUBLIC: SENSOR DESKRIPSI STREAMING
 app.get('/api/events', async (req, res) => {
@@ -113,7 +124,8 @@ app.post('/api/register', async (req, res) => {
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user', fullName, phone });
+        // Pastikan model User kamu sudah ada field 'saldo', default 0 di registrasi ini aman
+        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user', fullName, phone, saldo: 0 });
         await newUser.save();
         res.json({ success: true, message: "Registrasi Berhasil!" });
     } catch (error) { res.status(500).json({ error: error.message }); }
@@ -128,23 +140,20 @@ app.post('/api/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah" });
 
-        // --- UPDATE: SIMPAN RIWAYAT LOGIN ---
         await LoginHistory.create({
             userId: user._id,
             device: req.headers['user-agent'] || "Unknown Device",
             ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
         });
-        // ------------------------------------
 
         res.json({ 
             success: true, 
             token: "token-rahasia-" + user._id, 
-            user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone } 
+            user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone, saldo: user.saldo || 0 } 
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API TARIK RIWAYAT LOGIN ---
 app.post('/api/history', async (req, res) => {
     try {
         const { userId } = req.body;
@@ -158,28 +167,97 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- PAYMENT & ORDER ---
+// ==========================================
+// --- API SALDO BARU (TOP UP & BELI) ---
+// ==========================================
+
+// 1. Ambil Profil & Saldo Terbaru
+app.get('/api/user/profile/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
+        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0 });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// 2. Request Top Up (Generate Token Midtrans)
+app.post('/api/topup', async (req, res) => {
+    try {
+        const { userId, email, name, amount } = req.body;
+        const orderId = `TOPUP-${Date.now()}`;
+        
+        let parameter = {
+            transaction_details: { order_id: orderId, gross_amount: amount },
+            customer_details: { first_name: name, email: email },
+            item_details: [{ id: "TOPUP-SALDO", price: amount, quantity: 1, name: "Top Up Saldo RCELLFEST" }]
+        };
+        
+        const transaction = await snap.createTransaction(parameter);
+        
+        // Catat di database dengan status pending
+        await Topup.create({ userId, orderId, amount, status: 'pending' });
+
+        res.json({ token: transaction.token, orderId });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// 3. Beli Tiket Menggunakan Saldo Langsung
+app.post('/api/buy-ticket', async (req, res) => {
+    try {
+        const { userId, eventId, price, quantity = 1 } = req.body;
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
+
+        const totalHarga = price * quantity;
+
+        // Potong saldo (Cari user yang saldonya cukup, lalu kurangi)
+        const user = await User.findOneAndUpdate(
+            { _id: userId, saldo: { $gte: totalHarga } }, 
+            { $inc: { saldo: -totalHarga } },
+            { new: true }
+        );
+
+        if (!user) return res.status(400).json({ success: false, message: "Saldo kamu tidak mencukupi. Silakan Top Up!" });
+
+        // Generate tiket jika saldo berhasil dipotong
+        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
+        
+        const newOrder = new Order({
+            ticketCode: ticketCode,
+            eventId: eventId,
+            customerName: user.fullName || user.username,
+            email: user.email,
+            status: 'valid', // Status langsung valid karena pakai saldo
+            orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
+        });
+        await newOrder.save();
+        
+        // Kurangi kursi konser
+        event.availableSeats -= quantity;
+        await event.save();
+        
+        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+
+// ==========================================
+// --- PAYMENT & ORDER LAMA (TETAP ADA) ---
+// ==========================================
 
 app.get('/api/orders/:orderId', async (req, res) => {
     try {
         const order = await Order.findOne({ orderIdMidtrans: req.params.orderId }).populate('eventId');
         if (!order) return res.status(404).json({ message: "Order tidak ditemukan" });
 
-        let responseData = {
-            status: order.status,
-            productName: order.eventId?.name,
-            customerName: order.customerName,
-            credentials: null 
-        };
-
-        if (order.status === 'valid' || order.status === 'used') {
-            responseData.credentials = order.eventId?.description;
-        }
-
+        let responseData = { status: order.status, productName: order.eventId?.name, customerName: order.customerName, credentials: null };
+        if (order.status === 'valid' || order.status === 'used') responseData.credentials = order.eventId?.description;
         res.json(responseData);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// (OPSIONAL) Jika masih mau mempertahankan fitur beli tiket langsung bayar pakai Midtrans
 app.post('/api/payment-token', async (req, res) => {
     try {
         const { eventId, customerName, customerEmail, quantity } = req.body;
@@ -202,12 +280,7 @@ app.post('/api/payment-token', async (req, res) => {
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
         const newOrder = new Order({
-            ticketCode: ticketCode,
-            eventId: eventId,
-            customerName: customerName,
-            email: customerEmail,
-            status: 'pending',        
-            orderIdMidtrans: orderId 
+            ticketCode: ticketCode, eventId: eventId, customerName: customerName, email: customerEmail, status: 'pending', orderIdMidtrans: orderId 
         });
         await newOrder.save();
         res.json({ token: transaction.token, orderId: orderId });
@@ -222,6 +295,9 @@ app.post('/api/cancel-order', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// ==========================================
+// 🔔 WEBHOOK MIDTRANS (SUDAH DIUPDATE)
+// ==========================================
 app.post('/api/payment-notification', async (req, res) => {
     try {
         const statusResponse = await snap.transaction.notification(req.body);
@@ -229,30 +305,58 @@ app.post('/api/payment-notification', async (req, res) => {
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
 
-        const order = await Order.findOne({ orderIdMidtrans: orderId });
-        if (!order) return res.status(404).json({message: "Order not found"});
+        // 1. CEK APAKAH INI TRANSAKSI TOP UP SALDO
+        if (orderId.startsWith('TOPUP-')) {
+            const topup = await Topup.findOne({ orderId: orderId });
+            if (!topup) return res.status(404).json({ message: "Data Top Up tidak ditemukan" });
 
-        if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
-            if (fraudStatus == 'challenge') {
-                order.status = 'pending';
-                await order.save();
-            } else {
-                order.status = 'valid';
-                const event = await Event.findById(order.eventId);
-                if(event) { event.availableSeats -= 1; await event.save(); }
-                await order.save();
+            if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
+                if (fraudStatus == 'accept' || !fraudStatus) {
+                    // Cek biar nggak nambah saldo 2x
+                    if (topup.status !== 'success') {
+                        topup.status = 'success';
+                        await topup.save();
+                        // Tambahkan saldo user
+                        await User.findByIdAndUpdate(topup.userId, { $inc: { saldo: topup.amount } });
+                    }
+                }
+            } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
+                topup.status = 'failed';
+                await topup.save();
             }
         } 
-        else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-            await Order.findOneAndDelete({ orderIdMidtrans: orderId });
-        } 
-        else if (transactionStatus == 'pending'){
-            order.status = 'pending';
-            await order.save();
+        // 2. CEK APAKAH INI PEMBELIAN TIKET LANGSUNG VIA MIDTRANS (NON-SALDO)
+        else {
+            const order = await Order.findOne({ orderIdMidtrans: orderId });
+            if (!order) return res.status(404).json({message: "Order not found"});
+
+            if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
+                if (fraudStatus == 'challenge') {
+                    order.status = 'pending';
+                    await order.save();
+                } else {
+                    if(order.status !== 'valid') {
+                        order.status = 'valid';
+                        const event = await Event.findById(order.eventId);
+                        if(event) { event.availableSeats -= 1; await event.save(); }
+                        await order.save();
+                    }
+                }
+            } 
+            else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
+                await Order.findOneAndDelete({ orderIdMidtrans: orderId });
+            } 
+            else if (transactionStatus == 'pending'){
+                order.status = 'pending';
+                await order.save();
+            }
         }
+
         res.status(200).send('OK');
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
+
+// --- API LAINNYA ---
 
 app.post('/api/validate', async (req, res) => {
     try {
