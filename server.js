@@ -146,10 +146,20 @@ app.post('/api/login', async (req, res) => {
             ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
         });
 
+        // UPDATE: Beritahu frontend apakah user sudah mengatur PIN atau belum (hasPin)
         res.json({ 
             success: true, 
             token: "token-rahasia-" + user._id, 
-            user: { id: user._id, username: user.username, email: user.email, role: user.role, fullName: user.fullName, phone: user.phone, saldo: user.saldo || 0 } 
+            user: { 
+                id: user._id, 
+                username: user.username, 
+                email: user.email, 
+                role: user.role, 
+                fullName: user.fullName, 
+                phone: user.phone, 
+                saldo: user.saldo || 0,
+                hasPin: !!user.pin // Convert keberadaan pin jadi boolean (true/false)
+            } 
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -168,7 +178,7 @@ app.post('/api/my-tickets', async (req, res) => {
 });
 
 // ==========================================
-// --- API SALDO BARU (TOP UP & BELI) ---
+// --- API SALDO BARU (TOP UP, BELI & PIN) ---
 // ==========================================
 
 // 1. Ambil Profil & Saldo Terbaru
@@ -176,7 +186,16 @@ app.get('/api/user/profile/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0 });
+        
+        // UPDATE: Sertakan juga status hasPin saat refresh profil
+        res.json({ 
+            id: user._id, 
+            username: user.username, 
+            email: user.email, 
+            fullName: user.fullName, 
+            saldo: user.saldo || 0,
+            hasPin: !!user.pin 
+        });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
@@ -201,25 +220,58 @@ app.post('/api/topup', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. Beli Tiket Menggunakan Saldo Langsung
+// 3. API ATUR PIN SALDO
+app.post('/api/user/set-pin', async (req, res) => {
+    try {
+        const { userId, pin } = req.body;
+        // Validasi pin
+        if (!pin || pin.length !== 6) return res.status(400).json({ message: "PIN harus 6 angka bulat!" });
+        
+        // Enkripsi pin
+        const hashedPin = await bcrypt.hash(pin, 10);
+        await User.findByIdAndUpdate(userId, { pin: hashedPin });
+        
+        res.json({ success: true, message: "PIN berhasil disetel!" });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+
+// 4. Beli Tiket Menggunakan Saldo Langsung (WAJIBKAN PIN)
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        const { userId, eventId, price, quantity = 1 } = req.body;
+        const { userId, eventId, price, quantity = 1, pin } = req.body; // <-- Terima PIN dari frontend
+        
+        // --- A. VALIDASI USER & PIN ---
+        const userCheck = await User.findById(userId);
+        if (!userCheck) return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+        
+        // Cek apakah user ini sudah mengatur PIN di akunnya
+        if (!userCheck.pin) {
+            return res.status(400).json({ success: false, message: "Belum set PIN. Silakan atur PIN Keamanan di menu Dashboard/Profil." });
+        }
+        
+        // Cek apakah input PIN dari form cocok dengan PIN di database
+        const isPinMatch = await bcrypt.compare(pin, userCheck.pin);
+        if (!isPinMatch) {
+            return res.status(400).json({ success: false, message: "PIN Saldo yang kamu masukkan salah!" });
+        }
+
+        // --- B. PROSES PEMBELIAN TIKET ---
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
         const totalHarga = price * quantity;
 
-        // Potong saldo (Cari user yang saldonya cukup, lalu kurangi)
+        // Potong saldo dengan mengecek kecukupan saldo (mencegah bug double request)
         const user = await User.findOneAndUpdate(
             { _id: userId, saldo: { $gte: totalHarga } }, 
             { $inc: { saldo: -totalHarga } },
             { new: true }
         );
 
-        if (!user) return res.status(400).json({ success: false, message: "Saldo kamu tidak mencukupi. Silakan Top Up!" });
+        if (!user) return res.status(400).json({ success: false, message: "Saldo kamu tidak mencukupi. Silakan Top Up Saldo!" });
 
-        // Generate tiket jika saldo berhasil dipotong
+        // Generate tiket
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
@@ -228,22 +280,23 @@ app.post('/api/buy-ticket', async (req, res) => {
             eventId: eventId,
             customerName: user.fullName || user.username,
             email: user.email,
-            status: 'valid', // Status langsung valid karena pakai saldo
+            status: 'valid', // Status langsung valid karena pakai saldo internal
             orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
         });
         await newOrder.save();
         
-        // Kurangi kursi konser
+        // Kurangi ketersediaan kursi
         event.availableSeats -= quantity;
         await event.save();
         
+        // Kirim response sukses beserta sisa saldo terbaru
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
 
 // ==========================================
-// --- PAYMENT & ORDER LAMA (TETAP ADA) ---
+// --- PAYMENT & ORDER LAMA (VIA MIDTRANS) ---
 // ==========================================
 
 app.get('/api/orders/:orderId', async (req, res) => {
@@ -257,7 +310,6 @@ app.get('/api/orders/:orderId', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// (OPSIONAL) Jika masih mau mempertahankan fitur beli tiket langsung bayar pakai Midtrans
 app.post('/api/payment-token', async (req, res) => {
     try {
         const { eventId, customerName, customerEmail, quantity } = req.body;
@@ -296,7 +348,7 @@ app.post('/api/cancel-order', async (req, res) => {
 });
 
 // ==========================================
-// 🔔 WEBHOOK MIDTRANS (SUDAH DIUPDATE)
+// 🔔 WEBHOOK MIDTRANS 
 // ==========================================
 app.post('/api/payment-notification', async (req, res) => {
     try {
