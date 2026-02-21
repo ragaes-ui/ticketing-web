@@ -684,7 +684,7 @@
             adminPassModal.show();
         }
 
-        async function saveAdminPassword() {
+async function saveAdminPassword() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
@@ -692,13 +692,67 @@
             const newPass = document.getElementById('adminNewPass').value;
             const confirmPass = document.getElementById('adminConfirmPass').value;
 
+            // Validasi form kosong
             if (!oldPass || !newPass || !confirmPass) {
                 return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'});
             }
 
+            // Validasi kecocokan password baru
             if (newPass !== confirmPass) {
                 return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'});
             }
+
+            try {
+                // --- PENCARIAN ID ADMIN (FIXED) ---
+                let adminId = '';
+                
+                // 1. Coba ekstrak ID langsung dari Token (Berdasarkan setting server.js kamu)
+                if (token && token.includes('token-rahasia-')) {
+                    adminId = token.split('token-rahasia-')[1];
+                } 
+                // 2. Jika tidak ada, coba ambil dari storage adminData / userData
+                else {
+                    const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+                    if (adminData.id) {
+                        adminId = adminData.id;
+                    } else {
+                        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                        adminId = userData.id || '';
+                    }
+                }
+
+                // Jika ID tetap tidak ketemu
+                if (!adminId) {
+                    return Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'ID Admin tidak ditemukan. Silakan Logout dan Login kembali.', background: '#1c1c2d', color: '#fff'});
+                }
+
+                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+                // Hit API ke Backend
+                const res = await fetch('/api/user/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    adminPassModal.hide();
+                    Swal.fire({
+                        icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff'
+                    }).then(() => {
+                        logout(); // Paksa login ulang untuk keamanan
+                    });
+                } else {
+                    // Tampilkan pesan error spesifik dari backend (misal: "Password lama salah!")
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah atau terjadi kesalahan.', background: '#1c1c2d', color: '#fff'});
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'});
+            }
+        }
 
             try {
                 // Di sini kita asumsikan ID Admin disimpan di localStorage atau server membaca dari token.
