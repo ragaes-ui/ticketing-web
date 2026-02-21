@@ -13,7 +13,7 @@
     
     <script type="text/javascript"
             src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="SB-Mid-client-B0QVtPjOdqXMklFX"></script>
+            data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
@@ -245,6 +245,10 @@
                         <i class="bi bi-plus-circle me-1"></i> <span data-i18n="btn_topup">Top Up</span>
                     </button>
                     
+                    <button onclick="openPinModal()" class="btn btn-glass btn-sm text-warning border-warning" title="Atur PIN Saldo">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </button>
+
                     <button onclick="openNameModal()" class="btn btn-glass btn-sm" title="Edit Profil">
                         <i class="bi bi-pencil-square"></i>
                     </button>
@@ -255,7 +259,8 @@
                         <i class="bi bi-clock-history"></i>
                     </a>
                 </div>
-                </div>
+                
+            </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -338,6 +343,26 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="pinModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" data-i18n="modal_pin_title">Atur PIN Keamanan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <label class="text-muted mb-3" data-i18n="modal_pin_desc">Buat 6 Digit PIN Keamanan Saldo</label>
+                    <input type="password" id="inputNewPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
+                    <small class="text-muted d-block mt-3 text-warning" data-i18n="modal_pin_note">Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.</small>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="savePin()" class="btn btn-primary-neon w-100" data-i18n="btn_save_pin">Simpan PIN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -348,18 +373,16 @@
 
         // --- SETUP AWAL ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Theme Init
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
 
-            // Lang Init
             const savedLang = localStorage.getItem('lang') || 'id';
             updateLanguage(savedLang);
 
             renderProfile();
             loadTickets();
-            fetchLatestProfile(); // Panggil Saldo Terbaru
+            fetchLatestProfile(); 
         });
 
         // --- KAMUS BAHASA ---
@@ -369,6 +392,7 @@
                 btn_edit_profile: "Edit Profil", btn_password: "Password", btn_history: "Riwayat",
                 section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
                 btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
+                modal_pin_title: "Atur PIN Keamanan", modal_pin_desc: "Buat 6 Digit PIN Keamanan Saldo", modal_pin_note: "Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.", btn_save_pin: "Simpan PIN",
                 loading_tickets: "Mengambil data tiket...", empty_tickets: "Belum ada tiket yang dibeli.",
                 modal_name_title: "Ubah Nama", modal_name_label: "Nama Lengkap Baru", btn_save: "Simpan Perubahan",
                 modal_pass_title: "Ganti Password", modal_pass_old: "Password Lama", modal_pass_new: "Password Baru",
@@ -386,6 +410,7 @@
                 btn_edit_profile: "Edit Profile", btn_password: "Password", btn_history: "History",
                 section_assets: "My Digital Assets", btn_buy_new: "Buy New",
                 btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
+                modal_pin_title: "Set Security PIN", modal_pin_desc: "Create 6 Digit Security PIN", modal_pin_note: "Remember this PIN! Used when buying tickets with balance.", btn_save_pin: "Save PIN",
                 loading_tickets: "Loading tickets...", empty_tickets: "No purchased tickets found.",
                 modal_name_title: "Change Name", modal_name_label: "New Full Name", btn_save: "Save Changes",
                 modal_pass_title: "Change Password", modal_pass_old: "Old Password", modal_pass_new: "New Password",
@@ -410,7 +435,7 @@
             }
         }
 
-        // --- FETCH SALDO TERBARU DARI DB ---
+        // --- FETCH SALDO & PIN STATUS DARI DB ---
         async function fetchLatestProfile() {
             if(!user || !user.id) return;
             try {
@@ -419,10 +444,46 @@
                     const data = await res.json();
                     document.getElementById('saldoDisplay').innerText = data.saldo.toLocaleString('id-ID');
                     user.saldo = data.saldo;
+                    user.hasPin = data.hasPin; // UPDATE status PIN dari server
                     localStorage.setItem('userData', JSON.stringify(user));
                 }
             } catch(e) {
                 console.error("Gagal menarik data saldo", e);
+            }
+        }
+
+        // --- FUNGSI ATUR PIN ---
+        const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
+        function openPinModal() {
+            document.getElementById('inputNewPin').value = '';
+            pinModal.show();
+        }
+
+        async function savePin() {
+            const pin = document.getElementById('inputNewPin').value;
+            const lang = localStorage.getItem('lang') || 'id';
+            
+            if(pin.length !== 6 || isNaN(pin)) {
+                return Swal.fire({icon: 'error', title: 'Oops', text: lang === 'id' ? 'PIN wajib 6 angka bulat!' : 'PIN must be exactly 6 digits!', background: '#1c1c2d', color: '#fff'});
+            }
+            
+            try {
+                const res = await fetch('/api/user/set-pin', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ userId: user.id, pin: pin })
+                });
+                const data = await res.json();
+                
+                if(res.ok && data.success) {
+                    user.hasPin = true; 
+                    localStorage.setItem('userData', JSON.stringify(user));
+                    pinModal.hide();
+                    Swal.fire({icon:'success', title: lang === 'id' ? 'Sukses' : 'Success', text: lang === 'id' ? 'PIN berhasil disimpan!' : 'PIN saved successfully!', background:'#1c1c2d', color:'#fff'});
+                } else {
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff'});
+                }
+            } catch(e) { 
+                console.error(e); 
             }
         }
 
@@ -652,7 +713,7 @@
             }
         }
 
-        // --- PDF GENERATOR (Fix Blank & Z-Index) ---
+        // --- PDF GENERATOR ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -663,7 +724,6 @@
             const element = document.createElement('div');
             document.body.appendChild(element);
             
-            // Z-Index Trick: Render behind content
             element.style.cssText = 'width: 450px; position: fixed; top: 0; left: 0; z-index: -9999; background: white; color: black; font-family: sans-serif;';
 
             let contentMiddle = '';
@@ -727,12 +787,10 @@
             Swal.close();
         }
 
-        // --- HELPER ---
         function copyToClipboard(text) { navigator.clipboard.writeText(text); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang]; const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); Toast.fire({ icon: 'success', title: t.toast_copy }); }
         
         function logout() { localStorage.clear(); window.location.href = 'user-login.html'; }
         
-        // Modals Logic
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
         function openNameModal() { document.getElementById('inputNewName').value = user.fullName; nameModal.show(); }
         async function saveName() { 
