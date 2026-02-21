@@ -21,7 +21,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
+    
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
@@ -65,7 +67,6 @@
             transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.8s;
         }
 
-        /* Ikon Tengah dengan Efek Pulse */
         .loader-icon-box {
             position: relative; width: 80px; height: 80px;
             display: flex; align-items: center; justify-content: center;
@@ -79,7 +80,6 @@
             animation: icon-float 2s ease-in-out infinite;
         }
         
-        /* Cincin Berdenyut di Belakang Ikon */
         .pulse-ring {
             position: absolute; width: 100%; height: 100%;
             border-radius: 50%; border: 2px solid rgba(0, 73, 204, 0.5);
@@ -87,7 +87,6 @@
         }
         .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
 
-        /* Teks dengan Efek Mengkilap */
         .loader-text {
             font-size: 1.5rem; font-weight: 900; letter-spacing: 4px;
             background: linear-gradient(90deg, #333, #aaa, #333);
@@ -100,7 +99,6 @@
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* Loading Bar Tipis */
         .loader-bar-container {
             width: 120px; height: 3px; background: rgba(128, 128, 128, 0.2);
             border-radius: 3px; margin-top: 15px; overflow: hidden;
@@ -110,7 +108,6 @@
             animation: fill-bar 1.5s ease-in-out infinite;
         }
 
-        /* Animasi Keyframes */
         @keyframes pulse-ripple {
             0% { transform: scale(0.8); opacity: 0.8; border-width: 2px; }
             100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
@@ -373,7 +370,7 @@
                 section_hot: "Pilihan Hari Ini", link_view_all: "Lihat Semua", loading_text: "Memuat event...",
                 partner_title: "Partner Pembayaran Resmi", footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_guide: "Panduan", footer_follow: "Ikuti Kami",
                 modal_desc_title: "Deskripsi & Info", modal_price_label: "Harga", btn_buy_ticket: "Beli Tiket", btn_buy_account: "Beli Akun", btn_sold_out: "HABIS", btn_buy_short: "BELI",
-                txt_tba: "Lokasi TBA", txt_date_tba: "Tanggal TBA", alert_login_title: "Login Dulu", alert_login_text: "Silakan login member untuk membeli.", alert_confirm_title: "Konfirmasi", alert_pay_btn: "Bayar"
+                txt_tba: "Lokasi TBA", txt_date_tba: "Tanggal TBA", alert_login_title: "Login Dulu", alert_login_text: "Silakan login member untuk membeli.", alert_confirm_title: "Konfirmasi"
             },
             en: {
                 nav_explore: "Explore", nav_about: "About Us", nav_guide: "Help & Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout",
@@ -383,7 +380,7 @@
                 section_hot: "Today's Picks", link_view_all: "View All", loading_text: "Loading events...",
                 partner_title: "Official Payment Partners", footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_guide: "Guide", footer_follow: "Follow Us",
                 modal_desc_title: "Description & Info", modal_price_label: "Price", btn_buy_ticket: "Buy Ticket", btn_buy_account: "Buy Account", btn_sold_out: "SOLD OUT", btn_buy_short: "BUY",
-                txt_tba: "Venue TBA", txt_date_tba: "Date TBA", alert_login_title: "Login Required", alert_login_text: "Please login to purchase.", alert_confirm_title: "Confirm", alert_pay_btn: "Pay Now"
+                txt_tba: "Venue TBA", txt_date_tba: "Date TBA", alert_login_title: "Login Required", alert_login_text: "Please login to purchase.", alert_confirm_title: "Confirm"
             }
         };
 
@@ -589,23 +586,134 @@
         }
         document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
 
+        // --- FUNGSI PEMBELIAN TIKET DENGAN PILIHAN METODE ---
         async function buyTicket(eventId) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const userRaw = localStorage.getItem('userData');
-            if (!userRaw) { Swal.fire({ title: t.alert_login_title, text: t.alert_login_text, icon: 'info', confirmButtonText: 'Login', confirmButtonColor: '#0049CC' }).then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; }); return; }
+            
+            // 1. Cek Login
+            if (!userRaw) { 
+                Swal.fire({ 
+                    title: t.alert_login_title, 
+                    text: t.alert_login_text, 
+                    icon: 'info', 
+                    confirmButtonText: 'Login', 
+                    confirmButtonColor: '#0049CC' 
+                }).then((r) => { 
+                    if(r.isConfirmed) window.location.href = 'user-login.html'; 
+                }); 
+                return; 
+            }
+            
             const user = JSON.parse(userRaw);
             const event = allEvents.find(e => e._id === eventId);
-            const namaPemesan = user.fullName ? user.fullName : user.username;
-            const confirm = await Swal.fire({ title: t.alert_confirm_title, html: `${lang === 'id' ? 'Beli' : 'Buy'} <b>${event.name}</b>?<br>${t.modal_price_label}: <b>Rp ${new Intl.NumberFormat('id-ID').format(event.price)}</b>`, icon: 'question', showCancelButton: true, confirmButtonColor: '#0049CC', confirmButtonText: t.alert_pay_btn });
-            if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Processing...', didOpen: () => { Swal.showLoading(); } });
+            if (!event) return;
+
+            const hargaFormatted = new Intl.NumberFormat('id-ID').format(event.price);
+            
+            // Tarik data saldo paling update (opsional, jika tidak ada fallback ke storage)
+            const saldoUser = user.saldo || 0; 
+            const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
+            
+            // 2. Tampilkan Pilihan Metode Pembayaran via SweetAlert Radio Button
+            const inputOptions = {
+                'saldo': `<b>Potong Saldo</b> (Sisa: Rp ${saldoFormatted})`,
+                'midtrans': `<b>Metode Lain</b> (VA, E-Wallet, QRIS)`
+            };
+
+            const { value: paymentMethod } = await Swal.fire({
+                title: lang === 'id' ? 'Pilih Metode Pembayaran' : 'Select Payment Method',
+                html: `<div class="text-start mt-2">
+                          <p class="mb-3">Beli tiket <b>${event.name}</b> seharga <b class="text-danger">Rp ${hargaFormatted}</b></p>
+                       </div>`,
+                input: 'radio',
+                inputOptions: inputOptions,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return lang === 'id' ? 'Pilih metode pembayaran terlebih dahulu!' : 'Please choose a payment method!';
+                    }
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#0049CC',
+                cancelButtonColor: '#d33',
+                confirmButtonText: lang === 'id' ? 'Lanjutkan' : 'Continue',
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel'
+            });
+
+            if (!paymentMethod) return; // Jika klik batal, berhenti disini
+
+            // 3. Eksekusi Pembayaran Sesuai Pilihan
+            if (paymentMethod === 'saldo') {
+                // --- ALUR POTONG SALDO ---
+                
+                // Cek cepat apakah saldo mencukupi
+                if (saldoUser < event.price) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: lang === 'id' ? 'Saldo Tidak Cukup' : 'Insufficient Balance',
+                        text: lang === 'id' ? 'Silakan top up saldo terlebih dahulu.' : 'Please top up your balance.',
+                        confirmButtonText: lang === 'id' ? 'Isi Saldo' : 'Top Up',
+                        confirmButtonColor: '#0049CC'
+                    }).then((r) => { if(r.isConfirmed) window.location.href = 'dashboard.html'; });
+                    return;
+                }
+
+                Swal.fire({ title: lang === 'id' ? 'Memproses...' : 'Processing...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 try {
-                    const res = await fetch('/api/payment-token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email, userId: user.id }) });
+                    const res = await fetch('/api/buy-ticket', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: user.id, eventId: eventId, price: event.price })
+                    });
+                    const data = await res.json();
+                    
+                    if (res.ok && data.success) {
+                        user.saldo = data.sisaSaldo;
+                        localStorage.setItem('userData', JSON.stringify(user));
+                        Swal.fire({ 
+                            icon: 'success', 
+                            title: lang === 'id' ? 'Berhasil!' : 'Success!', 
+                            html: `${lang === 'id' ? 'Tiket berhasil dibeli pakai Saldo.' : 'Ticket bought using Balance.'}<br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}`, 
+                            confirmButtonColor: '#0049CC' 
+                        }).then(() => window.location.href = 'dashboard.html'); 
+                    } else {
+                        Swal.fire('Error', data.message || 'Gagal memotong saldo.', 'error');
+                    }
+                } catch (err) { Swal.fire('Error', 'Gagal terhubung ke server.', 'error'); }
+
+            } else if (paymentMethod === 'midtrans') {
+                // --- ALUR MIDTRANS (VA / E-WALLET / DLL) ---
+                const namaPemesan = user.fullName ? user.fullName : user.username;
+                Swal.fire({ title: lang === 'id' ? 'Menghubungkan ke Payment Gateway...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                
+                try {
+                    const res = await fetch('/api/payment-token', { 
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ eventId, quantity: 1, customerName: namaPemesan, customerEmail: user.email, userId: user.id }) 
+                    });
                     const data = await res.json();
                     Swal.close(); 
-                    if (res.ok && data.token) { window.snap.pay(data.token, { onSuccess: function(result){ Swal.fire('Success!', 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; }); }, onPending: function(result){ Swal.fire('Pending', 'Please complete your payment.', 'info'); }, onError: function(result){ Swal.fire('Failed', 'Payment failed.', 'error'); }, onClose: function(){ fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); Swal.fire('Cancelled', 'You cancelled the payment.', 'info'); } }); } else { Swal.fire('Error', data.message || 'Error.', 'error'); }
-                } catch (err) { Swal.fire('Error', 'Connection failed.', 'error'); }
+                    
+                    if (res.ok && data.token) { 
+                        window.snap.pay(data.token, { 
+                            onSuccess: function(result){ 
+                                Swal.fire('Success!', lang === 'id' ? 'Pembayaran berhasil!' : 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
+                            }, 
+                            onPending: function(result){ 
+                                Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); 
+                            }, 
+                            onError: function(result){ 
+                                Swal.fire('Failed', lang === 'id' ? 'Pembayaran gagal.' : 'Payment failed.', 'error'); 
+                            }, 
+                            onClose: function(){ 
+                                fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); 
+                                Swal.fire(lang === 'id' ? 'Dibatalkan' : 'Cancelled', lang === 'id' ? 'Kamu menutup pop-up pembayaran.' : 'You closed the payment popup.', 'info'); 
+                            } 
+                        }); 
+                    } else { 
+                        Swal.fire('Error', data.message || 'Gagal membuat tagihan.', 'error'); 
+                    }
+                } catch (err) { Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); }
             }
         }
     </script>
