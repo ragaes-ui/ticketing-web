@@ -220,19 +220,42 @@ app.post('/api/topup', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. API ATUR PIN SALDO
+// 3. API ATUR / UBAH PIN SALDO (DENGAN CEK PIN LAMA)
 app.post('/api/user/set-pin', async (req, res) => {
     try {
-        const { userId, pin } = req.body;
-        // Validasi pin
-        if (!pin || pin.length !== 6) return res.status(400).json({ message: "PIN harus 6 angka bulat!" });
+        const { userId, oldPin, newPin, pin } = req.body;
+        // Frontend mungkin mengirim 'newPin' (saat ubah) atau 'pin' (saat buat baru), kita ambil salah satu
+        const finalPin = newPin || pin;
+
+        // 1. Validasi Input Dasar
+        if (!finalPin || finalPin.length !== 6) {
+            return res.status(400).json({ message: "PIN baru harus 6 angka bulat!" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
+
+        // 2. Jika User SUDAH punya PIN, wajib validasi PIN Lama
+        if (user.pin) {
+            if (!oldPin) {
+                return res.status(400).json({ message: "Harap masukkan PIN Lama untuk keamanan." });
+            }
+            const isMatch = await bcrypt.compare(oldPin, user.pin);
+            if (!isMatch) {
+                return res.status(400).json({ message: "PIN Lama salah!" });
+            }
+        }
+
+        // 3. Enkripsi PIN Baru dan Simpan
+        const hashedPin = await bcrypt.hash(finalPin, 10);
+        user.pin = hashedPin;
+        await user.save();
         
-        // Enkripsi pin
-        const hashedPin = await bcrypt.hash(pin, 10);
-        await User.findByIdAndUpdate(userId, { pin: hashedPin });
-        
-        res.json({ success: true, message: "PIN berhasil disetel!" });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        res.json({ success: true, message: "PIN berhasil disimpan!" });
+
+    } catch (error) { 
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 
