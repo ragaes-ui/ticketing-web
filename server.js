@@ -177,6 +177,15 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// --- API RIWAYAT TOP UP ---
+app.post('/api/my-topups', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        // Ambil data topup, urutkan dari yang terbaru
+        const topups = await Topup.find({ userId }).sort({ timestamp: -1 });
+        res.json(topups);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
 // ==========================================
 // --- API SALDO BARU (TOP UP, BELI & PIN) ---
 // ==========================================
@@ -316,7 +325,6 @@ app.post('/api/buy-ticket', async (req, res) => {
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
-
 
 // ==========================================
 // --- PAYMENT & ORDER LAMA (VIA MIDTRANS) ---
