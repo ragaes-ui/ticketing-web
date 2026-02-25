@@ -31,6 +31,15 @@ const topupSchema = new mongoose.Schema({
 });
 const Topup = mongoose.model('Topup', topupSchema);
 
+// --- MODEL BARU: KODE PROMO ---
+const promoSchema = new mongoose.Schema({
+    code: { type: String, required: true, unique: true, uppercase: true }, // Kode Unik (misal: MERDEKA)
+    discount: { type: Number, required: true }, // Jumlah Diskon (Rp)
+    quota: { type: Number, default: 100 }, // Sisa Kuota
+    expiresAt: { type: Date, required: true } // Tanggal Kadaluarsa
+});
+const Promo = mongoose.model('Promo', promoSchema);
+
 const app = express();
 
 app.use(cors());
@@ -524,6 +533,56 @@ app.post('/api/maintenance', async (req, res) => {
         await config.save();
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ==========================================
+// --- API KODE PROMO ---
+// ==========================================
+
+// 1. Cek Kode Promo (Dipakai User saat beli)
+app.post('/api/check-promo', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const promo = await Promo.findOne({ code: code.toUpperCase() });
+
+        if (!promo) return res.json({ valid: false, message: "Kode promo tidak ditemukan." });
+        if (promo.quota <= 0) return res.json({ valid: false, message: "Kuota promo habis." });
+        if (new Date() > promo.expiresAt) return res.json({ valid: false, message: "Kode promo sudah kadaluarsa." });
+
+        res.json({ valid: true, discount: promo.discount, message: `Diskon Rp ${promo.discount.toLocaleString('id-ID')}!` });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// 2. Lihat Semua Promo (Dipakai Admin Dashboard)
+app.get('/api/promos', async (req, res) => {
+    try {
+        const promos = await Promo.find().sort({ _id: -1 });
+        res.json(promos);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// 3. Buat Promo Baru (Dipakai Admin Dashboard)
+app.post('/api/promos', async (req, res) => {
+    try {
+        const { code, discount, quota, daysActive } = req.body;
+        
+        // Hitung tanggal kadaluarsa
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
+
+        const newPromo = new Promo({ code, discount, quota, expiresAt });
+        await newPromo.save();
+        
+        res.json({ success: true, message: "Promo berhasil dibuat!" });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// 4. Hapus Promo (Dipakai Admin Dashboard)
+app.delete('/api/promos/:id', async (req, res) => {
+    try {
+        await Promo.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Promo dihapus!" });
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ROUTE HANDLER TERAKHIR
