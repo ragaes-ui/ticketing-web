@@ -189,6 +189,25 @@
             display: flex;
             align-items: center;
         }
+
+        /* History Item Style */
+        .history-item { 
+            border-bottom: 1px solid var(--glass-border); 
+            padding: 15px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-icon { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.2rem; 
+        }
     </style>
 </head>
 <body>
@@ -221,7 +240,7 @@
 
     <div class="container pb-5 mt-4">
         
-        <div class="glass-card mb-5">
+        <div class="glass-card mb-4">
             <div class="row align-items-center">
                 <div class="col-md-5 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
@@ -259,22 +278,48 @@
                         <i class="bi bi-clock-history"></i>
                     </a>
                 </div>
-                
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold mb-0" style="color: var(--text-main);"><i class="bi bi-collection-play me-2 text-primary"></i> <span data-i18n="section_assets">Aset Digital Saya</span></h4>
-            <a href="index.html" class="btn btn-primary-neon btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span>
-            </a>
-        </div>
+        <ul class="nav nav-pills mb-4 gap-2" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="btn btn-glass active rounded-pill px-4" id="tickets-tab" data-bs-toggle="pill" data-bs-target="#tickets-pane" type="button" role="tab" aria-selected="true">
+                    <i class="bi bi-collection-play me-2"></i> <span data-i18n="tab_tickets">Aset Digital</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="btn btn-glass rounded-pill px-4" id="topups-tab" data-bs-toggle="pill" data-bs-target="#topups-pane" type="button" role="tab" aria-selected="false" onclick="loadTopupHistory()">
+                    <i class="bi bi-wallet-fill me-2"></i> <span data-i18n="tab_history">Riwayat Saldo</span>
+                </button>
+            </li>
+        </ul>
 
-        <div id="ticketList" class="row g-4">
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-3 text-muted" data-i18n="loading_tickets">Mengambil data tiket...</p>
+        <div class="tab-content" id="dashboardTabsContent">
+            
+            <div class="tab-pane fade show active" id="tickets-pane" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0" style="color: var(--text-main);"><span data-i18n="section_assets">Aset Digital Saya</span></h4>
+                    <a href="index.html" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
+                </div>
+                <div id="ticketList" class="row g-4">
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-3 text-muted" data-i18n="loading_tickets">Mengambil data tiket...</p>
+                    </div>
+                </div>
             </div>
+
+            <div class="tab-pane fade" id="topups-pane" role="tabpanel">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i> <span data-i18n="section_history_title">Riwayat Transaksi Saldo</span></h5>
+                    <div id="topupList">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -417,7 +462,9 @@
                 txt_date_tba: "Tanggal TBA", toast_copy: "Berhasil disalin!", toast_pdf_gen: "Sedang membuat PDF...",
                 pdf_header: "E-TICKET RCELLFEST", pdf_info: "Tunjukkan QR Code ini di pintu masuk.", pdf_footer: "Terima kasih telah memesan.",
                 error_fetch: "Gagal mengambil data. Cek koneksi backend.",
-                err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!"
+                err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!",
+                tab_tickets: "Aset Digital", tab_history: "Riwayat Saldo", section_history_title: "Riwayat Transaksi Saldo", empty_history: "Belum ada riwayat top up.",
+                status_success: "BERHASIL", status_pending: "MENUNGGU", status_failed: "GAGAL"
             },
             en: {
                 nav_home: "Home", nav_logout: "Logout",
@@ -437,7 +484,9 @@
                 txt_date_tba: "Date TBA", toast_copy: "Copied!", toast_pdf_gen: "Generating PDF...",
                 pdf_header: "RCELLFEST E-TICKET", pdf_info: "Show this QR Code at the entrance.", pdf_footer: "Thank you for booking.",
                 error_fetch: "Failed to fetch data. Check backend connection.",
-                err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!"
+                err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!",
+                tab_tickets: "My Assets", tab_history: "Balance History", section_history_title: "Balance Transaction History", empty_history: "No top up history found.",
+                status_success: "SUCCESS", status_pending: "PENDING", status_failed: "FAILED"
             }
         };
 
@@ -468,11 +517,68 @@
             }
         }
 
+        // --- FETCH TOP UP HISTORY ---
+        async function loadTopupHistory() {
+            const container = document.getElementById('topupList');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            
+            try {
+                const res = await fetch('/api/my-topups', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id })
+                });
+                const history = await res.json();
+                
+                if (history.length === 0) {
+                    container.innerHTML = `<div class="text-center py-5 text-muted">${t.empty_history}</div>`;
+                    return;
+                }
+
+                let html = '';
+                history.forEach(item => {
+                    let badgeClass = 'bg-secondary';
+                    let icon = '<i class="bi bi-hourglass-split"></i>';
+                    let statusText = t.status_pending;
+
+                    if (item.status === 'success') { badgeClass = 'bg-success'; icon = '<i class="bi bi-check-lg"></i>'; statusText = t.status_success; }
+                    else if (item.status === 'failed') { badgeClass = 'bg-danger'; icon = '<i class="bi bi-x-lg"></i>'; statusText = t.status_failed; }
+
+                    let dateStr = "TBA";
+                    try {
+                        const dateObj = new Date(item.timestamp);
+                        dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    } catch(e) {}
+
+                    html += `
+                        <div class="history-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="history-icon ${badgeClass} text-white bg-opacity-75">${icon}</div>
+                                <div>
+                                    <div class="fw-bold">Top Up Saldo</div>
+                                    <div class="small text-muted" style="font-size:0.8rem">${item.orderId}</div>
+                                    <div class="small text-muted">${dateStr}</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+ Rp ${item.amount.toLocaleString('id-ID')}</div>
+                                <span class="badge ${badgeClass} rounded-pill" style="font-size: 0.7rem;">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="text-center py-5 text-danger">Gagal memuat riwayat.</div>`;
+            }
+        }
+
         // --- FUNGSI ATUR / UBAH PIN ---
         const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
         
         function openPinModal() {
-            document.getElementById('inputOldPin').value = ''; // Reset inputs
+            document.getElementById('inputOldPin').value = ''; 
             document.getElementById('inputNewPin').value = '';
             document.getElementById('inputConfirmPin').value = '';
             
@@ -634,7 +740,8 @@
             const newLang = currentLang === 'id' ? 'en' : 'id';
             localStorage.setItem('lang', newLang);
             updateLanguage(newLang);
-            loadTickets(); 
+            loadTickets();
+            loadTopupHistory();
         }
 
         function updateLanguage(lang) {
