@@ -517,14 +517,15 @@
             }
         }
 
-        // --- FETCH TOP UP HISTORY ---
+        // --- FETCH BALANCE HISTORY (MUTASI SALDO) ---
         async function loadTopupHistory() {
             const container = document.getElementById('topupList');
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             
             try {
-                const res = await fetch('/api/my-topups', {
+                // Panggil API baru yang sudah digabung
+                const res = await fetch('/api/balance-history', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: user.id })
                 });
@@ -537,16 +538,30 @@
 
                 let html = '';
                 history.forEach(item => {
-                    let badgeClass = 'bg-secondary';
-                    let icon = '<i class="bi bi-hourglass-split"></i>';
-                    let statusText = t.status_pending;
+                    let badgeClass = '';
+                    let icon = '';
+                    let amountClass = '';
+                    let sign = '';
 
-                    if (item.status === 'success') { badgeClass = 'bg-success'; icon = '<i class="bi bi-check-lg"></i>'; statusText = t.status_success; }
-                    else if (item.status === 'failed') { badgeClass = 'bg-danger'; icon = '<i class="bi bi-x-lg"></i>'; statusText = t.status_failed; }
+                    // Logika Tampilan Uang Masuk vs Keluar
+                    if (item.type === 'in') {
+                        // UANG MASUK (TOP UP)
+                        badgeClass = 'bg-success';
+                        icon = '<i class="bi bi-arrow-down-left"></i>'; // Panah masuk
+                        amountClass = 'text-success';
+                        sign = '+';
+                    } else {
+                        // UANG KELUAR (BELI TIKET)
+                        badgeClass = 'bg-danger';
+                        icon = '<i class="bi bi-arrow-up-right"></i>'; // Panah keluar
+                        amountClass = 'text-danger';
+                        sign = '-';
+                    }
 
+                    // Format Tanggal
                     let dateStr = "TBA";
                     try {
-                        const dateObj = new Date(item.timestamp);
+                        const dateObj = new Date(item.date);
                         dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                     } catch(e) {}
 
@@ -555,14 +570,14 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="history-icon ${badgeClass} text-white bg-opacity-75">${icon}</div>
                                 <div>
-                                    <div class="fw-bold">Top Up Saldo</div>
-                                    <div class="small text-muted" style="font-size:0.8rem">${item.orderId}</div>
+                                    <div class="fw-bold">${item.title}</div>
+                                    <div class="small text-muted" style="font-size:0.8rem">${item.id}</div>
                                     <div class="small text-muted">${dateStr}</div>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <div class="fw-bold text-success">+ Rp ${item.amount.toLocaleString('id-ID')}</div>
-                                <span class="badge ${badgeClass} rounded-pill" style="font-size: 0.7rem;">${statusText}</span>
+                                <div class="fw-bold ${amountClass}">${sign} Rp ${item.amount.toLocaleString('id-ID')}</div>
+                                <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">${item.type === 'in' ? 'SUCCESS' : 'PAYMENT'}</span>
                             </div>
                         </div>
                     `;
