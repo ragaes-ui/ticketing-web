@@ -569,7 +569,34 @@
         }
         document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
 
-        // --- UPDATE FUNGSI PEMBELIAN TIKET ---
+        // --- 1. FUNGSI CEK PROMO (Helper untuk Swal) ---
+        async function cekPromo() {
+            const codeInput = document.getElementById('swal-input-promo');
+            const statusEl = document.getElementById('promo-status');
+            const code = codeInput.value;
+
+            if(!code) return;
+            
+            statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
+            
+            try {
+                const res = await fetch('/api/check-promo', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ code })
+                });
+                const data = await res.json();
+                
+                if(data.valid) {
+                    statusEl.className = "text-success fw-bold mb-3 small";
+                    statusEl.innerText = `✅ ${data.message}`;
+                } else {
+                    statusEl.className = "text-danger fw-bold mb-3 small";
+                    statusEl.innerText = `❌ ${data.message}`;
+                }
+            } catch(e) { statusEl.innerText = "Error cek promo"; }
+        }
+
+        // --- 2. FUNGSI BELI TIKET (UPDATE: DENGAN PROMO) ---
         async function buyTicket(eventId) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -593,107 +620,96 @@
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
 
-            const hargaFormatted = new Intl.NumberFormat('id-ID').format(event.price);
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
             
-            // 2. Tampilkan Pilihan Metode Pembayaran
-            const inputOptions = {
-                'saldo': `<b>Potong Saldo</b> (Sisa: Rp ${saldoFormatted})`,
-                'midtrans': `<b>Metode Lain</b> (VA, E-Wallet, QRIS)`
-            };
-
+            // 2. Pilih Metode Pembayaran
             const { value: paymentMethod } = await Swal.fire({
-                title: lang === 'id' ? 'Pilih Metode Pembayaran' : 'Select Payment Method',
-                html: `<div class="text-start mt-2">
-                          <p class="mb-3">Beli tiket <b>${event.name}</b> seharga <b class="text-danger">Rp ${hargaFormatted}</b></p>
-                       </div>`,
+                title: lang === 'id' ? 'Metode Pembayaran' : 'Payment Method',
                 input: 'radio',
-                inputOptions: inputOptions,
+                inputOptions: {
+                    'saldo': `<b>Potong Saldo</b> (Sisa: Rp ${saldoFormatted})`,
+                    'midtrans': `<b>Metode Lain</b> (VA, E-Wallet, QRIS)`
+                },
                 inputValidator: (value) => {
-                    if (!value) {
-                        return lang === 'id' ? 'Pilih metode pembayaran terlebih dahulu!' : 'Please choose a payment method!';
-                    }
+                    if (!value) return lang === 'id' ? 'Pilih metode pembayaran!' : 'Choose a payment method!';
                 },
                 showCancelButton: true,
                 confirmButtonColor: '#0049CC',
-                cancelButtonColor: '#d33',
-                confirmButtonText: lang === 'id' ? 'Lanjutkan' : 'Continue',
-                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel'
+                confirmButtonText: lang === 'id' ? 'Lanjut' : 'Next'
             });
 
             if (!paymentMethod) return;
 
             // 3. Eksekusi Pembayaran
             if (paymentMethod === 'saldo') {
-                // --- ALUR POTONG SALDO DENGAN VERIFIKASI PIN ---
-                
-                // A. Cek apakah user sudah set PIN
-                if (!user.hasPin) {
-                    Swal.fire({
-                        icon: 'warning', 
-                        title: lang === 'id' ? 'PIN Belum Diatur' : 'PIN Not Set', 
-                        text: lang === 'id' ? 'Kamu belum mengatur PIN Keamanan Saldo. Silakan buat PIN terlebih dahulu di menu Dashboard.' : 'You have not set a Security PIN. Please set it in the Dashboard.',
-                        confirmButtonText: lang === 'id' ? 'Ke Dashboard' : 'To Dashboard', 
-                        confirmButtonColor: '#0049CC'
-                    }).then((r) => { if(r.isConfirmed) window.location.href = 'dashboard.html'; });
-                    return;
-                }
+                // --- FORM PIN & PROMO ---
+                const { value: formValues } = await Swal.fire({
+                    title: 'Konfirmasi',
+                    html: `
+                        <div class="text-start mb-3 border-bottom pb-2">
+                            <p class="mb-1 fw-bold">${event.name}</p>
+                            <p class="mb-0 text-muted">Harga: Rp ${event.price.toLocaleString('id-ID')}</p>
+                        </div>
+                        
+                        <div class="input-group mb-2">
+                            <input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)">
+                            <button class="btn btn-outline-primary" type="button" onclick="cekPromo()">Cek</button>
+                        </div>
+                        <div id="promo-status" class="text-start mb-3 small"></div>
 
-                // B. Cek Saldo
-                if (saldoUser < event.price) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: lang === 'id' ? 'Saldo Tidak Cukup' : 'Insufficient Balance',
-                        text: lang === 'id' ? 'Silakan top up saldo terlebih dahulu.' : 'Please top up your balance.',
-                        confirmButtonText: lang === 'id' ? 'Isi Saldo' : 'Top Up',
-                        confirmButtonColor: '#0049CC'
-                    }).then((r) => { if(r.isConfirmed) window.location.href = 'dashboard.html'; });
-                    return;
-                }
-
-                // C. Minta Input PIN via SweetAlert
-                const { value: inputPin } = await Swal.fire({
-                    title: lang === 'id' ? 'Verifikasi PIN' : 'Verify PIN',
-                    html: lang === 'id' ? `Masukkan 6 digit PIN kamu untuk membayar <b>Rp ${hargaFormatted}</b>` : `Enter your 6-digit PIN to pay <b>Rp ${hargaFormatted}</b>`,
-                    input: 'password',
-                    inputAttributes: { maxlength: 6, autocapitalize: 'off', autocorrect: 'off', inputmode: 'numeric', pattern: '[0-9]*', style: 'text-align:center; letter-spacing: 15px; font-size: 1.5rem; font-weight: bold;' },
-                    showCancelButton: true, 
-                    confirmButtonText: lang === 'id' ? 'Bayar Sekarang' : 'Pay Now', 
+                        <label class="small text-muted mb-1">PIN Transaksi (6 Digit)</label>
+                        <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 5px;">
+                    `,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Bayar',
                     confirmButtonColor: '#0049CC',
-                    cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                    inputValidator: (value) => { 
-                        if (!value || value.length !== 6 || isNaN(value)) return lang === 'id' ? 'PIN harus 6 angka bulat!' : 'PIN must be exactly 6 digits!'; 
+                    preConfirm: () => {
+                        return {
+                            promo: document.getElementById('swal-input-promo').value,
+                            pin: document.getElementById('swal-input-pin').value
+                        }
                     }
                 });
 
-                if (!inputPin) return; // User batal input PIN
+                if (!formValues) return;
+                const { promo, pin } = formValues;
 
-                // D. Hit API Beli (Kirim PIN)
-                Swal.fire({ title: lang === 'id' ? 'Memvalidasi PIN...' : 'Validating PIN...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                // Validasi PIN Client Side
+                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+
+                // D. Kirim ke Server
+                Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+                
                 try {
                     const res = await fetch('/api/buy-ticket', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: user.id, eventId: eventId, price: event.price, pin: inputPin }) 
+                        body: JSON.stringify({ 
+                            userId: user.id, 
+                            eventId: eventId, 
+                            price: event.price, 
+                            pin: pin, 
+                            promoCode: promo // <-- Kode promo dikirim di sini
+                        })
                     });
                     const data = await res.json();
-                    
+
                     if (res.ok && data.success) {
                         user.saldo = data.sisaSaldo;
                         localStorage.setItem('userData', JSON.stringify(user));
                         Swal.fire({ 
                             icon: 'success', 
-                            title: lang === 'id' ? 'Berhasil!' : 'Success!', 
-                            html: `${lang === 'id' ? 'Pembayaran berhasil.' : 'Payment successful.'}<br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}`, 
-                            confirmButtonColor: '#0049CC' 
-                        }).then(() => window.location.href = 'dashboard.html'); 
+                            title: 'Berhasil!', 
+                            html: `Tiket: <b>${data.ticketCode}</b><br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}` 
+                        }).then(() => window.location.href = 'dashboard.html');
                     } else {
-                        Swal.fire('Gagal', data.message || 'Pembayaran gagal.', 'error');
+                        Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error');
                     }
-                } catch (err) { Swal.fire('Error', 'Gagal terhubung ke server.', 'error'); }
+                } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
 
             } else if (paymentMethod === 'midtrans') {
-                // --- ALUR MIDTRANS (VA / E-WALLET / DLL) ---
+                // --- ALUR MIDTRANS (Tetap sama seperti sebelumnya) ---
                 const namaPemesan = user.fullName ? user.fullName : user.username;
                 Swal.fire({ title: lang === 'id' ? 'Menghubungkan ke Payment Gateway...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 
