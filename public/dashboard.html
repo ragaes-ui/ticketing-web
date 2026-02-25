@@ -352,6 +352,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
+                    
+                    <div class="mb-3" id="groupOldPin" style="display: none;">
+                        <label class="text-muted mb-2 text-warning fw-bold" data-i18n="modal_pin_old">PIN Lama</label>
+                        <input type="password" id="inputOldPin" class="form-control text-center fw-bold fs-3 mx-auto border-warning" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
+                    </div>
+
                     <div class="mb-3">
                         <label class="text-muted mb-2" data-i18n="modal_pin_desc">PIN Baru (6 Digit)</label>
                         <input type="password" id="inputNewPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
@@ -360,7 +366,7 @@
                         <label class="text-muted mb-2" data-i18n="modal_pin_confirm">Konfirmasi PIN Baru</label>
                         <input type="password" id="inputConfirmPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
                     </div>
-                    <small class="text-muted d-block mt-3 text-warning" data-i18n="modal_pin_note">Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.</small>
+                    <small class="text-muted d-block mt-3 text-info" data-i18n="modal_pin_note">Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.</small>
                 </div>
                 <div class="modal-footer">
                     <button onclick="savePin()" id="btnSavePin" class="btn btn-primary-neon w-100" data-i18n="btn_save_pin">Simpan PIN</button>
@@ -398,7 +404,7 @@
                 btn_edit_profile: "Edit Profil", btn_password: "Password", btn_history: "Riwayat",
                 section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
                 btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
-                modal_pin_title: "Atur PIN Keamanan", modal_pin_desc: "PIN Baru (6 Digit)", modal_pin_confirm: "Konfirmasi PIN Baru", 
+                modal_pin_title: "Atur PIN Keamanan", modal_pin_old: "Masukkan PIN Lama", modal_pin_desc: "PIN Baru (6 Digit)", modal_pin_confirm: "Konfirmasi PIN Baru", 
                 modal_pin_note: "Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.", btn_save_pin: "Simpan PIN", btn_change_pin: "Update PIN",
                 loading_tickets: "Mengambil data tiket...", empty_tickets: "Belum ada tiket yang dibeli.",
                 modal_name_title: "Ubah Nama", modal_name_label: "Nama Lengkap Baru", btn_save: "Simpan Perubahan",
@@ -411,14 +417,14 @@
                 txt_date_tba: "Tanggal TBA", toast_copy: "Berhasil disalin!", toast_pdf_gen: "Sedang membuat PDF...",
                 pdf_header: "E-TICKET RCELLFEST", pdf_info: "Tunjukkan QR Code ini di pintu masuk.", pdf_footer: "Terima kasih telah memesan.",
                 error_fetch: "Gagal mengambil data. Cek koneksi backend.",
-                err_pin_match: "PIN tidak cocok!"
+                err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!"
             },
             en: {
                 nav_home: "Home", nav_logout: "Logout",
                 btn_edit_profile: "Edit Profile", btn_password: "Password", btn_history: "History",
                 section_assets: "My Digital Assets", btn_buy_new: "Buy New",
                 btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
-                modal_pin_title: "Set Security PIN", modal_pin_desc: "New PIN (6 Digits)", modal_pin_confirm: "Confirm New PIN",
+                modal_pin_title: "Set Security PIN", modal_pin_old: "Enter Old PIN", modal_pin_desc: "New PIN (6 Digits)", modal_pin_confirm: "Confirm New PIN",
                 modal_pin_note: "Remember this PIN! Used when buying tickets with balance.", btn_save_pin: "Save PIN", btn_change_pin: "Update PIN",
                 loading_tickets: "Loading tickets...", empty_tickets: "No purchased tickets found.",
                 modal_name_title: "Change Name", modal_name_label: "New Full Name", btn_save: "Save Changes",
@@ -431,7 +437,7 @@
                 txt_date_tba: "Date TBA", toast_copy: "Copied!", toast_pdf_gen: "Generating PDF...",
                 pdf_header: "RCELLFEST E-TICKET", pdf_info: "Show this QR Code at the entrance.", pdf_footer: "Thank you for booking.",
                 error_fetch: "Failed to fetch data. Check backend connection.",
-                err_pin_match: "PINs do not match!"
+                err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!"
             }
         };
 
@@ -464,45 +470,62 @@
 
         // --- FUNGSI ATUR / UBAH PIN ---
         const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
+        
         function openPinModal() {
+            document.getElementById('inputOldPin').value = ''; // Reset inputs
             document.getElementById('inputNewPin').value = '';
             document.getElementById('inputConfirmPin').value = '';
             
-            // Ubah teks modal jika user sudah punya PIN (Mode Ubah)
             const lang = localStorage.getItem('lang') || 'id';
             const titleEl = document.getElementById('pinModalTitle');
             const btnEl = document.getElementById('btnSavePin');
+            const oldPinGroup = document.getElementById('groupOldPin');
             
             if (user.hasPin) {
+                // Mode Ubah PIN (Tampilkan input lama)
                 titleEl.innerText = (lang === 'id') ? 'Ubah PIN Transaksi' : 'Change Transaction PIN';
                 btnEl.innerText = translations[lang].btn_change_pin;
+                oldPinGroup.style.display = 'block';
             } else {
+                // Mode Buat PIN Baru
                 titleEl.innerText = translations[lang].modal_pin_title;
                 btnEl.innerText = translations[lang].btn_save_pin;
+                oldPinGroup.style.display = 'none';
             }
             
             pinModal.show();
         }
 
         async function savePin() {
-            const pin = document.getElementById('inputNewPin').value;
+            const oldPin = document.getElementById('inputOldPin').value;
+            const newPin = document.getElementById('inputNewPin').value;
             const confirmPin = document.getElementById('inputConfirmPin').value;
             const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
             
-            // Validasi Format
-            if(pin.length !== 6 || isNaN(pin)) {
-                return Swal.fire({icon: 'error', title: 'Oops', text: lang === 'id' ? 'PIN wajib 6 angka bulat!' : 'PIN must be exactly 6 digits!', background: '#1c1c2d', color: '#fff'});
+            // Validasi PIN Lama (Hanya jika user sudah punya PIN)
+            if (user.hasPin && (!oldPin || oldPin.length !== 6 || isNaN(oldPin))) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_old_pin, background: '#1c1c2d', color: '#fff'});
+            }
+
+            // Validasi Format PIN Baru
+            if(newPin.length !== 6 || isNaN(newPin)) {
+                return Swal.fire({icon: 'error', title: 'Oops', text: t.err_pin_len, background: '#1c1c2d', color: '#fff'});
             }
 
             // Validasi Konfirmasi
-            if (pin !== confirmPin) {
-                return Swal.fire({icon: 'error', title: 'Error', text: translations[lang].err_pin_match, background: '#1c1c2d', color: '#fff'});
+            if (newPin !== confirmPin) {
+                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pin_match, background: '#1c1c2d', color: '#fff'});
             }
             
+            // Payload data
+            const payload = { userId: user.id, newPin: newPin };
+            if (user.hasPin) payload.oldPin = oldPin;
+
             try {
                 const res = await fetch('/api/user/set-pin', {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ userId: user.id, pin: pin })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 
