@@ -177,15 +177,51 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API RIWAYAT TOP UP ---
-app.post('/api/my-topups', async (req, res) => {
+// --- API RIWAYAT MUTASI SALDO (GABUNGAN TOPUP & BELI) ---
+// Gantikan api/my-topups dengan ini:
+app.post('/api/balance-history', async (req, res) => {
     try {
         const { userId } = req.body;
-        // Ambil data topup, urutkan dari yang terbaru
-        const topups = await Topup.find({ userId }).sort({ timestamp: -1 });
-        res.json(topups);
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        
+        // 1. Ambil Data User untuk dapatkan Email (karena Order disimpan pakai email)
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // 2. Ambil Data Top Up (Uang Masuk) - Hanya yang sukses
+        const topups = await Topup.find({ userId: userId, status: 'success' }).lean();
+        const historyTopup = topups.map(t => ({
+            type: 'in', // Masuk
+            title: 'Top Up Saldo',
+            amount: t.amount,
+            date: t.timestamp,
+            id: t.orderId
+        }));
+
+        // 3. Ambil Data Pembelian Tiket (Uang Keluar)
+        // Kita filter yang orderIdMidtrans-nya diawali "SALDO-PAY" (artinya bayar pakai saldo)
+        const orders = await Order.find({ 
+            email: user.email, 
+            orderIdMidtrans: { $regex: /^SALDO-PAY/ } 
+        }).populate('eventId').lean();
+
+        const historyOrder = orders.map(o => ({
+            type: 'out', // Keluar
+            title: `Beli: ${o.eventId?.name || 'Tiket Event'}`,
+            amount: o.eventId?.price || 0, // Ambil harga dari event
+            date: o.purchaseDate,
+            id: o.ticketCode
+        }));
+
+        // 4. Gabungkan dan Urutkan dari yang paling baru
+        const fullHistory = [...historyTopup, ...historyOrder].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        res.json(fullHistory);
+
+    } catch (error) { 
+        res.status(500).json({ error: error.message }); 
+    }
 });
+
 // ==========================================
 // --- API SALDO BARU (TOP UP, BELI & PIN) ---
 // ==========================================
