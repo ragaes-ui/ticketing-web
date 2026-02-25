@@ -313,42 +313,61 @@ app.post('/api/user/set-pin', async (req, res) => {
 });
 
 
-// 4. Beli Tiket Menggunakan Saldo Langsung (WAJIBKAN PIN)
+// 4. Beli Tiket Menggunakan Saldo (UPDATE: DENGAN PROMO)
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        const { userId, eventId, price, quantity = 1, pin } = req.body; // <-- Terima PIN dari frontend
+        // Kita terima tambahan data 'promoCode' dari frontend
+        const { userId, eventId, price, quantity = 1, pin, promoCode } = req.body; 
         
         // --- A. VALIDASI USER & PIN ---
         const userCheck = await User.findById(userId);
         if (!userCheck) return res.status(404).json({ success: false, message: "User tidak ditemukan" });
         
-        // Cek apakah user ini sudah mengatur PIN di akunnya
         if (!userCheck.pin) {
-            return res.status(400).json({ success: false, message: "Belum set PIN. Silakan atur PIN Keamanan di menu Dashboard/Profil." });
+            return res.status(400).json({ success: false, message: "Belum set PIN. Silakan atur PIN di Dashboard." });
         }
         
-        // Cek apakah input PIN dari form cocok dengan PIN di database
         const isPinMatch = await bcrypt.compare(pin, userCheck.pin);
         if (!isPinMatch) {
-            return res.status(400).json({ success: false, message: "PIN Saldo yang kamu masukkan salah!" });
+            return res.status(400).json({ success: false, message: "PIN Saldo salah!" });
         }
 
-        // --- B. PROSES PEMBELIAN TIKET ---
+        // --- B. CEK EVENT ---
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        const totalHarga = price * quantity;
+        // --- C. HITUNG HARGA & CEK PROMO ---
+        let totalHarga = price * quantity;
+        let discountAmount = 0;
 
-        // Potong saldo dengan mengecek kecukupan saldo (mencegah bug double request)
+        // Jika ada kode promo dikirim, kita cek validitasnya
+        if (promoCode) {
+            const promo = await Promo.findOne({ code: promoCode.toUpperCase() });
+            
+            // Syarat: Promo ada, Kuota > 0, dan Belum Kadaluarsa
+            if (promo && promo.quota > 0 && new Date() < promo.expiresAt) {
+                discountAmount = promo.discount;
+                
+                // Kurangi kuota promo nanti setelah transaksi sukses
+                promo.quota -= 1;
+                await promo.save();
+            }
+        }
+
+        // Harga Akhir (Jangan sampai minus)
+        let finalPrice = totalHarga - discountAmount;
+        if (finalPrice < 0) finalPrice = 0;
+
+        // --- D. POTONG SALDO ---
         const user = await User.findOneAndUpdate(
-            { _id: userId, saldo: { $gte: totalHarga } }, 
-            { $inc: { saldo: -totalHarga } },
+            { _id: userId, saldo: { $gte: finalPrice } }, 
+            { $inc: { saldo: -finalPrice } },
             { new: true }
         );
 
-        if (!user) return res.status(400).json({ success: false, message: "Saldo kamu tidak mencukupi. Silakan Top Up Saldo!" });
+        if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
-        // Generate tiket
+        // --- E. GENERATE TIKET ---
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
@@ -357,19 +376,20 @@ app.post('/api/buy-ticket', async (req, res) => {
             eventId: eventId,
             customerName: user.fullName || user.username,
             email: user.email,
-            status: 'valid', // Status langsung valid karena pakai saldo internal
+            status: 'valid',
             orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
         });
         await newOrder.save();
         
-        // Kurangi ketersediaan kursi
+        // Kurangi kursi event
         event.availableSeats -= quantity;
         await event.save();
         
-        // Kirim response sukses beserta sisa saldo terbaru
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
+
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
+
 
 // ==========================================
 // --- PAYMENT & ORDER LAMA (VIA MIDTRANS) ---
