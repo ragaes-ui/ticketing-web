@@ -6,6 +6,8 @@ const orderSchema = new mongoose.Schema({
   
   // Relasi ke Event
   eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }, 
+
+  price: { type: Number, required: true },
   
   customerName: String,
   email: String,
