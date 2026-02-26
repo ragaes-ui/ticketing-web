@@ -776,7 +776,7 @@
             });
         }
 
-        // --- LOAD TIKET (DENGAN DATA PEMESAN) ---
+// --- 1. FUNGSI LOAD TIKET (UPDATE TAMPILAN TIER) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const lang = localStorage.getItem('lang') || 'id';
@@ -822,27 +822,34 @@
                     let descText = event.description || "";
                     let descClean = descText.replace(/\n/g, " | "); 
                     
-                    // --- AMBIL DATA PEMESAN DARI DATABASE ---
                     const pemesanName = ticket.customerName || user.fullName || user.username;
                     const pemesanPhone = ticket.phone || '-';
                     const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
                     const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
+                    
+                    // 👇 AMBIL NAMA TIER DARI DATABASE TIKET
+                    const tierName = ticket.tierName || 'General';
 
                     // --- DATA UNTUK EXPORT PDF ---
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
                         code: ticket.ticketCode, isStreaming: isStreaming, desc: descText, 
-                        buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar
+                        buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
+                        tierName: tierName // <--- Bawa ke PDF
                     }));
 
                     let mainContent = '';
                     
-                    // TAMPILAN GRID UNTUK SEMUA JENIS TIKET
+                    // TAMPILAN GRID TIKET DI DASHBOARD (Update tambah Tipe Tiket)
                     mainContent += `
                         <div class="ticket-info-grid">
                             <div>
                                 <div class="info-label">Nama Pemesan</div>
                                 <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Tipe Tiket</div>
+                                <div class="info-value text-primary fw-bold">${tierName}</div>
                             </div>
                             <div>
                                 <div class="info-label">No. WhatsApp</div>
@@ -852,7 +859,7 @@
                                 <div class="info-label">Pembayaran</div>
                                 <div class="info-value"><i class="bi ${metodeBayar === 'SALDO' ? 'bi-wallet2 text-primary' : 'bi-credit-card text-success'}"></i> ${metodeBayar}</div>
                             </div>
-                            <div>
+                            <div style="grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 10px; margin-top: 5px;">
                                 <div class="info-label">Total Harga</div>
                                 <div class="info-value">Rp ${hargaTiket.toLocaleString('id-ID')}</div>
                             </div>
@@ -916,7 +923,7 @@
             }
         }
 
-// --- PDF GENERATOR (UPDATE NAMA FILE CUSTOM) ---
+        // --- 2. FUNGSI DOWNLOAD PDF (UPDATE TAMPILAN TIER) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -924,14 +931,11 @@
 
             Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
 
-            // 1. Simpan posisi scroll & paksa scroll ke atas
             const currentScroll = window.scrollY;
             window.scrollTo(0, 0);
 
             const element = document.createElement('div');
             document.body.appendChild(element);
-            
-            // 2. Gunakan absolute, lempar ke kiri layar, dan paksa background putih
             element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
 
             let contentMiddle = '';
@@ -962,7 +966,9 @@
                     
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h1 style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
-                        <p style="margin: 5px 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
+                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                            ${data.tierName} </span>
+                        <p style="margin: 8px 0 0 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
@@ -995,45 +1001,33 @@
             `;
 
             try {
-                // Tunggu gambar (QR Code) benar-benar ter-load sebelum di-print
                 const imgs = element.querySelectorAll('img');
                 const promises = Array.from(imgs).map(img => {
                     if (img.complete) return Promise.resolve();
                     return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
                 });
                 await Promise.all(promises);
-                
-                // Jeda 500ms agar font render dengan baik
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // --- 3. LOGIKA UNTUK MEMBERSIHKAN NAMA FILE ---
-                // Menghilangkan spasi & karakter aneh agar aman di semua HP/PC
                 const cleanBuyer = data.buyerName.replace(/[^a-zA-Z0-9]/g, "_");
                 const cleanEvent = data.eventName.replace(/[^a-zA-Z0-9]/g, "_");
-                const customFileName = `Tiket_${cleanBuyer}_${cleanEvent}.pdf`;
+                const cleanTier = data.tierName.replace(/[^a-zA-Z0-9]/g, "");
+                
+                const customFileName = `Tiket_${cleanBuyer}_${cleanEvent}_${cleanTier}.pdf`;
 
                 const opt = { 
                     margin: [10, 10, 10, 10], 
-                    filename: customFileName, // <--- NAMA FILE SUDAH CUSTOM DI SINI
+                    filename: customFileName, 
                     image: { type: 'jpeg', quality: 1 }, 
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true, 
-                        backgroundColor: '#ffffff', 
-                        scrollY: 0, 
-                        windowY: 0 
-                    }, 
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, windowY: 0 }, 
                     jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
                 };
                 
-                // Print hanya pada area ID
                 await html2pdf().set(opt).from(element.querySelector('#pdf-print-area')).save();
-                
             } catch (error) {
                 console.error("Error Cetak PDF:", error);
                 Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF', background: '#1c1c2d', color: '#fff'});
             } finally {
-                // Bersihkan sampah DOM & kembalikan posisi scroll
                 document.body.removeChild(element);
                 window.scrollTo(0, currentScroll);
                 Swal.close();
