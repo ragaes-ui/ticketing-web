@@ -9,6 +9,8 @@ const orderSchema = new mongoose.Schema({
   
   customerName: String,
   email: String,
+  phone: String, // 👈 TAMBAHAN: Untuk menyimpan No. WhatsApp
+  nik: String,   // 👈 TAMBAHAN: Untuk menyimpan NIK KTP (Opsional)
   
   // PENTING: Update status agar mendukung flow pembayaran
   status: { 
