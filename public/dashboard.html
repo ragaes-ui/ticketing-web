@@ -1047,10 +1047,61 @@
                 user.fullName = newName; localStorage.setItem('userData',JSON.stringify(user)); renderProfile(); nameModal.hide(); Swal.fire({icon:'success', title:'Sukses', background:'#1c1c2d', color:'#fff'}); 
             } catch(e) {}
         }
-        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
-        function openPassModal() { passModal.show(); }
-        async function savePassword() { passModal.hide(); Swal.fire({icon:'success', title:'Sukses', text:'Silakan login ulang', background:'#1c1c2d', color:'#fff'}).then(()=>logout()); }
-    </script>
+                const passModal = new bootstrap.Modal(document.getElementById('passModal'));
+        function openPassModal() { 
+            document.getElementById('oldPass').value = '';
+            document.getElementById('newPass').value = '';
+            passModal.show(); 
+        }
+
+        async function savePassword() { 
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+
+            if (!oldPass || !newPass) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!', background: '#1c1c2d', color: '#fff'});
+            }
+
+            // Tampilkan loading
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#1c1c2d', color: '#fff' });
+
+            try {
+                const res = await fetch('/api/user/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id, // ID diambil dari variabel user yang login
+                        oldPassword: oldPass,
+                        newPassword: newPass
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    passModal.hide(); 
+                    Swal.fire({
+                        icon: 'success', 
+                        title: 'Sukses', 
+                        text: 'Password berhasil diubah! Silakan login ulang.', 
+                        background: '#1c1c2d', 
+                        color: '#fff'
+                    }).then(() => logout()); 
+                } else {
+                    Swal.fire({
+                        icon: 'error', 
+                        title: 'Gagal', 
+                        text: data.message || 'Gagal mengubah password.', 
+                        background: '#1c1c2d', 
+                        color: '#fff'
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#1c1c2d', color: '#fff'});
+            }
+        }
+
 
     <script>
         (async function() {
