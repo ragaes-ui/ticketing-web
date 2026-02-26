@@ -916,7 +916,7 @@
             }
         }
 
-// --- PDF GENERATOR (VERSI ANTI-BLANK) ---
+// --- PDF GENERATOR (UPDATE NAMA FILE CUSTOM) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -924,14 +924,14 @@
 
             Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
 
-            // 1. PENTING: Simpan posisi scroll & paksa scroll ke atas agar html2canvas tidak blank
+            // 1. Simpan posisi scroll & paksa scroll ke atas
             const currentScroll = window.scrollY;
             window.scrollTo(0, 0);
 
             const element = document.createElement('div');
             document.body.appendChild(element);
             
-            // 2. PENTING: Gunakan absolute, lempar ke kiri layar, dan paksa background putih
+            // 2. Gunakan absolute, lempar ke kiri layar, dan paksa background putih
             element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
 
             let contentMiddle = '';
@@ -953,7 +953,6 @@
                     </div>`;
             }
 
-            // Gunakan ID unik untuk menargetkan render area
             element.innerHTML = `
                 <div id="pdf-print-area" style="padding: 30px; background-color: #ffffff; border: 1px solid #ddd;">
                     <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -1007,14 +1006,20 @@
                 // Jeda 500ms agar font render dengan baik
                 await new Promise(resolve => setTimeout(resolve, 500));
 
+                // --- 3. LOGIKA UNTUK MEMBERSIHKAN NAMA FILE ---
+                // Menghilangkan spasi & karakter aneh agar aman di semua HP/PC
+                const cleanBuyer = data.buyerName.replace(/[^a-zA-Z0-9]/g, "_");
+                const cleanEvent = data.eventName.replace(/[^a-zA-Z0-9]/g, "_");
+                const customFileName = `Tiket_${cleanBuyer}_${cleanEvent}.pdf`;
+
                 const opt = { 
                     margin: [10, 10, 10, 10], 
-                    filename: `Tiket-${data.code}.pdf`, 
+                    filename: customFileName, // <--- NAMA FILE SUDAH CUSTOM DI SINI
                     image: { type: 'jpeg', quality: 1 }, 
                     html2canvas: { 
                         scale: 2, 
                         useCORS: true, 
-                        backgroundColor: '#ffffff', // 3. PENTING: Paksa background putih di canvas
+                        backgroundColor: '#ffffff', 
                         scrollY: 0, 
                         windowY: 0 
                     }, 
