@@ -12,7 +12,20 @@
                 const data = await res.json();
                 const isAdmin = localStorage.getItem('adminToken'); 
                 if (data.isActive && !isAdmin) {
-                    document.documentElement.innerHTML = `<head><title>Maintenance</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:0;font-family:sans-serif;background:#0e1e3b;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center}.btn{background:white;color:#0e1e3b;border:none;padding:10px 25px;border-radius:50px;cursor:pointer;font-weight:bold}</style></head><body><h1>🚧 Lagi Didandanin! ✨</h1><p>Website sedang maintenance rutin.</p><button onclick="location.reload()" class="btn">Refresh</button></body>`;
+                    document.documentElement.innerHTML = `
+                    <head>
+                        <title>Maintenance</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                            body { margin:0; padding:0; font-family:sans-serif; background:#0e1e3b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; }
+                            .btn { background:white; color:#0e1e3b; border:none; padding:10px 25px; border-radius:50px; cursor:pointer; font-weight:bold; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>🚧 Lagi Didandanin! ✨</h1>
+                        <p>Website sedang maintenance rutin.</p>
+                        <button onclick="location.reload()" class="btn">Refresh</button>
+                    </body>`;
                 }
             } catch (err) {}
         })();
@@ -111,7 +124,11 @@
         }
         @keyframes icon-float { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes text-shimmer { to { background-position: 200% center; } }
-        @keyframes fill-bar { 0% { width: 0%; transform: translateX(-100%); } 50% { width: 100%; transform: translateX(0); } 100% { width: 100%; transform: translateX(100%); } }
+        @keyframes fill-bar { 
+            0% { width: 0%; transform: translateX(-100%); } 
+            50% { width: 100%; transform: translateX(0); } 
+            100% { width: 100%; transform: translateX(100%); } 
+        }
 
         .hide-loader { opacity: 0; visibility: hidden; transform: scale(1.1); }
 
@@ -186,67 +203,82 @@
         @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
 
-        /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS (SWEETALERT) --- */
-        .payment-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
+        /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS & TIERING --- */
+        .payment-selector { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-top: 15px; 
         }
-        .payment-card {
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            background: var(--bg-card);
+        .payment-card { 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            text-align: left; 
+            background: var(--bg-card); 
         }
-        .payment-card:hover {
-            border-color: #0049CC;
-            background: var(--hover-cat);
-            transform: translateY(-2px);
+        .payment-card:hover { 
+            border-color: #0049CC; 
+            background: var(--hover-cat); 
+            transform: translateY(-2px); 
         }
-        .payment-card.selected {
-            border-color: #0049CC;
-            background: #e6f0ff;
+        .payment-card.selected { 
+            border-color: #0049CC; 
+            background: #e6f0ff; 
         }
-        [data-theme="dark"] .payment-card.selected {
-            background: #1e293b;
-            border-color: #60a5fa;
+        [data-theme="dark"] .payment-card.selected { 
+            background: #1e293b; 
+            border-color: #60a5fa; 
         }
-        .payment-icon {
-            font-size: 1.5rem;
-            color: #0049CC;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 73, 204, 0.1);
-            border-radius: 10px;
+        .payment-icon { 
+            font-size: 1.5rem; 
+            color: #0049CC; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(0, 73, 204, 0.1); 
+            border-radius: 10px; 
         }
-        .payment-details h6 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-main);
+        .payment-details h6 { 
+            margin: 0; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            color: var(--text-main); 
         }
-        .payment-details p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        .payment-details p { 
+            margin: 0; 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
         }
-        /* Custom Sweetalert Input Check */
-        .swal2-html-container .form-control {
-            color: var(--text-main);
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
+        
+        .swal2-html-container .form-control { 
+            color: var(--text-main); 
+            background-color: var(--bg-input); 
+            border: 1px solid var(--border-color); 
         }
-        .swal2-html-container .form-label { color: var(--text-muted); }
+        .swal2-html-container .form-label { 
+            color: var(--text-muted); 
+        }
+
+        /* Gaya untuk Radio Button Tipe Tiket */
+        .tier-label { 
+            cursor: pointer; 
+            transition: 0.2s; 
+            border: 2px solid var(--border-color); 
+        }
+        .tier-label:hover { 
+            border-color: #0049CC; 
+        }
+        .tier-label input:checked + div { 
+            font-weight: bold; 
+        }
     </style>
 </head>
 <body>
@@ -328,10 +360,32 @@
             <p class="partner-title" data-i18n="partner_title">Partner Pembayaran Resmi</p>
             <div class="logos-slider">
                 <div class="logos-slide-track">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
+                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
                 </div>
                 <div class="logos-slide-track">
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri">
+                    <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
                 </div>
             </div>
         </div>
@@ -364,7 +418,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (version 3.1).</small>
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (version 3.2).</small>
                 </div>
             </div>
         </div>
@@ -391,12 +445,19 @@
                     <hr>
                     <h6 class="fw-bold" data-i18n="modal_desc_title">Deskripsi & Info</h6>
                     <p class="modal-desc-text" id="modalDesc"></p>
+                    
+                    <div class="mt-4 mb-3">
+                        <h6 class="fw-bold mb-2">Pilih Tipe Tiket</h6>
+                        <div id="ticketTierSelection" class="d-flex flex-column gap-2">
+                            </div>
+                    </div>
+
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="text-secondary d-block" data-i18n="modal_price_label">Harga</small>
+                            <small class="text-secondary d-block" data-i18n="modal_price_label">Total Harga</small>
                             <div class="modal-price-tag" id="modalPrice">Rp 0</div>
                         </div>
-                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">Beli Tiket</button>
+                        <button id="btnModalBuy" class="btn btn-secondary btn-lg px-4 rounded-pill fw-bold" disabled>Pilih Tiket Dulu</button>
                     </div>
                 </div>
             </div>
@@ -433,7 +494,6 @@
             }
         };
 
-        // --- LOADING LOGIC ---
         document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
@@ -450,7 +510,6 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // --- FUNCTIONS ---
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
@@ -554,11 +613,18 @@
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
             const btn = document.getElementById(`btn-cat-${category}`);
             if(btn) btn.classList.add('active');
-            if (category === 'All') { renderEvents(allEvents); } else { const filtered = allEvents.filter(e => (e.category || 'General') === category); renderEvents(filtered); }
+            if (category === 'All') { 
+                renderEvents(allEvents); 
+            } else { 
+                const filtered = allEvents.filter(e => (e.category || 'General') === category); 
+                renderEvents(filtered); 
+            }
         }
 
         function getEventImage(event) {
-            if (event.image && event.image.startsWith("http")) { return event.image; }
+            if (event.image && event.image.startsWith("http")) { 
+                return event.image; 
+            }
             const cat = (event.category || "General").toLowerCase();
             switch (cat) {
                 case 'konser': return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
@@ -587,41 +653,150 @@
                 const isSoldOut = event.availableSeats <= 0;
                 let dateStr = t.txt_date_tba;
                 if (event.date) { 
-                    try { const dateObj = new Date(event.date); dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); } catch (e) { dateStr = event.date; } 
+                    try { 
+                        const dateObj = new Date(event.date); 
+                        dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
+                    } catch (e) { dateStr = event.date; } 
                 }
                 const catName = event.category || 'General'; 
                 const locationName = event.location || t.txt_tba;
                 const imageUrl = getEventImage(event);
+                
+                // Pada tampilan depan, jika ada tipe tiket, ubah label jadi "Mulai Dari Rp..."
+                const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
                 let btnText = isSoldOut ? t.btn_sold_out : t.btn_buy_short;
                 if (catName === 'Streaming' && !isSoldOut) { btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; }
 
-                container.innerHTML += `<div class="col-6 col-md-4 col-lg-3"><div class="card-event" onclick="showDetail('${event._id}')"><div class="card-img-top" style="background-image: url('${imageUrl}');"><span class="category-badge-img">${catName}</span><div class="date-float">${dateStr}</div></div><div class="card-body"><h5 class="event-title text-truncate">${event.name}</h5><div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}</div><div class="price-val">Rp ${harga}</div><button onclick="event.stopPropagation(); buyTicket('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">${btnText}</button></div></div></div>`;
+                container.innerHTML += `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card-event" onclick="showDetail('${event._id}')">
+                        <div class="card-img-top" style="background-image: url('${imageUrl}');">
+                            <span class="category-badge-img">${catName}</span>
+                            <div class="date-float">${dateStr}</div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="event-title text-truncate">${event.name}</h5>
+                            <div class="event-venue text-truncate">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
+                            </div>
+                            <div class="price-val">${hargaLabel}</div>
+                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${isSoldOut ? 'disabled' : ''}">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
             });
         }
 
+        // --- UPDATE FUNGSI SHOW DETAIL UNTUK TIERING TIKET ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-            const harga = new Intl.NumberFormat('id-ID').format(event.price);
+            
             let dateStr = t.txt_date_tba;
-            if (event.date) { try { const dateObj = new Date(event.date); dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); } catch (e) { dateStr = event.date; } }
+            if (event.date) { 
+                try { 
+                    const dateObj = new Date(event.date); 
+                    dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); 
+                } catch (e) { dateStr = event.date; } 
+            }
+            
             document.getElementById('modalTitle').innerText = event.name;
-            document.getElementById('modalPrice').innerText = `Rp ${harga}`;
             document.getElementById('modalDate').innerText = dateStr;
-            const catName = event.category || "General";
-            document.getElementById('modalCategory').innerText = catName;
+            document.getElementById('modalCategory').innerText = event.category || "General";
             document.getElementById('modalVenue').innerText = event.location || t.txt_tba;
-            const imageUrl = getEventImage(event);
-            document.getElementById('modalHeaderImg').style.backgroundImage = `url('${imageUrl}')`;
+            document.getElementById('modalHeaderImg').style.backgroundImage = `url('${getEventImage(event)}')`;
+            
             let safeDescription = event.description || (lang === 'id' ? "Deskripsi lengkap belum tersedia." : "Full description not available yet.");
-            if (catName === 'Streaming') { safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; }
+            if (event.category === 'Streaming') { 
+                safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; 
+            }
             document.getElementById('modalDesc').innerText = safeDescription;
+
+            // Logika Rendering Tier Tiket
             const btnBuy = document.getElementById('btnModalBuy');
-            const isSoldOut = event.availableSeats <= 0;
-            if (isSoldOut) { btnBuy.innerText = t.btn_sold_out; btnBuy.classList.add('disabled', 'btn-secondary'); btnBuy.classList.remove('btn-primary'); btnBuy.removeAttribute('onclick'); } else { btnBuy.innerText = (catName === 'Streaming') ? t.btn_buy_account : t.btn_buy_ticket; btnBuy.classList.remove('disabled', 'btn-secondary'); btnBuy.classList.add('btn-primary'); btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId); }; }
+            const priceTag = document.getElementById('modalPrice');
+            const tierContainer = document.getElementById('ticketTierSelection');
+            
+            priceTag.innerText = "Rp 0";
+            btnBuy.disabled = true; 
+            btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
+            btnBuy.innerText = lang === 'id' ? "Pilih Tiket Dulu" : "Select Ticket First";
+            tierContainer.innerHTML = '';
+
+            if (event.tickets && event.tickets.length > 0) {
+                event.tickets.forEach((tier, index) => {
+                    const isSoldOut = tier.availableSeats <= 0;
+                    
+                    tierContainer.innerHTML += `
+                        <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'bg-light opacity-50' : 'bg-white'}" style="cursor: ${isSoldOut ? 'not-allowed' : 'pointer'};">
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="radio" name="ticketTier" value="${index}" class="form-check-input mt-0" onchange="selectTier('${eventId}', ${index})" ${isSoldOut ? 'disabled' : ''}>
+                                <div>
+                                    <h6 class="mb-0 text-dark">${tier.tierName}</h6>
+                                    <small class="text-muted">Sisa: ${tier.availableSeats} tiket</small>
+                                </div>
+                            </div>
+                            <div class="fw-bold text-primary">Rp ${tier.price.toLocaleString('id-ID')}</div>
+                        </label>
+                    `;
+                });
+            } else {
+                // Fallback jika Admin belum input array tiket (pakai harga default event)
+                const isSoldOut = event.availableSeats <= 0;
+                tierContainer.innerHTML = `
+                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'bg-light opacity-50' : 'bg-white'}" style="cursor: ${isSoldOut ? 'not-allowed' : 'pointer'};">
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="radio" name="ticketTier" value="-1" class="form-check-input mt-0" onchange="selectTierFallback('${eventId}')" ${isSoldOut ? 'disabled' : ''}>
+                            <div>
+                                <h6 class="mb-0 text-dark">Tiket General</h6>
+                                <small class="text-muted">Sisa: ${event.availableSeats} tiket</small>
+                            </div>
+                        </div>
+                        <div class="fw-bold text-primary">Rp ${event.price.toLocaleString('id-ID')}</div>
+                    </label>
+                `;
+            }
             detailModal.show();
+        }
+
+        // Fungsi saat radio button tier dipilih
+        function selectTier(eventId, tierIndex) {
+            const event = allEvents.find(e => e._id === eventId);
+            const selectedTier = event.tickets[tierIndex];
+            
+            document.getElementById('modalPrice').innerText = `Rp ${selectedTier.price.toLocaleString('id-ID')}`;
+            
+            const btnBuy = document.getElementById('btnModalBuy');
+            btnBuy.disabled = false;
+            btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
+            btnBuy.innerText = "Lanjut Pembayaran";
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                buyTicket(eventId, selectedTier); 
+            };
+        }
+
+        // Fungsi fallback jika data tiket kosong di array
+        function selectTierFallback(eventId) {
+            const event = allEvents.find(e => e._id === eventId);
+            document.getElementById('modalPrice').innerText = `Rp ${event.price.toLocaleString('id-ID')}`;
+            
+            const btnBuy = document.getElementById('btnModalBuy');
+            btnBuy.disabled = false;
+            btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
+            btnBuy.innerText = "Lanjut Pembayaran";
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                // Buat mock objek tier agar fungsi buyTicket tidak error
+                const mockTier = { tierName: 'General', price: event.price };
+                buyTicket(eventId, mockTier); 
+            };
         }
 
         function searchEvent() {
@@ -629,37 +804,43 @@
             const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
             renderEvents(filtered);
         }
-        document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
+        
+        document.getElementById('searchInput').addEventListener("keypress", function(e) { 
+            if (e.key === "Enter") searchEvent(); 
+        });
 
         // --- 1. FUNGSI CEK PROMO ---
         async function cekPromo() {
             const codeInput = document.getElementById('swal-input-promo');
             const statusEl = document.getElementById('promo-status');
             const code = codeInput.value;
-
+            
             if(!code) return;
             
             statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
             
             try {
-                const res = await fetch('/api/check-promo', {
-                    method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ code })
+                const res = await fetch('/api/check-promo', { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ code }) 
                 });
                 const data = await res.json();
                 
-                if(data.valid) {
-                    statusEl.className = "text-success fw-bold mb-3 small";
-                    statusEl.innerText = `✅ ${data.message}`;
-                } else {
-                    statusEl.className = "text-danger fw-bold mb-3 small";
-                    statusEl.innerText = `❌ ${data.message}`;
+                if(data.valid) { 
+                    statusEl.className = "text-success fw-bold mb-3 small"; 
+                    statusEl.innerText = `✅ ${data.message}`; 
+                } else { 
+                    statusEl.className = "text-danger fw-bold mb-3 small"; 
+                    statusEl.innerText = `❌ ${data.message}`; 
                 }
-            } catch(e) { statusEl.innerText = "Error cek promo"; }
+            } catch(e) { 
+                statusEl.innerText = "Error cek promo"; 
+            }
         }
 
         // --- 2. FUNGSI BELI TIKET (FORM CHECKOUT + PAYMENT CARDS) ---
-        async function buyTicket(eventId) {
+        async function buyTicket(eventId, selectedTier) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const userRaw = localStorage.getItem('userData');
@@ -710,20 +891,20 @@
                         </div>
                     </div>
                 `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>',
-                confirmButtonColor: '#0049CC',
-                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
+                focusConfirm: false, 
+                showCancelButton: true, 
+                confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', 
+                confirmButtonColor: '#0049CC', 
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel', 
                 width: '32em',
                 preConfirm: () => {
-                    const name = document.getElementById('chk-name').value;
-                    const phone = document.getElementById('chk-phone').value;
+                    const name = document.getElementById('chk-name').value; 
+                    const phone = document.getElementById('chk-phone').value; 
                     const nik = document.getElementById('chk-nik').value;
                     
-                    if (!name || !phone) {
-                        Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!');
-                        return false;
+                    if (!name || !phone) { 
+                        Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); 
+                        return false; 
                     }
                     return { name, phone, nik, email: user.email };
                 }
@@ -737,12 +918,21 @@
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
             
+            // PENTING: Gunakan selectedTier.price sebagai harga yang ditagih
+            const hargaDitagih = selectedTier.price;
+
             const { value: paymentMethod } = await Swal.fire({
                 title: lang === 'id' ? 'Pilih Pembayaran' : 'Select Payment',
                 html: `
                     <div class="text-start mb-3 border-bottom pb-2">
-                        <small class="text-muted d-block">Total Tagihan:</small>
-                        <h4 class="fw-800 text-primary mb-0">Rp ${event.price.toLocaleString('id-ID')}</h4>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted fw-bold">${selectedTier.tierName}</span>
+                            <span class="fw-bold">1x</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="text-muted">Total Tagihan:</span>
+                            <h4 class="fw-800 text-primary mb-0">Rp ${hargaDitagih.toLocaleString('id-ID')}</h4>
+                        </div>
                     </div>
                     <div class="payment-selector" id="paymentOptions">
                         <div class="payment-card" onclick="window.selectPayment('saldo')">
@@ -761,17 +951,17 @@
                         </div>
                     </div>
                 `,
-                showConfirmButton: false,
-                showCancelButton: true,
+                showConfirmButton: false, 
+                showCancelButton: true, 
                 cancelButtonText: lang === 'id' ? 'Kembali' : 'Back',
-                didOpen: () => {
-                    window.selectPayment = (method) => {
-                        window.tempPaymentMethod = method;
-                        Swal.clickConfirm();
-                    };
+                didOpen: () => { 
+                    window.selectPayment = (method) => { 
+                        window.tempPaymentMethod = method; 
+                        Swal.clickConfirm(); 
+                    }; 
                 },
-                preConfirm: () => {
-                    return window.tempPaymentMethod;
+                preConfirm: () => { 
+                    return window.tempPaymentMethod; 
                 }
             });
 
@@ -793,59 +983,70 @@
                         <label class="small text-muted mb-1">Masukkan 6 Digit PIN Transaksi</label>
                         <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px;">
                     `,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    confirmButtonText: 'Bayar Sekarang',
+                    focusConfirm: false, 
+                    showCancelButton: true, 
+                    confirmButtonText: 'Bayar Sekarang', 
                     confirmButtonColor: '#0049CC',
-                    preConfirm: () => {
-                        return {
-                            promo: document.getElementById('swal-input-promo').value,
-                            pin: document.getElementById('swal-input-pin').value
-                        }
+                    preConfirm: () => { 
+                        return { 
+                            promo: document.getElementById('swal-input-promo').value, 
+                            pin: document.getElementById('swal-input-pin').value 
+                        } 
                     }
                 });
 
                 if (!formValues) return;
                 const { promo, pin } = formValues;
 
-                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                if (!pin || pin.length !== 6) {
+                    return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                }
 
                 Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading() });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                             userId: user.id, 
                             eventId: eventId, 
-                            price: event.price, 
+                            tierName: selectedTier.tierName, // Kirim nama tiket ke backend
+                            price: hargaDitagih,             // Kirim harga spesifik tier tsb
                             pin: pin, 
                             promoCode: promo,
                             buyerData: checkoutData // Kirim data pembeli ke backend
                         })
                     });
+                    
                     const data = await res.json();
 
                     if (res.ok && data.success) {
                         user.saldo = data.sisaSaldo;
                         localStorage.setItem('userData', JSON.stringify(user));
                         Swal.fire({ 
-                            icon: 'success', title: 'Berhasil!', 
+                            icon: 'success', 
+                            title: 'Berhasil!', 
                             html: `Tiket: <b>${data.ticketCode}</b><br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}` 
                         }).then(() => window.location.href = 'dashboard.html');
-                    } else {
-                        Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error');
+                    } else { 
+                        Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error'); 
                     }
-                } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi terputus', 'error'); 
+                }
 
             } else if (paymentMethod === 'midtrans') {
                 Swal.fire({ title: lang === 'id' ? 'Menyiapkan Tagihan...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 
                 try {
                     const res = await fetch('/api/payment-token', { 
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
                             eventId, 
+                            tierName: selectedTier.tierName, // Kirim nama tier
+                            price: hargaDitagih,             // Override harga event dgn harga tier
                             quantity: 1, 
                             customerName: checkoutData.name, 
                             customerEmail: checkoutData.email, 
@@ -854,21 +1055,32 @@
                             buyerData: checkoutData // Kirim data pembeli ke backend
                         }) 
                     });
+                    
                     const data = await res.json();
                     Swal.close(); 
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
-                            onSuccess: function(result){ Swal.fire('Sukses!', 'Pembayaran berhasil!', 'success').then(() => { window.location.href = 'dashboard.html'; }); }, 
-                            onPending: function(result){ Swal.fire('Pending', 'Selesaikan pembayaran Anda di instruksi Midtrans.', 'info'); }, 
-                            onError: function(result){ Swal.fire('Gagal', 'Pembayaran ditolak atau gagal.', 'error'); }, 
+                            onSuccess: function(result){ 
+                                Swal.fire('Sukses!', 'Pembayaran berhasil!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
+                            }, 
+                            onPending: function(result){ 
+                                Swal.fire('Pending', 'Selesaikan pembayaran Anda di instruksi Midtrans.', 'info'); 
+                            }, 
+                            onError: function(result){ 
+                                Swal.fire('Gagal', 'Pembayaran ditolak atau gagal.', 'error'); 
+                            }, 
                             onClose: function(){ 
                                 fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); 
                                 Swal.fire('Dibatalkan', 'Anda menutup pop-up pembayaran.', 'info'); 
                             } 
                         }); 
-                    } else { Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); }
-                } catch (err) { Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); }
+                    } else { 
+                        Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); 
+                    }
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); 
+                }
             }
         }
     </script>
