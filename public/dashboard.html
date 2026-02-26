@@ -54,7 +54,10 @@
         }
 
         /* Animasi Background hanya untuk Dark Mode */
-        [data-theme="dark"] body { animation: gradientBG 15s ease infinite; }
+        [data-theme="dark"] body { 
+            animation: gradientBG 15s ease infinite; 
+        }
+        
         @keyframes gradientBG { 
             0% { background-position: 0% 50%; } 
             50% { background-position: 100% 50%; } 
@@ -62,10 +65,26 @@
         }
 
         /* Blob Effects (Dark Mode Only) */
-        .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5; display: none; }
-        [data-theme="dark"] .blob { display: block; }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
-        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
+        .blob { 
+            position: fixed; 
+            border-radius: 50%; 
+            filter: blur(80px); 
+            z-index: -1; 
+            opacity: 0.5; 
+            display: none; 
+        }
+        
+        [data-theme="dark"] .blob { 
+            display: block; 
+        }
+        
+        .blob-1 { 
+            top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; 
+        }
+        
+        .blob-2 { 
+            bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; 
+        }
 
         /* Navbar */
         .navbar {
@@ -75,7 +94,10 @@
             padding: 15px 0;
             transition: background 0.3s;
         }
-        .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; }
+        
+        .navbar-brand { 
+            font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; 
+        }
 
         /* Glass Card (Profile & Tickets) */
         .glass-card {
@@ -89,7 +111,11 @@
             transition: 0.3s;
         }
 
-        .profile-img { width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; box-shadow: 0 0 15px rgba(0, 198, 255, 0.5); }
+        .profile-img { 
+            width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); 
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
+            color: white; box-shadow: 0 0 15px rgba(0, 198, 255, 0.5); 
+        }
 
         /* Ticket Card Styling */
         .ticket-card {
@@ -104,16 +130,25 @@
             flex-direction: column;
             box-shadow: var(--card-shadow);
         }
-        .ticket-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,73,204,0.2); }
+        
+        .ticket-card:hover { 
+            transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,73,204,0.2); 
+        }
 
         .ticket-header {
             background: linear-gradient(90deg, #00c6ff, #0072ff);
             padding: 15px 20px;
             color: white;
         }
-        .ticket-header.streaming { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        
+        .ticket-header.streaming { 
+            background: linear-gradient(90deg, #11998e, #38ef7d); 
+        }
 
-        .ticket-body { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; color: var(--text-main); }
+        .ticket-body { 
+            padding: 25px; text-align: center; flex-grow: 1; display: flex; 
+            flex-direction: column; justify-content: center; color: var(--text-main); 
+        }
 
         /* --- TAMBAHAN: GRID INFO PEMESAN --- */
         .ticket-info-grid {
@@ -127,8 +162,15 @@
             text-align: left;
             margin: 15px 0;
         }
-        .info-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 3px; }
-        .info-value { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin: 0; }
+        
+        .info-label { 
+            font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; 
+            letter-spacing: 1px; font-weight: 700; margin-bottom: 3px; 
+        }
+        
+        .info-value { 
+            font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin: 0; 
+        }
 
         .qr-container {
             background: white;
@@ -138,7 +180,10 @@
             margin: 15px 0;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .qr-image { width: 140px; height: 140px; object-fit: contain; }
+        
+        .qr-image { 
+            width: 140px; height: 140px; object-fit: contain; 
+        }
 
         .account-box {
             background: rgba(0, 255, 127, 0.1);
@@ -151,7 +196,10 @@
             word-break: break-all;
             font-family: monospace;
         }
-        [data-theme="dark"] .account-box { color: #00ff7f; }
+        
+        [data-theme="dark"] .account-box { 
+            color: #00ff7f; 
+        }
 
         .ticket-code {
             background: rgba(128, 128, 128, 0.1);
@@ -165,33 +213,52 @@
             color: var(--text-main);
         }
 
-        .ticket-date { display: block; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        .ticket-date { 
+            display: block; margin-bottom: 10px; font-size: 0.9rem; 
+            color: var(--text-muted); font-weight: 500; 
+        }
 
         /* Buttons */
         .btn-glass { 
             background: rgba(128, 128, 128, 0.1); border: 1px solid var(--text-muted); 
             color: var(--text-main); border-radius: 50px; padding: 8px 20px; transition: 0.3s; 
         }
-        .btn-glass:hover { background: rgba(128, 128, 128, 0.2); transform: scale(1.05); }
+        
+        .btn-glass:hover { 
+            background: rgba(128, 128, 128, 0.2); transform: scale(1.05); 
+        }
         
         .btn-primary-neon { 
             background: var(--primary-gradient); border: none; color: white; 
             box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); border-radius: 50px; 
             padding: 8px 20px; transition: 0.3s; 
         }
-        .btn-primary-neon:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5); color: white; }
+        
+        .btn-primary-neon:hover { 
+            transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5); color: white; 
+        }
 
         /* Modals */
         .modal-content { 
             background: var(--bg-nav); backdrop-filter: blur(20px); 
             border: 1px solid var(--glass-border); border-radius: 24px; color: var(--text-main); 
         }
-        .modal-header, .modal-footer { border-color: var(--glass-border); }
+        
+        .modal-header, .modal-footer { 
+            border-color: var(--glass-border); 
+        }
+        
         .form-control { 
             background: rgba(128, 128, 128, 0.05); border: 1px solid var(--text-muted); color: var(--text-main); 
         }
-        .form-control:focus { background: rgba(128, 128, 128, 0.1); color: var(--text-main); border-color: #00c6ff; box-shadow: none; }
-        [data-theme="dark"] .btn-close { filter: invert(1); }
+        
+        .form-control:focus { 
+            background: rgba(128, 128, 128, 0.1); color: var(--text-main); border-color: #00c6ff; box-shadow: none; 
+        }
+        
+        [data-theme="dark"] .btn-close { 
+            filter: invert(1); 
+        }
         
         /* Saldo Box */
         .saldo-box {
@@ -213,7 +280,11 @@
             justify-content: space-between; 
             align-items: center; 
         }
-        .history-item:last-child { border-bottom: none; }
+        
+        .history-item:last-child { 
+            border-bottom: none; 
+        }
+        
         .history-icon { 
             width: 40px; 
             height: 40px; 
@@ -289,9 +360,6 @@
                     <button onclick="openPassModal()" class="btn btn-glass btn-sm" title="Ganti Password">
                         <i class="bi bi-key"></i>
                     </button>
-                    <a href="history.html" class="btn btn-glass btn-sm" title="Riwayat">
-                        <i class="bi bi-clock-history"></i>
-                    </a>
                 </div>
             </div>
         </div>
@@ -304,7 +372,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="btn btn-glass rounded-pill px-4" id="topups-tab" data-bs-toggle="pill" data-bs-target="#topups-pane" type="button" role="tab" aria-selected="false" onclick="loadTopupHistory()">
-                    <i class="bi bi-wallet-fill me-2"></i> <span data-i18n="tab_history">Riwayat Saldo</span>
+                    <i class="bi bi-arrow-left-right me-2"></i> <span data-i18n="tab_history">Riwayat Saldo</span>
                 </button>
             </li>
         </ul>
@@ -326,7 +394,7 @@
 
             <div class="tab-pane fade" id="topups-pane" role="tabpanel">
                 <div class="glass-card">
-                    <h5 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i> <span data-i18n="section_history_title">Riwayat Transaksi Saldo</span></h5>
+                    <h5 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i> <span data-i18n="section_history_title">Riwayat Mutasi Saldo</span></h5>
                     <div id="topupList">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status"></div>
@@ -415,16 +483,16 @@
                     
                     <div class="mb-3" id="groupOldPin" style="display: none;">
                         <label class="text-muted mb-2 text-warning fw-bold" data-i18n="modal_pin_old">PIN Lama</label>
-                        <input type="password" id="inputOldPin" class="form-control text-center fw-bold fs-3 mx-auto border-warning" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
+                        <input type="password" id="inputOldPin" class="form-control text-center fw-bold fs-3 mx-auto border-warning" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
                     </div>
 
                     <div class="mb-3">
                         <label class="text-muted mb-2" data-i18n="modal_pin_desc">PIN Baru (6 Digit)</label>
-                        <input type="password" id="inputNewPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
+                        <input type="password" id="inputNewPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
                     </div>
                     <div>
                         <label class="text-muted mb-2" data-i18n="modal_pin_confirm">Konfirmasi PIN Baru</label>
-                        <input type="password" id="inputConfirmPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" placeholder="••••••" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
+                        <input type="password" id="inputConfirmPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
                     </div>
                     <small class="text-muted d-block mt-3 text-info" data-i18n="modal_pin_note">Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.</small>
                 </div>
@@ -461,46 +529,36 @@
         const translations = {
             id: {
                 nav_home: "Home", nav_logout: "Keluar",
-                btn_edit_profile: "Edit Profil", btn_password: "Password", btn_history: "Riwayat",
                 section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
                 btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
                 modal_pin_title: "Atur PIN Keamanan", modal_pin_old: "Masukkan PIN Lama", modal_pin_desc: "PIN Baru (6 Digit)", modal_pin_confirm: "Konfirmasi PIN Baru", 
                 modal_pin_note: "Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.", btn_save_pin: "Simpan PIN", btn_change_pin: "Update PIN",
                 loading_tickets: "Mengambil data tiket...", empty_tickets: "Belum ada tiket yang dibeli.",
                 modal_name_title: "Ubah Nama", modal_name_label: "Nama Lengkap Baru", btn_save: "Simpan Perubahan",
-                modal_pass_title: "Ganti Password", modal_pass_old: "Password Lama", modal_pass_new: "Password Baru",
-                btn_update_pass: "Update Password",
-                lbl_account_premium: "AKUN PREMIUM", lbl_ticket_entry: "TIKET MASUK",
-                lbl_scan: "SCAN DI LOKASI", lbl_credentials: "CREDENTIALS:",
-                btn_copy: "Salin", btn_pdf: "Simpan PDF",
-                status_used: "SUDAH DIPAKAI", status_active: "TIKET AKTIF",
+                modal_pass_title: "Ganti Password", modal_pass_old: "Password Lama", modal_pass_new: "Password Baru", btn_update_pass: "Update Password",
+                lbl_account_premium: "AKUN PREMIUM", lbl_ticket_entry: "TIKET MASUK", lbl_scan: "SCAN DI LOKASI", lbl_credentials: "CREDENTIALS:",
+                btn_copy: "Salin", btn_pdf: "Simpan PDF", status_used: "SUDAH DIPAKAI", status_active: "TIKET AKTIF",
                 txt_date_tba: "Tanggal TBA", toast_copy: "Berhasil disalin!", toast_pdf_gen: "Sedang membuat PDF...",
                 pdf_header: "E-TICKET RCELLFEST", pdf_info: "Tunjukkan QR Code ini di pintu masuk.", pdf_footer: "Terima kasih telah memesan.",
-                error_fetch: "Gagal mengambil data. Cek koneksi backend.",
-                err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!",
-                tab_tickets: "Aset Digital", tab_history: "Riwayat Saldo", section_history_title: "Riwayat Transaksi Saldo", empty_history: "Belum ada riwayat top up.",
+                error_fetch: "Gagal mengambil data. Cek koneksi backend.", err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!",
+                tab_tickets: "Aset Digital", tab_history: "Riwayat Saldo", section_history_title: "Riwayat Mutasi Saldo", empty_history: "Belum ada riwayat mutasi.",
                 status_success: "BERHASIL", status_pending: "MENUNGGU", status_failed: "GAGAL"
             },
             en: {
                 nav_home: "Home", nav_logout: "Logout",
-                btn_edit_profile: "Edit Profile", btn_password: "Password", btn_history: "History",
                 section_assets: "My Digital Assets", btn_buy_new: "Buy New",
                 btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
                 modal_pin_title: "Set Security PIN", modal_pin_old: "Enter Old PIN", modal_pin_desc: "New PIN (6 Digits)", modal_pin_confirm: "Confirm New PIN",
                 modal_pin_note: "Remember this PIN! Used when buying tickets with balance.", btn_save_pin: "Save PIN", btn_change_pin: "Update PIN",
                 loading_tickets: "Loading tickets...", empty_tickets: "No purchased tickets found.",
                 modal_name_title: "Change Name", modal_name_label: "New Full Name", btn_save: "Save Changes",
-                modal_pass_title: "Change Password", modal_pass_old: "Old Password", modal_pass_new: "New Password",
-                btn_update_pass: "Update Password",
-                lbl_account_premium: "PREMIUM ACCOUNT", lbl_ticket_entry: "ENTRY TICKET",
-                lbl_scan: "SCAN AT VENUE", lbl_credentials: "CREDENTIALS:",
-                btn_copy: "Copy", btn_pdf: "Save PDF",
-                status_used: "USED", status_active: "ACTIVE TICKET",
+                modal_pass_title: "Change Password", modal_pass_old: "Old Password", modal_pass_new: "New Password", btn_update_pass: "Update Password",
+                lbl_account_premium: "PREMIUM ACCOUNT", lbl_ticket_entry: "ENTRY TICKET", lbl_scan: "SCAN AT VENUE", lbl_credentials: "CREDENTIALS:",
+                btn_copy: "Copy", btn_pdf: "Save PDF", status_used: "USED", status_active: "ACTIVE TICKET",
                 txt_date_tba: "Date TBA", toast_copy: "Copied!", toast_pdf_gen: "Generating PDF...",
                 pdf_header: "RCELLFEST E-TICKET", pdf_info: "Show this QR Code at the entrance.", pdf_footer: "Thank you for booking.",
-                error_fetch: "Failed to fetch data. Check backend connection.",
-                err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!",
-                tab_tickets: "My Assets", tab_history: "Balance History", section_history_title: "Balance Transaction History", empty_history: "No top up history found.",
+                error_fetch: "Failed to fetch data.", err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!",
+                tab_tickets: "My Assets", tab_history: "Balance History", section_history_title: "Balance Transaction History", empty_history: "No balance history found.",
                 status_success: "SUCCESS", status_pending: "PENDING", status_failed: "FAILED"
             }
         };
@@ -531,13 +589,13 @@
             }
         }
 
+        // --- FETCH BALANCE HISTORY (UANG MASUK & KELUAR) ---
         async function loadTopupHistory() {
             const container = document.getElementById('topupList');
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             
             try {
-                // Panggil API baru yang sudah digabung
                 const res = await fetch('/api/balance-history', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: user.id })
@@ -556,16 +614,18 @@
                     let amountClass = '';
                     let sign = '';
 
-                    // Logika Tampilan Uang Masuk vs Keluar
                     if (item.type === 'in') {
-                        badgeClass = 'bg-success'; icon = '<i class="bi bi-arrow-down-left"></i>'; 
-                        amountClass = 'text-success'; sign = '+';
+                        badgeClass = 'bg-success'; 
+                        icon = '<i class="bi bi-arrow-down-left"></i>'; 
+                        amountClass = 'text-success'; 
+                        sign = '+';
                     } else {
-                        badgeClass = 'bg-danger'; icon = '<i class="bi bi-arrow-up-right"></i>'; 
-                        amountClass = 'text-danger'; sign = '-';
+                        badgeClass = 'bg-danger'; 
+                        icon = '<i class="bi bi-arrow-up-right"></i>'; 
+                        amountClass = 'text-danger'; 
+                        sign = '-';
                     }
 
-                    // Format Tanggal
                     let dateStr = "TBA";
                     try {
                         const dateObj = new Date(item.date);
@@ -596,6 +656,9 @@
             }
         }
 
+        // --- FUNGSI ATUR / UBAH PIN ---
+        const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
+        
         function openPinModal() {
             document.getElementById('inputOldPin').value = ''; 
             document.getElementById('inputNewPin').value = '';
@@ -660,6 +723,7 @@
             }
         }
 
+        // --- FUNGSI TOP UP ---
         const topupModal = new bootstrap.Modal(document.getElementById('topupModal'));
         function openTopupModal() {
             document.getElementById('topupAmount').value = '';
@@ -722,7 +786,63 @@
             }
         }
 
-        // --- THEME LOGIC ---
+        // --- FUNGSI GANTI PASSWORD (DIPERBAIKI) ---
+        const passModal = new bootstrap.Modal(document.getElementById('passModal'));
+        
+        function openPassModal() { 
+            document.getElementById('oldPass').value = '';
+            document.getElementById('newPass').value = '';
+            passModal.show(); 
+        }
+
+        async function savePassword() { 
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+
+            if (!oldPass || !newPass) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!', background: '#1c1c2d', color: '#fff'});
+            }
+
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#1c1c2d', color: '#fff' });
+
+            try {
+                const res = await fetch('/api/user/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id, 
+                        oldPassword: oldPass,
+                        newPassword: newPass
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    passModal.hide(); 
+                    Swal.fire({
+                        icon: 'success', 
+                        title: 'Sukses', 
+                        text: 'Password berhasil diubah! Silakan login ulang.', 
+                        background: '#1c1c2d', 
+                        color: '#fff'
+                    }).then(() => logout()); 
+                } else {
+                    Swal.fire({
+                        icon: 'error', 
+                        title: 'Gagal', 
+                        text: data.message || 'Gagal mengubah password.', 
+                        background: '#1c1c2d', 
+                        color: '#fff'
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#1c1c2d', color: '#fff'});
+            }
+        }
+
+        // --- MISC LOGIC ---
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -735,23 +855,26 @@
             const icon = document.getElementById('theme-icon');
             const btn = document.getElementById('theme-btn');
             if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill'); icon.classList.add('bi-sun-fill');
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
                 icon.style.color = "#FFD700";
-                btn.classList.add('btn-dark'); btn.classList.remove('btn-light');
+                btn.classList.add('btn-dark');
+                btn.classList.remove('btn-light');
             } else {
-                icon.classList.remove('bi-sun-fill'); icon.classList.add('bi-moon-stars-fill');
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
                 icon.style.color = "";
-                btn.classList.add('btn-light'); btn.classList.remove('btn-dark');
+                btn.classList.add('btn-light');
+                btn.classList.remove('btn-dark');
             }
         }
 
-        // --- LANGUAGE LOGIC ---
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
             localStorage.setItem('lang', newLang);
             updateLanguage(newLang);
-            loadTickets();
+            loadTickets(); 
             loadTopupHistory();
         }
 
@@ -760,8 +883,13 @@
             const langBtn = document.getElementById('lang-btn');
             if(langBtn) {
                 langBtn.innerText = lang.toUpperCase();
-                if(lang === 'en') { langBtn.classList.add('btn-primary'); langBtn.classList.remove('btn-outline-secondary'); }
-                else { langBtn.classList.add('btn-outline-secondary'); langBtn.classList.remove('btn-primary'); }
+                if(lang === 'en') {
+                    langBtn.classList.add('btn-primary');
+                    langBtn.classList.remove('btn-outline-secondary');
+                } else {
+                    langBtn.classList.add('btn-outline-secondary');
+                    langBtn.classList.remove('btn-primary');
+                }
             }
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -776,7 +904,7 @@
             });
         }
 
-// --- 1. FUNGSI LOAD TIKET (UPDATE TAMPILAN TIER) ---
+        // --- LOAD TIKET (ASET DIGITAL) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const lang = localStorage.getItem('lang') || 'id';
@@ -826,21 +954,17 @@
                     const pemesanPhone = ticket.phone || '-';
                     const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
                     const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
-                    
-                    // 👇 AMBIL NAMA TIER DARI DATABASE TIKET
                     const tierName = ticket.tierName || 'General';
 
-                    // --- DATA UNTUK EXPORT PDF ---
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
                         code: ticket.ticketCode, isStreaming: isStreaming, desc: descText, 
                         buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
-                        tierName: tierName // <--- Bawa ke PDF
+                        tierName: tierName
                     }));
 
                     let mainContent = '';
                     
-                    // TAMPILAN GRID TIKET DI DASHBOARD (Update tambah Tipe Tiket)
                     mainContent += `
                         <div class="ticket-info-grid">
                             <div>
@@ -923,7 +1047,7 @@
             }
         }
 
-        // --- 2. FUNGSI DOWNLOAD PDF (UPDATE TAMPILAN TIER) ---
+        // --- PDF GENERATOR ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -1034,12 +1158,24 @@
             }
         }
 
-        function copyToClipboard(text) { navigator.clipboard.writeText(text); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang]; const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); Toast.fire({ icon: 'success', title: t.toast_copy }); }
+        function copyToClipboard(text) { 
+            navigator.clipboard.writeText(text); 
+            const lang = localStorage.getItem('lang') || 'id'; 
+            const t = translations[lang]; 
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); 
+            Toast.fire({ icon: 'success', title: t.toast_copy }); 
+        }
         
-        function logout() { localStorage.clear(); window.location.href = 'user-login.html'; }
+        function logout() { 
+            localStorage.clear(); window.location.href = 'user-login.html'; 
+        }
         
         const nameModal = new bootstrap.Modal(document.getElementById('nameModal'));
-        function openNameModal() { document.getElementById('inputNewName').value = user.fullName; nameModal.show(); }
+        function openNameModal() { 
+            document.getElementById('inputNewName').value = user.fullName; 
+            nameModal.show(); 
+        }
+
         async function saveName() { 
             const newName = document.getElementById('inputNewName').value;
             try {
@@ -1047,61 +1183,7 @@
                 user.fullName = newName; localStorage.setItem('userData',JSON.stringify(user)); renderProfile(); nameModal.hide(); Swal.fire({icon:'success', title:'Sukses', background:'#1c1c2d', color:'#fff'}); 
             } catch(e) {}
         }
-                const passModal = new bootstrap.Modal(document.getElementById('passModal'));
-        function openPassModal() { 
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
-            passModal.show(); 
-        }
-
-        async function savePassword() { 
-            const oldPass = document.getElementById('oldPass').value;
-            const newPass = document.getElementById('newPass').value;
-
-            if (!oldPass || !newPass) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!', background: '#1c1c2d', color: '#fff'});
-            }
-
-            // Tampilkan loading
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#1c1c2d', color: '#fff' });
-
-            try {
-                const res = await fetch('/api/user/change-password', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: user.id, // ID diambil dari variabel user yang login
-                        oldPassword: oldPass,
-                        newPassword: newPass
-                    })
-                });
-
-                const data = await res.json();
-
-                if (res.ok && data.success) {
-                    passModal.hide(); 
-                    Swal.fire({
-                        icon: 'success', 
-                        title: 'Sukses', 
-                        text: 'Password berhasil diubah! Silakan login ulang.', 
-                        background: '#1c1c2d', 
-                        color: '#fff'
-                    }).then(() => logout()); 
-                } else {
-                    Swal.fire({
-                        icon: 'error', 
-                        title: 'Gagal', 
-                        text: data.message || 'Gagal mengubah password.', 
-                        background: '#1c1c2d', 
-                        color: '#fff'
-                    });
-                }
-            } catch (e) {
-                console.error(e);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#1c1c2d', color: '#fff'});
-            }
-        }
-
+    </script>
 
     <script>
         (async function() {
