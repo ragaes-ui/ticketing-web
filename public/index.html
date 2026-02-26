@@ -743,7 +743,7 @@ if (event.tickets && event.tickets.length > 0) {
                                 <input type="radio" name="ticketTier" value="${index}" class="form-check-input mt-0" onchange="selectTier('${eventId}', ${index})" ${isSoldOut ? 'disabled' : ''}>
                                 <div style="color: var(--text-main);">
                                     <h6 class="mb-0">${tier.tierName}</h6>
-                                    <small class="text-muted">Sisa: ${tier.availableSeats} tiket</small>
+                                    <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
                                 </div>
                             </div>
                             <div class="fw-bold text-primary">Rp ${tier.price.toLocaleString('id-ID')}</div>
@@ -759,7 +759,7 @@ if (event.tickets && event.tickets.length > 0) {
                             <input type="radio" name="ticketTier" value="-1" class="form-check-input mt-0" onchange="selectTierFallback('${eventId}')" ${isSoldOut ? 'disabled' : ''}>
                             <div style="color: var(--text-main);">
                                 <h6 class="mb-0">Tiket General</h6>
-                                <small class="text-muted">Sisa: ${event.availableSeats} tiket</small>
+                                <small style="color: var(--text-muted);">Sisa: ${event.availableSeats} tiket</small>
                             </div>
                         </div>
                         <div class="fw-bold text-primary">Rp ${event.price.toLocaleString('id-ID')}</div>
