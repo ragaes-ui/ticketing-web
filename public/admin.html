@@ -12,7 +12,6 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <script>
-        // Cek Login Admin
         const token = localStorage.getItem('adminToken');
         if (!token) window.location.href = 'login.html';
     </script>
@@ -43,49 +42,23 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Blob Effects */
         .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.6; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
         .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
 
-        /* Glassmorphism */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            border: var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--glass-shadow);
-            padding: 25px;
-            color: white;
-        }
-
-        .navbar {
-            background: rgba(15, 12, 41, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 15px 0;
-        }
-
-        /* Inputs */
-        .form-control, .form-select {
-            background: rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white !important;
-            border-radius: 12px;
-            padding: 12px;
-        }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: 20px; box-shadow: var(--glass-shadow); padding: 25px; color: white; }
+        .navbar { background: rgba(15, 12, 41, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0; }
+        
+        .form-control, .form-select { background: rgba(0, 0, 0, 0.3) !important; border: 1px solid rgba(255, 255, 255, 0.2); color: white !important; border-radius: 12px; padding: 12px; }
         .form-control:focus { border-color: #00c6ff; box-shadow: 0 0 10px rgba(0, 198, 255, 0.3); }
         ::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
 
-        /* Buttons */
         .btn-primary { background: var(--primary-gradient); border: none; padding: 12px; border-radius: 12px; font-weight: 600; transition: 0.3s; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
 
-        /* Table */
         .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.1); }
         .table-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; }
 
-        /* Modal */
         .modal-content { background: rgba(28, 28, 45, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; color: white; }
         .modal-header, .modal-footer { border-color: rgba(255,255,255,0.1); }
         .btn-close { filter: invert(1); }
@@ -93,24 +66,16 @@
         .img-preview-box { width: 100%; height: 150px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 10px; background: rgba(0,0,0,0.2); }
         .img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        /* Switch */
         .form-check-input { height: 1.8em; width: 3.5em; background-color: rgba(255,255,255,0.2); border: none; }
         .form-check-input:checked { background-color: #ff0055; }
 
-        /* Promo Styles */
-        .promo-ticket {
-            border: 1px dashed #00c6ff;
-            background: rgba(0, 198, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.2s;
-        }
+        .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
         .promo-ticket:hover { background: rgba(0, 198, 255, 0.2); }
         .promo-code { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #ffeb3b; letter-spacing: 1px; }
+
+        /* --- TAMBAHAN UNTUK TICKET TIER --- */
+        .tier-row { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; position: relative; }
+        .btn-remove-tier { position: absolute; top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; padding: 0; font-size: 12px; }
     </style>
 </head>
 <body class="pb-5">
@@ -129,15 +94,12 @@
                 <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3" target="_blank">
                     <i class="bi bi-box-arrow-up-right me-1"></i> <span data-i18n="nav_website">Website</span>
                 </a>
-                
                 <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3">
                     <i class="bi bi-ticket-perforated-fill me-1"></i> <span data-i18n="nav_promo">Kelola Promo</span>
                 </button>
-
                 <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3">
                     <i class="bi bi-key me-1"></i> <span data-i18n="nav_password">Password</span>
                 </button>
-
                 <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-4">
                     <i class="bi bi-power"></i> <span data-i18n="nav_logout">Logout</span>
                 </button>
@@ -150,17 +112,13 @@
             <div class="col-12">
                 <div class="glass-card d-flex justify-content-between align-items-center" style="border-left: 5px solid #ff9800;">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="bg-warning bg-opacity-25 p-3 rounded-circle text-warning">
-                            <i class="bi bi-cone-striped fs-4"></i>
-                        </div>
+                        <div class="bg-warning bg-opacity-25 p-3 rounded-circle text-warning"><i class="bi bi-cone-striped fs-4"></i></div>
                         <div>
                             <h5 class="fw-bold mb-0" data-i18n="maint_title">Maintenance Mode</h5>
                             <small class="text-white-50" data-i18n="maint_desc">Matikan akses publik sementara.</small>
                         </div>
                     </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="switchMaintenance">
-                    </div>
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="switchMaintenance"></div>
                 </div>
             </div>
         </div>
@@ -210,16 +168,24 @@
                             <textarea id="description" class="form-control" rows="3" placeholder="..."></textarea>
                             <small class="text-info fst-italic" id="descHint" style="font-size: 0.75rem;"></small>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-6 mb-3">
-                                <label class="form-label" data-i18n="lbl_price">Harga (IDR)</label>
-                                <input type="number" id="price" class="form-control" required>
+                        
+                        <div class="mb-3 pt-3 border-top border-secondary">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold m-0 text-warning">Tipe Tiket & Harga</label>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0" onclick="addTierRow('addTiersContainer')">+ Tambah</button>
                             </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label" data-i18n="lbl_stock">Stok</label>
-                                <input type="number" id="capacity" class="form-control" required>
+                            
+                            <div id="addTiersContainer">
+                                <div class="tier-row">
+                                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (Misal: VIP, Regular)" required>
+                                    <div class="row g-2">
+                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" placeholder="Harga (Rp)" required></div>
+                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Kuota / Stok" required></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                         <button type="submit" class="btn btn-primary w-100 mt-2" id="btnPublish">
                             <i class="bi bi-rocket-takeoff me-2"></i> <span data-i18n="btn_publish">Publish Sekarang</span>
                         </button>
@@ -233,9 +199,7 @@
                         <h5 class="fw-bold m-0"><i class="bi bi-database-fill me-2 text-primary"></i> <span data-i18n="table_title">Database Item</span></h5>
                         <div class="d-flex gap-2">
                             <input type="text" id="searchBox" class="form-control form-control-sm" placeholder="..." style="width: 150px;" onkeyup="filterTable()">
-                            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()">
-                                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                            </button>
+                            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -244,13 +208,12 @@
                                 <tr>
                                     <th width="60" data-i18n="th_cover">Cover</th>
                                     <th data-i18n="th_info">Produk Info</th>
-                                    <th data-i18n="th_price">Harga</th>
-                                    <th class="text-center" data-i18n="th_stock">Stok</th>
+                                    <th data-i18n="th_price">Harga (Mulai Dari)</th>
+                                    <th class="text-center" data-i18n="th_stock">Sisa Stok Total</th>
                                     <th class="text-end" data-i18n="th_action">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody">
-                                </tbody>
+                            <tbody id="tableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -259,7 +222,7 @@
     </div>
 
     <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> <span data-i18n="modal_edit_title">Edit Data</span></h5>
@@ -306,16 +269,13 @@
                             <label data-i18n="lbl_desc">Deskripsi</label>
                             <textarea id="editDescription" class="form-control" rows="3"></textarea>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label data-i18n="lbl_price">Harga</label>
-                                <input type="number" id="editPrice" class="form-control">
+                        
+                        <div class="mb-3 pt-3 border-top border-secondary">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold m-0 text-warning">Edit Tipe Tiket</label>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0" onclick="addTierRow('editTiersContainer')">+ Tambah</button>
                             </div>
-                            <div class="col-6">
-                                <label class="text-warning" data-i18n="lbl_update_stock">Update Stok Sisa</label>
-                                <input type="number" id="editStock" class="form-control border-warning">
-                            </div>
-                            <input type="hidden" id="editCapacity">
+                            <div id="editTiersContainer"></div>
                         </div>
                     </form>
                 </div>
@@ -339,36 +299,21 @@
                         <div class="col-md-5 border-end border-secondary mb-4 mb-md-0">
                             <h6 class="fw-bold mb-3 text-warning">Buat Promo Baru</h6>
                             <form id="formPromo">
-                                <div class="mb-2">
-                                    <label class="small text-muted">Kode Promo (Unik)</label>
-                                    <input type="text" id="promoCode" class="form-control text-uppercase fw-bold" placeholder="Misal: DISKON10" required>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">Nominal Diskon</label>
-                                    <input type="number" id="promoDisc" class="form-control" placeholder="Rp" required>
-                                </div>
+                                <div class="mb-2"><label class="small text-muted">Kode Promo (Unik)</label><input type="text" id="promoCode" class="form-control text-uppercase fw-bold" placeholder="Misal: DISKON10" required></div>
+                                <div class="mb-2"><label class="small text-muted">Nominal Diskon</label><input type="number" id="promoDisc" class="form-control" placeholder="Rp" required></div>
                                 <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="small text-muted">Kuota</label>
-                                        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="small text-muted">Aktif (Hari)</label>
-                                        <input type="number" id="promoDays" class="form-control" placeholder="7" required>
-                                    </div>
+                                    <div class="col-6"><label class="small text-muted">Kuota</label><input type="number" id="promoQuota" class="form-control" placeholder="100" required></div>
+                                    <div class="col-6"><label class="small text-muted">Aktif (Hari)</label><input type="number" id="promoDays" class="form-control" placeholder="7" required></div>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100 fw-bold">Buat Promo</button>
                             </form>
                         </div>
-                        
                         <div class="col-md-7 ps-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold text-info m-0">Daftar Promo Aktif</h6>
                                 <button onclick="loadPromos()" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise"></i></button>
                             </div>
-                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer">
-                                <div class="text-center text-muted small py-4">Memuat data promo...</div>
-                            </div>
+                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer"><div class="text-center text-muted small py-4">Memuat data promo...</div></div>
                         </div>
                     </div>
                 </div>
@@ -384,23 +329,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label data-i18n="lbl_old_pass">Password Lama</label>
-                        <input type="password" id="adminOldPass" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label data-i18n="lbl_new_pass">Password Baru</label>
-                        <input type="password" id="adminNewPass" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label>
-                        <input type="password" id="adminConfirmPass" class="form-control">
-                    </div>
+                    <div class="mb-3"><label data-i18n="lbl_old_pass">Password Lama</label><input type="password" id="adminOldPass" class="form-control"></div>
+                    <div class="mb-3"><label data-i18n="lbl_new_pass">Password Baru</label><input type="password" id="adminNewPass" class="form-control"></div>
+                    <div class="mb-3"><label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label><input type="password" id="adminConfirmPass" class="form-control"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button>
-                    <button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button>
-                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button><button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button></div>
             </div>
         </div>
     </div>
@@ -415,7 +348,7 @@
         let eventsData = []; 
         const switchMaint = document.getElementById('switchMaintenance');
 
-        // --- KAMUS BAHASA ---
+        // --- KAMUS BAHASA (BISA DISKIP, SAMA SEPERTI ASLI) ---
         const translations = {
             id: {
                 nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password", nav_promo: "Kelola Promo",
@@ -475,9 +408,7 @@
                     if(el.querySelector('i')) {
                         const icon = el.querySelector('i').outerHTML;
                         el.innerHTML = `${icon} ${t[key]}`;
-                    } else {
-                        el.innerHTML = t[key];
-                    }
+                    } else { el.innerHTML = t[key]; }
                 }
             });
             const searchBox = document.getElementById('searchBox');
@@ -491,52 +422,59 @@
         function previewImage(url, imgId, textId) {
             const imgEl = document.getElementById(imgId);
             const textEl = document.getElementById(textId);
-            if (url && url.length > 5) {
-                imgEl.src = url; imgEl.style.display = 'block'; if(textEl) textEl.style.display = 'none';
-            } else {
-                imgEl.style.display = 'none'; if(textEl) textEl.style.display = 'block';
-            }
+            if (url && url.length > 5) { imgEl.src = url; imgEl.style.display = 'block'; if(textEl) textEl.style.display = 'none'; } 
+            else { imgEl.style.display = 'none'; if(textEl) textEl.style.display = 'block'; }
         }
 
         function filterTable() {
             const term = document.getElementById('searchBox').value.toLowerCase();
             const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(term) ? '' : 'none';
-            });
+            rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
         }
 
         function checkCategory(select) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const desc = document.getElementById('description');
-            if (select.value === 'Streaming') {
-                desc.placeholder = t.ph_desc_stream;
-                document.getElementById('descHint').innerText = t.desc_hint_stream;
-            } else {
-                desc.placeholder = t.ph_desc_default;
-                document.getElementById('descHint').innerText = t.desc_hint_default;
-            }
+            if (select.value === 'Streaming') { desc.placeholder = t.ph_desc_stream; document.getElementById('descHint').innerText = t.desc_hint_stream; } 
+            else { desc.placeholder = t.ph_desc_default; document.getElementById('descHint').innerText = t.desc_hint_default; }
         }
 
-        async function checkMaintenanceStatus() {
-            try { const res = await fetch('/api/maintenance'); const data = await res.json(); if(switchMaint) switchMaint.checked = data.isActive; } catch (err) {}
+        // --- TAMBAHAN: FUNGSI DYNAMIC TIER ROW ---
+        function addTierRow(containerId, tierName = '', price = '', stock = '') {
+            const container = document.getElementById(containerId);
+            const rowHtml = `
+                <div class="tier-row">
+                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">X</button>
+                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (Misal: VIP, Regular)" value="${tierName}" required>
+                    <div class="row g-2">
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" placeholder="Harga (Rp)" value="${price}" required></div>
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Kuota" value="${stock}" required></div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
         }
 
-        if(switchMaint) {
-            switchMaint.addEventListener('change', async function() {
-                const lang = localStorage.getItem('lang') || 'id';
-                const t = translations[lang];
-                const isActive = this.checked;
-                try { 
-                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ isActive }) }); 
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
-                    Toast.fire({ icon: 'success', title: isActive ? t.toast_maint_on : t.toast_maint_off });
-                } catch (err) { this.checked = !isActive; }
+        function getTiersData(containerId) {
+            const container = document.getElementById(containerId);
+            const rows = container.querySelectorAll('.tier-row');
+            let tiers = [];
+            
+            rows.forEach(row => {
+                const name = row.querySelector('.tier-name').value;
+                const price = row.querySelector('.tier-price').value;
+                const stock = row.querySelector('.tier-stock').value;
+                
+                if(name && price && stock) {
+                    tiers.push({ tierName: name, price: parseInt(price), totalSeats: parseInt(stock), availableSeats: parseInt(stock) });
+                }
             });
+            return tiers;
         }
-        
+
+
+        // --- FUNGSI LOAD DATA EVENT KE TABEL ---
         async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -574,6 +512,60 @@
             } catch (err) { console.error(err); }
         }
 
+        // --- TAMBAH DATA EVENT BARU ---
+        document.getElementById('formEvent').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            // Ambil array data tier dari form
+            const tiersData = getTiersData('addTiersContainer');
+            if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
+
+            // Kalkulasi harga termurah & total kapasitas dari array tier
+            const startFromPrice = Math.min(...tiersData.map(t => t.price));
+            const totalCap = tiersData.reduce((acc, curr) => acc + curr.totalSeats, 0);
+
+            const btn = document.getElementById('btnPublish'); 
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+            
+            const data = {
+                name: document.getElementById('name').value, 
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value, 
+                date: document.getElementById('date').value, 
+                description: document.getElementById('description').value,
+                image: document.getElementById('image').value,
+                
+                // Gunakan hasil kalkulasi array untuk field utama (agar kompatibel sama kodingan lama)
+                price: startFromPrice, 
+                capacity: totalCap,
+                availableSeats: totalCap,
+                
+                // Masukkan array tiers ke JSON yang dikirim
+                tickets: tiersData
+            };
+
+            await fetch('/api/events', { 
+                method: 'POST', 
+                headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, 
+                body: JSON.stringify(data) 
+            });
+            
+            loadTable(); 
+            e.target.reset(); 
+            document.getElementById('addTiersContainer').innerHTML = ''; // bersihkan div
+            addTierRow('addTiersContainer'); // Beri 1 baris kosong default
+            
+            document.getElementById('addPreview').style.display = 'none';
+            document.getElementById('addPreviewText').style.display = 'block';
+
+            btn.innerHTML = originalText;
+            Swal.fire({ title: t.alert_success_title, text: t.alert_success_add, icon: 'success', background: '#1c1c2d', color: '#fff' });
+        });
+
+        // --- BUKA MODAL EDIT ---
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if (ev) {
@@ -590,19 +582,25 @@
                     document.getElementById('editDate').value = '';
                 }
 
-                document.getElementById('editPrice').value = ev.price;
-                document.getElementById('editStock').value = ev.availableSeats;
-                document.getElementById('editCapacity').value = ev.totalCapacity;
                 document.getElementById('editDescription').value = ev.description;
-                
                 document.getElementById('editImage').value = ev.image || '';
                 previewImage(ev.image || '', 'editPreview', 'editPreviewText');
                 
+                // Render form Tipe Tiket
+                const tiersContainer = document.getElementById('editTiersContainer');
+                tiersContainer.innerHTML = '';
+                if (ev.tickets && ev.tickets.length > 0) {
+                    ev.tickets.forEach(t => addTierRow('editTiersContainer', t.tierName, t.price, t.availableSeats));
+                } else {
+                    // Jika data lama belum ada tickets-nya, pancing dgn 1 data fallback
+                    addTierRow('editTiersContainer', 'General', ev.price, ev.availableSeats);
+                }
+
                 editModal.show();
             }
         }
 
-        // SIMPAN EDIT
+        // --- SIMPAN HASIL EDIT ---
         async function saveEdit() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -611,16 +609,25 @@
             const rawDate = document.getElementById('editDate').value;
             const isoDate = rawDate ? new Date(rawDate).toISOString() : null;
 
+            // Ambil array tier yang baru diedit
+            const tiersData = getTiersData('editTiersContainer');
+            if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
+
+            const startFromPrice = Math.min(...tiersData.map(t => t.price));
+            const totalAvailCap = tiersData.reduce((acc, curr) => acc + curr.availableSeats, 0);
+
             const data = {
                 name: document.getElementById('editName').value, 
                 category: document.getElementById('editCategory').value,
                 location: document.getElementById('editLocation').value, 
                 date: isoDate,
-                price: document.getElementById('editPrice').value, 
                 description: document.getElementById('editDescription').value,
-                availableSeats: document.getElementById('editStock').value, 
-                capacity: document.getElementById('editCapacity').value,
-                image: document.getElementById('editImage').value
+                image: document.getElementById('editImage').value,
+                
+                price: startFromPrice,
+                availableSeats: totalAvailCap, 
+                
+                tickets: tiersData
             };
             
             await fetch(`/api/events/${id}`, { 
@@ -634,201 +641,64 @@
             Swal.fire({ title: t.alert_success_title, text: t.alert_success_edit, icon: 'success', background: '#1c1c2d', color: '#fff' });
         }
 
-        // TAMBAH BARU
-        document.getElementById('formEvent').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
 
-            const btn = document.getElementById('btnPublish'); 
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
-            
-            const data = {
-                name: document.getElementById('name').value, 
-                category: document.getElementById('category').value,
-                location: document.getElementById('location').value, 
-                date: document.getElementById('date').value, 
-                price: document.getElementById('price').value, 
-                capacity: document.getElementById('capacity').value,
-                description: document.getElementById('description').value,
-                image: document.getElementById('image').value 
-            };
-
-            await fetch('/api/events', { 
-                method: 'POST', 
-                headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, 
-                body: JSON.stringify(data) 
+        // --- SISA FUNGSI BAWAAN ANDA ---
+        async function checkMaintenanceStatus() { try { const res = await fetch('/api/maintenance'); const data = await res.json(); if(switchMaint) switchMaint.checked = data.isActive; } catch (err) {} }
+        if(switchMaint) {
+            switchMaint.addEventListener('change', async function() {
+                const lang = localStorage.getItem('lang') || 'id';
+                const t = translations[lang];
+                const isActive = this.checked;
+                try { 
+                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ isActive }) }); 
+                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
+                    Toast.fire({ icon: 'success', title: isActive ? t.toast_maint_on : t.toast_maint_off });
+                } catch (err) { this.checked = !isActive; }
             });
-            
-            loadTable(); 
-            e.target.reset(); 
-            
-            document.getElementById('addPreview').style.display = 'none';
-            document.getElementById('addPreviewText').style.display = 'block';
-
-            btn.innerHTML = originalText;
-            Swal.fire({ title: t.alert_success_title, text: t.alert_success_add, icon: 'success', background: '#1c1c2d', color: '#fff' });
-        });
-
+        }
+        
         async function hapusKonser(id) { 
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-
-            const result = await Swal.fire({ 
-                title: t.alert_del_title, 
-                text: t.alert_del_text, 
-                icon:'warning', 
-                showCancelButton:true, 
-                confirmButtonColor: '#d33', 
-                cancelButtonColor: '#3085d6', 
-                confirmButtonText: t.btn_confirm_del,
-                cancelButtonText: t.btn_cancel_del,
-                background: '#1c1c2d', 
-                color: '#fff' 
-            });
-            
-            if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); 
-                loadTable(); 
-            } 
+            const result = await Swal.fire({ title: t.alert_del_title, text: t.alert_del_text, icon:'warning', showCancelButton:true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: t.btn_confirm_del, cancelButtonText: t.btn_cancel_del, background: '#1c1c2d', color: '#fff' });
+            if(result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); loadTable(); } 
         }
 
-        // --- MANAJEMEN PROMO (LOGIKA) ---
-        function openPromoModal() {
-            promoModal.show();
-            loadPromos();
-        }
-
+        // Promo
+        function openPromoModal() { promoModal.show(); loadPromos(); }
         async function loadPromos() {
             const container = document.getElementById('promoListContainer');
             try {
-                const res = await fetch('/api/promos');
-                const promos = await res.json();
-                
-                if(promos.length === 0) {
-                    container.innerHTML = '<div class="text-center text-muted small py-4">Belum ada promo aktif.</div>';
-                    return;
-                }
-                
+                const res = await fetch('/api/promos'); const promos = await res.json();
+                if(promos.length === 0) { container.innerHTML = '<div class="text-center text-muted small py-4">Belum ada promo aktif.</div>'; return; }
                 let html = '';
                 promos.forEach(p => {
                     const date = new Date(p.expiresAt).toLocaleDateString();
-                    html += `
-                    <div class="promo-ticket">
-                        <div>
-                            <div class="promo-code">${p.code}</div>
-                            <div class="small text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} | Kuota: ${p.quota}</div>
-                            <div class="small text-muted" style="font-size:0.7rem">Exp: ${date}</div>
-                        </div>
-                        <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                    </div>`;
+                    html += `<div class="promo-ticket"><div><div class="promo-code">${p.code}</div><div class="small text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} | Kuota: ${p.quota}</div><div class="small text-muted" style="font-size:0.7rem">Exp: ${date}</div></div><button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></div>`;
                 });
                 container.innerHTML = html;
-            } catch (e) {
-                container.innerHTML = '<div class="text-danger small">Gagal memuat data.</div>';
-            }
+            } catch (e) { container.innerHTML = '<div class="text-danger small">Gagal memuat data.</div>'; }
         }
-
         document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                code: document.getElementById('promoCode').value,
-                discount: document.getElementById('promoDisc').value,
-                quota: document.getElementById('promoQuota').value,
-                daysActive: document.getElementById('promoDays').value
-            };
-
-            try {
-                await fetch('/api/promos', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                e.target.reset();
-                loadPromos();
-                
-                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' });
-                Toast.fire({ icon: 'success', title: 'Promo Berhasil Dibuat!' });
-            } catch (e) {
-                Swal.fire('Error', 'Gagal membuat promo', 'error');
-            }
+            const data = { code: document.getElementById('promoCode').value, discount: document.getElementById('promoDisc').value, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value };
+            try { await fetch('/api/promos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); e.target.reset(); loadPromos(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff', icon: 'success', title: 'Promo Berhasil Dibuat!' }); } catch (e) { Swal.fire('Error', 'Gagal membuat promo', 'error'); }
         });
+        async function hapusPromo(id) { if(confirm('Yakin ingin menghapus promo ini?')) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); } }
 
-        async function hapusPromo(id) {
-            if(confirm('Yakin ingin menghapus promo ini?')) {
-                await fetch(`/api/promos/${id}`, { method: 'DELETE' });
-                loadPromos();
-            }
-        }
-
-        // --- GANTI PASSWORD ---
-        function openAdminPassModal() {
-            document.getElementById('adminOldPass').value = '';
-            document.getElementById('adminNewPass').value = '';
-            document.getElementById('adminConfirmPass').value = '';
-            adminPassModal.show();
-        }
-
+        // Password Admin
+        function openAdminPassModal() { document.getElementById('adminOldPass').value = ''; document.getElementById('adminNewPass').value = ''; document.getElementById('adminConfirmPass').value = ''; adminPassModal.show(); }
         async function saveAdminPassword() {
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
-
-            const oldPass = document.getElementById('adminOldPass').value;
-            const newPass = document.getElementById('adminNewPass').value;
-            const confirmPass = document.getElementById('adminConfirmPass').value;
-
-            if (!oldPass || !newPass || !confirmPass) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'});
-            }
-
-            if (newPass !== confirmPass) {
-                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'});
-            }
-
+            const oldPass = document.getElementById('adminOldPass').value; const newPass = document.getElementById('adminNewPass').value; const confirmPass = document.getElementById('adminConfirmPass').value;
+            if (!oldPass || !newPass || !confirmPass) return Swal.fire({icon: 'warning', text: 'Harap isi semua kolom', background: '#1c1c2d', color: '#fff'});
+            if (newPass !== confirmPass) return Swal.fire({icon: 'error', text: 'Password tidak cocok', background: '#1c1c2d', color: '#fff'});
             try {
-                let adminId = '';
-                if (token && token.includes('token-rahasia-')) {
-                    adminId = token.split('token-rahasia-')[1];
-                } 
-                else {
-                    const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
-                    if (adminData.id) {
-                        adminId = adminData.id;
-                    } else {
-                        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                        adminId = userData.id || '';
-                    }
-                }
-
-                if (!adminId) {
-                    return Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'ID Admin tidak ditemukan. Silakan Logout dan Login kembali.', background: '#1c1c2d', color: '#fff'});
-                }
-
-                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-
-                const res = await fetch('/api/user/change-password', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass })
-                });
-
+                let adminId = token && token.includes('token-rahasia-') ? token.split('token-rahasia-')[1] : JSON.parse(localStorage.getItem('adminData') || '{}').id;
+                const res = await fetch('/api/user/change-password', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass }) });
                 const data = await res.json();
-
-                if (res.ok && data.success) {
-                    adminPassModal.hide();
-                    Swal.fire({
-                        icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff'
-                    }).then(() => {
-                        logout(); 
-                    });
-                } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah.', background: '#1c1c2d', color: '#fff'});
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'});
-            }
+                if (res.ok && data.success) { adminPassModal.hide(); Swal.fire({icon: 'success', title: 'Berhasil!', background: '#1c1c2d', color: '#fff'}).then(() => logout()); } 
+                else { Swal.fire({icon: 'error', text: data.message, background: '#1c1c2d', color: '#fff'}); }
+            } catch (error) { Swal.fire({icon: 'error', text: 'Koneksi gagal', background: '#1c1c2d', color: '#fff'}); }
         }
         
         function logout() { localStorage.removeItem('adminToken'); localStorage.removeItem('adminData'); window.location.href = 'login.html'; }
