@@ -29,7 +29,7 @@
     <style>
         /* --- VARIABLES --- */
         :root {
-            --bg-body: #ffffff;
+            --bg-body: #f8f9fa;
             --bg-nav: #ffffff;
             --bg-card: #ffffff;
             --bg-input: #ffffff;
@@ -37,10 +37,11 @@
             --text-main: #333333;
             --text-muted: #6c757d;
             --border-color: #eeeeee;
-            --shadow-color: rgba(0,0,0,0.05);
+            --shadow-color: rgba(0,0,0,0.08);
             --hover-cat: #f0f7ff;
             --cat-text-color: #555;
             --cat-text-active: #0049CC;
+            --accent-color: #0049CC;
         }
 
         [data-theme="dark"] {
@@ -56,8 +57,10 @@
             --hover-cat: #334155;
             --cat-text-color: #cbd5e1;
             --cat-text-active: #60a5fa;
+            --accent-color: #60a5fa;
         }
 
+        /* --- PRELOADER --- */
         #preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--bg-body);
@@ -67,15 +70,12 @@
         }
         .loader-icon-box {
             position: relative; width: 80px; height: 80px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
         }
         .loader-icon-main {
-            font-size: 3rem; 
-            background: linear-gradient(135deg, #0049CC, #00c6ff);
+            font-size: 3rem; background: linear-gradient(135deg, #0049CC, #00c6ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            z-index: 2; position: relative;
-            animation: icon-float 2s ease-in-out infinite;
+            z-index: 2; position: relative; animation: icon-float 2s ease-in-out infinite;
         }
         .pulse-ring {
             position: absolute; width: 100%; height: 100%;
@@ -83,19 +83,16 @@
             opacity: 0; animation: pulse-ripple 2s linear infinite;
         }
         .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
-
         .loader-text {
             font-size: 1.5rem; font-weight: 900; letter-spacing: 4px;
             background: linear-gradient(90deg, #333, #aaa, #333);
-            background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: text-shimmer 3s linear infinite;
         }
         [data-theme="dark"] .loader-text { 
             background: linear-gradient(90deg, #fff, #888, #fff); 
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
         .loader-bar-container {
             width: 120px; height: 3px; background: rgba(128, 128, 128, 0.2);
             border-radius: 3px; margin-top: 15px; overflow: hidden;
@@ -104,87 +101,98 @@
             height: 100%; width: 0%; background: #0049CC;
             animation: fill-bar 1.5s ease-in-out infinite;
         }
-
-        @keyframes pulse-ripple {
-            0% { transform: scale(0.8); opacity: 0.8; border-width: 2px; }
-            100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
-        }
+        @keyframes pulse-ripple { 0% { transform: scale(0.8); opacity: 0.8; border-width: 2px; } 100% { transform: scale(2.5); opacity: 0; border-width: 0px; } }
         @keyframes icon-float { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes text-shimmer { to { background-position: 200% center; } }
         @keyframes fill-bar { 0% { width: 0%; transform: translateX(-100%); } 50% { width: 100%; transform: translateX(0); } 100% { width: 100%; transform: translateX(100%); } }
-
         .hide-loader { opacity: 0; visibility: hidden; transform: scale(1.1); }
 
+        /* --- MAIN LAYOUT --- */
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 76px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
-        .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
-        .nav-link:hover { color: #0049CC; }
+        .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 4px 20px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
+        .navbar-brand { font-weight: 800; color: var(--accent-color) !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .nav-link { font-weight: 600; color: var(--text-muted); margin: 0 10px; font-size: 0.95rem; }
+        .nav-link:hover { color: var(--accent-color); }
         [data-theme="dark"] .nav-link { color: #e2e8f0; }
         [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
-        .hero-section { background: linear-gradient(135deg, #0049CC 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; width: 100%; margin: 0; }
-        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
-        @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
+        .hero-section { background: linear-gradient(135deg, #0049CC 0%, #007bff 100%); padding: 80px 0 120px 0; color: white; position: relative; width: 100%; margin: 0; border-radius: 0 0 40px 40px; }
+        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -1px; }
+        @media (max-width: 768px) { .hero-section { padding: 50px 0 100px 0; border-radius: 0 0 25px 25px; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
-        .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
+        .hero-bg-circle { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -100px; right: -50px; pointer-events: none; }
         
-        .search-wrapper { margin-top: -45px; position: relative; z-index: 10; padding: 0 15px; }
-        .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 8px 25px var(--shadow-color); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; }
-        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
+        .search-wrapper { margin-top: -55px; position: relative; z-index: 10; padding: 0 15px; }
+        .search-box { background: var(--bg-card); padding: 10px; border-radius: 50px; box-shadow: 0 10px 30px var(--shadow-color); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; border: 1px solid var(--border-color); }
+        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 20px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
         [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
-        .btn-search { background: #0049CC; color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
-        .btn-search:hover { background: #003db3; }
+        .btn-search { background: var(--accent-color); color: white; border: none; padding: 12px 30px; border-radius: 40px; font-weight: 700; transition: 0.3s; white-space: nowrap; box-shadow: 0 4px 15px rgba(0, 73, 204, 0.3); }
+        .btn-search:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 73, 204, 0.4); }
 
-        .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
-        .category-item:hover, .category-item.active { background: var(--hover-cat); transform: scale(1.05); }
+        .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 15px 10px; border-radius: 16px; }
+        .category-item:hover, .category-item.active { background: var(--hover-cat); transform: translateY(-5px); }
         .category-item.active .cat-text { color: var(--cat-text-active); font-weight: 800; }
-        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
-        .cat-text { font-size: 0.8rem; font-weight: 600; color: var(--cat-text-color); }
+        .icon-circle { width: 50px; height: 50px; background: var(--bg-card); color: var(--accent-color); border: 2px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 10px auto; transition: 0.3s; }
+        .category-item:hover .icon-circle { border-color: var(--accent-color); background: var(--accent-color); color: white; }
+        .cat-text { font-size: 0.85rem; font-weight: 600; color: var(--cat-text-color); }
 
-        .card-event { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; background: var(--bg-card); height: 100%; display: flex; flex-direction: column; cursor: pointer; }
-        .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--shadow-color); border-color: transparent; }
-        .card-img-top { height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px; }
-        .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
-        .category-badge-img { position: relative; z-index: 2; background: rgba(0, 73, 204, 0.95); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
-        .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: #0049CC; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
-        .event-venue { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
-        .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
-        .btn-outline-book { border: 1px solid #0049CC; color: #0049CC; font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
-        .btn-outline-book:hover { background: #0049CC; color: white; }
-        .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
+        /* --- EVENT CARDS --- */
+        .card-event { border: none; border-radius: 20px; overflow: hidden; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); background: var(--bg-card); height: 100%; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 5px 15px var(--shadow-color); }
+        .card-event:hover { transform: translateY(-10px); box-shadow: 0 20px 40px var(--shadow-color); }
+        .card-img-top { height: 200px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 15px; }
+        .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%); pointer-events: none; }
+        .category-badge-img { position: relative; z-index: 2; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px); color: var(--accent-color); font-size: 0.75rem; padding: 6px 14px; border-radius: 30px; font-weight: 800; letter-spacing: 0.5px; }
+        .date-float { position: absolute; bottom: 15px; left: 15px; z-index: 2; color: white; font-weight: 700; font-size: 0.9rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .event-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; line-height: 1.4; color: var(--text-main); }
+        .event-venue { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .price-val { font-size: 1.1rem; font-weight: 800; color: #ff5e1f; margin-bottom: 15px; }
+        .btn-outline-book { border: 2px solid var(--accent-color); color: var(--accent-color); font-weight: 700; padding: 10px; border-radius: 12px; background: transparent; width: 100%; margin-top: auto; font-size: 0.95rem; position: relative; z-index: 2; transition: 0.2s; }
+        .btn-outline-book:hover { background: var(--accent-color); color: white; transform: scale(1.02); }
+        .btn-outline-book.disabled { border-color: var(--border-color); color: #aaa; background: var(--bg-section); cursor: not-allowed; }
 
-        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
-        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
-        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
-        .footer-link:hover { color: white; text-decoration: underline; }
-        .social-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 8px; text-decoration: none; }
-        .social-btn:hover { background: white; color: #0e1e3b; }
+        /* --- FOOTER & PARTNERS --- */
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 60px 0 30px 0; margin-top: 0; font-size: 0.9rem; }
+        .footer-head { font-weight: 700; margin-bottom: 20px; color: white; font-size: 1rem; letter-spacing: 0.5px; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 10px; transition: 0.2s; }
+        .footer-link:hover { color: white; transform: translateX(5px); }
+        .social-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 10px; text-decoration: none; transition: 0.3s; }
+        .social-btn:hover { background: white; color: #0e1e3b; transform: rotate(15deg); }
 
-        .modal-header-img { height: 250px; background-color: #ddd; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: flex-start; color: white; font-size: 3rem; border-radius: 12px 12px 0 0; padding: 20px; position: relative; }
-        .modal-header-img::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%); border-radius: 12px 12px 0 0; }
-        .modal-content { border-radius: 16px; border: none; background-color: var(--bg-nav); color: var(--text-main); }
-        .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
-        .modal-desc-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
+        /* --- MODAL --- */
+        .modal-header-img { height: 280px; background-color: #ddd; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: flex-start; color: white; font-size: 3rem; border-radius: 20px 20px 0 0; padding: 30px; position: relative; }
+        .modal-header-img::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%); border-radius: 20px 20px 0 0; }
+        .modal-content { border-radius: 20px; border: none; background-color: var(--bg-nav); color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .modal-price-tag { font-size: 1.8rem; font-weight: 800; color: #ff5e1f; letter-spacing: -0.5px; }
+        .modal-desc-text { color: var(--text-muted); font-size: 1rem; line-height: 1.7; white-space: pre-wrap; }
         [data-theme="dark"] .bg-light { background-color: #334155 !important; }
         [data-theme="dark"] .text-dark { color: #fff !important; }
         [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
-        .btn-help-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: white; color: #0049CC; border: 2px solid #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2); z-index: 9999; transition: all 0.3s; font-size: 1.5rem; }
-        .btn-help-floating:hover { transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3); background: #0049CC; color: white; }
+        .btn-help-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: white; color: #0049CC; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.25); z-index: 9999; transition: all 0.3s; font-size: 1.8rem; }
+        .btn-help-floating:hover { transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 30px rgba(0, 73, 204, 0.4); background: #0049CC; color: white; }
 
-        .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; overflow: hidden; }
-        .partner-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 25px; text-align: center; }
+        .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 50px 0; margin-top: 60px; overflow: hidden; }
+        .partner-title { font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 30px; text-align: center; }
         .logos-slider { white-space: nowrap; position: relative; }
         .logos-slide-track { display: inline-block; animation: 35s slide-infinite linear infinite; }
-        .logos-slide-track img { height: 35px; margin: 0 40px; filter: grayscale(100%) opacity(0.6); transition: all 0.3s ease; cursor: pointer; vertical-align: middle; }
-        .logos-slide-track img:hover { filter: grayscale(0%) opacity(1); transform: scale(1.15); }
+        .logos-slide-track img { height: 40px; margin: 0 45px; filter: grayscale(100%) opacity(0.5); transition: all 0.3s ease; cursor: pointer; vertical-align: middle; }
+        .logos-slide-track img:hover { filter: grayscale(0%) opacity(1); transform: scale(1.1); }
         .logos-slider:hover .logos-slide-track { animation-play-state: paused; }
         @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
+
+        /* --- SWEETALERT PAYMENT CARDS STYLING --- */
+        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .payment-card { border: 2px solid var(--border-color); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
+        .payment-card:hover { border-color: var(--accent-color); background: var(--hover-cat); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .payment-card.selected { border-color: var(--accent-color); background: #e6f0ff; }
+        [data-theme="dark"] .payment-card.selected { background: #1e293b; border-color: #60a5fa; }
+        .payment-icon { font-size: 1.8rem; color: var(--accent-color); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(0, 73, 204, 0.08); border-radius: 12px; }
+        [data-theme="dark"] .payment-icon { background: rgba(96, 165, 250, 0.1); }
+        .payment-details h6 { margin: 0; font-weight: 800; font-size: 1rem; color: var(--text-main); }
+        .payment-details p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -217,7 +225,7 @@
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
                 <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
                 <div id="navUserArea">
-                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
+                    <a href="user-login.html" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm shadow-sm" data-i18n="nav_login">Masuk / Daftar</a>
                 </div>
             </div>
         </div>
@@ -226,34 +234,59 @@
     <section class="hero-section text-center">
         <div class="hero-bg-circle"></div>
         <div class="container position-relative z-1">
-            <h1 class="hero-title mb-2" data-i18n="hero_title">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
-            <p class="hero-lead opacity-75 mb-0" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
+            <h1 class="hero-title mb-3" data-i18n="hero_title">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
+            <p class="hero-lead opacity-90 mb-0" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
         </div>
     </section>
 
-    <div class="search-wrapper mb-4">
+    <div class="search-wrapper mb-5">
         <div class="search-box">
-            <i class="bi bi-search text-secondary ms-2"></i>
+            <i class="bi bi-search text-secondary ms-2 fs-5"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
             <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
         </div>
     </div>
 
     <div class="container">
-        <div class="row justify-content-center mb-5 g-2 px-2">
-            <div class="col-3 col-md-2" onclick="filterCategory('All')"><div class="category-item" id="btn-cat-All"><div class="icon-circle"><i class="bi bi-grid-fill"></i></div><div class="cat-text" data-i18n="cat_all">Semua</div></div></div>
-            <div class="col-3 col-md-2" onclick="filterCategory('Konser')"><div class="category-item" id="btn-cat-Konser"><div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div><div class="cat-text" data-i18n="cat_concert">Konser</div></div></div>
-            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')"><div class="category-item" id="btn-cat-Olahraga"><div class="icon-circle"><i class="bi bi-trophy-fill"></i></div><div class="cat-text" data-i18n="cat_sports">Olahraga</div></div></div>
-            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')"><div class="category-item" id="btn-cat-Workshop"><div class="icon-circle"><i class="bi bi-palette-fill"></i></div><div class="cat-text" data-i18n="cat_workshop">Workshop</div></div></div>
-            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')"><div class="category-item" id="btn-cat-Streaming"><div class="icon-circle"><i class="bi bi-camera-reels"></i></div><div class="cat-text" data-i18n="cat_streaming">Streaming</div></div></div>
+        <div class="row justify-content-center mb-5 g-3 px-2">
+            <div class="col-4 col-md-2" onclick="filterCategory('All')">
+                <div class="category-item" id="btn-cat-All">
+                    <div class="icon-circle"><i class="bi bi-grid-fill"></i></div>
+                    <div class="cat-text" data-i18n="cat_all">Semua</div>
+                </div>
+            </div>
+            <div class="col-4 col-md-2" onclick="filterCategory('Konser')">
+                <div class="category-item" id="btn-cat-Konser">
+                    <div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div>
+                    <div class="cat-text" data-i18n="cat_concert">Konser</div>
+                </div>
+            </div>
+            <div class="col-4 col-md-2" onclick="filterCategory('Olahraga')">
+                <div class="category-item" id="btn-cat-Olahraga">
+                    <div class="icon-circle"><i class="bi bi-trophy-fill"></i></div>
+                    <div class="cat-text" data-i18n="cat_sports">Olahraga</div>
+                </div>
+            </div>
+            <div class="col-4 col-md-2" onclick="filterCategory('Workshop')">
+                <div class="category-item" id="btn-cat-Workshop">
+                    <div class="icon-circle"><i class="bi bi-palette-fill"></i></div>
+                    <div class="cat-text" data-i18n="cat_workshop">Workshop</div>
+                </div>
+            </div>
+            <div class="col-4 col-md-2" onclick="filterCategory('Streaming')">
+                <div class="category-item" id="btn-cat-Streaming">
+                    <div class="icon-circle"><i class="bi bi-camera-reels"></i></div>
+                    <div class="cat-text" data-i18n="cat_streaming">Streaming</div>
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-            <h5 class="fw-bold m-0">🔥 <span data-i18n="section_hot">Pilihan Hari Ini</span></h5>
+        <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+            <h4 class="fw-800 m-0">🔥 <span data-i18n="section_hot">Pilihan Hari Ini</span></h4>
             <a href="#" class="text-decoration-none fw-bold small" onclick="filterCategory('All')"><span data-i18n="link_view_all">Lihat Semua</span> <i class="bi bi-arrow-right"></i></a>
         </div>
 
-        <div class="row g-3" id="event-list">
+        <div class="row g-4" id="event-list">
             <div class="col-12 text-center py-5">
                 <div class="spinner-border text-primary" role="status"></div>
                 <p class="mt-2 text-secondary small" data-i18n="loading_text">Memuat event...</p>
@@ -302,7 +335,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (version 3.1).</small>
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love (version 3.2).</small>
                 </div>
             </div>
         </div>
@@ -313,7 +346,7 @@
             <div class="modal-content">
                 <div class="position-relative">
                     <div class="modal-header-img" id="modalHeaderImg"></div>
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2 rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
@@ -321,20 +354,20 @@
                             <span class="badge bg-primary mb-2" id="modalCategory">General</span>
                             <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
                             <div class="text-secondary small mt-2">
-                                <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
+                                <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-main">Lokasi TBA</span> 
                                 &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
                             </div>
                         </div>
                     </div>
-                    <hr>
-                    <h6 class="fw-bold" data-i18n="modal_desc_title">Deskripsi & Info</h6>
+                    <hr class="text-muted opacity-25">
+                    <h6 class="fw-bold mb-3" data-i18n="modal_desc_title">Deskripsi & Info</h6>
                     <p class="modal-desc-text" id="modalDesc"></p>
-                    <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                    <div class="mt-4 p-4 bg-light rounded-4 d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="text-secondary d-block" data-i18n="modal_price_label">Harga</small>
+                            <small class="text-secondary d-block fw-bold" data-i18n="modal_price_label">Harga</small>
                             <div class="modal-price-tag" id="modalPrice">Rp 0</div>
                         </div>
-                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-4 rounded-pill fw-bold">Beli Tiket</button>
+                        <button id="btnModalBuy" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow">Beli Tiket</button>
                     </div>
                 </div>
             </div>
@@ -371,7 +404,7 @@
             }
         };
 
-        // --- LOADING LOGIC ---
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
@@ -388,7 +421,7 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // --- FUNCTIONS ---
+        // --- HELPERS ---
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
@@ -453,19 +486,19 @@
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
                     <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1 shadow-sm" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle text-primary"></i>
                             <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
-                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-4">
+                            <li><a class="dropdown-item rounded-3 small fw-bold" href="dashboard.html"><i class="bi bi-ticket-perforated me-2"></i>${t.nav_my_ticket}</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
+                            <li><button class="dropdown-item rounded-3 text-danger small fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>${t.nav_logout}</button></li>
                         </ul>
                     </div>
                 `;
             } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">${t.nav_login}</a>`;
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm shadow-sm">${t.nav_login}</a>`;
             }
         }
 
@@ -475,6 +508,7 @@
             window.location.reload();
         }
 
+        // --- DATA & RENDER ---
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
@@ -569,23 +603,16 @@
         }
         document.getElementById('searchInput').addEventListener("keypress", function(e) { if (e.key === "Enter") searchEvent(); });
 
-        // --- 1. FUNGSI CEK PROMO (Helper untuk Swal) ---
+        // --- TRANSACTION & PROMO ---
         async function cekPromo() {
             const codeInput = document.getElementById('swal-input-promo');
             const statusEl = document.getElementById('promo-status');
             const code = codeInput.value;
-
             if(!code) return;
-            
             statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
-            
             try {
-                const res = await fetch('/api/check-promo', {
-                    method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ code })
-                });
+                const res = await fetch('/api/check-promo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code }) });
                 const data = await res.json();
-                
                 if(data.valid) {
                     statusEl.className = "text-success fw-bold mb-3 small";
                     statusEl.innerText = `✅ ${data.message}`;
@@ -596,7 +623,7 @@
             } catch(e) { statusEl.innerText = "Error cek promo"; }
         }
 
-        // --- 2. FUNGSI BELI TIKET (UPDATE: DENGAN PROMO) ---
+        // --- NEW BUY TICKET FUNCTION (WITH PAYMENT CARDS) ---
         async function buyTicket(eventId) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -623,27 +650,45 @@
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
             
-            // 2. Pilih Metode Pembayaran
+            // 2. Pilih Metode Pembayaran (NEW CARD DESIGN)
             const { value: paymentMethod } = await Swal.fire({
-                title: lang === 'id' ? 'Metode Pembayaran' : 'Payment Method',
-                input: 'radio',
-                inputOptions: {
-                    'saldo': `<b>Potong Saldo</b> (Sisa: Rp ${saldoFormatted})`,
-                    'midtrans': `<b>Metode Lain</b> (VA, E-Wallet, QRIS)`
-                },
-                inputValidator: (value) => {
-                    if (!value) return lang === 'id' ? 'Pilih metode pembayaran!' : 'Choose a payment method!';
-                },
+                title: lang === 'id' ? 'Pilih Metode Pembayaran' : 'Select Payment Method',
+                html: `
+                    <div class="payment-selector" id="paymentOptions">
+                        <div class="payment-card" onclick="window.selectPayment('saldo')">
+                            <div class="payment-icon"><i class="bi bi-wallet2"></i></div>
+                            <div class="payment-details">
+                                <h6>${lang === 'id' ? 'Potong Saldo RCELL' : 'RCELL Balance'}</h6>
+                                <p>Sisa: <span class="text-success fw-bold">Rp ${saldoFormatted}</span></p>
+                            </div>
+                        </div>
+                        <div class="payment-card" onclick="window.selectPayment('midtrans')">
+                            <div class="payment-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                            <div class="payment-details">
+                                <h6>Instan & Otomatis</h6>
+                                <p>Virtual Account, QRIS, E-Wallet (GoPay, OVO, dll)</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
                 showCancelButton: true,
-                confirmButtonColor: '#0049CC',
-                confirmButtonText: lang === 'id' ? 'Lanjut' : 'Next'
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
+                didOpen: () => {
+                    window.selectPayment = (method) => {
+                        window.tempPaymentMethod = method;
+                        Swal.clickConfirm();
+                    };
+                },
+                preConfirm: () => {
+                    return window.tempPaymentMethod;
+                }
             });
 
             if (!paymentMethod) return;
 
             // 3. Eksekusi Pembayaran
             if (paymentMethod === 'saldo') {
-                // --- FORM PIN & PROMO ---
                 const { value: formValues } = await Swal.fire({
                     title: 'Konfirmasi',
                     html: `
@@ -651,13 +696,11 @@
                             <p class="mb-1 fw-bold">${event.name}</p>
                             <p class="mb-0 text-muted">Harga: Rp ${event.price.toLocaleString('id-ID')}</p>
                         </div>
-                        
                         <div class="input-group mb-2">
                             <input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)">
                             <button class="btn btn-outline-primary" type="button" onclick="cekPromo()">Cek</button>
                         </div>
                         <div id="promo-status" class="text-start mb-3 small"></div>
-
                         <label class="small text-muted mb-1">PIN Transaksi (6 Digit)</label>
                         <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 5px;">
                     `,
@@ -676,22 +719,14 @@
                 if (!formValues) return;
                 const { promo, pin } = formValues;
 
-                // Validasi PIN Client Side
                 if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
 
-                // D. Kirim ke Server
                 Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            userId: user.id, 
-                            eventId: eventId, 
-                            price: event.price, 
-                            pin: pin, 
-                            promoCode: promo // <-- Kode promo dikirim di sini
-                        })
+                        body: JSON.stringify({ userId: user.id, eventId: eventId, price: event.price, pin: pin, promoCode: promo })
                     });
                     const data = await res.json();
 
@@ -709,7 +744,6 @@
                 } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
 
             } else if (paymentMethod === 'midtrans') {
-                // --- ALUR MIDTRANS (Tetap sama seperti sebelumnya) ---
                 const namaPemesan = user.fullName ? user.fullName : user.username;
                 Swal.fire({ title: lang === 'id' ? 'Menghubungkan ke Payment Gateway...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 
@@ -723,23 +757,15 @@
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
-                            onSuccess: function(result){ 
-                                Swal.fire('Success!', lang === 'id' ? 'Pembayaran berhasil!' : 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
-                            }, 
-                            onPending: function(result){ 
-                                Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); 
-                            }, 
-                            onError: function(result){ 
-                                Swal.fire('Failed', lang === 'id' ? 'Pembayaran gagal.' : 'Payment failed.', 'error'); 
-                            }, 
+                            onSuccess: function(result){ Swal.fire('Success!', lang === 'id' ? 'Pembayaran berhasil!' : 'Payment successful!', 'success').then(() => { window.location.href = 'dashboard.html'; }); }, 
+                            onPending: function(result){ Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); }, 
+                            onError: function(result){ Swal.fire('Failed', lang === 'id' ? 'Pembayaran gagal.' : 'Payment failed.', 'error'); }, 
                             onClose: function(){ 
                                 fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); 
                                 Swal.fire(lang === 'id' ? 'Dibatalkan' : 'Cancelled', lang === 'id' ? 'Kamu menutup pop-up pembayaran.' : 'You closed the payment popup.', 'info'); 
                             } 
                         }); 
-                    } else { 
-                        Swal.fire('Error', data.message || 'Gagal membuat tagihan.', 'error'); 
-                    }
+                    } else { Swal.fire('Error', data.message || 'Gagal membuat tagihan.', 'error'); }
                 } catch (err) { Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); }
             }
         }
