@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
   eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }, 
 
   price: { type: Number, required: true },
-  
+  tierName: { type: String, default: 'General' },
   customerName: String,
   email: String,
   phone: String, // 👈 TAMBAHAN: Untuk menyimpan No. WhatsApp
