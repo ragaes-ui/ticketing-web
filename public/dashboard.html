@@ -916,7 +916,7 @@
             }
         }
 
-        // --- PDF GENERATOR (DIPERBARUI) ---
+// --- PDF GENERATOR (VERSI ANTI-BLANK) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -924,10 +924,15 @@
 
             Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
 
+            // 1. PENTING: Simpan posisi scroll & paksa scroll ke atas agar html2canvas tidak blank
+            const currentScroll = window.scrollY;
+            window.scrollTo(0, 0);
+
             const element = document.createElement('div');
             document.body.appendChild(element);
             
-            element.style.cssText = 'width: 450px; position: fixed; top: 0; left: 0; z-index: -9999; background: white; color: black; font-family: sans-serif;';
+            // 2. PENTING: Gunakan absolute, lempar ke kiri layar, dan paksa background putih
+            element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
 
             let contentMiddle = '';
             let labelType = data.isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
@@ -943,44 +948,44 @@
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
                 contentMiddle = `
                     <div style="margin: 20px 0;">
-                        <img src="${qrUrl}" crossorigin="anonymous" style="width: 180px; height: 180px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;">
+                        <img src="${qrUrl}" style="width: 180px; height: 180px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
                         <p style="font-size: 12px; color: #666; margin-top: 5px;">${t.pdf_info}</p>
                     </div>`;
             }
 
-            // TAMPILKAN DATA PEMESAN DI DALAM CETAKAN PDF
+            // Gunakan ID unik untuk menargetkan render area
             element.innerHTML = `
-                <div style="padding: 30px; border: 1px solid #ddd;">
+                <div id="pdf-print-area" style="padding: 30px; background-color: #ffffff; border: 1px solid #ddd;">
                     <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <h2 style="margin:0; color: #0049CC;">RCELLFEST</h2>
+                        <h2 style="margin:0; color: #0049CC; font-weight: 800;">RCELLFEST</h2>
                         <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
                     </div>
                     
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <h1 style="margin: 0; font-size: 20px; line-height: 1.2;">${data.eventName}</h1>
+                        <h1 style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
                         <p style="margin: 5px 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: left; font-size: 12px;">
-                        <div>
-                            <p style="margin:0; color:#555; font-weight:bold;">NAMA PEMESAN</p>
-                            <p style="margin:2px 0 0 0; color:#000;">${data.buyerName}</p>
+                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                        <div style="width: 32%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerName}</p>
                         </div>
-                        <div>
-                            <p style="margin:0; color:#555; font-weight:bold;">NO. WHATSAPP</p>
-                            <p style="margin:2px 0 0 0; color:#000;">${data.buyerPhone}</p>
+                        <div style="width: 32%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NO. WHATSAPP</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
                         </div>
-                        <div>
-                            <p style="margin:0; color:#555; font-weight:bold;">METODE BAYAR</p>
-                            <p style="margin:2px 0 0 0; color:#000;">${data.paymentMethod}</p>
+                        <div style="width: 32%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">METODE BAYAR</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
                         </div>
                     </div>
 
                     <div style="text-align: center;">${contentMiddle}</div>
                     
-                    <div style="background: #f8f9fa; padding: 10px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
-                        <p style="margin:0; font-size: 10px; color: #999;">KODE TIKET</p>
-                        <p style="margin:0; font-size: 18px; font-weight: bold; letter-spacing: 3px; font-family: monospace;">${data.code}</p>
+                    <div style="background: #f8f9fa; padding: 15px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin:0; font-size: 10px; color: #999; font-weight:bold;">KODE TIKET / BOOKING ID</p>
+                        <p style="margin:0; font-size: 22px; font-weight: bold; letter-spacing: 3px; font-family: monospace; color: #000;">${data.code}</p>
                     </div>
                     
                     <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
@@ -990,24 +995,44 @@
                 </div>
             `;
 
-            const imgs = element.querySelectorAll('img');
-            const promises = Array.from(imgs).map(img => {
-                if (img.complete) return Promise.resolve();
-                return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-            });
-            await Promise.all(promises);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                // Tunggu gambar (QR Code) benar-benar ter-load sebelum di-print
+                const imgs = element.querySelectorAll('img');
+                const promises = Array.from(imgs).map(img => {
+                    if (img.complete) return Promise.resolve();
+                    return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                });
+                await Promise.all(promises);
+                
+                // Jeda 500ms agar font render dengan baik
+                await new Promise(resolve => setTimeout(resolve, 500));
 
-            const opt = { 
-                margin: 10, filename: `Tiket-${data.code}.pdf`, 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true }, 
-                jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
-            };
-            
-            await html2pdf().set(opt).from(element).save();
-            document.body.removeChild(element);
-            Swal.close();
+                const opt = { 
+                    margin: [10, 10, 10, 10], 
+                    filename: `Tiket-${data.code}.pdf`, 
+                    image: { type: 'jpeg', quality: 1 }, 
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        backgroundColor: '#ffffff', // 3. PENTING: Paksa background putih di canvas
+                        scrollY: 0, 
+                        windowY: 0 
+                    }, 
+                    jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
+                };
+                
+                // Print hanya pada area ID
+                await html2pdf().set(opt).from(element.querySelector('#pdf-print-area')).save();
+                
+            } catch (error) {
+                console.error("Error Cetak PDF:", error);
+                Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF', background: '#1c1c2d', color: '#fff'});
+            } finally {
+                // Bersihkan sampah DOM & kembalikan posisi scroll
+                document.body.removeChild(element);
+                window.scrollTo(0, currentScroll);
+                Swal.close();
+            }
         }
 
         function copyToClipboard(text) { navigator.clipboard.writeText(text); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang]; const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); Toast.fire({ icon: 'success', title: t.toast_copy }); }
