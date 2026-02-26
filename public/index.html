@@ -267,17 +267,23 @@
             color: var(--text-muted); 
         }
 
-        /* Gaya untuk Radio Button Tipe Tiket */
+/* Gaya untuk Radio Button Tipe Tiket */
         .tier-label { 
             cursor: pointer; 
             transition: 0.2s; 
             border: 2px solid var(--border-color); 
+            background-color: var(--bg-card); /* Tambahan: Otomatis ikut tema */
         }
         .tier-label:hover { 
             border-color: #0049CC; 
         }
         .tier-label input:checked + div { 
             font-weight: bold; 
+        }
+        .tier-sold-out {
+            background-color: var(--bg-section);
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -727,16 +733,16 @@
             btnBuy.innerText = lang === 'id' ? "Pilih Tiket Dulu" : "Select Ticket First";
             tierContainer.innerHTML = '';
 
-            if (event.tickets && event.tickets.length > 0) {
+if (event.tickets && event.tickets.length > 0) {
                 event.tickets.forEach((tier, index) => {
                     const isSoldOut = tier.availableSeats <= 0;
                     
                     tierContainer.innerHTML += `
-                        <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'bg-light opacity-50' : 'bg-white'}" style="cursor: ${isSoldOut ? 'not-allowed' : 'pointer'};">
+                        <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'tier-sold-out' : ''}">
                             <div class="d-flex align-items-center gap-3">
                                 <input type="radio" name="ticketTier" value="${index}" class="form-check-input mt-0" onchange="selectTier('${eventId}', ${index})" ${isSoldOut ? 'disabled' : ''}>
-                                <div>
-                                    <h6 class="mb-0 text-dark">${tier.tierName}</h6>
+                                <div style="color: var(--text-main);">
+                                    <h6 class="mb-0">${tier.tierName}</h6>
                                     <small class="text-muted">Sisa: ${tier.availableSeats} tiket</small>
                                 </div>
                             </div>
@@ -748,11 +754,11 @@
                 // Fallback jika Admin belum input array tiket (pakai harga default event)
                 const isSoldOut = event.availableSeats <= 0;
                 tierContainer.innerHTML = `
-                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'bg-light opacity-50' : 'bg-white'}" style="cursor: ${isSoldOut ? 'not-allowed' : 'pointer'};">
+                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'tier-sold-out' : ''}">
                         <div class="d-flex align-items-center gap-3">
                             <input type="radio" name="ticketTier" value="-1" class="form-check-input mt-0" onchange="selectTierFallback('${eventId}')" ${isSoldOut ? 'disabled' : ''}>
-                            <div>
-                                <h6 class="mb-0 text-dark">Tiket General</h6>
+                            <div style="color: var(--text-main);">
+                                <h6 class="mb-0">Tiket General</h6>
                                 <small class="text-muted">Sisa: ${event.availableSeats} tiket</small>
                             </div>
                         </div>
