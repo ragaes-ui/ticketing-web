@@ -368,6 +368,8 @@ app.post('/api/buy-ticket', async (req, res) => {
         const newOrder = new Order({
             ticketCode: ticketCode,
             eventId: eventId,
+            // 👇 TAMBAHKAN INI (Simpan harga yang dibayar setelah potong promo)
+            price: finalPrice,
             // 👇 MASUKKAN DATA DARI FORM CHECKOUT KE DATABASE
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             email: buyerData ? buyerData.email : user.email,
@@ -435,6 +437,8 @@ app.post('/api/payment-token', async (req, res) => {
         const newOrder = new Order({
             ticketCode: ticketCode, 
             eventId: eventId, 
+            // 👇 TAMBAHKAN INI (Simpan total harga dari Midtrans)
+            price: grossAmount,
             // 👇 MASUKKAN DATA DARI FORM CHECKOUT
             customerName: buyerData ? buyerData.name : customerName, 
             email: buyerData ? buyerData.email : customerEmail, 
