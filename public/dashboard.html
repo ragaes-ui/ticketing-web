@@ -115,6 +115,21 @@
 
         .ticket-body { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; color: var(--text-main); }
 
+        /* --- TAMBAHAN: GRID INFO PEMESAN --- */
+        .ticket-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: rgba(128, 128, 128, 0.05);
+            border: var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            margin: 15px 0;
+        }
+        .info-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 3px; }
+        .info-value { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin: 0; }
+
         .qr-container {
             background: white;
             padding: 10px;
@@ -500,7 +515,6 @@
             }
         }
 
-        // --- FETCH SALDO & PIN STATUS DARI DB ---
         async function fetchLatestProfile() {
             if(!user || !user.id) return;
             try {
@@ -517,7 +531,6 @@
             }
         }
 
-        // --- FETCH BALANCE HISTORY (MUTASI SALDO) ---
         async function loadTopupHistory() {
             const container = document.getElementById('topupList');
             const lang = localStorage.getItem('lang') || 'id';
@@ -545,17 +558,11 @@
 
                     // Logika Tampilan Uang Masuk vs Keluar
                     if (item.type === 'in') {
-                        // UANG MASUK (TOP UP)
-                        badgeClass = 'bg-success';
-                        icon = '<i class="bi bi-arrow-down-left"></i>'; // Panah masuk
-                        amountClass = 'text-success';
-                        sign = '+';
+                        badgeClass = 'bg-success'; icon = '<i class="bi bi-arrow-down-left"></i>'; 
+                        amountClass = 'text-success'; sign = '+';
                     } else {
-                        // UANG KELUAR (BELI TIKET)
-                        badgeClass = 'bg-danger';
-                        icon = '<i class="bi bi-arrow-up-right"></i>'; // Panah keluar
-                        amountClass = 'text-danger';
-                        sign = '-';
+                        badgeClass = 'bg-danger'; icon = '<i class="bi bi-arrow-up-right"></i>'; 
+                        amountClass = 'text-danger'; sign = '-';
                     }
 
                     // Format Tanggal
@@ -589,9 +596,6 @@
             }
         }
 
-        // --- FUNGSI ATUR / UBAH PIN ---
-        const pinModal = new bootstrap.Modal(document.getElementById('pinModal'));
-        
         function openPinModal() {
             document.getElementById('inputOldPin').value = ''; 
             document.getElementById('inputNewPin').value = '';
@@ -603,17 +607,14 @@
             const oldPinGroup = document.getElementById('groupOldPin');
             
             if (user.hasPin) {
-                // Mode Ubah PIN (Tampilkan input lama)
                 titleEl.innerText = (lang === 'id') ? 'Ubah PIN Transaksi' : 'Change Transaction PIN';
                 btnEl.innerText = translations[lang].btn_change_pin;
                 oldPinGroup.style.display = 'block';
             } else {
-                // Mode Buat PIN Baru
                 titleEl.innerText = translations[lang].modal_pin_title;
                 btnEl.innerText = translations[lang].btn_save_pin;
                 oldPinGroup.style.display = 'none';
             }
-            
             pinModal.show();
         }
 
@@ -624,22 +625,18 @@
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             
-            // Validasi PIN Lama (Hanya jika user sudah punya PIN)
             if (user.hasPin && (!oldPin || oldPin.length !== 6 || isNaN(oldPin))) {
                 return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_old_pin, background: '#1c1c2d', color: '#fff'});
             }
 
-            // Validasi Format PIN Baru
             if(newPin.length !== 6 || isNaN(newPin)) {
                 return Swal.fire({icon: 'error', title: 'Oops', text: t.err_pin_len, background: '#1c1c2d', color: '#fff'});
             }
 
-            // Validasi Konfirmasi
             if (newPin !== confirmPin) {
                 return Swal.fire({icon: 'error', title: 'Error', text: t.err_pin_match, background: '#1c1c2d', color: '#fff'});
             }
             
-            // Payload data
             const payload = { userId: user.id, newPin: newPin };
             if (user.hasPin) payload.oldPin = oldPin;
 
@@ -663,7 +660,6 @@
             }
         }
 
-        // --- FUNGSI TOP UP ---
         const topupModal = new bootstrap.Modal(document.getElementById('topupModal'));
         function openTopupModal() {
             document.getElementById('topupAmount').value = '';
@@ -780,7 +776,7 @@
             });
         }
 
-        // --- LOAD TIKET ---
+        // --- LOAD TIKET (DENGAN DATA PEMESAN) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
             const lang = localStorage.getItem('lang') || 'id';
@@ -826,20 +822,50 @@
                     let descText = event.description || "";
                     let descClean = descText.replace(/\n/g, " | "); 
                     
+                    // --- AMBIL DATA PEMESAN DARI DATABASE ---
+                    const pemesanName = ticket.customerName || user.fullName || user.username;
+                    const pemesanPhone = ticket.phone || '-';
+                    const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
+                    const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
+
+                    // --- DATA UNTUK EXPORT PDF ---
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
                         code: ticket.ticketCode, isStreaming: isStreaming, desc: descText, 
-                        userName: user.fullName || user.username
+                        buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar
                     }));
 
                     let mainContent = '';
+                    
+                    // TAMPILAN GRID UNTUK SEMUA JENIS TIKET
+                    mainContent += `
+                        <div class="ticket-info-grid">
+                            <div>
+                                <div class="info-label">Nama Pemesan</div>
+                                <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">No. WhatsApp</div>
+                                <div class="info-value">${pemesanPhone}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Pembayaran</div>
+                                <div class="info-value"><i class="bi ${metodeBayar === 'SALDO' ? 'bi-wallet2 text-primary' : 'bi-credit-card text-success'}"></i> ${metodeBayar}</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Total Harga</div>
+                                <div class="info-value">Rp ${hargaTiket.toLocaleString('id-ID')}</div>
+                            </div>
+                        </div>
+                    `;
+
                     if (isStreaming) {
-                        mainContent = `
-                            <div class="account-box">
+                        mainContent += `
+                            <div class="account-box mt-3">
                                 <small class="d-block mb-1 opacity-75">${t.lbl_credentials}</small>
                                 <div class="fw-bold text-break" style="white-space: pre-wrap;">${descText}</div>
                             </div>
-                            <div class="d-flex gap-2 w-100">
+                            <div class="d-flex gap-2 w-100 mt-2">
                                 <button onclick="copyToClipboard('${descClean}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
                                     <i class="bi bi-copy me-1"></i> ${t.btn_copy}
                                 </button>
@@ -850,8 +876,8 @@
                         `;
                     } else {
                         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
-                        mainContent = `
-                            <small class="text-muted fw-bold mb-2 d-block">${t.lbl_scan}</small>
+                        mainContent += `
+                            <small class="text-muted fw-bold mb-2 d-block mt-3">${t.lbl_scan}</small>
                             <div class="qr-container">
                                 <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous">
                             </div>
@@ -890,7 +916,7 @@
             }
         }
 
-        // --- PDF GENERATOR ---
+        // --- PDF GENERATOR (DIPERBARUI) ---
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
@@ -922,23 +948,43 @@
                     </div>`;
             }
 
+            // TAMPILKAN DATA PEMESAN DI DALAM CETAKAN PDF
             element.innerHTML = `
                 <div style="padding: 30px; border: 1px solid #ddd;">
                     <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
                         <h2 style="margin:0; color: #0049CC;">RCELLFEST</h2>
                         <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
                     </div>
-                    <div style="text-align: center;">
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
                         <h1 style="margin: 0; font-size: 20px; line-height: 1.2;">${data.eventName}</h1>
                         <p style="margin: 5px 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
                     </div>
+
+                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: left; font-size: 12px;">
+                        <div>
+                            <p style="margin:0; color:#555; font-weight:bold;">NAMA PEMESAN</p>
+                            <p style="margin:2px 0 0 0; color:#000;">${data.buyerName}</p>
+                        </div>
+                        <div>
+                            <p style="margin:0; color:#555; font-weight:bold;">NO. WHATSAPP</p>
+                            <p style="margin:2px 0 0 0; color:#000;">${data.buyerPhone}</p>
+                        </div>
+                        <div>
+                            <p style="margin:0; color:#555; font-weight:bold;">METODE BAYAR</p>
+                            <p style="margin:2px 0 0 0; color:#000;">${data.paymentMethod}</p>
+                        </div>
+                    </div>
+
                     <div style="text-align: center;">${contentMiddle}</div>
+                    
                     <div style="background: #f8f9fa; padding: 10px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
-                        <p style="margin:0; font-size: 10px; color: #999;">BOOKING ID</p>
+                        <p style="margin:0; font-size: 10px; color: #999;">KODE TIKET</p>
                         <p style="margin:0; font-size: 18px; font-weight: bold; letter-spacing: 3px; font-family: monospace;">${data.code}</p>
                     </div>
+                    
                     <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        <p style="margin:0;">Booked by: ${data.userName}</p>
+                        <p style="margin:0;">Printed automatically by RCELLFEST System.</p>
                         <p style="margin:0;">www.rcellfest.shop</p>
                     </div>
                 </div>
