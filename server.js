@@ -313,11 +313,11 @@ app.post('/api/user/set-pin', async (req, res) => {
 });
 
 
-// 4. Beli Tiket Menggunakan Saldo (UPDATE: DENGAN PROMO)
+// 4. Beli Tiket Menggunakan Saldo (DENGAN CHECKOUT DATA)
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        // Kita terima tambahan data 'promoCode' dari frontend
-        const { userId, eventId, price, quantity = 1, pin, promoCode } = req.body; 
+        // 👇 TAMBAHKAN buyerData DI SINI
+        const { userId, eventId, price, quantity = 1, pin, promoCode, buyerData } = req.body; 
         
         // --- A. VALIDASI USER & PIN ---
         const userCheck = await User.findById(userId);
@@ -340,21 +340,15 @@ app.post('/api/buy-ticket', async (req, res) => {
         let totalHarga = price * quantity;
         let discountAmount = 0;
 
-        // Jika ada kode promo dikirim, kita cek validitasnya
         if (promoCode) {
             const promo = await Promo.findOne({ code: promoCode.toUpperCase() });
-            
-            // Syarat: Promo ada, Kuota > 0, dan Belum Kadaluarsa
             if (promo && promo.quota > 0 && new Date() < promo.expiresAt) {
                 discountAmount = promo.discount;
-                
-                // Kurangi kuota promo nanti setelah transaksi sukses
                 promo.quota -= 1;
                 await promo.save();
             }
         }
 
-        // Harga Akhir (Jangan sampai minus)
         let finalPrice = totalHarga - discountAmount;
         if (finalPrice < 0) finalPrice = 0;
 
@@ -367,16 +361,20 @@ app.post('/api/buy-ticket', async (req, res) => {
 
         if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
-        // --- E. GENERATE TIKET ---
+        // --- E. GENERATE TIKET & SIMPAN DATA PEMBELI ---
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
         const newOrder = new Order({
             ticketCode: ticketCode,
             eventId: eventId,
-            customerName: user.fullName || user.username,
-            email: user.email,
+            // 👇 MASUKKAN DATA DARI FORM CHECKOUT KE DATABASE
+            customerName: buyerData ? buyerData.name : (user.fullName || user.username),
+            email: buyerData ? buyerData.email : user.email,
+            phone: buyerData ? buyerData.phone : user.phone,
+            nik: buyerData ? buyerData.nik : undefined,
             status: 'valid',
+            paymentMethod: 'saldo', // Penanda bayar pakai saldo
             orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
         });
         await newOrder.save();
@@ -406,9 +404,12 @@ app.get('/api/orders/:orderId', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// --- PAYMENT LAMA (VIA MIDTRANS) DENGAN CHECKOUT DATA ---
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { eventId, customerName, customerEmail, quantity } = req.body;
+        // 👇 TAMBAHKAN customerPhone, userId, dan buyerData
+        const { eventId, customerName, customerEmail, customerPhone, quantity, userId, buyerData } = req.body;
+        
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
@@ -418,7 +419,11 @@ app.post('/api/payment-token', async (req, res) => {
         let parameter = {
             transaction_details: { order_id: orderId, gross_amount: grossAmount },
             credit_card:{ secure : true },
-            customer_details: { first_name: customerName, email: customerEmail },
+            customer_details: { 
+                first_name: customerName, 
+                email: customerEmail,
+                phone: customerPhone // Kirim nomor HP ke Midtrans
+            },
             item_details: [{ id: eventId, price: event.price, quantity: quantity, name: event.name.substring(0, 50) }]
         };
 
@@ -428,9 +433,19 @@ app.post('/api/payment-token', async (req, res) => {
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
         const newOrder = new Order({
-            ticketCode: ticketCode, eventId: eventId, customerName: customerName, email: customerEmail, status: 'pending', orderIdMidtrans: orderId 
+            ticketCode: ticketCode, 
+            eventId: eventId, 
+            // 👇 MASUKKAN DATA DARI FORM CHECKOUT
+            customerName: buyerData ? buyerData.name : customerName, 
+            email: buyerData ? buyerData.email : customerEmail, 
+            phone: buyerData ? buyerData.phone : customerPhone,
+            nik: buyerData ? buyerData.nik : undefined,
+            status: 'pending', 
+            paymentMethod: 'midtrans', // Penanda bayar pakai Midtrans
+            orderIdMidtrans: orderId 
         });
         await newOrder.save();
+        
         res.json({ token: transaction.token, orderId: orderId });
     } catch (error) { console.log("Midtrans Error:", error); res.status(500).json({ message: error.message }); }
 });
