@@ -407,62 +407,55 @@ app.get('/api/orders/:orderId', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- PAYMENT LAMA (VIA MIDTRANS) DENGAN CHECKOUT DATA ---
+// Request Token Pembayaran Midtrans (UPDATE: TIER TIKET)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        // 👇 TAMBAHKAN customerPhone, userId, dan buyerData
-        const { eventId, customerName, customerEmail, customerPhone, quantity, userId, buyerData } = req.body;
+        const { eventId, quantity = 1, customerName, customerEmail, customerPhone, userId, tierName } = req.body;
         
         const event = await Event.findById(eventId);
-        if(!event) return res.status(404).json({ message: "Event tidak ditemukan" });
+        if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
+
+        // --- LOGIKA HARGA TIPE TIKET (TIER) ---
+        let hargaSatuan = event.price; 
         
-        const grossAmount = event.price * quantity;
-        const orderId = "ORDER-" + new Date().getTime(); 
+        // Jika user memilih tipe tiket tertentu (misal VIP)
+        if (tierName && event.tickets && event.tickets.length > 0) {
+            const selectedTier = event.tickets.find(t => t.tierName === tierName);
+            if (selectedTier) {
+                hargaSatuan = selectedTier.price; // Ambil harga VIP
+            }
+        }
+
+        const gross_amount = hargaSatuan * quantity; // Hitung tagihan akhir
+        const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         let parameter = {
-            transaction_details: { order_id: orderId, gross_amount: grossAmount },
-            credit_card:{ secure : true },
-            customer_details: { 
-                first_name: customerName, 
-                email: customerEmail,
-                phone: customerPhone // Kirim nomor HP ke Midtrans
+            transaction_details: {
+                order_id: orderId,
+                gross_amount: gross_amount
             },
-            item_details: [{ id: eventId, price: event.price, quantity: quantity, name: event.name.substring(0, 50) }]
+            customer_details: {
+                first_name: customerName,
+                email: customerEmail,
+                phone: customerPhone || "0800000000"
+            },
+            item_details: [{
+                id: eventId,
+                price: hargaSatuan,
+                quantity: quantity,
+                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` // Info nama tiket di Midtrans
+            }]
         };
 
-        const transaction = await snap.createTransaction(parameter);
+        const token = await snap.createTransactionToken(parameter);
+        res.json({ token, orderId });
 
-        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
-        
-        const newOrder = new Order({
-            ticketCode: ticketCode, 
-            eventId: eventId, 
-            // 👇 TAMBAHKAN INI (Simpan total harga dari Midtrans)
-            price: grossAmount,
-            tierName: req.body.tierName,
-            // 👇 MASUKKAN DATA DARI FORM CHECKOUT
-            customerName: buyerData ? buyerData.name : customerName, 
-            email: buyerData ? buyerData.email : customerEmail, 
-            phone: buyerData ? buyerData.phone : customerPhone,
-            nik: buyerData ? buyerData.nik : undefined,
-            status: 'pending', 
-            paymentMethod: 'midtrans', // Penanda bayar pakai Midtrans
-            orderIdMidtrans: orderId 
-        });
-        await newOrder.save();
-        
-        res.json({ token: transaction.token, orderId: orderId });
-    } catch (error) { console.log("Midtrans Error:", error); res.status(500).json({ message: error.message }); }
+    } catch (error) {
+        console.error("Midtrans Error:", error.message);
+        res.status(500).json({ message: 'Gagal membuat token pembayaran' });
+    }
 });
 
-app.post('/api/cancel-order', async (req, res) => {
-    try {
-        const { orderId } = req.body;
-        await Order.findOneAndDelete({ orderIdMidtrans: orderId, status: 'pending' });
-        res.json({ success: true });
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
 
 // ==========================================
 // 🔔 WEBHOOK MIDTRANS 
