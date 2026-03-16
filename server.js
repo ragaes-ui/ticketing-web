@@ -407,54 +407,74 @@ app.get('/api/orders/:orderId', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Request Token Pembayaran Midtrans (UPDATE: TIER TIKET)
+// 1. Request Token Pembayaran Midtrans (Hanya buat token, JANGAN simpan tiket dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { eventId, quantity = 1, customerName, customerEmail, customerPhone, userId, tierName } = req.body;
+        const { eventId, quantity = 1, customerName, customerEmail, customerPhone, tierName } = req.body;
         
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        // --- LOGIKA HARGA TIPE TIKET (TIER) ---
         let hargaSatuan = event.price; 
-        
-        // Jika user memilih tipe tiket tertentu (misal VIP)
         if (tierName && event.tickets && event.tickets.length > 0) {
             const selectedTier = event.tickets.find(t => t.tierName === tierName);
-            if (selectedTier) {
-                hargaSatuan = selectedTier.price; // Ambil harga VIP
-            }
+            if (selectedTier) hargaSatuan = selectedTier.price;
         }
 
-        const gross_amount = hargaSatuan * quantity; // Hitung tagihan akhir
+        const gross_amount = hargaSatuan * quantity;
         const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         let parameter = {
-            transaction_details: {
-                order_id: orderId,
-                gross_amount: gross_amount
-            },
-            customer_details: {
-                first_name: customerName,
-                email: customerEmail,
-                phone: customerPhone || "0800000000"
-            },
-            item_details: [{
-                id: eventId,
-                price: hargaSatuan,
-                quantity: quantity,
-                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` // Info nama tiket di Midtrans
-            }]
+            transaction_details: { order_id: orderId, gross_amount: gross_amount },
+            customer_details: { first_name: customerName, email: customerEmail, phone: customerPhone || "0800000000" },
+            item_details: [{ id: eventId, price: hargaSatuan, quantity: quantity, name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` }]
         };
 
         const token = await snap.createTransactionToken(parameter);
         res.json({ token, orderId });
 
-    } catch (error) {
-        console.error("Midtrans Error:", error.message);
-        res.status(500).json({ message: 'Gagal membuat token pembayaran' });
-    }
+    } catch (error) { res.status(500).json({ message: 'Gagal membuat token pembayaran' }); }
 });
+
+// 2. API BARU: Simpan Tiket LANGSUNG VALID saat Midtrans sukses
+app.post('/api/midtrans-success', async (req, res) => {
+    try {
+        const { eventId, userId, customerName, customerEmail, tierName, price, orderId } = req.body;
+        
+        const event = await Event.findById(eventId);
+        if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
+
+        // Generate Tiket Baru
+        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
+
+        const newOrder = new Order({
+            ticketCode: ticketCode,
+            eventId: eventId,
+            customerName: customerName,
+            email: customerEmail,
+            tierName: tierName || 'General',
+            price: price,
+            paymentMethod: 'MIDTRANS',
+            status: 'valid', // LANGSUNG STATUS VALID (SUCCESS)
+            orderIdMidtrans: orderId
+        });
+        await newOrder.save();
+
+        // Kurangi Kursi Event & Tipe Tiket
+        event.availableSeats -= 1;
+        if (tierName && event.tickets && event.tickets.length > 0) {
+            const selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
+            if (selectedTierIndex !== -1) {
+                event.tickets[selectedTierIndex].availableSeats -= 1;
+            }
+        }
+        await event.save();
+
+        res.json({ success: true, ticketCode });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
 
 
 // ==========================================
