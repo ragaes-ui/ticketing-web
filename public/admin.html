@@ -12,7 +12,6 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <script>
-        // Cek Login Admin
         const token = localStorage.getItem('adminToken');
         if (!token) window.location.href = 'login.html';
     </script>
@@ -70,7 +69,6 @@
         .form-check-input { height: 1.8em; width: 3.5em; background-color: rgba(255,255,255,0.2); border: none; }
         .form-check-input:checked { background-color: #ff0055; }
 
-        /* --- PROMO --- */
         .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
         .promo-ticket:hover { background: rgba(0, 198, 255, 0.2); }
         .promo-code { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #ffeb3b; letter-spacing: 1px; }
@@ -301,15 +299,12 @@
                                 <button type="submit" class="btn btn-success w-100 fw-bold">Buat Promo</button>
                             </form>
                         </div>
-                        
                         <div class="col-md-7 ps-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold text-info m-0">Daftar Promo Aktif</h6>
                                 <button onclick="loadPromos()" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise"></i></button>
                             </div>
-                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer">
-                                <div class="text-center text-muted small py-4">Memuat data promo...</div>
-                            </div>
+                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer"><div class="text-center text-muted small py-4">Memuat data promo...</div></div>
                         </div>
                     </div>
                 </div>
@@ -344,7 +339,6 @@
         let eventsData = []; 
         const switchMaint = document.getElementById('switchMaintenance');
 
-        // BAHASA
         const translations = {
             id: {
                 nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password", nav_promo: "Kelola Promo",
@@ -436,7 +430,6 @@
             else { desc.placeholder = t.ph_desc_default; document.getElementById('descHint').innerText = t.desc_hint_default; }
         }
 
-        // --- FUNGSI DYNAMIC TIER ROW ---
         function addTierRow(containerId, tierName = '', price = '', stock = '') {
             const container = document.getElementById(containerId);
             const rowHtml = `
@@ -467,7 +460,6 @@
             return tiers;
         }
 
-        // --- CEK MAINTENANCE ---
         async function checkMaintenanceStatus() {
             try { const res = await fetch('/api/maintenance'); const data = await res.json(); if(switchMaint) switchMaint.checked = data.isActive; } catch (err) {}
         }
@@ -485,7 +477,6 @@
             });
         }
         
-        // --- LOAD TABEL EVENT ---
         async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -507,6 +498,14 @@
                     let stokDisplay = ev.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : ev.availableSeats;
                     
                     let imgUrl = ev.image ? ev.image : "https://placehold.co/100x100?text=No+Img";
+
+                    // --- LOGIKA TOMBOL SELESAI / BATAL SELESAI ---
+                    let btnSelesai = '';
+                    if (ev.availableSeats === -1) {
+                        btnSelesai = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-outline-success me-1" title="Buka Kembali Event"><i class="bi bi-arrow-counterclockwise"></i></button>`;
+                    } else {
+                        btnSelesai = `<button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-outline-warning me-1" title="Tandai Selesai"><i class="bi bi-calendar-check-fill"></i></button>`;
+                    }
                     
                     tbody.innerHTML += `
                     <tr>
@@ -518,7 +517,7 @@
                         <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
                         <td class="text-center ${stokClass}">${stokDisplay}</td>
                         <td class="text-end">
-                            <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-outline-warning me-1" title="Tandai Selesai"><i class="bi bi-calendar-check-fill"></i></button>
+                            ${btnSelesai}
                             <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-pencil-fill"></i></button>
                             <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
                         </td>
@@ -551,6 +550,41 @@
                 }); 
                 loadTable(); 
                 Swal.fire({icon: 'success', title: 'Berhasil', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
+            } 
+        }
+
+        // --- BATAL SELESAI (BUKA KEMBALI) ---
+        async function batalSelesai(id) { 
+            const ev = eventsData.find(e => e._id === id);
+            
+            // Hitung ulang kursi dari tipe tiket yang ada
+            let restoredSeats = 0;
+            if (ev.tickets && ev.tickets.length > 0) {
+                restoredSeats = ev.tickets.reduce((acc, curr) => acc + curr.availableSeats, 0);
+            }
+
+            const lang = localStorage.getItem('lang') || 'id';
+            const result = await Swal.fire({ 
+                title: lang === 'id' ? 'Buka Kembali Event?' : 'Reopen Event?', 
+                text: lang === 'id' ? 'Status selesai akan dibatalkan dan tiket bisa dibeli lagi sesuai sisa kuota yang ada.' : 'The event will be active again.', 
+                icon:'question', 
+                showCancelButton:true, 
+                confirmButtonColor: '#28a745', 
+                cancelButtonColor: '#3085d6', 
+                confirmButtonText: lang === 'id' ? 'Ya, Buka Kembali' : 'Yes, Reopen',
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
+                background: '#1c1c2d', 
+                color: '#fff' 
+            });
+            
+            if(result.isConfirmed) { 
+                await fetch(`/api/events/${id}`, { 
+                    method: 'PUT', 
+                    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
+                    body: JSON.stringify({ availableSeats: restoredSeats })
+                }); 
+                loadTable(); 
+                Swal.fire({icon: 'success', title: 'Berhasil Dibuka', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
             } 
         }
 
