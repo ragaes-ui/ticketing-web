@@ -641,7 +641,10 @@
                 
                 let dateStr = t.txt_date_tba;
                 if (event.date) { 
-                    try { const dateObj = new Date(event.date); dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); } catch (e) { dateStr = event.date; } 
+                    try { 
+                        const dateObj = new Date(event.date); 
+                        dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
+                    } catch (e) { dateStr = event.date; } 
                 }
                 const catName = event.category || 'General'; 
                 const locationName = event.location || t.txt_tba;
@@ -654,7 +657,25 @@
                 let btnText = isFinished ? (lang === 'id' ? 'EVENT SELESAI' : 'ENDED') : (isSoldOut ? t.btn_sold_out : t.btn_buy_short);
                 if (catName === 'Streaming' && !isSoldOut && !isFinished) { btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; }
 
-                container.innerHTML += `<div class="col-6 col-md-4 col-lg-3"><div class="card-event" onclick="showDetail('${event._id}')"><div class="card-img-top" style="background-image: url('${imageUrl}');"><span class="category-badge-img">${catName}</span><div class="date-float">${dateStr}</div></div><div class="card-body"><h5 class="event-title text-truncate">${event.name}</h5><div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}</div><div class="price-val">${hargaLabel}</div><button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${(isSoldOut || isFinished) ? 'disabled' : ''}">${btnText}</button></div></div></div>`;
+                container.innerHTML += `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card-event" onclick="showDetail('${event._id}')">
+                        <div class="card-img-top" style="background-image: url('${imageUrl}');">
+                            <span class="category-badge-img">${catName}</span>
+                            <div class="date-float">${dateStr}</div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="event-title text-truncate">${event.name}</h5>
+                            <div class="event-venue text-truncate">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
+                            </div>
+                            <div class="price-val">${hargaLabel}</div>
+                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${(isSoldOut || isFinished) ? 'disabled' : ''}">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
             });
         }
 
@@ -999,11 +1020,11 @@
                         body: JSON.stringify({ 
                             userId: user.id, 
                             eventId: eventId, 
-                            tierName: selectedTier.tierName, // Kirim nama tiket ke backend
-                            price: hargaDitagih,             // Kirim harga spesifik tier tsb
+                            tierName: selectedTier.tierName, 
+                            price: hargaDitagih,             
                             pin: pin, 
                             promoCode: promo,
-                            buyerData: checkoutData // Kirim data pembeli ke backend
+                            buyerData: checkoutData 
                         })
                     });
                     
@@ -1033,14 +1054,14 @@
                         headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
                             eventId, 
-                            tierName: selectedTier.tierName, // Kirim nama tier
-                            price: hargaDitagih,             // Override harga event dgn harga tier
+                            tierName: selectedTier.tierName, 
+                            price: hargaDitagih,             
                             quantity: 1, 
                             customerName: checkoutData.name, 
                             customerEmail: checkoutData.email, 
                             customerPhone: checkoutData.phone,
                             userId: user.id,
-                            buyerData: checkoutData // Kirim data pembeli ke backend
+                            buyerData: checkoutData 
                         }) 
                     });
                     
@@ -1050,7 +1071,6 @@
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
                             onSuccess: async function(result){ 
-                                // 👇 BAGIAN INI YANG DIUBAH: Simpan tiket ke database SAAT SUKSES
                                 Swal.fire({ title: 'Menerbitkan Tiket...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                                 try {
                                     const saveRes = await fetch('/api/midtrans-success', {
@@ -1091,6 +1111,8 @@
                         Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); 
                     }
  
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); 
                 }
             }
         }
