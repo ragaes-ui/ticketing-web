@@ -1049,25 +1049,48 @@
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
-                            onSuccess: function(result){ 
-                                Swal.fire('Sukses!', 'Pembayaran berhasil!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
+                            onSuccess: async function(result){ 
+                                // 👇 BAGIAN INI YANG DIUBAH: Simpan tiket ke database SAAT SUKSES
+                                Swal.fire({ title: 'Menerbitkan Tiket...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                                try {
+                                    const saveRes = await fetch('/api/midtrans-success', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            eventId: eventId,
+                                            userId: user.id,
+                                            customerName: checkoutData.name,
+                                            customerEmail: checkoutData.email,
+                                            tierName: selectedTier.tierName,
+                                            price: hargaDitagih,
+                                            orderId: data.orderId
+                                        })
+                                    });
+                                    const saveData = await saveRes.json();
+                                    
+                                    if(saveData.success) {
+                                        Swal.fire('Sukses!', 'Pembayaran berhasil & Tiket terbit!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
+                                    } else {
+                                        Swal.fire('Error', 'Pembayaran masuk, tapi tiket gagal dimuat.', 'error');
+                                    }
+                                } catch (e) {
+                                    Swal.fire('Error', 'Sistem sibuk, hubungi admin.', 'error');
+                                }
                             }, 
                             onPending: function(result){ 
-                                Swal.fire('Pending', 'Selesaikan pembayaran Anda di instruksi Midtrans.', 'info'); 
+                                Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); 
                             }, 
                             onError: function(result){ 
-                                Swal.fire('Gagal', 'Pembayaran ditolak atau gagal.', 'error'); 
+                                Swal.fire('Gagal', lang === 'id' ? 'Pembayaran ditolak/gagal.' : 'Payment failed.', 'error'); 
                             }, 
                             onClose: function(){ 
-                                fetch('/api/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: data.orderId }) }); 
-                                Swal.fire('Dibatalkan', 'Anda menutup pop-up pembayaran.', 'info'); 
+                                Swal.fire('Dibatalkan', lang === 'id' ? 'Kamu menutup pop-up pembayaran sebelum selesai.' : 'You closed the payment popup.', 'warning'); 
                             } 
                         }); 
                     } else { 
                         Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); 
                     }
-                } catch (err) { 
-                    Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); 
+ 
                 }
             }
         }
