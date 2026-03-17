@@ -172,7 +172,7 @@
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
         .btn-outline-book { border: 1px solid #0049CC; color: #0049CC; font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
         .btn-outline-book:hover { background: #0049CC; color: white; }
-        .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; }
+        .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; cursor: not-allowed; }
 
         .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
         .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
@@ -203,7 +203,7 @@
         @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
 
-        /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS & TIERING --- */
+        /* --- PAYMENT CARDS & TIERING --- */
         .payment-selector { 
             display: flex; 
             flex-direction: column; 
@@ -267,7 +267,6 @@
             color: var(--text-muted); 
         }
 
-        /* Gaya untuk Radio Button Tipe Tiket */
         .tier-label { 
             cursor: pointer; 
             transition: 0.2s; 
@@ -432,8 +431,7 @@
                     
                     <div class="mt-4 mb-3">
                         <h6 class="fw-bold mb-2">Pilih Tipe Tiket</h6>
-                        <div id="ticketTierSelection" class="d-flex flex-column gap-2">
-                            </div>
+                        <div id="ticketTierSelection" class="d-flex flex-column gap-2"></div>
                     </div>
 
                     <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
@@ -455,6 +453,7 @@
         let allEvents = [];
         let detailModal; 
         
+        // BAHASA
         const translations = {
             id: {
                 nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan & Bantuan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar",
@@ -478,6 +477,7 @@
             }
         };
 
+        // INISIALISASI
         document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
@@ -494,6 +494,7 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
+        // FUNGSI UMUM (TEMA & BAHASA)
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
@@ -548,6 +549,7 @@
             }
         }
 
+        // CEK LOGIN
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
             const navArea = document.getElementById('navUserArea');
@@ -580,6 +582,7 @@
             window.location.reload();
         }
 
+        // LOAD DATA EVENT
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
@@ -619,6 +622,7 @@
             }
         }
 
+        // --- RENDER DAFTAR EVENT DI BERANDA ---
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
@@ -635,8 +639,9 @@
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 
-                // --- LOGIKA EVENT SELESAI ---
+                // Cek Status (termasuk status baru: Coming Soon)
                 const isFinished = event.availableSeats === -1;
+                const isComingSoon = event.availableSeats === -2;
                 const isSoldOut = event.availableSeats === 0;
                 
                 let dateStr = t.txt_date_tba;
@@ -650,12 +655,22 @@
                 const locationName = event.location || t.txt_tba;
                 const imageUrl = getEventImage(event);
                 
-                // Pada tampilan depan, jika ada tipe tiket, ubah label jadi "Mulai Dari Rp..."
                 const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
                 
-                // Teks Tombol
-                let btnText = isFinished ? (lang === 'id' ? 'EVENT SELESAI' : 'ENDED') : (isSoldOut ? t.btn_sold_out : t.btn_buy_short);
-                if (catName === 'Streaming' && !isSoldOut && !isFinished) { btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; }
+                // Teks Tombol di Beranda
+                let btnText = 'BELI';
+                if (isComingSoon) {
+                    btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
+                } else if (isFinished) {
+                    btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                } else if (isSoldOut) {
+                    btnText = t.btn_sold_out;
+                } else if (catName === 'Streaming') {
+                    btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
+                }
+
+                // Jika tombol dimatikan (karena habis, selesai, atau belum mulai)
+                const isDisabled = isSoldOut || isFinished || isComingSoon;
 
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
@@ -670,7 +685,7 @@
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${(isSoldOut || isFinished) ? 'disabled' : ''}">
+                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
                                 ${btnText}
                             </button>
                         </div>
@@ -679,7 +694,7 @@
             });
         }
 
-        // --- UPDATE FUNGSI SHOW DETAIL UNTUK TIERING TIKET ---
+        // --- TAMPILKAN POPUP DETAIL (MODAL) ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -706,7 +721,6 @@
             }
             document.getElementById('modalDesc').innerText = safeDescription;
 
-            // Logika Rendering Tier Tiket
             const btnBuy = document.getElementById('btnModalBuy');
             const priceTag = document.getElementById('modalPrice');
             const tierContainer = document.getElementById('ticketTierSelection');
@@ -715,9 +729,18 @@
             tierContainer.innerHTML = '';
             
             const isFinished = event.availableSeats === -1;
+            const isComingSoon = event.availableSeats === -2;
             const isEventSoldOut = event.availableSeats === 0;
 
-            if (isFinished) {
+            // Logika Status Tombol & Alert
+            if (isComingSoon) {
+                btnBuy.innerText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON'; 
+                btnBuy.disabled = true;
+                btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark"; 
+                btnBuy.removeAttribute('onclick');
+                tierContainer.innerHTML = `<div class="alert alert-info text-center border-info"><i class="bi bi-clock-fill"></i> Tiket belum dijual / Coming Soon.</div>`;
+            }
+            else if (isFinished) {
                 btnBuy.innerText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED'; 
                 btnBuy.disabled = true;
                 btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold"; 
@@ -736,6 +759,7 @@
                 btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
                 btnBuy.innerText = lang === 'id' ? "Pilih Tiket Dulu" : "Select Ticket First";
 
+                // Membangun Radio Button untuk tiap Tipe Tiket
                 if (event.tickets && event.tickets.length > 0) {
                     event.tickets.forEach((tier, index) => {
                         const isTierSoldOut = tier.availableSeats <= 0;
@@ -754,7 +778,7 @@
                         `;
                     });
                 } else {
-                    // Fallback jika Admin belum input array tiket (pakai harga default event)
+                    // Fallback jika array tiket kosong di DB
                     tierContainer.innerHTML = `
                         <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-3">
@@ -772,7 +796,7 @@
             detailModal.show();
         }
 
-        // Fungsi saat radio button tier dipilih
+        // --- RADIO BUTTON DI KLIK ---
         function selectTier(eventId, tierIndex) {
             const event = allEvents.find(e => e._id === eventId);
             const selectedTier = event.tickets[tierIndex];
@@ -790,7 +814,6 @@
             };
         }
 
-        // Fungsi fallback jika data tiket kosong di array
         function selectTierFallback(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             document.getElementById('modalPrice').innerText = `Rp ${event.price.toLocaleString('id-ID')}`;
@@ -802,12 +825,12 @@
             
             btnBuy.onclick = function() { 
                 detailModal.hide(); 
-                // Buat mock objek tier agar fungsi buyTicket tidak error
                 const mockTier = { tierName: 'General', price: event.price };
                 buyTicket(eventId, mockTier); 
             };
         }
 
+        // --- SEARCH EVENT ---
         function searchEvent() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
@@ -818,7 +841,7 @@
             if (e.key === "Enter") searchEvent(); 
         });
 
-        // --- 1. FUNGSI CEK PROMO (Helper untuk Swal) ---
+        // --- CEK KODE PROMO ---
         async function cekPromo() {
             const codeInput = document.getElementById('swal-input-promo');
             const statusEl = document.getElementById('promo-status');
@@ -848,13 +871,13 @@
             }
         }
 
-        // --- 2. FUNGSI BELI TIKET (FORM CHECKOUT + PAYMENT CARDS) ---
+        // --- BELI TIKET ---
         async function buyTicket(eventId, selectedTier) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const userRaw = localStorage.getItem('userData');
             
-            // 1. CEK LOGIN
+            // Cek Login
             if (!userRaw) { 
                 Swal.fire({ 
                     title: t.alert_login_title, 
@@ -872,9 +895,7 @@
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
 
-            // ==========================================
-            // STEP 1: FORM PENGISIAN DATA PEMESAN (CHECKOUT)
-            // ==========================================
+            // Form Detail Pemesan
             const { value: checkoutData } = await Swal.fire({
                 title: lang === 'id' ? 'Detail Pemesan' : 'Buyer Details',
                 html: `
@@ -921,15 +942,11 @@
 
             if (!checkoutData) return;
 
-            // ==========================================
-            // STEP 2: PILIH METODE PEMBAYARAN (CARDS)
-            // ==========================================
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
-            
-            // PENTING: Gunakan selectedTier.price sebagai harga yang ditagih
             const hargaDitagih = selectedTier.price;
 
+            // Pilih Metode Pembayaran
             const { value: paymentMethod } = await Swal.fire({
                 title: lang === 'id' ? 'Pilih Pembayaran' : 'Select Payment',
                 html: `
@@ -976,9 +993,7 @@
 
             if (!paymentMethod) return;
 
-            // ==========================================
-            // STEP 3: EKSEKUSI PEMBAYARAN
-            // ==========================================
+            // Eksekusi Pembayaran via Saldo
             if (paymentMethod === 'saldo') {
                 const { value: formValues } = await Swal.fire({
                     title: 'Konfirmasi PIN',
@@ -1045,7 +1060,9 @@
                     Swal.fire('Error', 'Koneksi terputus', 'error'); 
                 }
 
-            } else if (paymentMethod === 'midtrans') {
+            } 
+            // Eksekusi Pembayaran via Midtrans
+            else if (paymentMethod === 'midtrans') {
                 Swal.fire({ title: lang === 'id' ? 'Menyiapkan Tagihan...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 
                 try {
