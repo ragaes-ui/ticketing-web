@@ -46,36 +46,98 @@
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
         .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
 
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: 20px; box-shadow: var(--glass-shadow); padding: 25px; color: white; }
-        .navbar { background: rgba(15, 12, 41, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0; }
+        .glass-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(16px); 
+            border: var(--glass-border); 
+            border-radius: 20px; 
+            box-shadow: var(--glass-shadow); 
+            padding: 25px; 
+            color: white; 
+        }
         
-        .form-control, .form-select { background: rgba(0, 0, 0, 0.3) !important; border: 1px solid rgba(255, 255, 255, 0.2); color: white !important; border-radius: 12px; padding: 12px; }
-        .form-control:focus { border-color: #00c6ff; box-shadow: 0 0 10px rgba(0, 198, 255, 0.3); }
+        .navbar { 
+            background: rgba(15, 12, 41, 0.7); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding: 15px 0; 
+        }
+        
+        .form-control, .form-select { 
+            background: rgba(0, 0, 0, 0.3) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white !important; 
+            border-radius: 12px; 
+            padding: 12px; 
+        }
+        
+        .form-control:focus { 
+            border-color: #00c6ff; 
+            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3); 
+        }
+        
         ::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
 
-        .btn-primary { background: var(--primary-gradient); border: none; padding: 12px; border-radius: 12px; font-weight: 600; transition: 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
+        .btn-primary { 
+            background: var(--primary-gradient); 
+            border: none; 
+            padding: 12px; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            transition: 0.3s; 
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); 
+        }
 
         .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.1); }
         .table-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; }
 
-        .modal-content { background: rgba(28, 28, 45, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; color: white; }
+        .modal-content { 
+            background: rgba(28, 28, 45, 0.95); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 24px; 
+            color: white; 
+        }
+        
         .modal-header, .modal-footer { border-color: rgba(255,255,255,0.1); }
         .btn-close { filter: invert(1); }
 
-        .img-preview-box { width: 100%; height: 150px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 10px; background: rgba(0,0,0,0.2); }
+        .img-preview-box { 
+            width: 100%; height: 150px; 
+            border: 2px dashed rgba(255,255,255,0.2); 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; margin-top: 10px; background: rgba(0,0,0,0.2); 
+        }
         .img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
         .form-check-input { height: 1.8em; width: 3.5em; background-color: rgba(255,255,255,0.2); border: none; }
         .form-check-input:checked { background-color: #ff0055; }
 
-        .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        /* --- PROMO & TIER STYLES --- */
+        .promo-ticket { 
+            border: 1px dashed #00c6ff; 
+            background: rgba(0, 198, 255, 0.1); 
+            border-radius: 12px; padding: 12px; margin-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center; transition: 0.2s; 
+        }
         .promo-ticket:hover { background: rgba(0, 198, 255, 0.2); }
         .promo-code { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #ffeb3b; letter-spacing: 1px; }
 
-        /* --- TICKET TIER --- */
-        .tier-row { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; position: relative; }
-        .btn-remove-tier { position: absolute; top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; padding: 0; font-size: 12px; }
+        .tier-row { 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 15px; border-radius: 12px; margin-bottom: 10px; position: relative; 
+        }
+        .btn-remove-tier { 
+            position: absolute; top: -10px; right: -10px; 
+            border-radius: 50%; width: 25px; height: 25px; 
+            display: flex; align-items: center; justify-content: center; padding: 0; font-size: 12px; 
+        }
     </style>
 </head>
 <body class="pb-5">
@@ -241,7 +303,10 @@
                             </div>
                         </div>
 
-                        <div class="mb-3"><label data-i18n="lbl_name">Nama Event</label><input type="text" id="editName" class="form-control"></div>
+                        <div class="mb-3">
+                            <label data-i18n="lbl_name">Nama Event</label>
+                            <input type="text" id="editName" class="form-control">
+                        </div>
                         
                         <div class="mb-3">
                             <label data-i18n="lbl_category">Kategori</label>
@@ -255,11 +320,20 @@
                         </div>
                         
                         <div class="row g-2 mb-3">
-                            <div class="col-6"><label data-i18n="lbl_location">Lokasi</label><input type="text" id="editLocation" class="form-control"></div>
-                            <div class="col-6"><label data-i18n="lbl_date">Tanggal</label><input type="datetime-local" id="editDate" class="form-control"></div>
+                            <div class="col-6">
+                                <label data-i18n="lbl_location">Lokasi</label>
+                                <input type="text" id="editLocation" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label data-i18n="lbl_date">Tanggal</label>
+                                <input type="datetime-local" id="editDate" class="form-control">
+                            </div>
                         </div>
                         
-                        <div class="mb-3"><label data-i18n="lbl_desc">Deskripsi</label><textarea id="editDescription" class="form-control" rows="3"></textarea></div>
+                        <div class="mb-3">
+                            <label data-i18n="lbl_desc">Deskripsi</label>
+                            <textarea id="editDescription" class="form-control" rows="3"></textarea>
+                        </div>
                         
                         <div class="mb-3 pt-3 border-top border-secondary">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -290,21 +364,36 @@
                         <div class="col-md-5 border-end border-secondary mb-4 mb-md-0">
                             <h6 class="fw-bold mb-3 text-warning">Buat Promo Baru</h6>
                             <form id="formPromo">
-                                <div class="mb-2"><label class="small text-muted">Kode Promo (Unik)</label><input type="text" id="promoCode" class="form-control text-uppercase fw-bold" placeholder="Misal: DISKON10" required></div>
-                                <div class="mb-2"><label class="small text-muted">Nominal Diskon</label><input type="number" id="promoDisc" class="form-control" placeholder="Rp" required></div>
+                                <div class="mb-2">
+                                    <label class="small text-muted">Kode Promo (Unik)</label>
+                                    <input type="text" id="promoCode" class="form-control text-uppercase fw-bold" placeholder="Misal: DISKON10" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="small text-muted">Nominal Diskon</label>
+                                    <input type="number" id="promoDisc" class="form-control" placeholder="Rp" required>
+                                </div>
                                 <div class="row g-2 mb-3">
-                                    <div class="col-6"><label class="small text-muted">Kuota</label><input type="number" id="promoQuota" class="form-control" placeholder="100" required></div>
-                                    <div class="col-6"><label class="small text-muted">Aktif (Hari)</label><input type="number" id="promoDays" class="form-control" placeholder="7" required></div>
+                                    <div class="col-6">
+                                        <label class="small text-muted">Kuota</label>
+                                        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small text-muted">Aktif (Hari)</label>
+                                        <input type="number" id="promoDays" class="form-control" placeholder="7" required>
+                                    </div>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100 fw-bold">Buat Promo</button>
                             </form>
                         </div>
+                        
                         <div class="col-md-7 ps-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold text-info m-0">Daftar Promo Aktif</h6>
                                 <button onclick="loadPromos()" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise"></i></button>
                             </div>
-                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer"><div class="text-center text-muted small py-4">Memuat data promo...</div></div>
+                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer">
+                                <div class="text-center text-muted small py-4">Memuat data promo...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -320,11 +409,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="mb-3"><label data-i18n="lbl_old_pass">Password Lama</label><input type="password" id="adminOldPass" class="form-control"></div>
-                    <div class="mb-3"><label data-i18n="lbl_new_pass">Password Baru</label><input type="password" id="adminNewPass" class="form-control"></div>
-                    <div class="mb-3"><label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label><input type="password" id="adminConfirmPass" class="form-control"></div>
+                    <div class="mb-3">
+                        <label data-i18n="lbl_old_pass">Password Lama</label>
+                        <input type="password" id="adminOldPass" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label data-i18n="lbl_new_pass">Password Baru</label>
+                        <input type="password" id="adminNewPass" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label>
+                        <input type="password" id="adminConfirmPass" class="form-control">
+                    </div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button><button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button>
+                    <button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button>
+                </div>
             </div>
         </div>
     </div>
@@ -339,6 +440,7 @@
         let eventsData = []; 
         const switchMaint = document.getElementById('switchMaintenance');
 
+        // --- KAMUS BAHASA ---
         const translations = {
             id: {
                 nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password", nav_promo: "Kelola Promo",
@@ -398,36 +500,57 @@
                     if(el.querySelector('i')) {
                         const icon = el.querySelector('i').outerHTML;
                         el.innerHTML = `${icon} ${t[key]}`;
-                    } else { el.innerHTML = t[key]; }
+                    } else {
+                        el.innerHTML = t[key];
+                    }
                 }
             });
             const searchBox = document.getElementById('searchBox');
             if(searchBox) searchBox.placeholder = lang === 'id' ? 'Cari...' : 'Search...';
             const langBtn = document.getElementById('lang-btn');
             langBtn.innerText = lang.toUpperCase();
-            if(lang === 'en') { langBtn.classList.remove('btn-outline-light'); langBtn.classList.add('btn-light'); } 
-            else { langBtn.classList.add('btn-outline-light'); langBtn.classList.remove('btn-light'); }
+            
+            if(lang === 'en') { 
+                langBtn.classList.remove('btn-outline-light'); 
+                langBtn.classList.add('btn-light'); 
+            } else { 
+                langBtn.classList.add('btn-outline-light'); 
+                langBtn.classList.remove('btn-light'); 
+            }
         }
 
         function previewImage(url, imgId, textId) {
             const imgEl = document.getElementById(imgId);
             const textEl = document.getElementById(textId);
-            if (url && url.length > 5) { imgEl.src = url; imgEl.style.display = 'block'; if(textEl) textEl.style.display = 'none'; } 
-            else { imgEl.style.display = 'none'; if(textEl) textEl.style.display = 'block'; }
+            if (url && url.length > 5) { 
+                imgEl.src = url; 
+                imgEl.style.display = 'block'; 
+                if(textEl) textEl.style.display = 'none'; 
+            } else { 
+                imgEl.style.display = 'none'; 
+                if(textEl) textEl.style.display = 'block'; 
+            }
         }
 
         function filterTable() {
             const term = document.getElementById('searchBox').value.toLowerCase();
             const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
+            rows.forEach(row => { 
+                row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; 
+            });
         }
 
         function checkCategory(select) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const desc = document.getElementById('description');
-            if (select.value === 'Streaming') { desc.placeholder = t.ph_desc_stream; document.getElementById('descHint').innerText = t.desc_hint_stream; } 
-            else { desc.placeholder = t.ph_desc_default; document.getElementById('descHint').innerText = t.desc_hint_default; }
+            if (select.value === 'Streaming') { 
+                desc.placeholder = t.ph_desc_stream; 
+                document.getElementById('descHint').innerText = t.desc_hint_stream; 
+            } else { 
+                desc.placeholder = t.ph_desc_default; 
+                document.getElementById('descHint').innerText = t.desc_hint_default; 
+            }
         }
 
         function addTierRow(containerId, tierName = '', price = '', stock = '') {
@@ -461,7 +584,11 @@
         }
 
         async function checkMaintenanceStatus() {
-            try { const res = await fetch('/api/maintenance'); const data = await res.json(); if(switchMaint) switchMaint.checked = data.isActive; } catch (err) {}
+            try { 
+                const res = await fetch('/api/maintenance'); 
+                const data = await res.json(); 
+                if(switchMaint) switchMaint.checked = data.isActive; 
+            } catch (err) {}
         }
 
         if(switchMaint) {
@@ -473,10 +600,13 @@
                     await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ isActive }) }); 
                     const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
                     Toast.fire({ icon: 'success', title: isActive ? t.toast_maint_on : t.toast_maint_off });
-                } catch (err) { this.checked = !isActive; }
+                } catch (err) { 
+                    this.checked = !isActive; 
+                }
             });
         }
         
+        // --- LOAD TABEL EVENT ---
         async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -495,16 +625,21 @@
                     let icon = ev.category === 'Streaming' ? '<span class="badge bg-info text-dark me-2" style="font-size:0.6rem">STREAM</span>' : '<span class="badge bg-primary me-2" style="font-size:0.6rem">EVENT</span>';
                     
                     let stokClass = ev.availableSeats < 5 && ev.availableSeats >= 0 ? 'text-danger fw-bold' : 'text-success';
-                    let stokDisplay = ev.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : ev.availableSeats;
+                    
+                    let stokDisplay = ev.availableSeats;
+                    if (ev.availableSeats === -1) stokDisplay = '<span class="badge bg-secondary">SELESAI</span>';
+                    if (ev.availableSeats === -2) stokDisplay = '<span class="badge bg-info text-dark">COMING SOON</span>';
                     
                     let imgUrl = ev.image ? ev.image : "https://placehold.co/100x100?text=No+Img";
 
-                    // --- LOGIKA TOMBOL SELESAI / BATAL SELESAI ---
-                    let btnSelesai = '';
-                    if (ev.availableSeats === -1) {
-                        btnSelesai = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-outline-success me-1" title="Buka Kembali Event"><i class="bi bi-arrow-counterclockwise"></i></button>`;
+                    let btnStatus = '';
+                    if (ev.availableSeats === -1 || ev.availableSeats === -2) {
+                        btnStatus = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-outline-success me-1" title="Buka Kembali Event"><i class="bi bi-arrow-counterclockwise"></i> Buka</button>`;
                     } else {
-                        btnSelesai = `<button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-outline-warning me-1" title="Tandai Selesai"><i class="bi bi-calendar-check-fill"></i></button>`;
+                        btnStatus = `
+                            <button onclick="tandaiBelumDimulai('${ev._id}')" class="btn btn-sm btn-outline-info me-1" title="Tandai Belum Dimulai"><i class="bi bi-clock-fill"></i></button>
+                            <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-outline-warning me-1" title="Tandai Selesai"><i class="bi bi-calendar-check-fill"></i></button>
+                        `;
                     }
                     
                     tbody.innerHTML += `
@@ -517,8 +652,8 @@
                         <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
                         <td class="text-center ${stokClass}">${stokDisplay}</td>
                         <td class="text-end">
-                            ${btnSelesai}
-                            <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-pencil-fill"></i></button>
+                            ${btnStatus}
+                            <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil-fill"></i></button>
                             <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
                         </td>
                     </tr>`;
@@ -538,26 +673,33 @@
                 cancelButtonColor: '#3085d6', 
                 confirmButtonText: lang === 'id' ? 'Ya, Selesaikan' : 'Yes, Finish',
                 cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1c1c2d', 
-                color: '#fff' 
+                background: '#1c1c2d', color: '#fff' 
             });
             
             if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { 
-                    method: 'PUT', 
-                    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
-                    body: JSON.stringify({ availableSeats: -1 })
-                }); 
+                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: -1 }) }); 
                 loadTable(); 
                 Swal.fire({icon: 'success', title: 'Berhasil', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
             } 
         }
 
-        // --- BATAL SELESAI (BUKA KEMBALI) ---
+        // --- TANDAI BELUM DIMULAI ---
+        async function tandaiBelumDimulai(id) { 
+            const result = await Swal.fire({ 
+                title: 'Jadikan Coming Soon?', 
+                text: 'Status event akan menjadi Belum Dimulai.', 
+                icon:'info', showCancelButton:true, confirmButtonColor: '#0dcaf0', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Tunda', background: '#1c1c2d', color: '#fff' 
+            });
+            if(result.isConfirmed) { 
+                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: -2 }) }); 
+                loadTable(); 
+                Swal.fire({icon: 'success', title: 'Status Diubah', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
+            } 
+        }
+
+        // --- BATAL SELESAI / BUKA KEMBALI ---
         async function batalSelesai(id) { 
             const ev = eventsData.find(e => e._id === id);
-            
-            // Hitung ulang kursi dari tipe tiket yang ada
             let restoredSeats = 0;
             if (ev.tickets && ev.tickets.length > 0) {
                 restoredSeats = ev.tickets.reduce((acc, curr) => acc + curr.availableSeats, 0);
@@ -566,23 +708,18 @@
             const lang = localStorage.getItem('lang') || 'id';
             const result = await Swal.fire({ 
                 title: lang === 'id' ? 'Buka Kembali Event?' : 'Reopen Event?', 
-                text: lang === 'id' ? 'Status selesai akan dibatalkan dan tiket bisa dibeli lagi sesuai sisa kuota yang ada.' : 'The event will be active again.', 
+                text: lang === 'id' ? 'Tiket bisa dibeli lagi sesuai sisa kuota yang ada.' : 'The event will be active again.', 
                 icon:'question', 
                 showCancelButton:true, 
                 confirmButtonColor: '#28a745', 
                 cancelButtonColor: '#3085d6', 
                 confirmButtonText: lang === 'id' ? 'Ya, Buka Kembali' : 'Yes, Reopen',
                 cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1c1c2d', 
-                color: '#fff' 
+                background: '#1c1c2d', color: '#fff' 
             });
             
             if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { 
-                    method: 'PUT', 
-                    headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token},
-                    body: JSON.stringify({ availableSeats: restoredSeats })
-                }); 
+                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: restoredSeats }) }); 
                 loadTable(); 
                 Swal.fire({icon: 'success', title: 'Berhasil Dibuka', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
             } 
@@ -596,8 +733,13 @@
                 document.getElementById('editName').value = ev.name;
                 document.getElementById('editCategory').value = ev.category;
                 document.getElementById('editLocation').value = ev.location;
-                if (ev.date) { const d = new Date(ev.date); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); document.getElementById('editDate').value = d.toISOString().slice(0, 16); } 
-                else { document.getElementById('editDate').value = ''; }
+                if (ev.date) { 
+                    const d = new Date(ev.date); 
+                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); 
+                    document.getElementById('editDate').value = d.toISOString().slice(0, 16); 
+                } else { 
+                    document.getElementById('editDate').value = ''; 
+                }
                 document.getElementById('editDescription').value = ev.description;
                 document.getElementById('editImage').value = ev.image || '';
                 previewImage(ev.image || '', 'editPreview', 'editPreviewText');
@@ -607,7 +749,7 @@
                 if (ev.tickets && ev.tickets.length > 0) {
                     ev.tickets.forEach(t => addTierRow('editTiersContainer', t.tierName, t.price, t.availableSeats));
                 } else {
-                    addTierRow('editTiersContainer', 'General', ev.price, ev.availableSeats === -1 ? 0 : ev.availableSeats);
+                    addTierRow('editTiersContainer', 'General', ev.price, (ev.availableSeats === -1 || ev.availableSeats === -2) ? 0 : ev.availableSeats);
                 }
                 editModal.show();
             }
@@ -615,13 +757,15 @@
 
         // --- SIMPAN EDIT EVENT ---
         async function saveEdit() {
-            const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
+            const lang = localStorage.getItem('lang') || 'id'; 
+            const t = translations[lang];
             const id = document.getElementById('editId').value;
             const rawDate = document.getElementById('editDate').value;
             const isoDate = rawDate ? new Date(rawDate).toISOString() : null;
             
             const tiersData = getTiersData('editTiersContainer');
             if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
+            
             const startFromPrice = Math.min(...tiersData.map(t => t.price));
             const totalAvailCap = tiersData.reduce((acc, curr) => acc + curr.availableSeats, 0);
 
@@ -638,18 +782,25 @@
             };
 
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify(data) });
-            editModal.hide(); loadTable(); Swal.fire({ title: t.alert_success_title, text: t.alert_success_edit, icon: 'success', background: '#1c1c2d', color: '#fff' });
+            editModal.hide(); 
+            loadTable(); 
+            Swal.fire({ title: t.alert_success_title, text: t.alert_success_edit, icon: 'success', background: '#1c1c2d', color: '#fff' });
         }
 
         // --- TAMBAH EVENT ---
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
-            e.preventDefault(); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
+            e.preventDefault(); 
+            const lang = localStorage.getItem('lang') || 'id'; 
+            const t = translations[lang];
+            
             const tiersData = getTiersData('addTiersContainer');
             if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
+            
             const startFromPrice = Math.min(...tiersData.map(t => t.price));
             const totalCap = tiersData.reduce((acc, curr) => acc + curr.totalSeats, 0);
 
-            const btn = document.getElementById('btnPublish'); const originalText = btn.innerHTML;
+            const btn = document.getElementById('btnPublish'); 
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
             
             const data = { 
@@ -666,27 +817,42 @@
             };
 
             await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify(data) });
+            
             loadTable(); 
             e.target.reset(); 
-            document.getElementById('addTiersContainer').innerHTML = ''; addTierRow('addTiersContainer'); 
-            document.getElementById('addPreview').style.display = 'none'; document.getElementById('addPreviewText').style.display = 'block';
-            btn.innerHTML = originalText; Swal.fire({ title: t.alert_success_title, text: t.alert_success_add, icon: 'success', background: '#1c1c2d', color: '#fff' });
+            document.getElementById('addTiersContainer').innerHTML = ''; 
+            addTierRow('addTiersContainer'); 
+            document.getElementById('addPreview').style.display = 'none'; 
+            document.getElementById('addPreviewText').style.display = 'block';
+            
+            btn.innerHTML = originalText; 
+            Swal.fire({ title: t.alert_success_title, text: t.alert_success_add, icon: 'success', background: '#1c1c2d', color: '#fff' });
         });
 
         // --- HAPUS EVENT ---
         async function hapusKonser(id) { 
-            const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
+            const lang = localStorage.getItem('lang') || 'id'; 
+            const t = translations[lang];
             const result = await Swal.fire({ title: t.alert_del_title, text: t.alert_del_text, icon:'warning', showCancelButton:true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: t.btn_confirm_del, cancelButtonText: t.btn_cancel_del, background: '#1c1c2d', color: '#fff' });
-            if(result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); loadTable(); } 
+            
+            if(result.isConfirmed) { 
+                await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); 
+                loadTable(); 
+            } 
         }
 
-        // --- MANAJEMEN PROMO LOGIC ---
+        // --- MANAJEMEN PROMO ---
         function openPromoModal() { promoModal.show(); loadPromos(); }
+        
         async function loadPromos() {
             const container = document.getElementById('promoListContainer');
             try {
-                const res = await fetch('/api/promos'); const promos = await res.json();
-                if(promos.length === 0) { container.innerHTML = '<div class="text-center text-muted small py-4">Belum ada promo aktif.</div>'; return; }
+                const res = await fetch('/api/promos'); 
+                const promos = await res.json();
+                if(promos.length === 0) { 
+                    container.innerHTML = '<div class="text-center text-muted small py-4">Belum ada promo aktif.</div>'; 
+                    return; 
+                }
                 let html = '';
                 promos.forEach(p => {
                     const date = new Date(p.expiresAt).toLocaleDateString();
@@ -698,32 +864,84 @@
 
         document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = { code: document.getElementById('promoCode').value, discount: document.getElementById('promoDisc').value, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value };
-            try { await fetch('/api/promos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); e.target.reset(); loadPromos(); const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); Toast.fire({ icon: 'success', title: 'Promo Berhasil Dibuat!' }); } catch (e) { Swal.fire('Error', 'Gagal membuat promo', 'error'); }
+            const data = { 
+                code: document.getElementById('promoCode').value, 
+                discount: document.getElementById('promoDisc').value, 
+                quota: document.getElementById('promoQuota').value, 
+                daysActive: document.getElementById('promoDays').value 
+            };
+            try { 
+                await fetch('/api/promos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); 
+                e.target.reset(); 
+                loadPromos(); 
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); 
+                Toast.fire({ icon: 'success', title: 'Promo Berhasil Dibuat!' }); 
+            } catch (e) { Swal.fire('Error', 'Gagal membuat promo', 'error'); }
         });
 
-        async function hapusPromo(id) { if(confirm('Yakin ingin menghapus promo ini?')) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); } }
+        async function hapusPromo(id) { 
+            if(confirm('Yakin ingin menghapus promo ini?')) { 
+                await fetch(`/api/promos/${id}`, { method: 'DELETE' }); 
+                loadPromos(); 
+            } 
+        }
 
         // --- GANTI PASSWORD ---
-        function openAdminPassModal() { document.getElementById('adminOldPass').value = ''; document.getElementById('adminNewPass').value = ''; document.getElementById('adminConfirmPass').value = ''; adminPassModal.show(); }
+        function openAdminPassModal() { 
+            document.getElementById('adminOldPass').value = ''; 
+            document.getElementById('adminNewPass').value = ''; 
+            document.getElementById('adminConfirmPass').value = ''; 
+            adminPassModal.show(); 
+        }
+
         async function saveAdminPassword() {
-            const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
-            const oldPass = document.getElementById('adminOldPass').value; const newPass = document.getElementById('adminNewPass').value; const confirmPass = document.getElementById('adminConfirmPass').value;
-            if (!oldPass || !newPass || !confirmPass) { return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'}); }
-            if (newPass !== confirmPass) { return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'}); }
+            const lang = localStorage.getItem('lang') || 'id'; 
+            const t = translations[lang];
+            const oldPass = document.getElementById('adminOldPass').value; 
+            const newPass = document.getElementById('adminNewPass').value; 
+            const confirmPass = document.getElementById('adminConfirmPass').value;
+            
+            if (!oldPass || !newPass || !confirmPass) { 
+                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'}); 
+            }
+            if (newPass !== confirmPass) { 
+                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'}); 
+            }
             try {
-                let adminId = ''; if (token && token.includes('token-rahasia-')) { adminId = token.split('token-rahasia-')[1]; } else { const adminData = JSON.parse(localStorage.getItem('adminData') || '{}'); if (adminData.id) { adminId = adminData.id; } else { const userData = JSON.parse(localStorage.getItem('userData') || '{}'); adminId = userData.id || ''; } }
+                let adminId = ''; 
+                if (token && token.includes('token-rahasia-')) { adminId = token.split('token-rahasia-')[1]; } 
+                else { 
+                    const adminData = JSON.parse(localStorage.getItem('adminData') || '{}'); 
+                    if (adminData.id) { adminId = adminData.id; } 
+                    else { const userData = JSON.parse(localStorage.getItem('userData') || '{}'); adminId = userData.id || ''; } 
+                }
+                
                 if (!adminId) { return Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'ID Admin tidak ditemukan. Silakan Logout dan Login kembali.', background: '#1c1c2d', color: '#fff'}); }
                 Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                
                 const res = await fetch('/api/user/change-password', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass }) });
                 const data = await res.json();
-                if (res.ok && data.success) { adminPassModal.hide(); Swal.fire({ icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff' }).then(() => { logout(); }); } else { Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah.', background: '#1c1c2d', color: '#fff'}); }
-            } catch (error) { Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'}); }
+                
+                if (res.ok && data.success) { 
+                    adminPassModal.hide(); 
+                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff' }).then(() => { logout(); }); 
+                } else { 
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah.', background: '#1c1c2d', color: '#fff'}); 
+                }
+            } catch (error) { 
+                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'}); 
+            }
         }
         
-        function logout() { localStorage.removeItem('adminToken'); localStorage.removeItem('adminData'); window.location.href = 'login.html'; }
+        function logout() { 
+            localStorage.removeItem('adminToken'); 
+            localStorage.removeItem('adminData'); 
+            window.location.href = 'login.html'; 
+        }
         
-        loadTable(); checkMaintenanceStatus(); checkCategory(document.getElementById('category'));
+        loadTable(); 
+        checkMaintenanceStatus(); 
+        checkCategory(document.getElementById('category'));
     </script>
 </body>
 </html>
