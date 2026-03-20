@@ -179,6 +179,7 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// --- API RIWAYAT MUTASI SALDO (GABUNGAN TOPUP & BELI) ---
 app.post('/api/balance-history', async (req, res) => {
     try {
         const { userId } = req.body;
@@ -188,21 +189,29 @@ app.post('/api/balance-history', async (req, res) => {
         // 1. Ambil data Uang Masuk (Top Up)
         const topups = await Topup.find({ userId: userId, status: 'success' }).lean();
         const historyTopup = topups.map(t => ({
-            type: 'in', title: 'Top Up Saldo', amount: t.amount, date: t.timestamp, id: t.orderId
+            type: 'in', 
+            title: 'Top Up Saldo', 
+            amount: t.amount, 
+            date: t.timestamp, 
+            id: t.orderId
         }));
 
-        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo)
-        // PERBAIKAN: Cari berdasarkan paymentMethod "SALDO" (huruf besar/kecil tidak masalah)
+        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo) - KODE SUPER KEBAL
         const orders = await Order.find({ 
-            email: user.email, 
-            paymentMethod: { $regex: /^saldo$/i } 
+            // Cek email tanpa peduli huruf besar/kecil
+            email: new RegExp('^' + user.email + '$', 'i'), 
+            // Cek semua transaksi yang metode bayarnya ada kata "saldo" ATAU ID-nya "SALDO-PAY"
+            $or: [
+                { paymentMethod: { $regex: /saldo/i } },
+                { orderIdMidtrans: { $regex: /SALDO/i } }
+            ]
         }).populate('eventId').lean();
         
         const historyOrder = orders.map(o => ({
             type: 'out', 
-            title: `Beli: ${o.eventId?.name || 'Tiket Event'}`, 
+            title: `Beli: ${o.eventId ? o.eventId.name : 'Tiket Event'}`, 
             amount: o.price || 0, 
-            date: o.createdAt || new Date(), // Pastikan tanggal selalu terbaca
+            date: o.createdAt || new Date(),
             id: o.ticketCode
         }));
 
