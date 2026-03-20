@@ -185,16 +185,28 @@ app.post('/api/balance-history', async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
+        // 1. Ambil data Uang Masuk (Top Up)
         const topups = await Topup.find({ userId: userId, status: 'success' }).lean();
         const historyTopup = topups.map(t => ({
             type: 'in', title: 'Top Up Saldo', amount: t.amount, date: t.timestamp, id: t.orderId
         }));
 
-        const orders = await Order.find({ email: user.email, orderIdMidtrans: { $regex: /^SALDO-PAY/ } }).populate('eventId').lean();
+        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo)
+        // PERBAIKAN: Cari berdasarkan paymentMethod "SALDO" (huruf besar/kecil tidak masalah)
+        const orders = await Order.find({ 
+            email: user.email, 
+            paymentMethod: { $regex: /^saldo$/i } 
+        }).populate('eventId').lean();
+        
         const historyOrder = orders.map(o => ({
-            type: 'out', title: `Beli: ${o.eventId?.name || 'Tiket Event'}`, amount: o.price || 0, date: o.createdAt, id: o.ticketCode
+            type: 'out', 
+            title: `Beli: ${o.eventId?.name || 'Tiket Event'}`, 
+            amount: o.price || 0, 
+            date: o.createdAt || new Date(), // Pastikan tanggal selalu terbaca
+            id: o.ticketCode
         }));
 
+        // 3. Gabungkan dan Urutkan dari yang terbaru
         const fullHistory = [...historyTopup, ...historyOrder].sort((a, b) => new Date(b.date) - new Date(a.date));
         res.json(fullHistory);
 
