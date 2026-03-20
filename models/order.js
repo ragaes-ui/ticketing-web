@@ -23,7 +23,8 @@ const orderSchema = new mongoose.Schema({
   
   // PENTING: Field baru untuk menyimpan ID unik transaksi Midtrans
   // Nanti dipakai buat mencocokkan pembayaran yang masuk
-  orderIdMidtrans: { type: String }, 
+  orderIdMidtrans: { type: String },
+  quantity : { type: Number, default: 1}, 
   
   purchaseDate: { type: Date, default: Date.now }
 });
