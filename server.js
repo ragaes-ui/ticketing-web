@@ -382,14 +382,13 @@ app.post('/api/buy-ticket', async (req, res) => {
         });
         await newOrder.save();
         
-        // Kurangi kursi event
-        event.availableSeats -= quantity;
+                // Kurangi Kursi Event & Kursi Tier
+        event.availableSeats -= quantity; // <-- Pastikan ini memotong 'quantity'
+        if (selectedTierIndex !== -1) {
+            event.tickets[selectedTierIndex].availableSeats -= quantity; // <-- Pastikan ini memotong 'quantity'
+        }
         await event.save();
-        
-        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
 
-    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
-});
 
 
 // ==========================================
@@ -439,34 +438,20 @@ app.post('/api/payment-token', async (req, res) => {
 // 2. API BARU: Simpan Tiket LANGSUNG VALID saat Midtrans sukses
 app.post('/api/midtrans-success', async (req, res) => {
     try {
-        const { eventId, userId, customerName, customerEmail, tierName, price, orderId } = req.body;
+        // 👇 Pastikan 'quantity' ditangkap dari req.body
+        const { eventId, userId, customerName, customerEmail, tierName, price, quantity = 1, orderId } = req.body;
         
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        // Generate Tiket Baru
-        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
+        // ... (Kode bikin tiket biarkan sama) ...
 
-        const newOrder = new Order({
-            ticketCode: ticketCode,
-            eventId: eventId,
-            customerName: customerName,
-            email: customerEmail,
-            tierName: tierName || 'General',
-            price: price,
-            paymentMethod: 'MIDTRANS',
-            status: 'valid', // LANGSUNG STATUS VALID (SUCCESS)
-            orderIdMidtrans: orderId
-        });
-        await newOrder.save();
-
-        // Kurangi Kursi Event & Tipe Tiket
-        event.availableSeats -= 1;
+        // 👇 UBAH BAGIAN INI: Kurangi Kursi Event & Tipe Tiket sesuai quantity
+        event.availableSeats -= quantity; 
         if (tierName && event.tickets && event.tickets.length > 0) {
             const selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
             if (selectedTierIndex !== -1) {
-                event.tickets[selectedTierIndex].availableSeats -= 1;
+                event.tickets[selectedTierIndex].availableSeats -= quantity; 
             }
         }
         await event.save();
@@ -474,8 +459,6 @@ app.post('/api/midtrans-success', async (req, res) => {
         res.json({ success: true, ticketCode });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
-
-
 
 // ==========================================
 // 🔔 WEBHOOK MIDTRANS 
