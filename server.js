@@ -33,10 +33,10 @@ const Topup = mongoose.model('Topup', topupSchema);
 
 // --- MODEL BARU: KODE PROMO ---
 const promoSchema = new mongoose.Schema({
-    code: { type: String, required: true, unique: true, uppercase: true }, // Kode Unik (misal: MERDEKA)
-    discount: { type: Number, required: true }, // Jumlah Diskon (Rp)
-    quota: { type: Number, default: 100 }, // Sisa Kuota
-    expiresAt: { type: Date, required: true } // Tanggal Kadaluarsa
+    code: { type: String, required: true, unique: true, uppercase: true }, 
+    discount: { type: Number, required: true }, 
+    quota: { type: Number, default: 100 }, 
+    expiresAt: { type: Date, required: true } 
 });
 const Promo = mongoose.model('Promo', promoSchema);
 
@@ -84,7 +84,6 @@ let snap = new midtransClient.Snap({
 // --- ROUTES API ---
 // ==========================================
 
-// 🔒 API PUBLIC: SENSOR DESKRIPSI STREAMING
 app.get('/api/events', async (req, res) => {
     try { 
         const events = await Event.find(); 
@@ -102,10 +101,11 @@ app.get('/api/events', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, date, price, capacity, description, category, location } = req.body;
+        const { name, date, price, capacity, description, category, location, tickets } = req.body;
         const newEvent = new Event({
             name, date, price, totalCapacity: capacity, availableSeats: capacity,
-            description: description || "", category: category || "General", location: location || "TBA"
+            description: description || "", category: category || "General", location: location || "TBA",
+            tickets: tickets || []
         });
         await newEvent.save();
         res.json(newEvent);
@@ -133,7 +133,6 @@ app.post('/api/register', async (req, res) => {
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
         const hashedPassword = await bcrypt.hash(password, 10);
-        // Pastikan model User kamu sudah ada field 'saldo', default 0 di registrasi ini aman
         const newUser = new User({ username, email, password: hashedPassword, role: role || 'user', fullName, phone, saldo: 0 });
         await newUser.save();
         res.json({ success: true, message: "Registrasi Berhasil!" });
@@ -155,19 +154,13 @@ app.post('/api/login', async (req, res) => {
             ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
         });
 
-        // UPDATE: Beritahu frontend apakah user sudah mengatur PIN atau belum (hasPin)
         res.json({ 
             success: true, 
             token: "token-rahasia-" + user._id, 
             user: { 
-                id: user._id, 
-                username: user.username, 
-                email: user.email, 
-                role: user.role, 
-                fullName: user.fullName, 
-                phone: user.phone, 
-                saldo: user.saldo || 0,
-                hasPin: !!user.pin // Convert keberadaan pin jadi boolean (true/false)
+                id: user._id, username: user.username, email: user.email, 
+                role: user.role, fullName: user.fullName, phone: user.phone, 
+                saldo: user.saldo || 0, hasPin: !!user.pin 
             } 
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
@@ -186,74 +179,43 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API RIWAYAT MUTASI SALDO (GABUNGAN TOPUP & BELI) ---
-// Gantikan api/my-topups dengan ini:
 app.post('/api/balance-history', async (req, res) => {
     try {
         const { userId } = req.body;
-        
-        // 1. Ambil Data User untuk dapatkan Email (karena Order disimpan pakai email)
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // 2. Ambil Data Top Up (Uang Masuk) - Hanya yang sukses
         const topups = await Topup.find({ userId: userId, status: 'success' }).lean();
         const historyTopup = topups.map(t => ({
-            type: 'in', // Masuk
-            title: 'Top Up Saldo',
-            amount: t.amount,
-            date: t.timestamp,
-            id: t.orderId
+            type: 'in', title: 'Top Up Saldo', amount: t.amount, date: t.timestamp, id: t.orderId
         }));
 
-        // 3. Ambil Data Pembelian Tiket (Uang Keluar)
-        // Kita filter yang orderIdMidtrans-nya diawali "SALDO-PAY" (artinya bayar pakai saldo)
-        const orders = await Order.find({ 
-            email: user.email, 
-            orderIdMidtrans: { $regex: /^SALDO-PAY/ } 
-        }).populate('eventId').lean();
-
+        const orders = await Order.find({ email: user.email, orderIdMidtrans: { $regex: /^SALDO-PAY/ } }).populate('eventId').lean();
         const historyOrder = orders.map(o => ({
-            type: 'out', // Keluar
-            title: `Beli: ${o.eventId?.name || 'Tiket Event'}`,
-            amount: o.eventId?.price || 0, // Ambil harga dari event
-            date: o.purchaseDate,
-            id: o.ticketCode
+            type: 'out', title: `Beli: ${o.eventId?.name || 'Tiket Event'}`, amount: o.price || 0, date: o.createdAt, id: o.ticketCode
         }));
 
-        // 4. Gabungkan dan Urutkan dari yang paling baru
         const fullHistory = [...historyTopup, ...historyOrder].sort((a, b) => new Date(b.date) - new Date(a.date));
-
         res.json(fullHistory);
 
-    } catch (error) { 
-        res.status(500).json({ error: error.message }); 
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ==========================================
 // --- API SALDO BARU (TOP UP, BELI & PIN) ---
 // ==========================================
 
-// 1. Ambil Profil & Saldo Terbaru
 app.get('/api/user/profile/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-        
-        // UPDATE: Sertakan juga status hasPin saat refresh profil
         res.json({ 
-            id: user._id, 
-            username: user.username, 
-            email: user.email, 
-            fullName: user.fullName, 
-            saldo: user.saldo || 0,
-            hasPin: !!user.pin 
+            id: user._id, username: user.username, email: user.email, 
+            fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin 
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 2. Request Top Up (Generate Token Midtrans)
 app.post('/api/topup', async (req, res) => {
     try {
         const { userId, email, name, amount } = req.body;
@@ -266,80 +228,58 @@ app.post('/api/topup', async (req, res) => {
         };
         
         const transaction = await snap.createTransaction(parameter);
-        
-        // Catat di database dengan status pending
         await Topup.create({ userId, orderId, amount, status: 'pending' });
-
         res.json({ token: transaction.token, orderId });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. API ATUR / UBAH PIN SALDO (DENGAN CEK PIN LAMA)
 app.post('/api/user/set-pin', async (req, res) => {
     try {
         const { userId, oldPin, newPin, pin } = req.body;
-        // Frontend mungkin mengirim 'newPin' (saat ubah) atau 'pin' (saat buat baru), kita ambil salah satu
         const finalPin = newPin || pin;
 
-        // 1. Validasi Input Dasar
-        if (!finalPin || finalPin.length !== 6) {
-            return res.status(400).json({ message: "PIN baru harus 6 angka bulat!" });
-        }
-
+        if (!finalPin || finalPin.length !== 6) return res.status(400).json({ message: "PIN baru harus 6 angka bulat!" });
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
-        // 2. Jika User SUDAH punya PIN, wajib validasi PIN Lama
         if (user.pin) {
-            if (!oldPin) {
-                return res.status(400).json({ message: "Harap masukkan PIN Lama untuk keamanan." });
-            }
+            if (!oldPin) return res.status(400).json({ message: "Harap masukkan PIN Lama." });
             const isMatch = await bcrypt.compare(oldPin, user.pin);
-            if (!isMatch) {
-                return res.status(400).json({ message: "PIN Lama salah!" });
-            }
+            if (!isMatch) return res.status(400).json({ message: "PIN Lama salah!" });
         }
 
-        // 3. Enkripsi PIN Baru dan Simpan
-        const hashedPin = await bcrypt.hash(finalPin, 10);
-        user.pin = hashedPin;
+        user.pin = await bcrypt.hash(finalPin, 10);
         await user.save();
-        
         res.json({ success: true, message: "PIN berhasil disimpan!" });
-
-    } catch (error) { 
-        res.status(500).json({ error: error.message }); 
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 
-// 4. Beli Tiket Menggunakan Saldo (DENGAN CHECKOUT DATA)
+// ==========================================
+// --- API PEMBELIAN TIKET ---
+// ==========================================
+
+// 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        // 👇 TAMBAHKAN buyerData DI SINI
-        const { userId, eventId, price, quantity = 1, pin, promoCode, buyerData } = req.body; 
+        const { userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName } = req.body; 
         
-        // --- A. VALIDASI USER & PIN ---
         const userCheck = await User.findById(userId);
         if (!userCheck) return res.status(404).json({ success: false, message: "User tidak ditemukan" });
-        
-        if (!userCheck.pin) {
-            return res.status(400).json({ success: false, message: "Belum set PIN. Silakan atur PIN di Dashboard." });
-        }
-        
+        if (!userCheck.pin) return res.status(400).json({ success: false, message: "Belum set PIN." });
         const isPinMatch = await bcrypt.compare(pin, userCheck.pin);
-        if (!isPinMatch) {
-            return res.status(400).json({ success: false, message: "PIN Saldo salah!" });
-        }
+        if (!isPinMatch) return res.status(400).json({ success: false, message: "PIN Saldo salah!" });
 
-        // --- B. CEK EVENT ---
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        // --- C. HITUNG HARGA & CEK PROMO ---
-        let totalHarga = price * quantity;
-        let discountAmount = 0;
+        // Temukan Index dari Tipe Tiket
+        let selectedTierIndex = -1;
+        if (tierName && event.tickets && event.tickets.length > 0) {
+            selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
+        }
 
+        let discountAmount = 0;
         if (promoCode) {
             const promo = await Promo.findOne({ code: promoCode.toUpperCase() });
             if (promo && promo.quota > 0 && new Date() < promo.expiresAt) {
@@ -349,116 +289,111 @@ app.post('/api/buy-ticket', async (req, res) => {
             }
         }
 
-        let finalPrice = totalHarga - discountAmount;
+        let finalPrice = price - discountAmount;
         if (finalPrice < 0) finalPrice = 0;
 
-        // --- D. POTONG SALDO ---
         const user = await User.findOneAndUpdate(
             { _id: userId, saldo: { $gte: finalPrice } }, 
             { $inc: { saldo: -finalPrice } },
             { new: true }
         );
-
         if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
-        // --- E. GENERATE TIKET & SIMPAN DATA PEMBELI ---
         const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
         const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
         
         const newOrder = new Order({
             ticketCode: ticketCode,
             eventId: eventId,
-            // 👇 TAMBAHKAN INI (Simpan harga yang dibayar setelah potong promo)
             price: finalPrice,
-            tierName: req.body.tierName,
-            // 👇 MASUKKAN DATA DARI FORM CHECKOUT KE DATABASE
+            tierName: tierName || 'General',
+            quantity: quantity,
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             email: buyerData ? buyerData.email : user.email,
             phone: buyerData ? buyerData.phone : user.phone,
             nik: buyerData ? buyerData.nik : undefined,
             status: 'valid',
-            paymentMethod: 'saldo', // Penanda bayar pakai saldo
+            paymentMethod: 'SALDO', 
             orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
         });
         await newOrder.save();
         
-                // Kurangi Kursi Event & Kursi Tier
-        event.availableSeats -= quantity; // <-- Pastikan ini memotong 'quantity'
+        // POTONG KUOTA TIKET
+        event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
-            event.tickets[selectedTierIndex].availableSeats -= quantity; // <-- Pastikan ini memotong 'quantity'
+            event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
 
+        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
 
-
-// ==========================================
-// --- PAYMENT & ORDER LAMA (VIA MIDTRANS) ---
-// ==========================================
-
-app.get('/api/orders/:orderId', async (req, res) => {
-    try {
-        const order = await Order.findOne({ orderIdMidtrans: req.params.orderId }).populate('eventId');
-        if (!order) return res.status(404).json({ message: "Order tidak ditemukan" });
-
-        let responseData = { status: order.status, productName: order.eventId?.name, customerName: order.customerName, credentials: null };
-        if (order.status === 'valid' || order.status === 'used') responseData.credentials = order.eventId?.description;
-        res.json(responseData);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
-// 1. Request Token Pembayaran Midtrans (Hanya buat token, JANGAN simpan tiket dulu)
+// 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { eventId, quantity = 1, customerName, customerEmail, customerPhone, tierName } = req.body;
-        
+        const { eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName } = req.body;
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        let hargaSatuan = event.price; 
-        if (tierName && event.tickets && event.tickets.length > 0) {
-            const selectedTier = event.tickets.find(t => t.tierName === tierName);
-            if (selectedTier) hargaSatuan = selectedTier.price;
-        }
-
-        const gross_amount = hargaSatuan * quantity;
+        const gross_amount = price * quantity;
         const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         let parameter = {
             transaction_details: { order_id: orderId, gross_amount: gross_amount },
             customer_details: { first_name: customerName, email: customerEmail, phone: customerPhone || "0800000000" },
-            item_details: [{ id: eventId, price: hargaSatuan, quantity: quantity, name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` }]
+            item_details: [{ id: eventId, price: price, quantity: quantity, name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` }]
         };
 
         const token = await snap.createTransactionToken(parameter);
         res.json({ token, orderId });
-
     } catch (error) { res.status(500).json({ message: 'Gagal membuat token pembayaran' }); }
 });
 
-// 2. API BARU: Simpan Tiket LANGSUNG VALID saat Midtrans sukses
+// 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
 app.post('/api/midtrans-success', async (req, res) => {
     try {
-        // 👇 Pastikan 'quantity' ditangkap dari req.body
-        const { eventId, userId, customerName, customerEmail, tierName, price, quantity = 1, orderId } = req.body;
+        const { eventId, customerName, customerEmail, tierName, price, quantity = 1, orderId, buyerData } = req.body;
         
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        // ... (Kode bikin tiket biarkan sama) ...
-
-        // 👇 UBAH BAGIAN INI: Kurangi Kursi Event & Tipe Tiket sesuai quantity
-        event.availableSeats -= quantity; 
+        let selectedTierIndex = -1;
         if (tierName && event.tickets && event.tickets.length > 0) {
-            const selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
-            if (selectedTierIndex !== -1) {
-                event.tickets[selectedTierIndex].availableSeats -= quantity; 
-            }
+            selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
+        }
+
+        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
+        
+        const newOrder = new Order({
+            ticketCode: ticketCode,
+            eventId: eventId,
+            price: price, // Total harga
+            tierName: tierName || 'General',
+            quantity: quantity,
+            customerName: customerName,
+            email: customerEmail,
+            phone: buyerData ? buyerData.phone : undefined,
+            nik: buyerData ? buyerData.nik : undefined,
+            status: 'valid',
+            paymentMethod: 'MIDTRANS', 
+            orderIdMidtrans: orderId
+        });
+        await newOrder.save();
+
+        // POTONG KUOTA TIKET
+        event.availableSeats -= quantity; 
+        if (selectedTierIndex !== -1) {
+            event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
 
         res.json({ success: true, ticketCode });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
+
 
 // ==========================================
 // 🔔 WEBHOOK MIDTRANS 
@@ -470,72 +405,84 @@ app.post('/api/payment-notification', async (req, res) => {
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
 
-        // 1. CEK APAKAH INI TRANSAKSI TOP UP SALDO
+        // 1. CEK JIKA TOP UP
         if (orderId.startsWith('TOPUP-')) {
             const topup = await Topup.findOne({ orderId: orderId });
             if (!topup) return res.status(404).json({ message: "Data Top Up tidak ditemukan" });
 
             if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
                 if (fraudStatus == 'accept' || !fraudStatus) {
-                    // Cek biar nggak nambah saldo 2x
                     if (topup.status !== 'success') {
-                        topup.status = 'success';
-                        await topup.save();
-                        // Tambahkan saldo user
+                        topup.status = 'success'; await topup.save();
                         await User.findByIdAndUpdate(topup.userId, { $inc: { saldo: topup.amount } });
                     }
                 }
             } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-                topup.status = 'failed';
-                await topup.save();
+                topup.status = 'failed'; await topup.save();
             }
         } 
-        // 2. CEK APAKAH INI PEMBELIAN TIKET LANGSUNG VIA MIDTRANS (NON-SALDO)
+        // 2. CEK JIKA PEMBELIAN TIKET
         else {
             const order = await Order.findOne({ orderIdMidtrans: orderId });
-            if (!order) return res.status(404).json({message: "Order not found"});
-
-            if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
-                if (fraudStatus == 'challenge') {
-                    order.status = 'pending';
-                    await order.save();
-                } else {
-                    if(order.status !== 'valid') {
-                        order.status = 'valid';
-                        const event = await Event.findById(order.eventId);
-                        if(event) { event.availableSeats -= 1; await event.save(); }
-                        await order.save();
+            if (order) {
+                if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
+                    if (fraudStatus == 'challenge') {
+                        order.status = 'pending'; await order.save();
+                    } else {
+                        if(order.status !== 'valid') { order.status = 'valid'; await order.save(); }
                     }
-                }
-            } 
-            else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
-                await Order.findOneAndDelete({ orderIdMidtrans: orderId });
-            } 
-            else if (transactionStatus == 'pending'){
-                order.status = 'pending';
-                await order.save();
+                } 
+                else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire'){
+                    await Order.findOneAndDelete({ orderIdMidtrans: orderId });
+                } 
             }
         }
-
         res.status(200).send('OK');
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- API LAINNYA ---
+// ==========================================
+// --- API VERIFIKASI TIKET (CHECK-IN) ---
+// ==========================================
 
-app.post('/api/validate', async (req, res) => {
+app.post('/api/verify-ticket', async (req, res) => {
     try {
-        const ticket = await Order.findOne({ ticketCode: req.body.ticketCode.trim() }).populate('eventId');
-        if (!ticket) return res.status(404).json({ valid: false, message: "TIKET TIDAK DITEMUKAN!" });
-        if (ticket.status === 'pending') return res.status(400).json({ valid: false, message: "BELUM DIBAYAR!" });
-        if (ticket.status === 'used') return res.status(400).json({ valid: false, message: "SUDAH DIPAKAI!" });
+        const { ticketCode } = req.body;
+        const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
+        
+        if (!ticket) return res.status(404).json({ success: false, message: 'Tiket tidak ditemukan atau KODE PALSU!' });
+        
+        res.json({
+            success: true,
+            ticket: {
+                code: ticket.ticketCode,
+                customerName: ticket.customerName,
+                eventName: ticket.eventId ? ticket.eventId.name : 'Event telah dihapus',
+                tierName: ticket.tierName || 'General',
+                quantity: ticket.quantity || 1,
+                paymentMethod: ticket.paymentMethod,
+                status: ticket.status,
+                buyDate: ticket.createdAt
+            }
+        });
+    } catch (error) { res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' }); }
+});
+
+app.post('/api/use-ticket', async (req, res) => {
+    try {
+        const { ticketCode } = req.body;
+        const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() });
+        
+        if (!ticket) return res.status(404).json({ success: false, message: 'Tiket tidak ditemukan!' });
+        if (ticket.status === 'used') return res.status(400).json({ success: false, message: 'Tiket ini SUDAH DIPAKAI sebelumnya!' });
 
         ticket.status = 'used'; 
         await ticket.save();
-        res.json({ valid: true, message: "TIKET VALID! ✅", data: { name: ticket.customerName, event: ticket.eventId?.name } });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        res.json({ success: true, message: 'Berhasil Check-In! Tiket hangus.' });
+    } catch (error) { res.status(500).json({ success: false, message: 'Terjadi kesalahan.' }); }
 });
 
+// --- API LAINNYA ---
 app.put('/api/user/update-name', async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
@@ -572,11 +519,7 @@ app.post('/api/maintenance', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ==========================================
 // --- API KODE PROMO ---
-// ==========================================
-
-// 1. Cek Kode Promo (Dipakai User saat beli)
 app.post('/api/check-promo', async (req, res) => {
     try {
         const { code } = req.body;
@@ -590,36 +533,24 @@ app.post('/api/check-promo', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 2. Lihat Semua Promo (Dipakai Admin Dashboard)
 app.get('/api/promos', async (req, res) => {
-    try {
-        const promos = await Promo.find().sort({ _id: -1 });
-        res.json(promos);
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    try { const promos = await Promo.find().sort({ _id: -1 }); res.json(promos); } 
+    catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 3. Buat Promo Baru (Dipakai Admin Dashboard)
 app.post('/api/promos', async (req, res) => {
     try {
         const { code, discount, quota, daysActive } = req.body;
-        
-        // Hitung tanggal kadaluarsa
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
-
+        const expiresAt = new Date(); expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
         const newPromo = new Promo({ code, discount, quota, expiresAt });
         await newPromo.save();
-        
         res.json({ success: true, message: "Promo berhasil dibuat!" });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// 4. Hapus Promo (Dipakai Admin Dashboard)
 app.delete('/api/promos/:id', async (req, res) => {
-    try {
-        await Promo.findByIdAndDelete(req.params.id);
-        res.json({ success: true, message: "Promo dihapus!" });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
+    catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ROUTE HANDLER TERAKHIR
