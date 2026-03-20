@@ -958,6 +958,7 @@
                     const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
                     const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
                     const tierName = ticket.tierName || 'General';
+                    const qty = ticket.quantity || 1;
 
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
@@ -979,8 +980,8 @@
                                 <div class="info-value text-primary fw-bold">${tierName}</div>
                             </div>
                             <div>
-                                <div class="info-label">No. WhatsApp</div>
-                                <div class="info-value">${pemesanPhone}</div>
+                                <div class="info-label">Jumlah</div>
+                                <div class="info-value fw-bold text-danger">${qty} Tiket</div>
                             </div>
                             <div>
                                 <div class="info-label">Pembayaran</div>
@@ -1200,4 +1201,4 @@
         })();
     </script>
 </body>
-</html>
+</html> 
