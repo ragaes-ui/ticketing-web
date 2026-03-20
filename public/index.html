@@ -910,15 +910,18 @@
                             <i class="bi bi-info-circle-fill me-1"></i> Pastikan nama sesuai untuk keperluan penukaran tiket.
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
-                                <input type="number" id="chk-qty" class="form-control text-center fw-bold bg-white" value="1" min="1" max="${maxBuy}" readonly>
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
-                            </div>
-                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
-                        </div>
+<div class="mb-3">
+    <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
+    <div class="input-group">
+        <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
+        
+        <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value < 1) this.value = 1; if(this.value > ${maxBuy}) this.value = ${maxBuy};">
+        
+        <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
+    </div>
+    <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+</div>
+
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
