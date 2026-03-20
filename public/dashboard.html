@@ -959,12 +959,14 @@
                     const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
                     const tierName = ticket.tierName || 'General';
                     const qty = ticket.quantity || 1;
+                    // 👇 TAMBAHKAN 'quantity: qty' DI SINI AGAR PDF TAHU JUMLAH TIKETNYA
 
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
                         code: ticket.ticketCode, isStreaming: isStreaming, desc: descText, 
                         buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
-                        tierName: tierName
+                        tierName: tierName, 
+                        quantity: qty
                     }));
 
                     let mainContent = '';
@@ -1103,6 +1105,8 @@
                         <div style="width: 32%;">
                             <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
                             <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerName}</p>
+                        </div>
+                        <p style="margin:2px 0 0 0; font-size: 13px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
                         </div>
                         <div style="width: 32%;">
                             <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NO. WHATSAPP</p>
