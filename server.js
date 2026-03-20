@@ -186,37 +186,36 @@ app.post('/api/balance-history', async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // 1. Ambil data Uang Masuk (Top Up)
-        const topups = await Topup.find({ userId: userId, status: 'success' }).lean();
+        // 1. Ambil data Uang Masuk (Top Up) - Hapus .lean() agar bisa ambil waktu dari ID
+        const topups = await Topup.find({ userId: userId, status: 'success' });
         const historyTopup = topups.map(t => ({
             type: 'in', 
             title: 'Top Up Saldo', 
             amount: t.amount, 
-            date: t.timestamp, 
+            // Ambil dari timestamp, kalau kosong ambil dari DNA waktu pembuatan ID-nya
+            date: t.timestamp || t._id.getTimestamp(), 
             id: t.orderId
         }));
 
-        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo) - KODE SUPER KEBAL
+        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo) - Hapus .lean()
         const orders = await Order.find({ 
-            // Cek email tanpa peduli huruf besar/kecil
             email: new RegExp('^' + user.email + '$', 'i'), 
-            // Cek semua transaksi yang metode bayarnya ada kata "saldo" ATAU ID-nya "SALDO-PAY"
             $or: [
                 { paymentMethod: { $regex: /saldo/i } },
                 { orderIdMidtrans: { $regex: /SALDO/i } }
             ]
-        }).populate('eventId').lean();
+        }).populate('eventId');
         
         const historyOrder = orders.map(o => ({
             type: 'out', 
             title: `Beli: ${o.eventId ? o.eventId.name : 'Tiket Event'}`, 
             amount: o.price || 0, 
-            date: o.createdAt || new Date(),
+            date: o.createdAt || o._id.getTimestamp(), // Waktu super akurat bawaan MongoDB
             id: o.ticketCode
         }));
 
-        // 3. Gabungkan dan Urutkan dari yang terbaru
-        const fullHistory = [...historyTopup, ...historyOrder].sort((a, b) => new Date(b.date) - new Date(a.date));
+        // 3. Gabungkan dan Urutkan murni berdasarkan Angka Waktu (Milidetik)
+        const fullHistory = [...historyTopup, ...historyOrder].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         res.json(fullHistory);
 
     } catch (error) { res.status(500).json({ error: error.message }); }
