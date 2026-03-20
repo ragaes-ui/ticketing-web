@@ -203,7 +203,7 @@
         @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
 
-        /* --- PAYMENT CARDS & TIERING --- */
+        /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS & TIERING --- */
         .payment-selector { 
             display: flex; 
             flex-direction: column; 
@@ -267,6 +267,7 @@
             color: var(--text-muted); 
         }
 
+        /* Gaya untuk Radio Button Tipe Tiket */
         .tier-label { 
             cursor: pointer; 
             transition: 0.2s; 
@@ -310,6 +311,7 @@
                     <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav_explore">Jelajah</a></li>
                     <li class="nav-item"><a class="nav-link" href="about.html" data-i18n="nav_about">Tentang Kami</a></li>
                     <li class="nav-item"><a class="nav-link" href="guide.html" data-i18n="nav_guide">Panduan & Bantuan</a></li>
+                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="cek-tiket.html"><i class="bi bi-qr-code-scan"></i> Cek Tiket</a></li>
                 </ul>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -825,7 +827,7 @@
             
             btnBuy.onclick = function() { 
                 detailModal.hide(); 
-                const mockTier = { tierName: 'General', price: event.price };
+                const mockTier = { tierName: 'General', price: event.price, availableSeats: event.availableSeats };
                 buyTicket(eventId, mockTier); 
             };
         }
@@ -871,13 +873,13 @@
             }
         }
 
-        // --- BELI TIKET ---
+        // --- BELI TIKET (DENGAN PEMILIHAN JUMLAH/KUANTITAS) ---
         async function buyTicket(eventId, selectedTier) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
             const userRaw = localStorage.getItem('userData');
             
-            // Cek Login
+            // 1. CEK LOGIN
             if (!userRaw) { 
                 Swal.fire({ 
                     title: t.alert_login_title, 
@@ -895,14 +897,29 @@
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
 
-            // Form Detail Pemesan
+            // ==========================================
+            // STEP 1: FORM PENGISIAN DATA PEMESAN & JUMLAH TIKET
+            // ==========================================
+            const maxBuy = selectedTier.availableSeats || 1;
+
             const { value: checkoutData } = await Swal.fire({
-                title: lang === 'id' ? 'Detail Pemesan' : 'Buyer Details',
+                title: `<i class="bi bi-cart-check-fill text-primary me-2"></i>${lang === 'id' ? 'Detail Pemesan' : 'Buyer Details'}`,
                 html: `
                     <div class="text-start px-2">
                         <div class="alert alert-info py-2 small mb-3">
                             <i class="bi bi-info-circle-fill me-1"></i> Pastikan nama sesuai untuk keperluan penukaran tiket.
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
+                                <input type="number" id="chk-qty" class="form-control text-center fw-bold bg-white" value="1" min="1" max="${maxBuy}" readonly>
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
                             <input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Masukkan nama lengkap">
@@ -931,33 +948,39 @@
                     const name = document.getElementById('chk-name').value; 
                     const phone = document.getElementById('chk-phone').value; 
                     const nik = document.getElementById('chk-nik').value;
+                    const qty = parseInt(document.getElementById('chk-qty').value) || 1;
                     
                     if (!name || !phone) { 
                         Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); 
                         return false; 
                     }
-                    return { name, phone, nik, email: user.email };
+                    return { name, phone, nik, email: user.email, qty };
                 }
             });
 
             if (!checkoutData) return;
 
+            // ==========================================
+            // STEP 2: PILIH METODE PEMBAYARAN & KALKULASI TOTAL
+            // ==========================================
+            const quantity = checkoutData.qty;
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
+            
             const hargaDitagih = selectedTier.price;
+            const totalTagihan = hargaDitagih * quantity;
 
-            // Pilih Metode Pembayaran
             const { value: paymentMethod } = await Swal.fire({
                 title: lang === 'id' ? 'Pilih Pembayaran' : 'Select Payment',
                 html: `
                     <div class="text-start mb-3 border-bottom pb-2">
                         <div class="d-flex justify-content-between">
                             <span class="text-muted fw-bold">${selectedTier.tierName}</span>
-                            <span class="fw-bold">1x</span>
+                            <span class="fw-bold">${quantity}x (Rp ${hargaDitagih.toLocaleString('id-ID')})</span>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <span class="text-muted">Total Tagihan:</span>
-                            <h4 class="fw-800 text-primary mb-0">Rp ${hargaDitagih.toLocaleString('id-ID')}</h4>
+                            <h4 class="fw-800 text-primary mb-0">Rp ${totalTagihan.toLocaleString('id-ID')}</h4>
                         </div>
                     </div>
                     <div class="payment-selector" id="paymentOptions">
@@ -993,7 +1016,11 @@
 
             if (!paymentMethod) return;
 
-            // Eksekusi Pembayaran via Saldo
+            // ==========================================
+            // STEP 3: EKSEKUSI PEMBAYARAN
+            // ==========================================
+            
+            // --- VIA SALDO ---
             if (paymentMethod === 'saldo') {
                 const { value: formValues } = await Swal.fire({
                     title: 'Konfirmasi PIN',
@@ -1036,7 +1063,8 @@
                             userId: user.id, 
                             eventId: eventId, 
                             tierName: selectedTier.tierName, 
-                            price: hargaDitagih,             
+                            price: totalTagihan, // Kirim harga total setelah dikali kuantitas       
+                            quantity: quantity,  // Kirim kuantitas ke server
                             pin: pin, 
                             promoCode: promo,
                             buyerData: checkoutData 
@@ -1061,7 +1089,7 @@
                 }
 
             } 
-            // Eksekusi Pembayaran via Midtrans
+            // --- VIA MIDTRANS ---
             else if (paymentMethod === 'midtrans') {
                 Swal.fire({ title: lang === 'id' ? 'Menyiapkan Tagihan...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 
@@ -1073,7 +1101,7 @@
                             eventId, 
                             tierName: selectedTier.tierName, 
                             price: hargaDitagih,             
-                            quantity: 1, 
+                            quantity: quantity, 
                             customerName: checkoutData.name, 
                             customerEmail: checkoutData.email, 
                             customerPhone: checkoutData.phone,
@@ -1099,7 +1127,8 @@
                                             customerName: checkoutData.name,
                                             customerEmail: checkoutData.email,
                                             tierName: selectedTier.tierName,
-                                            price: hargaDitagih,
+                                            price: totalTagihan,
+                                            quantity: quantity,
                                             orderId: data.orderId
                                         })
                                     });
