@@ -183,22 +183,29 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 // --- API RESET PASSWORD (LUPA PASSWORD) ---
+// --- API RESET PASSWORD (DENGAN KEAMANAN PIN) ---
 app.post('/api/reset-password', async (req, res) => {
     try {
-        const { username, newPassword } = req.body;
+        const { username, pin, newPassword } = req.body;
 
-        // 1. Cari user berdasarkan username (case-insensitive biar lebih aman)
+        // 1. Cari user berdasarkan username
         const user = await User.findOne({ username: new RegExp('^' + username + '$', 'i') });
-        
         if (!user) {
-            return res.status(404).json({ success: false, message: "Username tidak ditemukan di sistem." });
+            return res.status(404).json({ success: false, message: "Username tidak ditemukan." });
         }
 
-        // 2. Enkripsi (Hash) password baru
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        // 2. CEK KEAMANAN PIN
+        if (!user.pin) {
+            return res.status(400).json({ success: false, message: "Akun ini belum mengatur PIN. Silakan hubungi Admin untuk reset manual." });
+        }
 
-        // 3. Simpan password baru ke database
-        user.password = hashedPassword;
+        const isPinMatch = await bcrypt.compare(pin, user.pin);
+        if (!isPinMatch) {
+            return res.status(400).json({ success: false, message: "PIN Keamanan salah! Akses ditolak." });
+        }
+
+        // 3. Jika PIN benar, ganti passwordnya
+        user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
 
         res.json({ success: true, message: "Password berhasil direset." });
