@@ -621,28 +621,30 @@ app.delete('/api/promos/:id', async (req, res) => {
     try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
-// --- API CHATBOT OTAK GEMINI (SANGAT PINTAR) ---
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
-        if (!message) return res.status(400).json({ reply: "Tanya apa kak? 😊" });
+        
+        // Cek apakah API Key kebaca atau tidak
+        if (!process.env.GEMINI_API_KEY) {
+            return res.json({ reply: "API Key belum dipasang di Vercel, kak! 🔑" });
+        }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
-            systemInstruction: "Kamu adalah RCELL-Bot, asisten gaul website RCELLFEST. Gunakan emoji, jawab singkat, dan fokus hanya pada bantuan tiket, saldo, promo, dan event. Tolak pertanyaan di luar itu dengan sopan."
-        });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const result = await model.generateContent(message);
         const response = await result.response;
-        
-        res.json({ reply: response.text() });
+        const text = response.text();
+
+        res.json({ reply: text });
 
     } catch (error) {
-        console.error("Gemini Error:", error);
-        res.status(500).json({ reply: "Aduh, otak AI-ku lagi konslet. Coba lagi bentar ya! 😅" });
+        console.error(error);
+        res.json({ reply: "Waduh, otak AI-ku lagi konslet (Error: " + error.message + ") 😅" });
     }
 });
+
 
 
 // ROUTE HANDLER TERAKHIR
