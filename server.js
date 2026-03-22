@@ -625,48 +625,38 @@ app.post('/api/chat', async (req, res) => {
         const { message } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) return res.json({ reply: "Kunci AI belum ada! 🔑" });
+        if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // JURUS MATA-MATA: Kalau kamu ketik "cek", dia akan scan isi server Google
-        if (message.toLowerCase() === "cek") {
-            const checkUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-            const checkRes = await fetch(checkUrl);
-            const checkData = await checkRes.json();
+        // FIX TOTAL: Kita pakai model generasi terbaru sesuai daftar rahasia Google!
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-            if (checkData.models) {
-                // Kumpulkan semua nama model yang diizinkan untuk API Key kamu
-                const modelNames = checkData.models
-                    .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
-                    .map(m => m.name.replace('models/', ''))
-                    .join(", ");
-                return res.json({ reply: "Daftar Model Rahasia Kakak: " + modelNames });
-            } else {
-                return res.json({ reply: "Gagal scan: " + JSON.stringify(checkData.error) });
-            }
-        }
-
-        // --- KODE CHAT UTAMA (Kita pakai gemini-1.5-flash dulu sementara) ---
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `Kamu asisten RCELLFEST. Jawab singkat: ${message}` }] }]
+                contents: [{
+                    parts: [{ 
+                        text: `Kamu adalah RCELL-Bot, asisten website tiket RCELLFEST. Jawab dengan sangat ramah, gaul, singkat, dan gunakan emoji. Pertanyaan user: ${message}` 
+                    }]
+                }]
             })
         });
 
         const data = await response.json();
-        
+
         if (data.candidates && data.candidates[0].content) {
-            res.json({ reply: data.candidates[0].content.parts[0].text });
+            const replyText = data.candidates[0].content.parts[0].text;
+            res.json({ reply: replyText });
         } else {
-            res.json({ reply: "Error Google: " + (data.error ? data.error.message : "Tidak diketahui") });
+            const detailError = data.error ? data.error.message : "Respon kosong.";
+            res.json({ reply: "Duh, masih ada yang nyangkut kak: " + detailError });
         }
 
     } catch (error) {
-        res.json({ reply: "Sinyal putus kak: " + error.message });
+        res.json({ reply: "Sinyal putus kak! 📶" });
     }
 });
+
 
 
 
