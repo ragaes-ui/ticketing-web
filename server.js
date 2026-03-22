@@ -625,40 +625,38 @@ app.post('/api/chat', async (req, res) => {
         const { message } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) {
-            return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
-        }
+        if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // Tembak langsung ke API Google
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // URL diubah ke v1 (Stabil) dan model tanpa prefix 'models/' di URL karena sudah ada di path
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Kamu adalah RCELL-Bot, asisten website tiket RCELLFEST. Jawab singkat, gaul, dan ramah. Pertanyaan user: ${message}` }]
+                    parts: [{ text: `Kamu adalah RCELL-Bot, asisten website RCELLFEST. Jawab singkat dan ramah. User: ${message}` }]
                 }]
             })
         });
 
         const data = await response.json();
 
-        // Cek apakah ada jawaban dari Google
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+        if (data.candidates && data.candidates[0].content) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
         } else {
-            // Menampilkan error detail jika gagal
-            const detailError = data.error ? data.error.message : "Google sedang sibuk atau limit tercapai.";
+            // Jika gemini-pro juga gagal, kita coba model terbaru dengan penulisan lengkap
+            const detailError = data.error ? data.error.message : "Model tidak merespon.";
             console.error("Google API Error:", data);
-            res.json({ reply: "Google lagi pusing nih kak! 😅 Pesan: " + detailError });
+            res.json({ reply: "Google lagi pusing kak! 😅 Pesan: " + detailError });
         }
 
     } catch (error) {
         console.error("Fetch Error:", error);
-        res.json({ reply: "Koneksi ke AI terputus. Coba lagi ya kak! 📶" });
+        res.json({ reply: "Koneksi terputus. Coba lagi ya! 📶" });
     }
 });
-
 
 
 // ROUTE HANDLER TERAKHIR
