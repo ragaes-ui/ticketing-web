@@ -625,38 +625,46 @@ app.post('/api/chat', async (req, res) => {
         const { message } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
+        if (!apiKey) return res.json({ reply: "Kunci AI belum ada! 🔑" });
 
-        // JURUS MANUAL: Pakai v1beta/models/gemini-pro
-        // Ini adalah endpoint paling "tua" tapi paling sering berhasil buat akun baru
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        // JURUS MATA-MATA: Kalau kamu ketik "cek", dia akan scan isi server Google
+        if (message.toLowerCase() === "cek") {
+            const checkUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const checkRes = await fetch(checkUrl);
+            const checkData = await checkRes.json();
 
+            if (checkData.models) {
+                // Kumpulkan semua nama model yang diizinkan untuk API Key kamu
+                const modelNames = checkData.models
+                    .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+                    .map(m => m.name.replace('models/', ''))
+                    .join(", ");
+                return res.json({ reply: "Daftar Model Rahasia Kakak: " + modelNames });
+            } else {
+                return res.json({ reply: "Gagal scan: " + JSON.stringify(checkData.error) });
+            }
+        }
+
+        // --- KODE CHAT UTAMA (Kita pakai gemini-1.5-flash dulu sementara) ---
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: `Kamu adalah asisten RCELLFEST. Jawab ramah & singkat: ${message}` }]
-                }]
+                contents: [{ parts: [{ text: `Kamu asisten RCELLFEST. Jawab singkat: ${message}` }] }]
             })
         });
 
         const data = await response.json();
-
-        // Jika berhasil
+        
         if (data.candidates && data.candidates[0].content) {
-            const replyText = data.candidates[0].content.parts[0].text;
-            res.json({ reply: replyText });
-        } 
-        // Jika Google ngasih list model karena kita salah alamat
-        else {
-            const errorMsg = data.error ? data.error.message : "Google minta ganti model.";
-            console.log("Detail Error:", data);
-            res.json({ reply: "Duh, Google masih rewel kak! 😅 Pesan: " + errorMsg + ". Coba cek 'Google AI Studio' buat pastiin API Key kakak aktif ya!" });
+            res.json({ reply: data.candidates[0].content.parts[0].text });
+        } else {
+            res.json({ reply: "Error Google: " + (data.error ? data.error.message : "Tidak diketahui") });
         }
 
     } catch (error) {
-        res.json({ reply: "Koneksi AI terputus. Coba lagi nanti! 📶" });
+        res.json({ reply: "Sinyal putus kak: " + error.message });
     }
 });
 
