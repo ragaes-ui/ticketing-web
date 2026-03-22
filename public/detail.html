@@ -69,12 +69,17 @@
         .payment-card:hover, .payment-card.selected { border-color: var(--primary); background: var(--primary-light); }
         .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); border-radius: 10px; }
         
-        /* SweetAlert2 Styling Fix untuk Dark Mode */
+/* SweetAlert2 Styling Fix untuk Dark Mode */
         .swal2-popup { border-radius: 24px !important; border: 1px solid var(--border-color) !important; background: var(--bg-card) !important; color: var(--text-main) !important; }
+        .swal2-title { color: var(--text-main) !important; }
+        
+        /* INI KUNCINYA: Paksa teks di dalam pop-up jadi terang */
+        .swal2-html-container { color: var(--text-main) !important; } 
+        .swal2-html-container .text-muted { color: var(--text-muted) !important; }
+        
         .swal2-html-container .form-control { color: var(--text-main) !important; background-color: var(--bg-input) !important; border: 1px solid var(--border-color) !important; border-radius: 10px !important; }
         .swal2-html-container .form-control:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
         .swal2-html-container .form-label { color: var(--text-muted) !important; }
-        .swal2-title { color: var(--text-main) !important; }
     </style>
 </head>
 <body>
