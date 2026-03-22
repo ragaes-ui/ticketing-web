@@ -676,7 +676,7 @@
 
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card-event" onclick="showDetail('${event._id}')">
+                    <div class="card-event" onclick="window.location.href='detail.html?id=${event._id}'">
                         <div class="card-img-top" style="background-image: url('${imageUrl}');">
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
@@ -687,7 +687,7 @@
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
+                            <button onclick="event.stopPropagation(); window.location.href='detail.html?id=${event._id}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
                                 ${btnText}
                             </button>
                         </div>
