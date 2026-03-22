@@ -11,54 +11,80 @@
     
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
     
-    <style>
+<style>
+        /* --- THEME VARIABLES (VERSI PERBAIKAN PREMIUM) --- */
         :root {
-            --bg-body: #ffffff; --bg-nav: #ffffff; --bg-card: #ffffff;
-            --bg-input: #ffffff; --bg-section: #f8f9fa;
-            --text-main: #333333; --text-muted: #6c757d;
-            --border-color: #eeeeee; --shadow-color: rgba(0,0,0,0.05);
+            /* Mode Terang (Light) - Dibuat lebih bersih */
+            --bg-body: #f8f9fa;
+            --bg-nav: #ffffff;
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --bg-section: #f1f3f5;
+            --text-main: #1a1d21;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --shadow-color: rgba(0,0,0,0.03);
             --primary: #0049CC;
+            --primary-light: rgba(0, 73, 204, 0.05);
         }
 
         [data-theme="dark"] {
-            --bg-body: #0f172a; --bg-nav: #1e293b; --bg-card: #1e293b;
-            --bg-input: #334155; --bg-section: #020617;
-            --text-main: #f8f9fa; --text-muted: #cbd5e1;
-            --border-color: #334155; --shadow-color: rgba(0,0,0,0.5);
-            --primary: #60a5fa;
+            /* Mode Gelap (Dark) - PERBAIKAN TOTAL: Lebih lembut, tidak kaku */
+            --bg-body: #0b1120;       /* Navy Gelap Sangat Dalam */
+            --bg-nav: rgba(17, 24, 39, 0.8); /* Semi transparan */
+            --bg-card: #111827;       /* Lighter Navy untuk elemen */
+            --bg-input: #1f2937;
+            --bg-section: #080c14;    /* Super gelap untuk pemisah */
+            --text-main: #f3f4f6;     /* Putih keabuan agar tidak silau */
+            --text-muted: #9ca3af;    /* Abu-abu terang */
+            /* KUNCI: Gunakan border transparan tipis agar elegan */
+            --border-color: rgba(255,255,255,0.06); 
+            --shadow-color: rgba(0,0,0,0.3);
+            --primary: #38bdf8;       /* Biru Sian terang agar 'pop' */
+            --primary-light: rgba(56, 189, 248, 0.1);
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 76px; transition: 0.3s; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            padding-top: 76px; 
+            transition: background 0.3s, color 0.3s; 
+            -webkit-font-smoothing: antialiased; /* Font lebih tajam */
+        }
         
-        .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: 0.3s; }
+        .navbar { 
+            background-color: var(--bg-nav) !important; 
+            backdrop-filter: blur(10px); /* Efek blur kaca */
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0; height: 76px; transition: 0.3s; 
+        }
         .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
-        .nav-link:hover { color: #0049CC; }
-        [data-theme="dark"] .nav-link { color: #e2e8f0; }
+        [data-theme="dark"] .navbar-brand { color: #38bdf8 !important; } /* Sesuaikan warna logo di dark mode */
 
         /* Detail Layout */
-        .event-hero { height: 350px; background-size: cover; background-position: center; border-radius: 20px; position: relative; margin-top: 20px; display: flex; align-items: flex-end; padding: 30px; color: white; box-shadow: 0 10px 30px var(--shadow-color); }
-        .event-hero::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%); border-radius: 20px; }
-        .event-hero-content { position: relative; z-index: 2; width: 100%; }
+        .event-hero { height: 350px; background-size: cover; background-position: center; border-radius: 24px; position: relative; margin-top: 20px; display: flex; align-items: flex-end; padding: 30px; color: white; box-shadow: 0 10px 30px var(--shadow-color); border: 1px solid var(--border-color); }
+        .event-hero::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 100%); border-radius: 24px; }
         
-        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px var(--shadow-color); margin-bottom: 20px; }
-        .sticky-checkout { position: sticky; top: 100px; }
+        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 25px; box-shadow: 0 10px 25px var(--shadow-color); margin-bottom: 20px; transition: background 0.3s, border 0.3s; }
         
-        .tier-label { cursor: pointer; transition: 0.2s; border: 2px solid var(--border-color); background-color: var(--bg-card); display: block; margin-bottom: 10px; }
-        .tier-label:hover { border-color: var(--primary); }
-        .tier-label input:checked + div { font-weight: bold; }
-        .tier-label.selected { border-color: var(--primary); background: rgba(0, 73, 204, 0.05); }
-        [data-theme="dark"] .tier-label.selected { background: rgba(96, 165, 250, 0.1); }
-        .tier-sold-out { opacity: 0.5; cursor: not-allowed; background-color: var(--bg-section); }
+        .tier-label { cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); background-color: var(--bg-card); display: block; margin-bottom: 12px; border-radius: 16px !important; overflow: hidden; }
+        .tier-label:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .tier-label.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 15px var(--primary-light); }
+        .tier-sold-out { opacity: 0.4; cursor: not-allowed; background-color: var(--bg-section); border-style: dashed; }
 
-        /* Payment Selector Swal */
-        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-        .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
-        .payment-card:hover, .payment-card.selected { border-color: var(--primary); background: rgba(0, 73, 204, 0.05); }
-        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(0, 73, 204, 0.1); border-radius: 10px; }
-        
-        .swal2-html-container .form-control { color: var(--text-main); background-color: var(--bg-input); border: 1px solid var(--border-color); }
-        .swal2-html-container .form-label { color: var(--text-muted); }
+        /* SweetAlert2 Styling Fix untuk Dark Mode */
+        .swal2-popup { border-radius: 24px !important; border: 1px solid var(--border-color) !important; }
+        .swal2-html-container .form-control { 
+            color: var(--text-main) !important; 
+            background-color: var(--bg-input) !important; 
+            border: 1px solid var(--border-color) !important; 
+            border-radius: 10px !important;
+        }
+        .swal2-html-container .form-control:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
+        .swal2-html-container .form-label { color: var(--text-muted) !important; }
+        .swal2-title { color: var(--text-main) !important; }
     </style>
 </head>
 <body>
