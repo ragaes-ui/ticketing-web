@@ -626,36 +626,44 @@ app.post('/api/chat', async (req, res) => {
         const { message } = req.body;
         if (!message) return res.json({ reply: "Tanya apa kak? 😊" });
 
+        // Pastikan API Key ada
         if (!process.env.GEMINI_API_KEY) {
-            return res.json({ reply: "🔑 API Key belum diset di Environment Variables Vercel!" });
+            return res.json({ reply: "🔑 Waduh, API Key-nya belum dipasang di Vercel!" });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-        // JURUS TERAKHIR: Pakai gemini-1.5-flash tapi dengan format full name
+        // GUNAKAN MODEL TERBARU: gemini-1.5-flash
+        // Ini adalah model paling stabil saat ini untuk API gratisan
         const model = genAI.getGenerativeModel({ 
             model: "gemini-1.5-flash" 
         });
 
-        // Tambahkan safety settings & instruksi singkat
-        const result = await model.generateContent([
-            "Kamu adalah asisten website tiket RCELLFEST. Jawab singkat & gaul.",
-            message
-        ]);
-        
+        // Set instruksi sistem agar dia tahu tugasnya
+        const prompt = `Kamu adalah asisten AI RCELLFEST. 
+        Jawablah pertanyaan berikut dengan ramah dan singkat: ${message}`;
+
+        const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
         res.json({ reply: text });
 
     } catch (error) {
-        console.error("DEBUG ERROR:", error);
-        // Jika masih error, kasih tau detailnya biar kita bantai lagi
+        console.error("DEBUG DETAIL:", error);
+        
+        // Pesan jika error tetap terjadi
+        let errorMsg = error.message;
+        if (errorMsg.includes("404")) {
+            errorMsg = "Model AI tidak ditemukan. Silakan hubungi admin untuk update versi library.";
+        }
+
         res.json({ 
-            reply: "Waduh, koneksi ke otak AI terganggu. 😅 (Pesan: " + error.message + ")" 
+            reply: "Waduh, koneksi ke otak AI terputus. 😅 (Pesan: " + errorMsg + ")" 
         });
     }
 });
+
 
 
 // ROUTE HANDLER TERAKHIR
