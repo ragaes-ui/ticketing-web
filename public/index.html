@@ -40,6 +40,21 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
+                /* --- CHATBOT WIDGET --- */
+        .btn-chatbot { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border: none; border-radius: 50%; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.4); z-index: 9999; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
+        .btn-chatbot:hover { transform: scale(1.1); }
+        
+        .chat-widget { position: fixed; bottom: 100px; right: 30px; width: 350px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 9999; display: none; flex-direction: column; overflow: hidden; transition: 0.3s; }
+        .chat-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { height: 300px; overflow-y: auto; padding: 15px; background: var(--bg-section); display: flex; flex-direction: column; gap: 10px; }
+        .chat-footer { padding: 10px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
+        
+        .chat-msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+        .chat-msg.ai { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 0; }
+        .chat-msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+        
+        .typing-indicator { font-size: 0.8rem; color: var(--text-muted); align-self: flex-start; margin-left: 10px; display: none; font-style: italic; }
+
         /* --- VARIABLES --- */
         :root {
             --bg-body: #ffffff;
@@ -287,6 +302,77 @@
         }
     </style>
 </head>
+        <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
+        <i class="bi bi-robot"></i>
+    </button>
+
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div><i class="bi bi-robot me-2"></i> AI Support</div>
+            <button onclick="toggleChat()" class="btn-close btn-close-white" style="font-size: 0.8rem;"></button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg ai">Halo! 👋 Saya Asisten AI RCELLFEST. Ada yang ingin kamu tanyakan soal tiket atau event?</div>
+        </div>
+        <div class="typing-indicator" id="chatTyping">AI sedang mengetik...</div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" class="form-control" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const chatWidget = document.getElementById('chatWidget');
+            const icon = document.querySelector('#btnChatToggle i');
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+                icon.className = 'bi bi-robot';
+            } else {
+                chatWidget.style.display = 'flex';
+                icon.className = 'bi bi-x-lg';
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chatInput');
+            const message = inputEl.value.trim();
+            if (!message) return;
+
+            const chatBody = document.getElementById('chatBody');
+            const typingIndicator = document.getElementById('chatTyping');
+
+            // 1. Tampilkan Chat User
+            chatBody.innerHTML += `<div class="chat-msg user">${message}</div>`;
+            inputEl.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // 2. Munculkan indikator "Mengetik..."
+            typingIndicator.style.display = 'block';
+
+            try {
+                // 3. Tembak API AI ke Server
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await res.json();
+                
+                // 4. Hilangkan indikator & tampilkan balasan AI
+                typingIndicator.style.display = 'none';
+                chatBody.innerHTML += `<div class="chat-msg ai">${data.reply}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+
+            } catch (err) {
+                typingIndicator.style.display = 'none';
+                chatBody.innerHTML += `<div class="chat-msg ai text-danger">Waduh, koneksi ke AI terputus. Coba lagi nanti ya!</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+    </script>
+
 <body>
 
     <div id="preloader">
