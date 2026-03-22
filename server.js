@@ -620,18 +620,6 @@ app.delete('/api/promos/:id', async (req, res) => {
     try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
-
-// ROUTE HANDLER TERAKHIR
-app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-});
-
-// 404 Handler
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-});
-
 // ==========================================
 // --- API CHATBOT AI (ASISTEN RCELLFEST) ---
 // ==========================================
@@ -660,10 +648,18 @@ app.post('/api/chat', (req, res) => {
         reply = "Maaf kak, saya kurang mengerti pertanyaannya. 😅 Kamu bisa coba tanya dengan kata kunci: 'cara beli', 'top up saldo', 'letak tiket', atau 'metode bayar'.";
     }
 
-    // Simulasi jeda ngetik 1 detik biar kerasa natural
-    setTimeout(() => {
-        res.json({ reply });
-    }, 1000); 
+    setTimeout(() => { res.json({ reply }); }, 1000); 
+});
+
+// ROUTE HANDLER TERAKHIR
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+});
+
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 
