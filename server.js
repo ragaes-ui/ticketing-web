@@ -625,9 +625,11 @@ app.post('/api/chat', async (req, res) => {
         const { message } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
+        if (!apiKey) {
+            return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
+        }
 
-        // Kita tembak langsung ke API Google tanpa library bantuan
+        // Tembak langsung ke API Google
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -640,17 +642,22 @@ app.post('/api/chat', async (req, res) => {
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0].content) {
+        // Cek apakah ada jawaban dari Google
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
         } else {
-            // Kita tampilkan pesan error aslinya biar ketahuan masalahnya
-            let detailError = data.error ? data.error.message : "Error tidak diketahui";
+            // Menampilkan error detail jika gagal
+            const detailError = data.error ? data.error.message : "Google sedang sibuk atau limit tercapai.";
             console.error("Google API Error:", data);
-            res.json({ reply: "Google marah nih kak! 😅 Pesan: " + detailError });
+            res.json({ reply: "Google lagi pusing nih kak! 😅 Pesan: " + detailError });
         }
 
-
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        res.json({ reply: "Koneksi ke AI terputus. Coba lagi ya kak! 📶" });
+    }
+});
 
 
 
