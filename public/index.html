@@ -209,9 +209,6 @@
         [data-theme="dark"] .text-dark { color: #fff !important; }
         [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
-        .btn-help-floating { position: fixed; bottom: 30px; right: 100px; width: 60px; height: 60px; background: white; color: #0049CC; border: 2px solid #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2); z-index: 9999; transition: all 0.3s; font-size: 1.5rem; }
-        .btn-help-floating:hover { transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3); background: #0049CC; color: white; }
-
         .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; overflow: hidden; }
         .partner-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 25px; text-align: center; }
         .logos-slider { white-space: nowrap; position: relative; }
@@ -394,8 +391,6 @@
             </div>
         </div>
     </section>
-
-    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin"><i class="bi bi-envelope-heart-fill"></i></a>
 
     <footer class="footer-loket">
         <div class="container">
@@ -629,6 +624,7 @@
                 allEvents = await res.json();
                 renderEvents(allEvents);
             } catch (err) { 
+                console.error("Gagal memuat event:", err);
                 const lang = localStorage.getItem('lang') || 'id';
                 const errMsg = lang === 'id' ? 'Gagal memuat data event.' : 'Failed to load events.';
                 document.getElementById('event-list').innerHTML = `<div class="col-12 text-center text-danger py-5">${errMsg}</div>`;
@@ -648,7 +644,9 @@
         }
 
         function getEventImage(event) {
-            if (event.image && event.image.startsWith("http")) return event.image;
+            if (event.image && event.image.startsWith("http")) { 
+                return event.image; 
+            }
             const cat = (event.category || "General").toLowerCase();
             switch (cat) {
                 case 'konser': return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
@@ -659,6 +657,7 @@
             }
         }
 
+        // --- UBAH DI SINI: PANGGIL window.location.href SAJA ---
         function renderEvents(data) {
             const container = document.getElementById('event-list');
             container.innerHTML = ''; 
@@ -674,35 +673,40 @@
 
             data.forEach(event => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
+                
                 const isFinished = event.availableSeats === -1;
                 const isComingSoon = event.availableSeats === -2;
                 const isSoldOut = event.availableSeats === 0;
                 
-                let dateStr = "Tanggal TBA";
+                let dateStr = t.txt_date_tba;
                 if (event.date) { 
                     try { 
                         const dateObj = new Date(event.date); 
                         dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
                     } catch (e) { dateStr = event.date; } 
                 }
-                
                 const catName = event.category || 'General'; 
-                const locationName = event.location || "Lokasi TBA";
+                const locationName = event.location || t.txt_tba;
                 const imageUrl = getEventImage(event);
+                
                 const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
                 
                 let btnText = 'BELI';
-                if (isComingSoon) btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
-                else if (isFinished) btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
-                else if (isSoldOut) btnText = t.btn_sold_out;
-                else if (catName === 'Streaming') btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
+                if (isComingSoon) {
+                    btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
+                } else if (isFinished) {
+                    btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                } else if (isSoldOut) {
+                    btnText = t.btn_sold_out;
+                } else if (catName === 'Streaming') {
+                    btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
+                }
 
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
 
-                // FUNGSI LAMA (MODAL) DIPAKAI LAGI
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card-event" onclick="showDetail('${event._id}')">
+                    <div class="card-event" onclick="window.location.href='detail.html?id=${event._id}'">
                         <div class="card-img-top" style="background-image: url('${imageUrl}');">
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
@@ -713,7 +717,7 @@
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
+                            <button onclick="event.stopPropagation(); window.location.href='detail.html?id=${event._id}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
                                 ${btnText}
                             </button>
                         </div>
@@ -722,7 +726,7 @@
             });
         }
 
-        // --- FUNGSI MODAL & CHECKOUT ASLI KAMU (DIKEMBALIKAN UTUH) ---
+        // --- TAMPILKAN POPUP DETAIL (MODAL) LAMA - DIBIARKAN UTUH TAPI TIDAK DIPAKAI ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -789,6 +793,7 @@
                 if (event.tickets && event.tickets.length > 0) {
                     event.tickets.forEach((tier, index) => {
                         const isTierSoldOut = tier.availableSeats <= 0;
+                        
                         tierContainer.innerHTML += `
                             <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isTierSoldOut ? 'tier-sold-out' : ''}">
                                 <div class="d-flex align-items-center gap-3">
@@ -823,22 +828,73 @@
         function selectTier(eventId, tierIndex) {
             const event = allEvents.find(e => e._id === eventId);
             const selectedTier = event.tickets[tierIndex];
+            
             document.getElementById('modalPrice').innerText = `Rp ${selectedTier.price.toLocaleString('id-ID')}`;
+            
             const btnBuy = document.getElementById('btnModalBuy');
             btnBuy.disabled = false;
             btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
             btnBuy.innerText = "Lanjut Pembayaran";
-            btnBuy.onclick = function() { detailModal.hide(); buyTicket(eventId, selectedTier); };
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                buyTicket(eventId, selectedTier); 
+            };
         }
 
         function selectTierFallback(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             document.getElementById('modalPrice').innerText = `Rp ${event.price.toLocaleString('id-ID')}`;
+            
             const btnBuy = document.getElementById('btnModalBuy');
             btnBuy.disabled = false;
             btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
             btnBuy.innerText = "Lanjut Pembayaran";
-            btnBuy.onclick = function() { detailModal.hide(); const mockTier = { tierName: 'General', price: event.price, availableSeats: event.availableSeats }; buyTicket(eventId, mockTier); };
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                const mockTier = { tierName: 'General', price: event.price, availableSeats: event.availableSeats };
+                buyTicket(eventId, mockTier); 
+            };
+        }
+
+        function searchEvent() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
+            renderEvents(filtered);
+        }
+        
+        document.getElementById('searchInput').addEventListener("keypress", function(e) { 
+            if (e.key === "Enter") searchEvent(); 
+        });
+
+        async function cekPromo() {
+            const codeInput = document.getElementById('swal-input-promo');
+            const statusEl = document.getElementById('promo-status');
+            const code = codeInput.value;
+            
+            if(!code) return;
+            
+            statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
+            
+            try {
+                const res = await fetch('/api/check-promo', { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ code }) 
+                });
+                const data = await res.json();
+                
+                if(data.valid) { 
+                    statusEl.className = "text-success fw-bold mb-3 small"; 
+                    statusEl.innerText = `✅ ${data.message}`; 
+                } else { 
+                    statusEl.className = "text-danger fw-bold mb-3 small"; 
+                    statusEl.innerText = `❌ ${data.message}`; 
+                }
+            } catch(e) { 
+                statusEl.innerText = "Error cek promo"; 
+            }
         }
 
         async function buyTicket(eventId, selectedTier) {
@@ -847,8 +903,15 @@
             const userRaw = localStorage.getItem('userData');
             
             if (!userRaw) { 
-                Swal.fire({ title: t.alert_login_title, text: t.alert_login_text, icon: 'info', confirmButtonText: 'Login', confirmButtonColor: '#0049CC' })
-                .then((r) => { if(r.isConfirmed) window.location.href = 'user-login.html'; }); 
+                Swal.fire({ 
+                    title: t.alert_login_title, 
+                    text: t.alert_login_text, 
+                    icon: 'info', 
+                    confirmButtonText: 'Login', 
+                    confirmButtonColor: '#0049CC' 
+                }).then((r) => { 
+                    if(r.isConfirmed) window.location.href = 'user-login.html'; 
+                }); 
                 return; 
             }
             
@@ -862,26 +925,57 @@
                 title: `<i class="bi bi-cart-check-fill text-primary me-2"></i>${lang === 'id' ? 'Detail Pemesan' : 'Buyer Details'}`,
                 html: `
                     <div class="text-start px-2">
-                        <div class="alert alert-info py-2 small mb-3"><i class="bi bi-info-circle-fill me-1"></i> Pastikan nama sesuai untuk keperluan penukaran tiket.</div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
-                                <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value < 1) this.value = 1; if(this.value > ${maxBuy}) this.value = ${maxBuy};">
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
-                            </div>
-                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+                        <div class="alert alert-info py-2 small mb-3">
+                            <i class="bi bi-info-circle-fill me-1"></i> Pastikan nama sesuai untuk keperluan penukaran tiket.
                         </div>
-                        <div class="mb-3"><label class="form-label small fw-bold text-muted">Nama Lengkap</label><input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Masukkan nama lengkap"></div>
-                        <div class="mb-3"><label class="form-label small fw-bold text-muted">Email</label><input type="email" id="chk-email" class="form-control bg-light" value="${user.email || ''}" readonly></div>
-                        <div class="mb-3"><label class="form-label small fw-bold text-muted">No. WhatsApp</label><input type="tel" id="chk-phone" class="form-control" value="${user.phone || ''}" placeholder="Contoh: 08123456789"></div>
-                        <div class="mb-2"><label class="form-label small fw-bold text-muted">NIK (Nomor KTP) <span class="fw-normal">*Opsional</span></label><input type="number" id="chk-nik" class="form-control" placeholder="16 Digit NIK"></div>
+                        
+<div class="mb-3">
+    <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
+    <div class="input-group">
+        <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
+        
+        <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value < 1) this.value = 1; if(this.value > ${maxBuy}) this.value = ${maxBuy};">
+        
+        <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
+    </div>
+    <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+</div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
+                            <input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Email</label>
+                            <input type="email" id="chk-email" class="form-control bg-light" value="${user.email || ''}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">No. WhatsApp</label>
+                            <input type="tel" id="chk-phone" class="form-control" value="${user.phone || ''}" placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted">NIK (Nomor KTP) <span class="fw-normal">*Opsional</span></label>
+                            <input type="number" id="chk-nik" class="form-control" placeholder="16 Digit NIK">
+                        </div>
                     </div>
                 `,
-                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', confirmButtonColor: '#0049CC', cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel', width: '32em',
+                focusConfirm: false, 
+                showCancelButton: true, 
+                confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', 
+                confirmButtonColor: '#0049CC', 
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel', 
+                width: '32em',
                 preConfirm: () => {
-                    const name = document.getElementById('chk-name').value; const phone = document.getElementById('chk-phone').value; const nik = document.getElementById('chk-nik').value; const qty = parseInt(document.getElementById('chk-qty').value) || 1;
-                    if (!name || !phone) { Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); return false; }
+                    const name = document.getElementById('chk-name').value; 
+                    const phone = document.getElementById('chk-phone').value; 
+                    const nik = document.getElementById('chk-nik').value;
+                    const qty = parseInt(document.getElementById('chk-qty').value) || 1;
+                    
+                    if (!name || !phone) { 
+                        Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); 
+                        return false; 
+                    }
                     return { name, phone, nik, email: user.email, qty };
                 }
             });
@@ -891,6 +985,7 @@
             const quantity = checkoutData.qty;
             const saldoUser = user.saldo || 0; 
             const saldoFormatted = new Intl.NumberFormat('id-ID').format(saldoUser);
+            
             const hargaDitagih = selectedTier.price;
             const totalTagihan = hargaDitagih * quantity;
 
@@ -898,17 +993,44 @@
                 title: lang === 'id' ? 'Pilih Pembayaran' : 'Select Payment',
                 html: `
                     <div class="text-start mb-3 border-bottom pb-2">
-                        <div class="d-flex justify-content-between"><span class="text-muted fw-bold">${selectedTier.tierName}</span><span class="fw-bold">${quantity}x (Rp ${hargaDitagih.toLocaleString('id-ID')})</span></div>
-                        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Total Tagihan:</span><h4 class="fw-800 text-primary mb-0">Rp ${totalTagihan.toLocaleString('id-ID')}</h4></div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted fw-bold">${selectedTier.tierName}</span>
+                            <span class="fw-bold">${quantity}x (Rp ${hargaDitagih.toLocaleString('id-ID')})</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="text-muted">Total Tagihan:</span>
+                            <h4 class="fw-800 text-primary mb-0">Rp ${totalTagihan.toLocaleString('id-ID')}</h4>
+                        </div>
                     </div>
                     <div class="payment-selector" id="paymentOptions">
-                        <div class="payment-card" onclick="window.selectPayment('saldo')"><div class="payment-icon"><i class="bi bi-wallet2"></i></div><div class="payment-details"><h6>Potong Saldo RCELL</h6><p>Sisa: <span class="text-success fw-bold">Rp ${saldoFormatted}</span></p></div></div>
-                        <div class="payment-card" onclick="window.selectPayment('midtrans')"><div class="payment-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div><div class="payment-details"><h6>Instan & Otomatis</h6><p>VA, QRIS, E-Wallet (GoPay, DANA, dll)</p></div></div>
+                        <div class="payment-card" onclick="window.selectPayment('saldo')">
+                            <div class="payment-icon"><i class="bi bi-wallet2"></i></div>
+                            <div class="payment-details">
+                                <h6>Potong Saldo RCELL</h6>
+                                <p>Sisa: <span class="text-success fw-bold">Rp ${saldoFormatted}</span></p>
+                            </div>
+                        </div>
+                        <div class="payment-card" onclick="window.selectPayment('midtrans')">
+                            <div class="payment-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                            <div class="payment-details">
+                                <h6>Instan & Otomatis</h6>
+                                <p>VA, QRIS, E-Wallet (GoPay, DANA, dll)</p>
+                            </div>
+                        </div>
                     </div>
                 `,
-                showConfirmButton: false, showCancelButton: true, cancelButtonText: lang === 'id' ? 'Kembali' : 'Back',
-                didOpen: () => { window.selectPayment = (method) => { window.tempPaymentMethod = method; Swal.clickConfirm(); }; },
-                preConfirm: () => { return window.tempPaymentMethod; }
+                showConfirmButton: false, 
+                showCancelButton: true, 
+                cancelButtonText: lang === 'id' ? 'Kembali' : 'Back',
+                didOpen: () => { 
+                    window.selectPayment = (method) => { 
+                        window.tempPaymentMethod = method; 
+                        Swal.clickConfirm(); 
+                    }; 
+                },
+                preConfirm: () => { 
+                    return window.tempPaymentMethod; 
+                }
             });
 
             if (!paymentMethod) return;
@@ -917,43 +1039,91 @@
                 const { value: formValues } = await Swal.fire({
                     title: 'Konfirmasi PIN',
                     html: `
-                        <div class="input-group mb-3 mt-2"><input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)"><button class="btn btn-outline-primary" type="button" onclick="cekPromo()">Terapkan</button></div>
+                        <div class="input-group mb-3 mt-2">
+                            <input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)">
+                            <button class="btn btn-outline-primary" type="button" onclick="cekPromo()">Terapkan</button>
+                        </div>
                         <div id="promo-status" class="text-start mb-3 small"></div>
+                        
                         <label class="small text-muted mb-1">Masukkan 6 Digit PIN Transaksi</label>
                         <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px;">
                     `,
-                    focusConfirm: false, showCancelButton: true, confirmButtonText: 'Bayar Sekarang', confirmButtonColor: '#0049CC',
-                    preConfirm: () => { return { promo: document.getElementById('swal-input-promo').value, pin: document.getElementById('swal-input-pin').value } }
+                    focusConfirm: false, 
+                    showCancelButton: true, 
+                    confirmButtonText: 'Bayar Sekarang', 
+                    confirmButtonColor: '#0049CC',
+                    preConfirm: () => { 
+                        return { 
+                            promo: document.getElementById('swal-input-promo').value, 
+                            pin: document.getElementById('swal-input-pin').value 
+                        } 
+                    }
                 });
 
                 if (!formValues) return;
                 const { promo, pin } = formValues;
 
-                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                if (!pin || pin.length !== 6) {
+                    return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                }
 
                 Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading() });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: user.id, eventId: eventId, tierName: selectedTier.tierName, price: totalTagihan, quantity: quantity, pin: pin, promoCode: promo, buyerData: checkoutData })
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            userId: user.id, 
+                            eventId: eventId, 
+                            tierName: selectedTier.tierName, 
+                            price: totalTagihan,       
+                            quantity: quantity,  
+                            pin: pin, 
+                            promoCode: promo,
+                            buyerData: checkoutData 
+                        })
                     });
+                    
                     const data = await res.json();
 
                     if (res.ok && data.success) {
-                        user.saldo = data.sisaSaldo; localStorage.setItem('userData', JSON.stringify(user));
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b><br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}` }).then(() => window.location.href = 'dashboard.html');
-                    } else { Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error'); }
-                } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
+                        user.saldo = data.sisaSaldo;
+                        localStorage.setItem('userData', JSON.stringify(user));
+                        Swal.fire({ 
+                            icon: 'success', 
+                            title: 'Berhasil!', 
+                            html: `Tiket: <b>${data.ticketCode}</b><br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}` 
+                        }).then(() => window.location.href = 'dashboard.html');
+                    } else { 
+                        Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error'); 
+                    }
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi terputus', 'error'); 
+                }
 
             } else if (paymentMethod === 'midtrans') {
                 Swal.fire({ title: lang === 'id' ? 'Menyiapkan Tagihan...' : 'Connecting to Gateway...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                
                 try {
                     const res = await fetch('/api/payment-token', { 
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ eventId, tierName: selectedTier.tierName, price: hargaDitagih, quantity: quantity, customerName: checkoutData.name, customerEmail: checkoutData.email, customerPhone: checkoutData.phone, userId: user.id, buyerData: checkoutData }) 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ 
+                            eventId, 
+                            tierName: selectedTier.tierName, 
+                            price: hargaDitagih,             
+                            quantity: quantity, 
+                            customerName: checkoutData.name, 
+                            customerEmail: checkoutData.email, 
+                            customerPhone: checkoutData.phone,
+                            userId: user.id,
+                            buyerData: checkoutData 
+                        }) 
                     });
-                    const data = await res.json(); Swal.close(); 
+                    
+                    const data = await res.json();
+                    Swal.close(); 
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
@@ -961,32 +1131,48 @@
                                 Swal.fire({ title: 'Menerbitkan Tiket...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                                 try {
                                     const saveRes = await fetch('/api/midtrans-success', {
-                                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ eventId: eventId, userId: user.id, customerName: checkoutData.name, customerEmail: checkoutData.email, tierName: selectedTier.tierName, price: totalTagihan, quantity: quantity, orderId: data.orderId })
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            eventId: eventId,
+                                            userId: user.id,
+                                            customerName: checkoutData.name,
+                                            customerEmail: checkoutData.email,
+                                            tierName: selectedTier.tierName,
+                                            price: totalTagihan,
+                                            quantity: quantity,
+                                            orderId: data.orderId
+                                        })
                                     });
                                     const saveData = await saveRes.json();
-                                    if(saveData.success) { Swal.fire('Sukses!', 'Pembayaran berhasil & Tiket terbit!', 'success').then(() => { window.location.href = 'dashboard.html'; }); } 
-                                    else { Swal.fire('Error', 'Pembayaran masuk, tapi tiket gagal dimuat.', 'error'); }
-                                } catch (e) { Swal.fire('Error', 'Sistem sibuk, hubungi admin.', 'error'); }
+                                    
+                                    if(saveData.success) {
+                                        Swal.fire('Sukses!', 'Pembayaran berhasil & Tiket terbit!', 'success').then(() => { window.location.href = 'dashboard.html'; }); 
+                                    } else {
+                                        Swal.fire('Error', 'Pembayaran masuk, tapi tiket gagal dimuat.', 'error');
+                                    }
+                                } catch (e) {
+                                    Swal.fire('Error', 'Sistem sibuk, hubungi admin.', 'error');
+                                }
                             }, 
-                            onPending: function(result){ Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); }, 
-                            onError: function(result){ Swal.fire('Gagal', lang === 'id' ? 'Pembayaran ditolak/gagal.' : 'Payment failed.', 'error'); }, 
-                            onClose: function(){ Swal.fire('Dibatalkan', lang === 'id' ? 'Kamu menutup pop-up pembayaran sebelum selesai.' : 'You closed the payment popup.', 'warning'); } 
+                            onPending: function(result){ 
+                                Swal.fire('Pending', lang === 'id' ? 'Silakan selesaikan instruksi pembayaran.' : 'Please complete the payment instruction.', 'info'); 
+                            }, 
+                            onError: function(result){ 
+                                Swal.fire('Gagal', lang === 'id' ? 'Pembayaran ditolak/gagal.' : 'Payment failed.', 'error'); 
+                            }, 
+                            onClose: function(){ 
+                                Swal.fire('Dibatalkan', lang === 'id' ? 'Kamu menutup pop-up pembayaran sebelum selesai.' : 'You closed the payment popup.', 'warning'); 
+                            } 
                         }); 
-                    } else { Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); }
-                } catch (err) { Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); }
+                    } else { 
+                        Swal.fire('Error', data.message || 'Gagal membuat tagihan Midtrans.', 'error'); 
+                    }
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi ke payment gateway gagal.', 'error'); 
+                }
             }
         }
-
-        function searchEvent() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
-            renderEvents(filtered);
-        }
-        
-        document.getElementById('searchInput').addEventListener("keypress", function(e) { 
-            if (e.key === "Enter") searchEvent(); 
-        });
 
         // --- SCRIPT CHATBOT AI ---
         function toggleChat() {
