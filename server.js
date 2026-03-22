@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const midtransClient = require('midtrans-client');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // --- MODEL DATABASE ---
 const User = require('./models/users'); 
