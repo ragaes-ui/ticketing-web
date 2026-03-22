@@ -98,7 +98,24 @@ app.get('/api/events', async (req, res) => {
     } 
     catch (err) { res.status(500).json({ error: err.message }); }
 });
-
+// --- API BACA 1 EVENT DETAIL ---
+app.get('/api/events/:id', async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ message: "ID Event tidak valid" });
+        }
+        const event = await Event.findById(req.params.id);
+        if (!event) return res.status(404).json({ message: "Event tidak ditemukan" });
+        
+        const eventObj = event.toObject();
+        if (eventObj.category === 'Streaming') {
+            eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
+        }
+        res.json(eventObj);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 app.post('/api/events', async (req, res) => {
     try {
         const { name, date, price, capacity, description, category, location, tickets } = req.body;
