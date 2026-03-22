@@ -272,72 +272,70 @@
         }
 
         // Fitur Lupa Password
+// Fitur Lupa Password (Dengan Verifikasi PIN)
         async function resetPasswordFlow() {
-            // Tahap 1: Minta Username
-            const { value: inputUsername } = await Swal.fire({
-                title: 'Lupa Password',
-                text: 'Masukkan Username Anda untuk mengatur ulang password.',
-                input: 'text',
-                inputPlaceholder: 'Username Anda',
+            const { value: formValues } = await Swal.fire({
+                title: 'Reset Password',
+                html: `
+                    <div class="text-start px-1 mt-3">
+                        <label class="small text-muted mb-1">Username Akun</label>
+                        <input id="reset-username" class="form-control mb-3" placeholder="Ketik username Anda">
+                        
+                        <label class="small text-muted mb-1">PIN Saldo (6 Angka)</label>
+                        <input id="reset-pin" type="password" class="form-control mb-3 text-center fw-bold fs-4" placeholder="••••••" maxlength="6" style="letter-spacing: 10px;" inputmode="numeric">
+                        
+                        <label class="small text-muted mb-1">Password Baru</label>
+                        <input id="reset-newpass" type="password" class="form-control" placeholder="Minimal 6 karakter">
+                    </div>
+                `,
                 background: '#18181b',
                 color: '#fff',
                 showCancelButton: true,
                 confirmButtonColor: '#3b82f6',
                 cancelButtonColor: '#3f3f46',
-                confirmButtonText: 'Lanjut',
+                confirmButtonText: 'Reset Sekarang',
                 cancelButtonText: 'Batal',
-                inputValidator: (value) => {
-                    if (!value) return 'Username tidak boleh kosong!'
+                preConfirm: () => {
+                    const username = document.getElementById('reset-username').value;
+                    const pin = document.getElementById('reset-pin').value;
+                    const newPassword = document.getElementById('reset-newpass').value;
+
+                    if (!username || !pin || !newPassword) {
+                        Swal.showValidationMessage('Semua kolom wajib diisi!');
+                        return false;
+                    }
+                    if (pin.length !== 6 || isNaN(pin)) {
+                        Swal.showValidationMessage('PIN harus berupa 6 angka!');
+                        return false;
+                    }
+                    if (newPassword.length < 6) {
+                        Swal.showValidationMessage('Password baru minimal 6 karakter!');
+                        return false;
+                    }
+
+                    return { username, pin, newPassword };
                 }
             });
 
-            if (inputUsername) {
-                // Tahap 2: Minta Password Baru
-                const { value: newPassword } = await Swal.fire({
-                    title: 'Set Password Baru',
-                    text: `Buat password baru untuk akun ${inputUsername}`,
-                    input: 'password',
-                    inputPlaceholder: '••••••••',
-                    background: '#18181b',
-                    color: '#fff',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3b82f6',
-                    cancelButtonColor: '#3f3f46',
-                    confirmButtonText: 'Reset Password',
-                    cancelButtonText: 'Batal',
-                    inputValidator: (value) => {
-                        if (!value || value.length < 6) return 'Password minimal 6 karakter!'
-                    }
-                });
+            if (formValues) {
+                Swal.fire({ title: 'Memverifikasi...', background: '#18181b', color: '#fff', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-                if (newPassword) {
-                    // Tampilkan Loading
-                    Swal.fire({
-                        title: 'Memproses...',
-                        background: '#18181b',
-                        color: '#fff',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
+                try {
+                    const res = await fetch('/api/reset-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
                     });
+                    
+                    const data = await res.json();
 
-                    // Kirim ke Backend API
-                    try {
-                        const res = await fetch('/api/reset-password', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username: inputUsername, newPassword: newPassword })
-                        });
-                        
-                        const data = await res.json();
-
-                        if (res.ok && data.success) {
-                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Password berhasil diubah. Silakan Login.', background: '#18181b', color: '#fff' });
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Username tidak ditemukan.', background: '#18181b', color: '#fff' });
-                        }
-                    } catch (err) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#18181b', color: '#fff' });
+                    if (res.ok && data.success) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Password berhasil diubah. Silakan Login dengan password baru.', background: '#18181b', color: '#fff' });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: data.message, background: '#18181b', color: '#fff' });
                     }
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#18181b', color: '#fff' });
                 }
             }
         }
