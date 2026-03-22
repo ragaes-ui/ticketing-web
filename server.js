@@ -627,8 +627,8 @@ app.post('/api/chat', async (req, res) => {
 
         if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // JURUS PAMUNGKAS: Gunakan v1 (Stabil) dan model 'gemini-1.5-flash' tanpa embel-embel
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // JALUR TIKUS: Pakai gemini-1.0-pro (Model paling stabil di v1)
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -636,7 +636,7 @@ app.post('/api/chat', async (req, res) => {
             body: JSON.stringify({
                 contents: [{
                     parts: [{ 
-                        text: `Kamu adalah asisten RCELLFEST. Jawab ramah dan singkat: ${message}` 
+                        text: `Kamu adalah asisten website RCELLFEST. Jawab singkat dan ramah. Pertanyaan: ${message}` 
                     }]
                 }]
             })
@@ -644,21 +644,20 @@ app.post('/api/chat', async (req, res) => {
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0].content) {
+        if (data.candidates && data.candidates.length > 0) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
         } else if (data.error) {
-            // Jika tetap error, kita tampilkan detailnya lagi
-            res.json({ reply: "Pesan Google: " + data.error.message });
+            // Tampilkan error biar kita makin tahu maunya Google apa
+            res.json({ reply: "Aduh, Google bilang: " + data.error.message });
         } else {
-            res.json({ reply: "Lagi pusing kak, coba tanya sekali lagi ya! 🤖" });
+            res.json({ reply: "AI lagi narik napas dulu kak, coba chat lagi ya! 🤖" });
         }
 
     } catch (error) {
-        res.json({ reply: "Koneksi AI terputus. Coba lagi ya! 📶" });
+        res.json({ reply: "Koneksi AI terputus. Pastikan API Key benar! 📶" });
     }
 });
-
 
 
 // ROUTE HANDLER TERAKHIR
