@@ -182,6 +182,30 @@ app.post('/api/login', async (req, res) => {
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
+// --- API RESET PASSWORD (LUPA PASSWORD) ---
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const { username, newPassword } = req.body;
+
+        // 1. Cari user berdasarkan username (case-insensitive biar lebih aman)
+        const user = await User.findOne({ username: new RegExp('^' + username + '$', 'i') });
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Username tidak ditemukan di sistem." });
+        }
+
+        // 2. Enkripsi (Hash) password baru
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // 3. Simpan password baru ke database
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ success: true, message: "Password berhasil direset." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
+    }
+});
 
 app.post('/api/history', async (req, res) => {
     try {
