@@ -627,33 +627,35 @@ app.post('/api/chat', async (req, res) => {
         if (!message) return res.json({ reply: "Tanya apa kak? 😊" });
 
         if (!process.env.GEMINI_API_KEY) {
-            return res.json({ reply: "Waduh, kunciku (API Key) belum dipasang di Vercel! 🔑" });
+            return res.json({ reply: "🔑 API Key belum diset di Environment Variables Vercel!" });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-        // FIX: Coba pakai model 'gemini-pro' atau pastikan penulisan modelnya benar
-        // Kalau 1.5-flash error, biasanya gemini-pro adalah jalan ninja yang paling stabil
+        // JURUS TERAKHIR: Pakai gemini-1.5-flash tapi dengan format full name
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro", // Kita pakai gemini-pro dulu karena paling stabil di v1
+            model: "gemini-1.5-flash" 
         });
 
-        const result = await model.generateContent(message);
+        // Tambahkan safety settings & instruksi singkat
+        const result = await model.generateContent([
+            "Kamu adalah asisten website tiket RCELLFEST. Jawab singkat & gaul.",
+            message
+        ]);
+        
         const response = await result.response;
         const text = response.text();
 
         res.json({ reply: text });
 
     } catch (error) {
-        console.error("Detail Error:", error);
-        
-        // JIKA MASIH ERROR 404, kita paksa pakai model pro yang pasti ada
+        console.error("DEBUG ERROR:", error);
+        // Jika masih error, kasih tau detailnya biar kita bantai lagi
         res.json({ 
-            reply: "Aduh, otak AI-ku lagi dipake war tiket! 😅 (Pesan: " + error.message + "). Coba tanya sekali lagi ya kak!" 
+            reply: "Waduh, koneksi ke otak AI terganggu. 😅 (Pesan: " + error.message + ")" 
         });
     }
 });
-
 
 
 // ROUTE HANDLER TERAKHIR
