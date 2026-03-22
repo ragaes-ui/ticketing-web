@@ -620,36 +620,29 @@ app.delete('/api/promos/:id', async (req, res) => {
     try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
-// ==========================================
-// --- API CHATBOT AI (ASISTEN RCELLFEST) ---
-// ==========================================
-app.post('/api/chat', (req, res) => {
-    const { message } = req.body;
-    const msg = message.toLowerCase();
-    
-    let reply = "";
+// --- API CHATBOT OTAK GEMINI (SANGAT PINTAR) ---
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message } = req.body;
+        if (!message) return res.status(400).json({ reply: "Tanya apa kak? 😊" });
 
-    // Logika AI (Keyword Matching)
-    if (msg.includes('cara beli') || msg.includes('pesan tiket') || msg.includes('gimana beli')) {
-        reply = "Untuk membeli tiket, pilih event di Beranda -> Klik 'Beli' -> Pilih Tipe & Jumlah Tiket -> Pilih metode pembayaran (Saldo/Midtrans) -> Selesaikan pembayaran.";
-    } else if (msg.includes('saldo') || msg.includes('top up') || msg.includes('isi uang')) {
-        reply = "Kamu bisa isi saldo di menu 'Dashboard Saya'. Klik tombol 'Top Up', masukkan nominal (min Rp 10.000), lalu selesaikan pembayaran.";
-    } else if (msg.includes('promo') || msg.includes('diskon')) {
-        reply = "Kamu bisa memasukkan Kode Promo di halaman checkout (khusus pembayaran menggunakan metode Potong Saldo RCELL).";
-    } else if (msg.includes('pin') || msg.includes('lupa pin')) {
-        reply = "PIN transaksi wajib diatur jika kamu ingin membeli tiket pakai Saldo. Kamu bisa mengatur atau mengubah PIN di menu Dashboard (Ikon Gembok kuning).";
-    } else if (msg.includes('tiket saya') || msg.includes('dimana tiket') || msg.includes('cek tiket')) {
-        reply = "Tiket yang sudah dibeli akan otomatis masuk ke menu 'Dashboard Saya' di tab 'Aset Digital'. Kamu bisa screenshot QR Code-nya atau download versi PDF-nya!";
-    } else if (msg.includes('halo') || msg.includes('hi') || msg.includes('hai') || msg.includes('pagi') || msg.includes('malam')) {
-        reply = "Halo kak! 👋 Saya Asisten AI RCELLFEST. Ada yang bisa saya bantu terkait cara pembelian tiket, info top up saldo, atau tentang event?";
-    } else if (msg.includes('bayar') || msg.includes('metode') || msg.includes('qris')) {
-        reply = "Kami menerima pembayaran via Saldo RCELL, QRIS, GoPay, OVO, DANA, ShopeePay, LinkAja, serta Virtual Account BCA, Mandiri, BNI, dan BRI.";
-    } else {
-        reply = "Maaf kak, saya kurang mengerti pertanyaannya. 😅 Kamu bisa coba tanya dengan kata kunci: 'cara beli', 'top up saldo', 'letak tiket', atau 'metode bayar'.";
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: "Kamu adalah RCELL-Bot, asisten gaul website RCELLFEST. Gunakan emoji, jawab singkat, dan fokus hanya pada bantuan tiket, saldo, promo, dan event. Tolak pertanyaan di luar itu dengan sopan."
+        });
+
+        const result = await model.generateContent(message);
+        const response = await result.response;
+        
+        res.json({ reply: response.text() });
+
+    } catch (error) {
+        console.error("Gemini Error:", error);
+        res.status(500).json({ reply: "Aduh, otak AI-ku lagi konslet. Coba lagi bentar ya! 😅" });
     }
-
-    setTimeout(() => { res.json({ reply }); }, 1000); 
 });
+
 
 // ROUTE HANDLER TERAKHIR
 app.get('*', (req, res) => {
