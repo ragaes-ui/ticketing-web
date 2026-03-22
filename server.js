@@ -627,37 +627,39 @@ app.post('/api/chat', async (req, res) => {
 
         if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // JALUR TIKUS: Pakai gemini-1.0-pro (Model paling stabil di v1)
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
+        // JURUS MANUAL: Pakai v1beta/models/gemini-pro
+        // Ini adalah endpoint paling "tua" tapi paling sering berhasil buat akun baru
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ 
-                        text: `Kamu adalah asisten website RCELLFEST. Jawab singkat dan ramah. Pertanyaan: ${message}` 
-                    }]
+                    parts: [{ text: `Kamu adalah asisten RCELLFEST. Jawab ramah & singkat: ${message}` }]
                 }]
             })
         });
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates.length > 0) {
+        // Jika berhasil
+        if (data.candidates && data.candidates[0].content) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
-        } else if (data.error) {
-            // Tampilkan error biar kita makin tahu maunya Google apa
-            res.json({ reply: "Aduh, Google bilang: " + data.error.message });
-        } else {
-            res.json({ reply: "AI lagi narik napas dulu kak, coba chat lagi ya! 🤖" });
+        } 
+        // Jika Google ngasih list model karena kita salah alamat
+        else {
+            const errorMsg = data.error ? data.error.message : "Google minta ganti model.";
+            console.log("Detail Error:", data);
+            res.json({ reply: "Duh, Google masih rewel kak! 😅 Pesan: " + errorMsg + ". Coba cek 'Google AI Studio' buat pastiin API Key kakak aktif ya!" });
         }
 
     } catch (error) {
-        res.json({ reply: "Koneksi AI terputus. Pastikan API Key benar! 📶" });
+        res.json({ reply: "Koneksi AI terputus. Coba lagi nanti! 📶" });
     }
 });
+
 
 
 // ROUTE HANDLER TERAKHIR
