@@ -627,9 +627,8 @@ app.post('/api/chat', async (req, res) => {
 
         if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // JURUS TERAKHIR: Pakai model 1.5-flash-latest dengan v1beta
-        // Alamat URL ini adalah yang paling update menurut dokumentasi Google terbaru
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        // JURUS PAMUNGKAS: Gunakan v1 (Stabil) dan model 'gemini-1.5-flash' tanpa embel-embel
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -637,7 +636,7 @@ app.post('/api/chat', async (req, res) => {
             body: JSON.stringify({
                 contents: [{
                     parts: [{ 
-                        text: `Kamu adalah asisten website RCELLFEST. Jawab dengan sangat ramah, singkat, dan gunakan emoji. Pertanyaan: ${message}` 
+                        text: `Kamu adalah asisten RCELLFEST. Jawab ramah dan singkat: ${message}` 
                     }]
                 }]
             })
@@ -645,20 +644,18 @@ app.post('/api/chat', async (req, res) => {
 
         const data = await response.json();
 
-        // Cek data secara detail
-        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
+        if (data.candidates && data.candidates[0].content) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
         } else if (data.error) {
-            // Jika ada pesan error spesifik dari Google
-            res.json({ reply: "Waduh, Google bilang: " + data.error.message + " 😅" });
+            // Jika tetap error, kita tampilkan detailnya lagi
+            res.json({ reply: "Pesan Google: " + data.error.message });
         } else {
-            res.json({ reply: "Otak AI-ku lagi muter-muter nih kak, coba kirim chat sekali lagi ya! 🤖" });
+            res.json({ reply: "Lagi pusing kak, coba tanya sekali lagi ya! 🤖" });
         }
 
     } catch (error) {
-        console.error("Fetch Error:", error);
-        res.json({ reply: "Koneksi ke server AI terganggu. Pastikan API Key di Vercel sudah benar ya! 📶" });
+        res.json({ reply: "Koneksi AI terputus. Coba lagi ya! 📶" });
     }
 });
 
