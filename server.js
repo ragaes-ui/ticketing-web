@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const midtransClient = require('midtrans-client');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // --- MODEL DATABASE ---
 const User = require('./models/users'); 
@@ -624,45 +623,39 @@ app.delete('/api/promos/:id', async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
-        if (!message) return res.json({ reply: "Tanya apa kak? 😊" });
+        const apiKey = process.env.GEMINI_API_KEY;
 
-        // Pastikan API Key ada
-        if (!process.env.GEMINI_API_KEY) {
-            return res.json({ reply: "🔑 Waduh, API Key-nya belum dipasang di Vercel!" });
-        }
+        if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-        // GUNAKAN MODEL TERBARU: gemini-1.5-flash
-        // Ini adalah model paling stabil saat ini untuk API gratisan
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash" 
+        // Kita tembak langsung ke API Google tanpa library bantuan
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: `Kamu adalah RCELL-Bot, asisten website tiket RCELLFEST. Jawab singkat, gaul, dan ramah. Pertanyaan user: ${message}` }]
+                }]
+            })
         });
 
-        // Set instruksi sistem agar dia tahu tugasnya
-        const prompt = `Kamu adalah asisten AI RCELLFEST. 
-        Jawablah pertanyaan berikut dengan ramah dan singkat: ${message}`;
+        const data = await response.json();
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        res.json({ reply: text });
+        // Ambil teks balasannya
+        if (data.candidates && data.candidates[0].content) {
+            const replyText = data.candidates[0].content.parts[0].text;
+            res.json({ reply: replyText });
+        } else {
+            // Jika Google kirim error (misal API Key salah)
+            console.error("Google API Error:", data);
+            res.json({ reply: "Aduh, Google-nya lagi sibuk kak. Coba tanya lagi ya! 😅" });
+        }
 
     } catch (error) {
-        console.error("DEBUG DETAIL:", error);
-        
-        // Pesan jika error tetap terjadi
-        let errorMsg = error.message;
-        if (errorMsg.includes("404")) {
-            errorMsg = "Model AI tidak ditemukan. Silakan hubungi admin untuk update versi library.";
-        }
-
-        res.json({ 
-            reply: "Waduh, koneksi ke otak AI terputus. 😅 (Pesan: " + errorMsg + ")" 
-        });
+        console.error("Fetch Error:", error);
+        res.json({ reply: "Koneksi ke AI terputus. Pastikan sinyal HP aman ya! 📶" });
     }
 });
+
 
 
 
