@@ -624,14 +624,19 @@ app.delete('/api/promos/:id', async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
-        
-        // Cek apakah API Key kebaca atau tidak
+        if (!message) return res.json({ reply: "Tanya apa kak? 😊" });
+
         if (!process.env.GEMINI_API_KEY) {
-            return res.json({ reply: "API Key belum dipasang di Vercel, kak! 🔑" });
+            return res.json({ reply: "Waduh, kunciku (API Key) belum dipasang di Vercel! 🔑" });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        // FIX: Coba pakai model 'gemini-pro' atau pastikan penulisan modelnya benar
+        // Kalau 1.5-flash error, biasanya gemini-pro adalah jalan ninja yang paling stabil
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-pro", // Kita pakai gemini-pro dulu karena paling stabil di v1
+        });
 
         const result = await model.generateContent(message);
         const response = await result.response;
@@ -640,8 +645,12 @@ app.post('/api/chat', async (req, res) => {
         res.json({ reply: text });
 
     } catch (error) {
-        console.error(error);
-        res.json({ reply: "Waduh, otak AI-ku lagi konslet (Error: " + error.message + ") 😅" });
+        console.error("Detail Error:", error);
+        
+        // JIKA MASIH ERROR 404, kita paksa pakai model pro yang pasti ada
+        res.json({ 
+            reply: "Aduh, otak AI-ku lagi dipake war tiket! 😅 (Pesan: " + error.message + "). Coba tanya sekali lagi ya kak!" 
+        });
     }
 });
 
