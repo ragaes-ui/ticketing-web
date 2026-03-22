@@ -40,7 +40,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <style>
-        /* --- CHATBOT WIDGET --- */
+                /* --- CHATBOT WIDGET --- */
         .btn-chatbot { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border: none; border-radius: 50%; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.4); z-index: 9999; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
         .btn-chatbot:hover { transform: scale(1.1); }
         
@@ -69,7 +69,6 @@
             --hover-cat: #f0f7ff;
             --cat-text-color: #555;
             --cat-text-active: #0049CC;
-            --primary: #0049CC;
         }
 
         [data-theme="dark"] {
@@ -85,7 +84,6 @@
             --hover-cat: #334155;
             --cat-text-color: #cbd5e1;
             --cat-text-active: #60a5fa;
-            --primary: #60a5fa;
         }
 
         #preloader {
@@ -102,7 +100,7 @@
         }
         .loader-icon-main {
             font-size: 3rem; 
-            background: linear-gradient(135deg, var(--primary), #00c6ff);
+            background: linear-gradient(135deg, #0049CC, #00c6ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             z-index: 2; position: relative;
             animation: icon-float 2s ease-in-out infinite;
@@ -131,7 +129,7 @@
             border-radius: 3px; margin-top: 15px; overflow: hidden;
         }
         .loader-bar-fill {
-            height: 100%; width: 0%; background: var(--primary);
+            height: 100%; width: 0%; background: #0049CC;
             animation: fill-bar 1.5s ease-in-out infinite;
         }
 
@@ -152,13 +150,13 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 76px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
         .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
-        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .navbar-brand { font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
         .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
-        .nav-link:hover { color: var(--primary); }
+        .nav-link:hover { color: #0049CC; }
         [data-theme="dark"] .nav-link { color: #e2e8f0; }
-        [data-theme="dark"] .nav-link:hover { color: var(--primary); }
+        [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
-        .hero-section { background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; width: 100%; margin: 0; }
+        .hero-section { background: linear-gradient(135deg, #0049CC 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; width: 100%; margin: 0; }
         .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
         @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
@@ -168,30 +166,28 @@
         .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 8px 25px var(--shadow-color); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; }
         .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
         [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
-        .btn-search { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
-        .btn-search:hover { filter: brightness(0.9); }
+        .btn-search { background: #0049CC; color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
+        .btn-search:hover { background: #003db3; }
 
         .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
         .category-item:hover, .category-item.active { background: var(--hover-cat); transform: scale(1.05); }
         .category-item.active .cat-text { color: var(--cat-text-active); font-weight: 800; }
-        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
-        [data-theme="dark"] .icon-circle { background: rgba(96, 165, 250, 0.1); color: var(--primary); }
+        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
         .cat-text { font-size: 0.8rem; font-weight: 600; color: var(--cat-text-color); }
 
         .card-event { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; background: var(--bg-card); height: 100%; display: flex; flex-direction: column; cursor: pointer; }
         .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--shadow-color); border-color: transparent; }
         .card-img-top { height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px; }
         .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
-        .category-badge-img { position: relative; z-index: 2; background: var(--primary); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
-        .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: var(--primary); padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .category-badge-img { position: relative; z-index: 2; background: rgba(0, 73, 204, 0.95); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
+        .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: #0049CC; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
         .event-venue { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
-        .btn-outline-book { border: 1px solid var(--primary); color: var(--primary); font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
-        .btn-outline-book:hover { background: var(--primary); color: white; }
+        .btn-outline-book { border: 1px solid #0049CC; color: #0049CC; font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
+        .btn-outline-book:hover { background: #0049CC; color: white; }
         .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; cursor: not-allowed; }
-        [data-theme="dark"] .btn-outline-book.disabled { border-color: #475569; color: #64748b; background: #1e293b; }
 
         .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
         .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
@@ -209,6 +205,9 @@
         [data-theme="dark"] .text-dark { color: #fff !important; }
         [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
+        .btn-help-floating { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: white; color: #0049CC; border: 2px solid #0049CC; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.2); z-index: 9999; transition: all 0.3s; font-size: 1.5rem; }
+        .btn-help-floating:hover { transform: translateY(-5px) rotate(10deg) scale(1.1); box-shadow: 0 10px 25px rgba(0, 73, 204, 0.3); background: #0049CC; color: white; }
+
         .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; overflow: hidden; }
         .partner-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 25px; text-align: center; }
         .logos-slider { white-space: nowrap; position: relative; }
@@ -220,28 +219,90 @@
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
 
         /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS & TIERING --- */
-        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-        .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
-        .payment-card:hover { border-color: var(--primary); background: var(--hover-cat); transform: translateY(-2px); }
-        .payment-card.selected { border-color: var(--primary); background: rgba(0, 73, 204, 0.05); }
-        [data-theme="dark"] .payment-card.selected { background: rgba(96, 165, 250, 0.1); border-color: var(--primary); }
-        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(0, 73, 204, 0.1); border-radius: 10px; }
-        [data-theme="dark"] .payment-icon { background: rgba(96, 165, 250, 0.1); }
-        .payment-details h6 { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
-        .payment-details p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .payment-selector { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-top: 15px; 
+        }
+        .payment-card { 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            text-align: left; 
+            background: var(--bg-card); 
+        }
+        .payment-card:hover { 
+            border-color: #0049CC; 
+            background: var(--hover-cat); 
+            transform: translateY(-2px); 
+        }
+        .payment-card.selected { 
+            border-color: #0049CC; 
+            background: #e6f0ff; 
+        }
+        [data-theme="dark"] .payment-card.selected { 
+            background: #1e293b; 
+            border-color: #60a5fa; 
+        }
+        .payment-icon { 
+            font-size: 1.5rem; 
+            color: #0049CC; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(0, 73, 204, 0.1); 
+            border-radius: 10px; 
+        }
+        .payment-details h6 { 
+            margin: 0; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            color: var(--text-main); 
+        }
+        .payment-details p { 
+            margin: 0; 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+        }
         
-        .swal2-html-container .form-control { color: var(--text-main); background-color: var(--bg-input); border: 1px solid var(--border-color); }
-        .swal2-html-container .form-label { color: var(--text-muted); }
+        .swal2-html-container .form-control { 
+            color: var(--text-main); 
+            background-color: var(--bg-input); 
+            border: 1px solid var(--border-color); 
+        }
+        .swal2-html-container .form-label { 
+            color: var(--text-muted); 
+        }
 
         /* Gaya untuk Radio Button Tipe Tiket */
-        .tier-label { cursor: pointer; transition: 0.2s; border: 2px solid var(--border-color); background-color: var(--bg-card); }
-        .tier-label:hover { border-color: var(--primary); }
-        .tier-label input:checked + div { font-weight: bold; }
-        .tier-sold-out { background-color: var(--bg-section); opacity: 0.5; cursor: not-allowed; }
+        .tier-label { 
+            cursor: pointer; 
+            transition: 0.2s; 
+            border: 2px solid var(--border-color); 
+            background-color: var(--bg-card); 
+        }
+        .tier-label:hover { 
+            border-color: #0049CC; 
+        }
+        .tier-label input:checked + div { 
+            font-weight: bold; 
+        }
+        .tier-sold-out {
+            background-color: var(--bg-section);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
-</head>
+</head>      
 <body>
-
     <div id="preloader">
         <div class="loader-icon-box">
             <i class="bi bi-ticket-detailed-fill loader-icon-main"></i>
@@ -329,6 +390,8 @@
         </div>
     </section>
     
+    <a href="mailto:ragaes.dev@rcellfest.shop?subject=Bantuan%20RCELLFEST" class="btn-help-floating" title="Kirim Email ke Admin"><i class="bi bi-envelope-heart-fill"></i></a>
+
     <footer class="footer-loket">
         <div class="container">
             <div class="row g-4">
@@ -396,25 +459,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
-        <i class="bi bi-robot"></i>
-    </button>
-
-    <div class="chat-widget" id="chatWidget">
-        <div class="chat-header">
-            <div><i class="bi bi-robot me-2"></i> AI Support</div>
-            <button onclick="toggleChat()" class="btn-close btn-close-white" style="font-size: 0.8rem;"></button>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-msg ai">Halo! 👋 Saya Asisten AI RCELLFEST. Ada yang ingin kamu tanyakan soal tiket atau event?</div>
-        </div>
-        <div class="typing-indicator" id="chatTyping">AI sedang mengetik...</div>
-        <div class="chat-footer">
-            <input type="text" id="chatInput" class="form-control" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
-            <button onclick="sendChatMessage()" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
         </div>
     </div>
 
@@ -646,7 +690,7 @@
 
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card-event" onclick="showDetail('${event._id}')">
+                    <div class="card-event" onclick="window.location.href='detail.html?id=${event._id}'">
                         <div class="card-img-top" style="background-image: url('${imageUrl}');">
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
@@ -657,7 +701,7 @@
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); showDetail('${event._id}')" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
+                            <button onclick="event.stopPropagation(); window.location.href='detail.html?id=${event._id}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
                                 ${btnText}
                             </button>
                         </div>
@@ -1136,52 +1180,5 @@
             }
         }
     </script>
-    <script>
-        function toggleChat() {
-            const chatWidget = document.getElementById('chatWidget');
-            const icon = document.querySelector('#btnChatToggle i');
-            if (chatWidget.style.display === 'flex') {
-                chatWidget.style.display = 'none';
-                icon.className = 'bi bi-robot';
-            } else {
-                chatWidget.style.display = 'flex';
-                icon.className = 'bi bi-x-lg';
-            }
-        }
-
-        async function sendChatMessage() {
-            const inputEl = document.getElementById('chatInput');
-            const message = inputEl.value.trim();
-            if (!message) return;
-
-            const chatBody = document.getElementById('chatBody');
-            const typingIndicator = document.getElementById('chatTyping');
-
-            chatBody.innerHTML += `<div class="chat-msg user">${message}</div>`;
-            inputEl.value = '';
-            chatBody.scrollTop = chatBody.scrollHeight;
-
-            typingIndicator.style.display = 'block';
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
-                });
-                
-                const data = await res.json();
-                
-                typingIndicator.style.display = 'none';
-                chatBody.innerHTML += `<div class="chat-msg ai">${data.reply}</div>`;
-                chatBody.scrollTop = chatBody.scrollHeight;
-
-            } catch (err) {
-                typingIndicator.style.display = 'none';
-                chatBody.innerHTML += `<div class="chat-msg ai text-danger">Koneksi terputus. Coba lagi nanti ya!</div>`;
-                chatBody.scrollTop = chatBody.scrollHeight;
-            }
-        }
-    </script>
 </body>
-</html> 
+</html>
