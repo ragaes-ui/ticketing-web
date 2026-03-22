@@ -640,21 +640,16 @@ app.post('/api/chat', async (req, res) => {
 
         const data = await response.json();
 
-        // Ambil teks balasannya
         if (data.candidates && data.candidates[0].content) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
         } else {
-            // Jika Google kirim error (misal API Key salah)
+            // Kita tampilkan pesan error aslinya biar ketahuan masalahnya
+            let detailError = data.error ? data.error.message : "Error tidak diketahui";
             console.error("Google API Error:", data);
-            res.json({ reply: "Aduh, Google-nya lagi sibuk kak. Coba tanya lagi ya! 😅" });
+            res.json({ reply: "Google marah nih kak! 😅 Pesan: " + detailError });
         }
 
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        res.json({ reply: "Koneksi ke AI terputus. Pastikan sinyal HP aman ya! 📶" });
-    }
-});
 
 
 
