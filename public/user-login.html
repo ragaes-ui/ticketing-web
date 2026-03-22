@@ -12,14 +12,13 @@
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
-
     <style>
         /* --- RESET & BASIC VARIABLES --- */
         :root {
             --bg-dark: #09090b;
             --card-bg: #18181b;
             --input-bg: #27272a;
-            --primary: #3b82f6; /* Biru Neon */
+            --primary: #3b82f6; 
             --primary-glow: rgba(59, 130, 246, 0.5);
             --text-main: #f4f4f5;
             --text-muted: #a1a1aa;
@@ -30,7 +29,6 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-dark);
-            /* Gradasi statis (ringan) menggantikan animasi berat */
             background-image: radial-gradient(circle at top right, #1e3a8a 0%, transparent 40%),
                               radial-gradient(circle at bottom left, #3b82f6 0%, transparent 30%);
             background-repeat: no-repeat;
@@ -43,9 +41,9 @@
             padding: 20px;
         }
 
-        /* --- CARD DESIGN (Fake Glass - Lebih Ringan) --- */
+        /* --- CARD DESIGN --- */
         .login-card {
-            background-color: rgba(24, 24, 27, 0.95); /* Hampir solid, performa tinggi */
+            background-color: rgba(24, 24, 27, 0.95); 
             width: 100%;
             max-width: 400px;
             padding: 30px;
@@ -93,7 +91,7 @@
             width: 100%;
             background: var(--input-bg);
             border: 1px solid transparent;
-            padding: 14px 14px 14px 45px; /* Space for icon */
+            padding: 14px 14px 14px 45px; 
             border-radius: 10px;
             color: white;
             font-family: inherit;
@@ -101,12 +99,21 @@
             transition: 0.2s;
         }
 
-        /* Efek Focus Ringan */
         .form-control:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
             background: #202023;
         }
+
+        /* --- LUPA PASSWORD LINK --- */
+        .forgot-pass {
+            font-size: 0.75rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .forgot-pass:hover { text-decoration: underline; color: #60a5fa; }
 
         /* --- BUTTONS --- */
         .btn-primary {
@@ -189,7 +196,10 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Password</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="form-label" style="margin-bottom: 0;">Password</label>
+                    <a href="#" class="forgot-pass" id="forgotPassLink" onclick="resetPasswordFlow()">Lupa Password?</a>
+                </div>
                 <div class="input-wrapper">
                     <i class="bi bi-key"></i>
                     <input type="password" id="password" class="form-control" placeholder="••••••••" required>
@@ -225,6 +235,7 @@
             customClass: { popup: 'colored-toast' }
         });
 
+        // Mode Switcher (Login / Register)
         function toggleMode() {
             isLogin = !isLogin;
             const elements = {
@@ -233,7 +244,8 @@
                 info: document.getElementById('textInfo'),
                 link: document.querySelector('.link-accent'),
                 regFields: document.getElementById('registerFields'),
-                lblId: document.getElementById('lblIdentifier')
+                lblId: document.getElementById('lblIdentifier'),
+                forgotPass: document.getElementById('forgotPassLink') // Tangkap tombol lupa pass
             };
 
             if (isLogin) {
@@ -242,6 +254,7 @@
                 elements.info.innerText = "Belum punya akun?";
                 elements.link.innerText = "Buat Akun";
                 elements.regFields.classList.add('d-none');
+                elements.forgotPass.classList.remove('d-none'); // Tampilkan saat mode login
                 elements.lblId.innerText = "Email / Username";
                 
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).removeAttribute('required'));
@@ -251,18 +264,90 @@
                 elements.info.innerText = "Sudah punya akun?";
                 elements.link.innerText = "Login Aja";
                 elements.regFields.classList.remove('d-none');
+                elements.forgotPass.classList.add('d-none'); // Sembunyikan saat mode register
                 elements.lblId.innerText = "Username Unik";
 
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).setAttribute('required', 'true'));
             }
         }
 
+        // Fitur Lupa Password
+        async function resetPasswordFlow() {
+            // Tahap 1: Minta Username
+            const { value: inputUsername } = await Swal.fire({
+                title: 'Lupa Password',
+                text: 'Masukkan Username Anda untuk mengatur ulang password.',
+                input: 'text',
+                inputPlaceholder: 'Username Anda',
+                background: '#18181b',
+                color: '#fff',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#3f3f46',
+                confirmButtonText: 'Lanjut',
+                cancelButtonText: 'Batal',
+                inputValidator: (value) => {
+                    if (!value) return 'Username tidak boleh kosong!'
+                }
+            });
+
+            if (inputUsername) {
+                // Tahap 2: Minta Password Baru
+                const { value: newPassword } = await Swal.fire({
+                    title: 'Set Password Baru',
+                    text: `Buat password baru untuk akun ${inputUsername}`,
+                    input: 'password',
+                    inputPlaceholder: '••••••••',
+                    background: '#18181b',
+                    color: '#fff',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#3f3f46',
+                    confirmButtonText: 'Reset Password',
+                    cancelButtonText: 'Batal',
+                    inputValidator: (value) => {
+                        if (!value || value.length < 6) return 'Password minimal 6 karakter!'
+                    }
+                });
+
+                if (newPassword) {
+                    // Tampilkan Loading
+                    Swal.fire({
+                        title: 'Memproses...',
+                        background: '#18181b',
+                        color: '#fff',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    // Kirim ke Backend API
+                    try {
+                        const res = await fetch('/api/reset-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: inputUsername, newPassword: newPassword })
+                        });
+                        
+                        const data = await res.json();
+
+                        if (res.ok && data.success) {
+                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Password berhasil diubah. Silakan Login.', background: '#18181b', color: '#fff' });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Username tidak ditemukan.', background: '#18181b', color: '#fff' });
+                        }
+                    } catch (err) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#18181b', color: '#fff' });
+                    }
+                }
+            }
+        }
+
+        // Handle Submit Form (Login/Register)
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
             const originalText = btn.innerText;
             
-            // Loading State Sederhana
             btn.disabled = true;
             btn.innerText = "Memproses...";
             btn.style.opacity = "0.7";
