@@ -627,36 +627,41 @@ app.post('/api/chat', async (req, res) => {
 
         if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // URL diubah ke v1 (Stabil) dan model tanpa prefix 'models/' di URL karena sudah ada di path
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+        // JURUS TERAKHIR: Pakai model 1.5-flash-latest dengan v1beta
+        // Alamat URL ini adalah yang paling update menurut dokumentasi Google terbaru
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Kamu adalah RCELL-Bot, asisten website RCELLFEST. Jawab singkat dan ramah. User: ${message}` }]
+                    parts: [{ 
+                        text: `Kamu adalah asisten website RCELLFEST. Jawab dengan sangat ramah, singkat, dan gunakan emoji. Pertanyaan: ${message}` 
+                    }]
                 }]
             })
         });
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0].content) {
+        // Cek data secara detail
+        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
             const replyText = data.candidates[0].content.parts[0].text;
             res.json({ reply: replyText });
+        } else if (data.error) {
+            // Jika ada pesan error spesifik dari Google
+            res.json({ reply: "Waduh, Google bilang: " + data.error.message + " 😅" });
         } else {
-            // Jika gemini-pro juga gagal, kita coba model terbaru dengan penulisan lengkap
-            const detailError = data.error ? data.error.message : "Model tidak merespon.";
-            console.error("Google API Error:", data);
-            res.json({ reply: "Google lagi pusing kak! 😅 Pesan: " + detailError });
+            res.json({ reply: "Otak AI-ku lagi muter-muter nih kak, coba kirim chat sekali lagi ya! 🤖" });
         }
 
     } catch (error) {
         console.error("Fetch Error:", error);
-        res.json({ reply: "Koneksi terputus. Coba lagi ya! 📶" });
+        res.json({ reply: "Koneksi ke server AI terganggu. Pastikan API Key di Vercel sudah benar ya! 📶" });
     }
 });
+
 
 
 // ROUTE HANDLER TERAKHIR
