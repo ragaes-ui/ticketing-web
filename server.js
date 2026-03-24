@@ -512,6 +512,52 @@ app.post('/api/payment-notification', async (req, res) => {
 // ==========================================
 // --- API VERIFIKASI TIKET (CHECK-IN) ---
 // ==========================================
+// ==========================================
+// --- API GATE CHECK-IN (SCANNER) ---
+// ==========================================
+app.post('/api/validate', async (req, res) => {
+    try {
+        const { ticketCode } = req.body;
+        if (!ticketCode) return res.status(400).json({ valid: false, message: "KODE KOSONG", detail: "Harap masukkan kode tiket." });
+
+        // Cari tiket di database berdasarkan kode
+        const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
+
+        // 1. Jika tiket tidak ditemukan
+        if (!ticket) {
+            return res.json({
+                valid: false,
+                message: "TIKET TIDAK DITEMUKAN",
+                detail: "Kode tiket tidak terdaftar di sistem kami."
+            });
+        }
+
+        // 2. Jika tiket sudah pernah di-scan / dipakai
+        if (ticket.status === 'used') {
+            return res.json({
+                valid: false,
+                message: "TIKET SUDAH DIPAKAI",
+                detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!"
+            });
+        }
+
+        // 3. Jika tiket valid, langsung otomatis hanguskan tiket (ubah status jadi used)
+        ticket.status = 'used';
+        await ticket.save();
+
+        // Kirim jawaban sukses ke HTML Scanner
+        res.json({
+            valid: true,
+            data: {
+                event: ticket.eventId ? ticket.eventId.name : "RCELLFEST Event",
+                name: ticket.customerName
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." });
+    }
+});
 
 app.post('/api/verify-ticket', async (req, res) => {
     try {
