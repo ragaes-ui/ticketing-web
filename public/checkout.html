@@ -62,6 +62,13 @@
         /* Swal Fix Dark Mode */
         .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
+
+        /* 👇 FIX TOMBOL & TEKS YANG NGILANG DI DARK MODE 👇 */
+        [data-theme="dark"] .btn-outline-secondary { color: #f8f9fa; border-color: #475569; }
+        [data-theme="dark"] .btn-outline-secondary:hover { background-color: #475569; color: #fff; }
+        [data-theme="dark"] .btn-secondary { background-color: #475569; border-color: #475569; color: #fff; }
+        [data-theme="dark"] .btn-secondary:hover { background-color: #334155; }
+        [data-theme="dark"] .form-control::placeholder { color: #9ca3af; opacity: 1; }
     </style>
 </head>
 <body>
@@ -216,7 +223,6 @@
             hitungTotal();
         });
 
-        // FUNGSI KETIK JUMLAH TIKET MANUAL
         function manualUpdateQty(val) {
             const max = checkoutData.availableSeats || 1;
             let newQty = parseInt(val);
@@ -244,7 +250,6 @@
             document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
         }
 
-        // FUNGSI CEK KODE PROMO
         async function cekPromoLuar() {
             const inputEl = document.getElementById('inputPromo');
             const statusEl = document.getElementById('promoStatus');
