@@ -225,7 +225,11 @@
             document.getElementById('sumTierName').innerText = checkoutData.tierName;
             document.getElementById('sumPrice').innerText = `Rp ${checkoutData.price.toLocaleString('id-ID')}`;
             
-            hitungTotal();
+            hitungTotal(); // (Ini kodingan yang udah ada)
+
+            // 👇 TAMBAHKAN 1 BARIS INI 👇
+            // Trik Ilusi: Mengubah tulisan URL di atas browser tanpa pindah halaman
+            window.history.replaceState(null, '', `detail.html?checkout=true&id=${checkoutData.eventId}`);   
         });
 
         function manualUpdateQty(val) {
