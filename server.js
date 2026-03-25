@@ -330,6 +330,28 @@ app.post('/api/user/set-pin', async (req, res) => {
 // 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
+                // 1. Ambil token dari frontend
+        const { recaptchaToken, ...dataLainnya } = req.body; // Sesuaikan dengan variabel req.body kakak yang asli
+        
+        // 2. Tanya Google, ini robot apa manusia?
+        if (!recaptchaToken) {
+             return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
+        }
+
+        // GANTI PAKAI SECRET KEY DARI GOOGLE
+        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+        
+        const googleRes = await fetch(verifyUrl, { method: 'POST' });
+        const googleData = await googleRes.json();
+        
+        if (!googleData.success) {
+             return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
+        }
+        
+        // --- BATAS PENGECEKAN GOOGLE ---
+        // Lanjut ke kodingan kakak yang biasa (potong saldo / bikin token midtrans) ...
+
         const { userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName } = req.body; 
         
         const userCheck = await User.findById(userId);
@@ -401,6 +423,28 @@ app.post('/api/buy-ticket', async (req, res) => {
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
+                // 1. Ambil token dari frontend
+        const { recaptchaToken, ...dataLainnya } = req.body; // Sesuaikan dengan variabel req.body kakak yang asli
+        
+        // 2. Tanya Google, ini robot apa manusia?
+        if (!recaptchaToken) {
+             return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
+        }
+
+        // GANTI PAKAI SECRET KEY DARI GOOGLE
+        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+        
+        const googleRes = await fetch(verifyUrl, { method: 'POST' });
+        const googleData = await googleRes.json();
+        
+        if (!googleData.success) {
+             return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
+        }
+        
+        // --- BATAS PENGECEKAN GOOGLE ---
+        // Lanjut ke kodingan kakak yang biasa (potong saldo / bikin token midtrans) ...
+
         const { eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName } = req.body;
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
