@@ -151,16 +151,32 @@
         let currentEvent = null;
         let selectedTierObj = null;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            
-            // 👇 TAMBAHKAN KODINGAN PENANGKAP INI 👇
+              document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Ambil data URL satu kali saja (biar nggak tabrakan)
             const urlParams = new URLSearchParams(window.location.search);
-            // Kalau URL-nya mengandung kata 'checkout=true', diam-diam lempar ke checkout aslinya
+            
+            // 2. PENANGKAP ILUSI CHECKOUT
             if (urlParams.get('checkout') === 'true') {
                 window.location.replace(`checkout.html?id=${urlParams.get('id')}`);
-                return; // Hentikan proses detail.html
+                return; 
             }
-            // 👆 SAMPAI SINI 👆
+
+            // 3. Kodingan Asli Detail Event
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            checkLoginStatus();
+
+            const eventId = urlParams.get('id');
+
+            if (!eventId) {
+                showError();
+                return;
+            }
+
+            await loadEventDetail(eventId);
+        });
+
 
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
