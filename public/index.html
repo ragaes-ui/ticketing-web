@@ -704,8 +704,11 @@
 
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
                                 // 👇 TAMBAHKAN 2 BARIS INI UNTUK BIKIN LINK NAMA EVENT 👇
-                const eventSlug = event.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
+                // Pakai pengaman: Kalau event.name kosong, otomatis diganti kata "event"
+const namaAman = event.name ? event.name : "event";
+const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
+
                 // 👆 SAMPAI SINI 👆
 
                 container.innerHTML += `
