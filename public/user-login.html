@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
@@ -206,6 +208,10 @@
                 </div>
             </div>
 
+            <div class="form-group" style="display: flex; justify-content: center;">
+                <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs" data-theme="dark"></div>
+            </div>
+
             <button type="submit" class="btn-primary" id="btnSubmit">
                 MASUK SEKARANG
             </button>
@@ -245,7 +251,7 @@
                 link: document.querySelector('.link-accent'),
                 regFields: document.getElementById('registerFields'),
                 lblId: document.getElementById('lblIdentifier'),
-                forgotPass: document.getElementById('forgotPassLink') // Tangkap tombol lupa pass
+                forgotPass: document.getElementById('forgotPassLink')
             };
 
             if (isLogin) {
@@ -254,7 +260,7 @@
                 elements.info.innerText = "Belum punya akun?";
                 elements.link.innerText = "Buat Akun";
                 elements.regFields.classList.add('d-none');
-                elements.forgotPass.classList.remove('d-none'); // Tampilkan saat mode login
+                elements.forgotPass.classList.remove('d-none');
                 elements.lblId.innerText = "Email / Username";
                 
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).removeAttribute('required'));
@@ -264,7 +270,7 @@
                 elements.info.innerText = "Sudah punya akun?";
                 elements.link.innerText = "Login Aja";
                 elements.regFields.classList.remove('d-none');
-                elements.forgotPass.classList.add('d-none'); // Sembunyikan saat mode register
+                elements.forgotPass.classList.add('d-none');
                 elements.lblId.innerText = "Username Unik";
 
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).setAttribute('required', 'true'));
@@ -272,7 +278,6 @@
         }
 
         // Fitur Lupa Password
-// Fitur Lupa Password (Dengan Verifikasi PIN)
         async function resetPasswordFlow() {
             const { value: formValues } = await Swal.fire({
                 title: 'Reset Password',
@@ -343,6 +348,20 @@
         // Handle Submit Form (Login/Register)
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // 👇 VALIDASI RECAPTCHA SEBELUM PROSES 👇
+            const recaptchaToken = grecaptcha.getResponse();
+            if (!recaptchaToken) {
+                return Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'Tunggu Sebentar!', 
+                    text: 'Harap centang "Saya bukan robot" terlebih dahulu.', 
+                    background: '#18181b', 
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+
             const btn = document.getElementById('btnSubmit');
             const originalText = btn.innerText;
             
@@ -351,15 +370,22 @@
             btn.style.opacity = "0.7";
 
             const getVal = (id) => document.getElementById(id).value;
+            
+            // Masukkan recaptchaToken ke dalam data yang dikirim ke server
             const payload = isLogin 
-                ? { identifier: getVal('identifier'), password: getVal('password') }
+                ? { 
+                    identifier: getVal('identifier'), 
+                    password: getVal('password'),
+                    recaptchaToken: recaptchaToken // <--- TAMBAHAN TOKEN
+                  }
                 : { 
                     username: getVal('identifier'), 
                     email: getVal('email'), 
                     password: getVal('password'), 
                     fullName: getVal('fullName'), 
                     phone: getVal('phone'), 
-                    role: 'user' 
+                    role: 'user',
+                    recaptchaToken: recaptchaToken // <--- TAMBAHAN TOKEN
                   };
 
             try {
@@ -379,14 +405,17 @@
                              window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
                         }, 1000);
                     } else {
-                        Toast.fire({ icon: 'success', title: 'Registrasi Berhasil' });
+                        Toast.fire({ icon: 'success', title: 'Registrasi Berhasil! Silakan Login.' });
                         toggleMode();
+                        grecaptcha.reset(); // Reset captcha setelah sukses daftar
                     }
                 } else {
                     Toast.fire({ icon: 'error', title: data.message || 'Gagal' });
+                    grecaptcha.reset(); // Reset captcha jika password/data salah
                 }
             } catch (err) {
                 Toast.fire({ icon: 'warning', title: 'Cek koneksi internet Anda' });
+                grecaptcha.reset(); // Reset captcha jika error jaringan
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
