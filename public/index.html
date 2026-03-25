@@ -703,11 +703,16 @@
                 }
 
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
+                                // 👇 TAMBAHKAN 2 BARIS INI UNTUK BIKIN LINK NAMA EVENT 👇
+                const eventSlug = event.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
+                // 👆 SAMPAI SINI 👆
 
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card-event" onclick="window.location.href='detail.html?id=${event._id}'">
-                        <div class="card-img-top" style="background-image: url('${imageUrl}');">
+                    <div class="card-event" onclick="window.location.href='${linkDetail}'">
+                        <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
+                            ${pinBadgeHTML}
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
                         </div>
@@ -717,7 +722,7 @@
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); window.location.href='detail.html?id=${event._id}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
+                            <button onclick="event.stopPropagation(); window.location.href='${linkDetail}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
                                 ${btnText}
                             </button>
                         </div>
