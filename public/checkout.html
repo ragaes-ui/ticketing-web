@@ -23,6 +23,7 @@
             --primary: #0049CC;
             --primary-light: rgba(0, 73, 204, 0.05);
             --shadow-color: rgba(0,0,0,0.05);
+            --bg-section: #f1f3f5;
         }
 
         [data-theme="dark"] {
@@ -36,6 +37,7 @@
             --primary: #38bdf8;
             --primary-light: rgba(56, 189, 248, 0.1);
             --shadow-color: rgba(0,0,0,0.3);
+            --bg-section: #080c14;
         }
 
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 90px; }
@@ -46,18 +48,18 @@
         
         .form-control { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 12px 15px; }
         .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
-        .form-control:read-only { background-color: var(--border-color); opacity: 0.7; }
+        .form-control:read-only { background-color: var(--border-color); opacity: 0.7; color: var(--text-muted); }
 
         .payment-card { border: 2px solid var(--border-color); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
         .payment-card:hover { border-color: var(--primary); background: var(--primary-light); }
         .payment-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 4px 15px var(--primary-light); }
         .payment-icon { font-size: 1.5rem; color: var(--primary); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--bg-body); border-radius: 12px; }
 
-        .captcha-box { border: 1px solid #d3d3d3; background: #f9f9f9; border-radius: 4px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; max-width: 300px; }
-        [data-theme="dark"] .captcha-box { background: #1f2937; border-color: #374151; }
+        .captcha-box { border: 1px solid var(--border-color); background: var(--bg-section); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; max-width: 320px; }
         
-        .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 600; }
+        .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 600; color: white;}
         
+        /* Swal Fix Dark Mode */
         .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
     </style>
@@ -99,7 +101,7 @@
                     <div class="mt-4">
                         <label class="captcha-box user-select-none" for="chkRobot">
                             <input type="checkbox" id="chkRobot" style="width: 24px; height: 24px; cursor: pointer;">
-                            <span class="fw-bold text-dark ms-2" style="font-size: 0.95rem;">Saya bukan robot</span>
+                            <span class="fw-bold ms-2" style="font-size: 0.95rem; color: var(--text-main);">Saya bukan robot</span>
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/RecaptchaLogo.svg/1200px-RecaptchaLogo.svg.png" style="height: 25px; margin-left: auto; opacity: 0.8;" alt="captcha">
                         </label>
                     </div>
@@ -136,17 +138,31 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded" style="background: var(--bg-section);">
                         <span class="fw-bold small">Jumlah Tiket:</span>
-                        <div class="input-group" style="width: 120px;">
+                        <div class="input-group" style="width: 130px;">
                             <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(-1)">-</button>
-                            <input type="number" id="chkQty" class="form-control text-center px-1" value="1" readonly>
+                            <input type="number" id="chkQty" class="form-control text-center px-1" value="1" onchange="manualUpdateQty(this.value)">
                             <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(1)">+</button>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" id="inputPromo" class="form-control text-uppercase" placeholder="Masukkan Kode Promo" style="font-size: 0.9rem;">
+                            <button class="btn btn-secondary px-3 fw-bold" type="button" onclick="cekPromoLuar()" style="font-size: 0.9rem;">Cek</button>
+                        </div>
+                        <div id="promoStatus" class="small mt-2"></div>
                     </div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Harga Satuan</span>
                         <span class="fw-bold small" id="sumPrice">Rp 0</span>
                     </div>
+                    
+                    <div class="d-flex justify-content-between mb-2 d-none" id="rowDiskon">
+                        <span class="text-success small"><i class="bi bi-tags-fill me-1"></i> Diskon Promo</span>
+                        <span class="fw-bold text-success small" id="sumDiskon">- Rp 0</span>
+                    </div>
+
                     <hr>
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <span class="fw-bold">Total Tagihan</span>
@@ -169,8 +185,10 @@
         let checkoutData = {};
         let selectedPayment = null;
         let qty = 1;
+        
+        let kodePromoAktif = "";
+        let diskonPromo = 0;
 
-        // Saat halaman dimuat
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -178,7 +196,6 @@
             const userRaw = localStorage.getItem('userData');
             const checkoutRaw = localStorage.getItem('checkoutData');
 
-            // Keamanan: Kalau data kosong, tendang balik ke home
             if (!userRaw || !checkoutRaw) {
                 window.location.href = 'index.html';
                 return;
@@ -187,19 +204,29 @@
             userData = JSON.parse(userRaw);
             checkoutData = JSON.parse(checkoutRaw);
 
-            // Isi Form Data Diri
             document.getElementById('chkName').value = userData.fullName || userData.username;
             document.getElementById('chkEmail').value = userData.email;
             document.getElementById('chkPhone').value = userData.phone || '';
             document.getElementById('txtSaldo').innerText = `Rp ${userData.saldo.toLocaleString('id-ID')}`;
 
-            // Isi Ringkasan Pesanan
             document.getElementById('sumEventName').innerText = checkoutData.eventName;
             document.getElementById('sumTierName').innerText = checkoutData.tierName;
             document.getElementById('sumPrice').innerText = `Rp ${checkoutData.price.toLocaleString('id-ID')}`;
             
             hitungTotal();
         });
+
+        // FUNGSI KETIK JUMLAH TIKET MANUAL
+        function manualUpdateQty(val) {
+            const max = checkoutData.availableSeats || 1;
+            let newQty = parseInt(val);
+            if (isNaN(newQty) || newQty < 1) newQty = 1;
+            if (newQty > max) newQty = max;
+            
+            qty = newQty;
+            document.getElementById('chkQty').value = qty;
+            hitungTotal();
+        }
 
         function updateQty(change) {
             const max = checkoutData.availableSeats || 1;
@@ -212,8 +239,45 @@
         }
 
         function hitungTotal() {
-            const total = checkoutData.price * qty;
+            let total = (checkoutData.price * qty) - diskonPromo;
+            if(total < 0) total = 0;
             document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        // FUNGSI CEK KODE PROMO
+        async function cekPromoLuar() {
+            const inputEl = document.getElementById('inputPromo');
+            const statusEl = document.getElementById('promoStatus');
+            const rowDiskon = document.getElementById('rowDiskon');
+            const code = inputEl.value.trim();
+
+            if(!code) return;
+            
+            statusEl.innerHTML = '<span class="text-info spinner-border spinner-border-sm me-1"></span> <span class="text-info small">Mengecek...</span>';
+            
+            try {
+                const res = await fetch('/api/check-promo', { 
+                    method: 'POST', headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ code: code }) 
+                });
+                const data = await res.json();
+                
+                if(data.valid) {
+                    kodePromoAktif = code.toUpperCase();
+                    diskonPromo = data.discount;
+                    statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`;
+                    document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`;
+                    rowDiskon.classList.remove('d-none');
+                } else {
+                    kodePromoAktif = "";
+                    diskonPromo = 0;
+                    statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`;
+                    rowDiskon.classList.add('d-none');
+                }
+                hitungTotal();
+            } catch(e) {
+                statusEl.innerHTML = '<span class="text-danger">Gagal mengecek promo.</span>';
+            }
         }
 
         function selectPayment(method) {
@@ -226,48 +290,40 @@
         }
 
         async function prosesBayar() {
-            // 1. Validasi Form
             const name = document.getElementById('chkName').value;
             const phone = document.getElementById('chkPhone').value;
             const isRobotChecked = document.getElementById('chkRobot').checked;
 
-            if (!name || !phone) {
-                return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
-            }
-            if (!isRobotChecked) {
-                return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
-            }
-            if (!selectedPayment) {
-                return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
-            }
+            if (!name || !phone) return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
+            if (!isRobotChecked) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
+            if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
 
-            const totalTagihan = checkoutData.price * qty;
+            let totalTagihan = (checkoutData.price * qty) - diskonPromo;
+            if (totalTagihan < 0) totalTagihan = 0;
+            
             const buyerPayload = { name: name, phone: phone, email: userData.email, qty: qty };
 
-            // 2. Eksekusi Pembayaran
             if (selectedPayment === 'saldo') {
-                if (userData.saldo < totalTagihan) {
-                    return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
-                }
+                if (userData.saldo < totalTagihan) return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
 
-                // Munculkan popup minta PIN
                 const { value: pin } = await Swal.fire({
                     title: 'Konfirmasi PIN',
                     html: `<input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px; background:var(--bg-input); color:var(--text-main);" placeholder="******">`,
-                    showCancelButton: true, confirmButtonText: 'Bayar', confirmButtonColor: '#0049CC',
+                    showCancelButton: true, confirmButtonText: 'Bayar', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
                     preConfirm: () => document.getElementById('swal-input-pin').value
                 });
 
                 if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
 
-                Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        // Kirim harga asli (price * qty), API backend yang akan memotong otomatis jika ada promoCode
                         body: JSON.stringify({ 
                             userId: userData.id, eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: totalTagihan, quantity: qty, pin: pin, buyerData: buyerPayload 
+                            price: (checkoutData.price * qty), quantity: qty, pin: pin, promoCode: kodePromoAktif, buyerData: buyerPayload 
                         })
                     });
                     const data = await res.json();
@@ -275,21 +331,23 @@
                     if (res.ok && data.success) {
                         userData.saldo = data.sisaSaldo; 
                         localStorage.setItem('userData', JSON.stringify(userData));
-                        localStorage.removeItem('checkoutData'); // Bersihkan cache
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>` }).then(() => window.location.href = 'dashboard.html');
-                    } else { 
-                        Swal.fire('Gagal', data.message, 'error'); 
-                    }
+                        localStorage.removeItem('checkoutData'); 
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html');
+                    } else { Swal.fire('Gagal', data.message, 'error'); }
                 } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
 
             } else if (selectedPayment === 'midtrans') {
-                Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 try {
+                    // Untuk Midtrans, kita akali ngirim harga per item yang udah dipotong diskon biar total gross_amount-nya bener
+                    let hargaMidtrans = checkoutData.price;
+                    if (diskonPromo > 0) { hargaMidtrans = totalTagihan / qty; }
+
                     const res = await fetch('/api/payment-token', { 
                         method: 'POST', headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
                             eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: checkoutData.price, quantity: qty, 
+                            price: hargaMidtrans, quantity: qty, 
                             customerName: name, customerEmail: userData.email, customerPhone: phone, userId: userData.id 
                         }) 
                     });
@@ -298,7 +356,7 @@
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
                             onSuccess: async function(result){ 
-                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading() });
+                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                                 const saveRes = await fetch('/api/midtrans-success', {
                                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ 
@@ -310,7 +368,7 @@
                                 const saveData = await saveRes.json();
                                 if(saveData.success) { 
                                     localStorage.removeItem('checkoutData');
-                                    Swal.fire('Sukses!', 'Tiket terbit!', 'success').then(() => window.location.href = 'dashboard.html'); 
+                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); 
                                 }
                             }
                         }); 
