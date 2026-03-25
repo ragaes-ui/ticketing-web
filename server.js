@@ -158,7 +158,26 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     try {
-        const { identifier, password } = req.body;
+        // 1. Tangkap token dari frontend
+        const { identifier, password, recaptchaToken } = req.body;
+
+        // 2. Tanya Google, ini yang login robot bukan?
+        if (!recaptchaToken) {
+             return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
+        }
+
+        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+        
+        const googleRes = await fetch(verifyUrl, { method: 'POST' });
+        const googleData = await googleRes.json();
+        
+        if (!googleData.success) {
+             return res.status(400).json({ success: false, message: "Verifikasi gagal! Sistem mendeteksi aktivitas robot." });
+        }
+        
+        // --- BATAS PENGECEKAN GOOGLE ---
+        
         const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
         
