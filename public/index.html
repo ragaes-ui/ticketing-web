@@ -703,19 +703,15 @@
                 }
 
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
-                                // 👇 TAMBAHKAN 2 BARIS INI UNTUK BIKIN LINK NAMA EVENT 👇
-                // Pakai pengaman: Kalau event.name kosong, otomatis diganti kata "event"
-const namaAman = event.name ? event.name : "event";
-const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
-
-                // 👆 SAMPAI SINI 👆
+                                // --- PENGAMAN & PEMBUAT LINK NAMA EVENT (SLUG) ---
+                const namaAman = event.name ? event.name : "event";
+                const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
 
                 container.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="card-event" onclick="window.location.href='${linkDetail}'">
                         <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
-                            ${pinBadgeHTML}
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
                         </div>
@@ -733,7 +729,6 @@ const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
                 </div>`;
             });
         }
-
         // --- TAMPILKAN POPUP DETAIL (MODAL) LAMA - DIBIARKAN UTUH TAPI TIDAK DIPAKAI ---
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
