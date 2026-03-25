@@ -320,7 +320,6 @@
                 try {
                     const res = await fetch('/api/buy-ticket', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        // Kirim harga asli (price * qty), API backend yang akan memotong otomatis jika ada promoCode
                         body: JSON.stringify({ 
                             userId: userData.id, eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
                             price: (checkoutData.price * qty), quantity: qty, pin: pin, promoCode: kodePromoAktif, buyerData: buyerPayload 
@@ -339,7 +338,6 @@
             } else if (selectedPayment === 'midtrans') {
                 Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 try {
-                    // Untuk Midtrans, kita akali ngirim harga per item yang udah dipotong diskon biar total gross_amount-nya bener
                     let hargaMidtrans = checkoutData.price;
                     if (diskonPromo > 0) { hargaMidtrans = totalTagihan / qty; }
 
@@ -355,7 +353,6 @@
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
-                            // 1. Kalau Sukses Bayar
                             onSuccess: async function(result){ 
                                 Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                                 const saveRes = await fetch('/api/midtrans-success', {
@@ -372,19 +369,20 @@
                                     Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); 
                                 }
                             },
-                            // 2. Kalau Nunggu Pembayaran (Misal transfer VA / Indomaret)
                             onPending: function(result){
                                 Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'});
                             },
-                            // 3. Kalau Error
                             onError: function(result){
                                 Swal.fire({icon: 'error', title: 'Pembayaran Gagal', text: 'Terjadi kesalahan dari pihak bank/pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'});
                             },
-                            // 4. Kalau Pop-up Ditutup Manual Sama User
                             onClose: function(){
                                 Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup halaman pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'});
                             }
-                        });
+                        }); 
+                    } else { Swal.fire('Error', data.message, 'error'); }
+                } catch (err) { Swal.fire('Error', 'Gagal memuat gateway', 'error'); }
+            }
+        }
     </script>
 </body>
 </html>
