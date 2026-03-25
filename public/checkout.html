@@ -54,8 +54,6 @@
         .payment-card:hover { border-color: var(--primary); background: var(--primary-light); }
         .payment-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 4px 15px var(--primary-light); }
         .payment-icon { font-size: 1.5rem; color: var(--primary); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--bg-body); border-radius: 12px; }
-
-        .captcha-box { border: 1px solid var(--border-color); background: var(--bg-section); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; max-width: 320px; }
         
         .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 600; color: white;}
         
@@ -63,12 +61,19 @@
         .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
 
-        /* 👇 FIX TOMBOL & TEKS YANG NGILANG DI DARK MODE 👇 */
-        [data-theme="dark"] .btn-outline-secondary { color: #f8f9fa; border-color: #475569; }
-        [data-theme="dark"] .btn-outline-secondary:hover { background-color: #475569; color: #fff; }
-        [data-theme="dark"] .btn-secondary { background-color: #475569; border-color: #475569; color: #fff; }
-        [data-theme="dark"] .btn-secondary:hover { background-color: #334155; }
-        [data-theme="dark"] .form-control::placeholder { color: #9ca3af; opacity: 1; }
+        /* 🔥 JURUS PAMUNGKAS DARK MODE (PAKAI !IMPORTANT) 🔥 */
+        [data-theme="dark"] .text-muted { color: #9ca3af !important; }
+        [data-theme="dark"] .text-dark { color: #f3f4f6 !important; }
+        [data-theme="dark"] .fw-bold { color: #f3f4f6 !important; }
+        [data-theme="dark"] .form-control { color: #f3f4f6 !important; background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] .form-control:read-only { background-color: #111827 !important; color: #6b7280 !important; }
+        [data-theme="dark"] .form-control::placeholder { color: #6b7280 !important; }
+        [data-theme="dark"] .btn-outline-secondary { color: #f3f4f6 !important; border-color: #4b5563 !important; }
+        [data-theme="dark"] .btn-outline-secondary:hover { background-color: #4b5563 !important; color: #fff !important; }
+        [data-theme="dark"] .btn-secondary { background-color: #4b5563 !important; border-color: #4b5563 !important; color: #fff !important; }
+        [data-theme="dark"] .captcha-box { background-color: #1f2937 !important; border-color: #374151 !important; }
+        [data-theme="dark"] .text-primary { color: #38bdf8 !important; }
+        [data-theme="dark"] span { color: inherit; }
     </style>
 </head>
 <body>
