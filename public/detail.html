@@ -314,144 +314,41 @@
             } catch(e) { statusEl.innerText = "Error cek promo"; }
         }
 
-        // --- PROSES CHECKOUT ---
-        async function startCheckout() {
+// --- PROSES PINDAH KE HALAMAN CHECKOUT ---
+        function startCheckout() {
             const userRaw = localStorage.getItem('userData');
-            if (!userRaw) {
-                return Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli.', icon: 'info', confirmButtonText: 'Login' })
-                .then(r => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
-            }
             
-            const user = JSON.parse(userRaw);
-            const maxBuy = selectedTierObj.availableSeats || 1;
-
-            // STEP 1: FORM PENGISIAN & KUANTITAS
-            const { value: checkoutData } = await Swal.fire({
-                title: `<i class="bi bi-cart-check-fill text-primary me-2"></i>Detail Pemesan`,
-                html: `
-                    <div class="text-start px-2">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
-                                <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value<1)this.value=1; if(this.value>${maxBuy})this.value=${maxBuy};">
-                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
-                            </div>
-                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
-                            <input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Sesuai KTP">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Email</label>
-                            <input type="email" id="chk-email" class="form-control" value="${user.email || ''}" readonly style="background:var(--bg-section);">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">No. WhatsApp</label>
-                            <input type="tel" id="chk-phone" class="form-control" value="${user.phone || ''}" placeholder="0812xxxx">
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true, confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', confirmButtonColor: '#0049CC', width: '32em', background: 'var(--bg-card)', color: 'var(--text-main)',
-                preConfirm: () => {
-                    const name = document.getElementById('chk-name').value;
-                    const phone = document.getElementById('chk-phone').value;
-                    const qty = parseInt(document.getElementById('chk-qty').value) || 1;
-                    if (!name || !phone) { Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); return false; }
-                    return { name, phone, email: user.email, qty };
-                }
-            });
-
-            if (!checkoutData) return;
-
-            // STEP 2: PILIH PEMBAYARAN
-            const quantity = checkoutData.qty;
-            const hargaDitagih = selectedTierObj.price;
-            const totalTagihan = hargaDitagih * quantity;
-            const saldoUser = user.saldo || 0;
-
-            const { value: paymentMethod } = await Swal.fire({
-                title: 'Pilih Pembayaran',
-                html: `
-                    <div class="text-start mb-3 border-bottom pb-2">
-                        <div class="d-flex justify-content-between"><span class="text-muted fw-bold">${selectedTierObj.tierName}</span><span class="fw-bold">${quantity}x</span></div>
-                        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Total Tagihan:</span><h4 class="fw-800 text-primary mb-0">Rp ${totalTagihan.toLocaleString('id-ID')}</h4></div>
-                    </div>
-                    <div class="payment-selector">
-                        <div class="payment-card" onclick="window.selectPayment('saldo')">
-                            <div class="payment-icon"><i class="bi bi-wallet2"></i></div>
-                            <div><h6 class="mb-0 fw-bold">Potong Saldo RCELL</h6><p class="mb-0 small text-muted">Sisa: <span class="text-success fw-bold">Rp ${saldoUser.toLocaleString('id-ID')}</span></p></div>
-                        </div>
-                        <div class="payment-card" onclick="window.selectPayment('midtrans')">
-                            <div class="payment-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
-                            <div><h6 class="mb-0 fw-bold">E-Wallet / VA / QRIS</h6><p class="mb-0 small text-muted">Instan & Otomatis</p></div>
-                        </div>
-                    </div>
-                `,
-                showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Kembali', background: 'var(--bg-card)', color: 'var(--text-main)',
-                didOpen: () => { window.selectPayment = (method) => { window.tempPaymentMethod = method; Swal.clickConfirm(); }; },
-                preConfirm: () => window.tempPaymentMethod
-            });
-
-            if (!paymentMethod) return;
-
-            // STEP 3: EKSEKUSI PEMBAYARAN
-            if (paymentMethod === 'saldo') {
-                const { value: formValues } = await Swal.fire({
-                    title: 'Konfirmasi PIN',
-                    html: `
-                        <div class="input-group mb-3 mt-2"><input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)"><button class="btn btn-primary" type="button" onclick="cekPromo()">Terapkan</button></div>
-                        <div id="promo-status" class="text-start mb-3 small"></div>
-                        <label class="small text-muted mb-1">Masukkan 6 Digit PIN</label>
-                        <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px;">
-                    `,
-                    showCancelButton: true, confirmButtonText: 'Bayar Sekarang', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
-                    preConfirm: () => ({ promo: document.getElementById('swal-input-promo').value, pin: document.getElementById('swal-input-pin').value })
+            // 1. Cek kalau pembeli belum login
+            if (!userRaw) {
+                return Swal.fire({ 
+                    title: 'Login Dulu', 
+                    text: 'Silakan login member untuk membeli tiket.', 
+                    icon: 'info', 
+                    confirmButtonText: 'Login',
+                    confirmButtonColor: '#0049CC',
+                    background: 'var(--bg-card)', 
+                    color: 'var(--text-main)'
+                }).then(r => { 
+                    if(r.isConfirmed) window.location.href = 'user-login.html'; 
                 });
-
-                if (!formValues) return;
-                if (!formValues.pin || formValues.pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
-
-                Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
-                
-                try {
-                    const res = await fetch('/api/buy-ticket', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: user.id, eventId: currentEvent._id, tierName: selectedTierObj.tierName, price: totalTagihan, quantity: quantity, pin: formValues.pin, promoCode: formValues.promo, buyerData: checkoutData })
-                    });
-                    const data = await res.json();
-
-                    if (res.ok && data.success) {
-                        user.saldo = data.sisaSaldo; localStorage.setItem('userData', JSON.stringify(user));
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html');
-                    } else { Swal.fire('Gagal', data.message, 'error'); }
-                } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
-
-            } else if (paymentMethod === 'midtrans') {
-                Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
-                try {
-                    const res = await fetch('/api/payment-token', { 
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ eventId: currentEvent._id, tierName: selectedTierObj.tierName, price: hargaDitagih, quantity: quantity, customerName: checkoutData.name, customerEmail: checkoutData.email, customerPhone: checkoutData.phone, userId: user.id }) 
-                    });
-                    const data = await res.json(); Swal.close(); 
-                    
-                    if (res.ok && data.token) { 
-                        window.snap.pay(data.token, { 
-                            onSuccess: async function(result){ 
-                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
-                                const saveRes = await fetch('/api/midtrans-success', {
-                                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ eventId: currentEvent._id, userId: user.id, customerName: checkoutData.name, customerEmail: checkoutData.email, tierName: selectedTierObj.tierName, price: totalTagihan, quantity: quantity, orderId: data.orderId, buyerData: checkoutData })
-                                });
-                                const saveData = await saveRes.json();
-                                if(saveData.success) { Swal.fire({icon:'success', title:'Sukses!', background:'var(--bg-card)', color:'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); }
-                            }
-                        }); 
-                    } else { Swal.fire('Error', data.message, 'error'); }
-                } catch (err) { Swal.fire('Error', 'Gagal memuat gateway', 'error'); }
             }
+
+            // 2. Bungkus data tiket & event untuk dibawa ke halaman checkout
+            const checkoutData = {
+                eventId: currentEvent._id,
+                eventName: currentEvent.name,
+                eventDate: currentEvent.date,
+                eventLocation: currentEvent.location,
+                tierName: selectedTierObj.tierName,
+                price: selectedTierObj.price,
+                availableSeats: selectedTierObj.availableSeats
+            };
+
+            // 3. Simpan ke dalam memori HP/Browser (Local Storage)
+            localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+            
+            // 4. Lempar pembeli ke halaman checkout! 🚀
+            window.location.href = `checkout.html?id=${currentEvent._id}`;
         }
     </script>
 </body>
