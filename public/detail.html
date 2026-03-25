@@ -152,6 +152,16 @@
         let selectedTierObj = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            
+            // 👇 TAMBAHKAN KODINGAN PENANGKAP INI 👇
+            const urlParams = new URLSearchParams(window.location.search);
+            // Kalau URL-nya mengandung kata 'checkout=true', diam-diam lempar ke checkout aslinya
+            if (urlParams.get('checkout') === 'true') {
+                window.location.replace(`checkout.html?id=${urlParams.get('id')}`);
+                return; // Hentikan proses detail.html
+            }
+            // 👆 SAMPAI SINI 👆
+
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
