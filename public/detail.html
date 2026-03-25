@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Checkout | RCELLFEST</title>
+    <title>Detail Event | RCELLFEST</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
-    <style>
+<style>
+        /* --- THEME VARIABLES (VERSI PERBAIKAN PREMIUM) --- */
         :root {
             --bg-body: #f8f9fa;
             --bg-nav: #ffffff;
             --bg-card: #ffffff;
             --bg-input: #ffffff;
+            --bg-section: #f1f3f5;
             --text-main: #1a1d21;
             --text-muted: #6c757d;
             --border-color: #e9ecef;
+            --shadow-color: rgba(0,0,0,0.03);
             --primary: #0049CC;
             --primary-light: rgba(0, 73, 204, 0.05);
-            --shadow-color: rgba(0,0,0,0.05);
-            --bg-section: #f1f3f5;
         }
 
         [data-theme="dark"] {
@@ -31,325 +33,407 @@
             --bg-nav: rgba(17, 24, 39, 0.8);
             --bg-card: #111827;
             --bg-input: #1f2937;
+            --bg-section: #080c14;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --border-color: rgba(255,255,255,0.06); 
+            --shadow-color: rgba(0,0,0,0.3);
             --primary: #38bdf8;
             --primary-light: rgba(56, 189, 248, 0.1);
-            --shadow-color: rgba(0,0,0,0.3);
-            --bg-section: #080c14;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 90px; }
-        .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color); }
-        .navbar-brand { font-weight: 800; color: var(--primary) !important; }
-
-        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px var(--shadow-color); margin-bottom: 20px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 76px; transition: background 0.3s, color 0.3s; -webkit-font-smoothing: antialiased; }
         
-        .form-control { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 12px 15px; }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
-        .form-control:read-only { background-color: var(--border-color); opacity: 0.7; color: var(--text-muted); }
+        .navbar { background-color: var(--bg-nav) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); padding: 12px 0; height: 76px; transition: 0.3s; }
+        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
+        .nav-link:hover { color: var(--primary); }
+        [data-theme="dark"] .nav-link { color: #e2e8f0; }
 
-        .payment-card { border: 2px solid var(--border-color); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
-        .payment-card:hover { border-color: var(--primary); background: var(--primary-light); }
-        .payment-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 4px 15px var(--primary-light); }
-        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--bg-body); border-radius: 12px; }
+        /* Detail Layout */
+        .event-hero { height: 350px; background-size: cover; background-position: center; border-radius: 24px; position: relative; margin-top: 20px; display: flex; align-items: flex-end; padding: 30px; color: white; box-shadow: 0 10px 30px var(--shadow-color); border: 1px solid var(--border-color); }
+        .event-hero::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 100%); border-radius: 24px; }
+        .event-hero-content { position: relative; z-index: 2; width: 100%; }
+        
+        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 25px; box-shadow: 0 10px 25px var(--shadow-color); margin-bottom: 20px; transition: background 0.3s, border 0.3s; }
+        .sticky-checkout { position: sticky; top: 100px; }
+        
+        .tier-label { cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); background-color: var(--bg-card); display: block; margin-bottom: 12px; border-radius: 16px !important; overflow: hidden; }
+        .tier-label:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .tier-label input:checked + div { font-weight: bold; }
+        .tier-label.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 15px var(--primary-light); }
+        .tier-sold-out { opacity: 0.4; cursor: not-allowed; background-color: var(--bg-section); border-style: dashed; }
 
-        .captcha-box { border: 1px solid var(--border-color); background: var(--bg-section); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; max-width: 320px; }
+        /* Payment Selector Swal - INI YANG TADI HILANG */
+        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
+        .payment-card:hover, .payment-card.selected { border-color: var(--primary); background: var(--primary-light); }
+        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); border-radius: 10px; }
         
-        .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 600; color: white;}
+/* SweetAlert2 Styling Fix untuk Dark Mode */
+        .swal2-popup { border-radius: 24px !important; border: 1px solid var(--border-color) !important; background: var(--bg-card) !important; color: var(--text-main) !important; }
+        .swal2-title { color: var(--text-main) !important; }
         
-        /* Swal Fix Dark Mode */
-        .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
-        .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
+        /* INI KUNCINYA: Paksa teks di dalam pop-up jadi terang */
+        .swal2-html-container { color: var(--text-main) !important; } 
+        .swal2-html-container .text-muted { color: var(--text-muted) !important; }
+        
+        .swal2-html-container .form-control { color: var(--text-main) !important; background-color: var(--bg-input) !important; border: 1px solid var(--border-color) !important; border-radius: 10px !important; }
+        .swal2-html-container .form-control:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
+        .swal2-html-container .form-label { color: var(--text-muted) !important; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand text-decoration-none" href="javascript:history.back()">
-                <i class="bi bi-arrow-left me-2"></i> Kembali
+            <a class="navbar-brand text-decoration-none" href="index.html">
+                <i class="bi bi-arrow-left me-2"></i> RCELLFEST
             </a>
-            <div class="fw-bold text-muted d-none d-md-block">Secure Checkout <i class="bi bi-lock-fill"></i></div>
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
+                <div id="navUserArea"></div>
+            </div>
         </div>
     </nav>
 
-    <div class="container pb-5">
-        <h2 class="fw-bold mb-4">Selesaikan Pembayaran</h2>
-        
-        <div class="row g-4">
-            <div class="col-lg-7">
-                
-                <div class="glass-panel">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Detail Pemesan</h5>
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="small fw-bold text-muted mb-1">Nama Lengkap (Sesuai KTP)</label>
-                            <input type="text" id="chkName" class="form-control" placeholder="Masukkan nama lengkap">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="small fw-bold text-muted mb-1">Email</label>
-                            <input type="email" id="chkEmail" class="form-control" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="small fw-bold text-muted mb-1">No. WhatsApp</label>
-                            <input type="tel" id="chkPhone" class="form-control" placeholder="0812xxxx">
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="captcha-box user-select-none" for="chkRobot">
-                            <input type="checkbox" id="chkRobot" style="width: 24px; height: 24px; cursor: pointer;">
-                            <span class="fw-bold ms-2" style="font-size: 0.95rem; color: var(--text-main);">Saya bukan robot</span>
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/RecaptchaLogo.svg/1200px-RecaptchaLogo.svg.png" style="height: 25px; margin-left: auto; opacity: 0.8;" alt="captcha">
-                        </label>
-                    </div>
-                </div>
-
-                <div class="glass-panel">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front text-primary me-2"></i>Metode Pembayaran</h5>
-                    
-                    <div class="payment-card" id="paySaldo" onclick="selectPayment('saldo')">
-                        <div class="payment-icon"><i class="bi bi-wallet2"></i></div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Potong Saldo RCELL</h6>
-                            <p class="mb-0 small text-muted">Sisa Saldo: <span class="text-success fw-bold" id="txtSaldo">Rp 0</span></p>
-                        </div>
-                    </div>
-
-                    <div class="payment-card" id="payMidtrans" onclick="selectPayment('midtrans')">
-                        <div class="payment-icon"><i class="bi bi-qr-code-scan"></i></div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">QRIS / E-Wallet / VA</h6>
-                            <p class="mb-0 small text-muted">Otomatis & Instan (GoPay, DANA, BCA, dll)</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="col-lg-5">
-                <div class="glass-panel position-sticky" style="top: 100px;">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Ringkasan Pesanan</h5>
-                    
-                    <h6 class="fw-bold mb-1" id="sumEventName">Memuat...</h6>
-                    <p class="text-muted small mb-3"><i class="bi bi-ticket-perforated"></i> Tipe: <span class="fw-bold text-primary" id="sumTierName">-</span></p>
-
-                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded" style="background: var(--bg-section);">
-                        <span class="fw-bold small">Jumlah Tiket:</span>
-                        <div class="input-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(-1)">-</button>
-                            <input type="number" id="chkQty" class="form-control text-center px-1" value="1" onchange="manualUpdateQty(this.value)">
-                            <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(1)">+</button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="input-group">
-                            <input type="text" id="inputPromo" class="form-control text-uppercase" placeholder="Masukkan Kode Promo" style="font-size: 0.9rem;">
-                            <button class="btn btn-secondary px-3 fw-bold" type="button" onclick="cekPromoLuar()" style="font-size: 0.9rem;">Cek</button>
-                        </div>
-                        <div id="promoStatus" class="small mt-2"></div>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Harga Satuan</span>
-                        <span class="fw-bold small" id="sumPrice">Rp 0</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between mb-2 d-none" id="rowDiskon">
-                        <span class="text-success small"><i class="bi bi-tags-fill me-1"></i> Diskon Promo</span>
-                        <span class="fw-bold text-success small" id="sumDiskon">- Rp 0</span>
-                    </div>
-
-                    <hr>
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="fw-bold">Total Tagihan</span>
-                        <h3 class="fw-bold text-primary mb-0" id="sumTotal">Rp 0</h3>
-                    </div>
-
-                    <button class="btn btn-primary w-100 shadow" id="btnProses" onclick="prosesBayar()">
-                        Bayar Sekarang <i class="bi bi-lock-fill ms-1"></i>
-                    </button>
+    <div class="container pb-5" id="mainContainer" style="display: none;">
+        <div class="event-hero" id="eventHero">
+            <div class="event-hero-content">
+                <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill" id="elCategory">General</span>
+                <h1 class="fw-bold mb-2 text-white" id="elTitle" style="font-size: 2.5rem; line-height: 1.2;">Memuat Event...</h1>
+                <div class="d-flex flex-wrap gap-3 mt-3 text-light opacity-75 fw-500">
+                    <div><i class="bi bi-calendar-event me-1"></i> <span id="elDate">TBA</span></div>
+                    <div><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="elVenue">TBA</span></div>
                 </div>
             </div>
         </div>
+
+        <div class="row mt-4 g-4">
+            <div class="col-lg-7">
+                <div class="glass-panel h-100">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Deskripsi & Info Event</h5>
+                    <p id="elDesc" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-muted);"></p>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="glass-panel sticky-checkout">
+                    <h5 class="fw-bold mb-3">Pilih Tipe Tiket</h5>
+                    
+                    <div id="ticketTierSelection" class="mb-4">
+                        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+                    </div>
+
+                    <div class="p-3 rounded-3 mt-2 d-flex justify-content-between align-items-center" style="background: var(--bg-section); border: 1px solid var(--border-color);">
+                        <div>
+                            <small class="text-muted d-block fw-bold">Total Harga</small>
+                            <h3 class="fw-bold text-primary mb-0" id="totalPriceDisplay">Rp 0</h3>
+                        </div>
+                        <button id="btnBuy" class="btn btn-secondary btn-lg px-4 rounded-pill fw-bold" disabled>Pilih Tiket</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5 pt-5 text-center" id="errorContainer" style="display: none;">
+        <i class="bi bi-emoji-frown display-1 text-muted"></i>
+        <h2 class="mt-3 fw-bold">Event Tidak Ditemukan</h2>
+        <p class="text-muted">Mungkin URL salah atau event sudah dihapus.</p>
+        <a href="index.html" class="btn btn-primary rounded-pill px-4 mt-3">Kembali ke Beranda</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        let userData = {};
-        let checkoutData = {};
-        let selectedPayment = null;
-        let qty = 1;
-        
-        let kodePromoAktif = "";
-        let diskonPromo = 0;
+        let currentEvent = null;
+        let selectedTierObj = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            checkLoginStatus();
 
-            const userRaw = localStorage.getItem('userData');
-            const checkoutRaw = localStorage.getItem('checkoutData');
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('id');
 
-            if (!userRaw || !checkoutRaw) {
-                window.location.href = 'index.html';
+            if (!eventId) {
+                showError();
                 return;
             }
 
-            userData = JSON.parse(userRaw);
-            checkoutData = JSON.parse(checkoutRaw);
-
-            document.getElementById('chkName').value = userData.fullName || userData.username;
-            document.getElementById('chkEmail').value = userData.email;
-            document.getElementById('chkPhone').value = userData.phone || '';
-            document.getElementById('txtSaldo').innerText = `Rp ${userData.saldo.toLocaleString('id-ID')}`;
-
-            document.getElementById('sumEventName').innerText = checkoutData.eventName;
-            document.getElementById('sumTierName').innerText = checkoutData.tierName;
-            document.getElementById('sumPrice').innerText = `Rp ${checkoutData.price.toLocaleString('id-ID')}`;
-            
-            hitungTotal();
+            await loadEventDetail(eventId);
         });
 
-        // FUNGSI KETIK JUMLAH TIKET MANUAL
-        function manualUpdateQty(val) {
-            const max = checkoutData.availableSeats || 1;
-            let newQty = parseInt(val);
-            if (isNaN(newQty) || newQty < 1) newQty = 1;
-            if (newQty > max) newQty = max;
-            
-            qty = newQty;
-            document.getElementById('chkQty').value = qty;
-            hitungTotal();
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
         }
 
-        function updateQty(change) {
-            const max = checkoutData.availableSeats || 1;
-            let newQty = qty + change;
-            if (newQty >= 1 && newQty <= max) {
-                qty = newQty;
-                document.getElementById('chkQty').value = qty;
-                hitungTotal();
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') { icon.className = 'bi bi-sun-fill text-warning'; } 
+            else { icon.className = 'bi bi-moon-stars-fill'; }
+        }
+
+        function checkLoginStatus() {
+            const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+            if (userRaw) {
+                const user = JSON.parse(userRaw);
+                navArea.innerHTML = `<a href="dashboard.html" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm"><i class="bi bi-person-circle me-1"></i> ${user.username}</a>`;
+            } else {
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm">Masuk / Daftar</a>`;
             }
         }
 
-        function hitungTotal() {
-            let total = (checkoutData.price * qty) - diskonPromo;
-            if(total < 0) total = 0;
-            document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        function showError() {
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('errorContainer').style.display = 'block';
         }
 
-        // FUNGSI CEK KODE PROMO
-        async function cekPromoLuar() {
-            const inputEl = document.getElementById('inputPromo');
-            const statusEl = document.getElementById('promoStatus');
-            const rowDiskon = document.getElementById('rowDiskon');
-            const code = inputEl.value.trim();
+        function getEventImage(event) {
+            if (event.image && event.image.startsWith("http")) return event.image;
+            const cat = (event.category || "General").toLowerCase();
+            if (cat === 'konser') return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=1200&auto=format&fit=crop";
+            if (cat === 'olahraga') return "https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop";
+            return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop";
+        }
 
-            if(!code) return;
-            
-            statusEl.innerHTML = '<span class="text-info spinner-border spinner-border-sm me-1"></span> <span class="text-info small">Mengecek...</span>';
-            
+        async function loadEventDetail(id) {
             try {
-                const res = await fetch('/api/check-promo', { 
-                    method: 'POST', headers: {'Content-Type':'application/json'}, 
-                    body: JSON.stringify({ code: code }) 
-                });
-                const data = await res.json();
+                const res = await fetch(`/api/events/${id}`);
+                if (!res.ok) throw new Error("Event tidak ditemukan");
                 
-                if(data.valid) {
-                    kodePromoAktif = code.toUpperCase();
-                    diskonPromo = data.discount;
-                    statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`;
-                    document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`;
-                    rowDiskon.classList.remove('d-none');
-                } else {
-                    kodePromoAktif = "";
-                    diskonPromo = 0;
-                    statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`;
-                    rowDiskon.classList.add('d-none');
+                currentEvent = await res.json();
+                document.getElementById('mainContainer').style.display = 'block';
+                
+                // Render Info Event
+                document.getElementById('elTitle').innerText = currentEvent.name;
+                document.getElementById('elCategory').innerText = currentEvent.category || "General";
+                document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
+                document.getElementById('elDesc').innerText = currentEvent.description || "Deskripsi belum tersedia.";
+                document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
+
+                let dateStr = "Tanggal TBA";
+                if (currentEvent.date) {
+                    const d = new Date(currentEvent.date);
+                    dateStr = d.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
                 }
-                hitungTotal();
-            } catch(e) {
-                statusEl.innerHTML = '<span class="text-danger">Gagal mengecek promo.</span>';
+                document.getElementById('elDate').innerText = dateStr;
+
+                renderTickets();
+            } catch (error) {
+                showError();
             }
         }
 
-        function selectPayment(method) {
-            selectedPayment = method;
-            document.getElementById('paySaldo').classList.remove('selected');
-            document.getElementById('payMidtrans').classList.remove('selected');
-            
-            if (method === 'saldo') document.getElementById('paySaldo').classList.add('selected');
-            if (method === 'midtrans') document.getElementById('payMidtrans').classList.add('selected');
+        function renderTickets() {
+            const container = document.getElementById('ticketTierSelection');
+            const btnBuy = document.getElementById('btnBuy');
+            container.innerHTML = '';
+
+            const isFinished = currentEvent.availableSeats === -1;
+            const isComingSoon = currentEvent.availableSeats === -2;
+            const isEventSoldOut = currentEvent.availableSeats === 0;
+
+            if (isComingSoon) {
+                btnBuy.innerText = 'BELUM DIMULAI'; btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark";
+                container.innerHTML = `<div class="alert alert-info text-center"><i class="bi bi-clock-fill"></i> Tiket belum dijual.</div>`;
+                return;
+            }
+            if (isFinished) {
+                btnBuy.innerText = 'EVENT SELESAI'; btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
+                container.innerHTML = `<div class="alert alert-secondary text-center">Event telah selesai.</div>`;
+                return;
+            }
+            if (isEventSoldOut) {
+                btnBuy.innerText = 'HABIS TERJUAL'; btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
+                container.innerHTML = `<div class="alert alert-danger text-center">Seluruh Tiket Habis Terjual.</div>`;
+                return;
+            }
+
+            let tickets = currentEvent.tickets;
+            if (!tickets || tickets.length === 0) {
+                // Fallback jika tidak ada array tiket
+                tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
+            }
+
+            tickets.forEach((tier, index) => {
+                const isSoldOut = tier.availableSeats <= 0;
+                container.innerHTML += `
+                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'tier-sold-out' : ''}" id="lblTier${index}">
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier(${index})" ${isSoldOut ? 'disabled' : ''}>
+                            <div>
+                                <h6 class="mb-0">${tier.tierName}</h6>
+                                <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
+                            </div>
+                        </div>
+                        <div class="fw-bold text-primary fs-5">Rp ${tier.price.toLocaleString('id-ID')}</div>
+                    </label>
+                `;
+            });
         }
 
-        async function prosesBayar() {
-            const name = document.getElementById('chkName').value;
-            const phone = document.getElementById('chkPhone').value;
-            const isRobotChecked = document.getElementById('chkRobot').checked;
+        function selectTier(index) {
+            // Hapus class selected dari semua label
+            document.querySelectorAll('.tier-label').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`lblTier${index}`).classList.add('selected');
 
-            if (!name || !phone) return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
-            if (!isRobotChecked) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
-            if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
-
-            let totalTagihan = (checkoutData.price * qty) - diskonPromo;
-            if (totalTagihan < 0) totalTagihan = 0;
+            let tickets = currentEvent.tickets;
+            if (!tickets || tickets.length === 0) tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             
-            const buyerPayload = { name: name, phone: phone, email: userData.email, qty: qty };
+            selectedTierObj = tickets[index];
+            document.getElementById('totalPriceDisplay').innerText = `Rp ${selectedTierObj.price.toLocaleString('id-ID')}`;
+            
+            const btnBuy = document.getElementById('btnBuy');
+            btnBuy.disabled = false;
+            btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow w-100";
+            btnBuy.innerText = "Beli Sekarang";
+            btnBuy.onclick = () => startCheckout();
+        }
 
-            if (selectedPayment === 'saldo') {
-                if (userData.saldo < totalTagihan) return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
+        async function cekPromo() {
+            const codeInput = document.getElementById('swal-input-promo');
+            const statusEl = document.getElementById('promo-status');
+            if(!codeInput.value) return;
+            
+            statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
+            try {
+                const res = await fetch('/api/check-promo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code: codeInput.value }) });
+                const data = await res.json();
+                statusEl.className = data.valid ? "text-success fw-bold mb-3 small" : "text-danger fw-bold mb-3 small";
+                statusEl.innerText = data.valid ? `✅ ${data.message}` : `❌ ${data.message}`;
+            } catch(e) { statusEl.innerText = "Error cek promo"; }
+        }
 
-                const { value: pin } = await Swal.fire({
+        // --- PROSES CHECKOUT ---
+        async function startCheckout() {
+            const userRaw = localStorage.getItem('userData');
+            if (!userRaw) {
+                return Swal.fire({ title: 'Login Dulu', text: 'Silakan login member untuk membeli.', icon: 'info', confirmButtonText: 'Login' })
+                .then(r => { if(r.isConfirmed) window.location.href = 'user-login.html'; });
+            }
+            
+            const user = JSON.parse(userRaw);
+            const maxBuy = selectedTierObj.availableSeats || 1;
+
+            // STEP 1: FORM PENGISIAN & KUANTITAS
+            const { value: checkoutData } = await Swal.fire({
+                title: `<i class="bi bi-cart-check-fill text-primary me-2"></i>Detail Pemesan`,
+                html: `
+                    <div class="text-start px-2">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
+                                <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value<1)this.value=1; if(this.value>${maxBuy})this.value=${maxBuy};">
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
+                            <input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Sesuai KTP">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Email</label>
+                            <input type="email" id="chk-email" class="form-control" value="${user.email || ''}" readonly style="background:var(--bg-section);">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">No. WhatsApp</label>
+                            <input type="tel" id="chk-phone" class="form-control" value="${user.phone || ''}" placeholder="0812xxxx">
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true, confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', confirmButtonColor: '#0049CC', width: '32em', background: 'var(--bg-card)', color: 'var(--text-main)',
+                preConfirm: () => {
+                    const name = document.getElementById('chk-name').value;
+                    const phone = document.getElementById('chk-phone').value;
+                    const qty = parseInt(document.getElementById('chk-qty').value) || 1;
+                    if (!name || !phone) { Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); return false; }
+                    return { name, phone, email: user.email, qty };
+                }
+            });
+
+            if (!checkoutData) return;
+
+            // STEP 2: PILIH PEMBAYARAN
+            const quantity = checkoutData.qty;
+            const hargaDitagih = selectedTierObj.price;
+            const totalTagihan = hargaDitagih * quantity;
+            const saldoUser = user.saldo || 0;
+
+            const { value: paymentMethod } = await Swal.fire({
+                title: 'Pilih Pembayaran',
+                html: `
+                    <div class="text-start mb-3 border-bottom pb-2">
+                        <div class="d-flex justify-content-between"><span class="text-muted fw-bold">${selectedTierObj.tierName}</span><span class="fw-bold">${quantity}x</span></div>
+                        <div class="d-flex justify-content-between mt-2"><span class="text-muted">Total Tagihan:</span><h4 class="fw-800 text-primary mb-0">Rp ${totalTagihan.toLocaleString('id-ID')}</h4></div>
+                    </div>
+                    <div class="payment-selector">
+                        <div class="payment-card" onclick="window.selectPayment('saldo')">
+                            <div class="payment-icon"><i class="bi bi-wallet2"></i></div>
+                            <div><h6 class="mb-0 fw-bold">Potong Saldo RCELL</h6><p class="mb-0 small text-muted">Sisa: <span class="text-success fw-bold">Rp ${saldoUser.toLocaleString('id-ID')}</span></p></div>
+                        </div>
+                        <div class="payment-card" onclick="window.selectPayment('midtrans')">
+                            <div class="payment-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                            <div><h6 class="mb-0 fw-bold">E-Wallet / VA / QRIS</h6><p class="mb-0 small text-muted">Instan & Otomatis</p></div>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Kembali', background: 'var(--bg-card)', color: 'var(--text-main)',
+                didOpen: () => { window.selectPayment = (method) => { window.tempPaymentMethod = method; Swal.clickConfirm(); }; },
+                preConfirm: () => window.tempPaymentMethod
+            });
+
+            if (!paymentMethod) return;
+
+            // STEP 3: EKSEKUSI PEMBAYARAN
+            if (paymentMethod === 'saldo') {
+                const { value: formValues } = await Swal.fire({
                     title: 'Konfirmasi PIN',
-                    html: `<input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px; background:var(--bg-input); color:var(--text-main);" placeholder="******">`,
-                    showCancelButton: true, confirmButtonText: 'Bayar', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
-                    preConfirm: () => document.getElementById('swal-input-pin').value
+                    html: `
+                        <div class="input-group mb-3 mt-2"><input id="swal-input-promo" class="form-control text-uppercase" placeholder="Kode Promo (Opsional)"><button class="btn btn-primary" type="button" onclick="cekPromo()">Terapkan</button></div>
+                        <div id="promo-status" class="text-start mb-3 small"></div>
+                        <label class="small text-muted mb-1">Masukkan 6 Digit PIN</label>
+                        <input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px;">
+                    `,
+                    showCancelButton: true, confirmButtonText: 'Bayar Sekarang', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
+                    preConfirm: () => ({ promo: document.getElementById('swal-input-promo').value, pin: document.getElementById('swal-input-pin').value })
                 });
 
-                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                if (!formValues) return;
+                if (!formValues.pin || formValues.pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
 
                 Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        // Kirim harga asli (price * qty), API backend yang akan memotong otomatis jika ada promoCode
-                        body: JSON.stringify({ 
-                            userId: userData.id, eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: (checkoutData.price * qty), quantity: qty, pin: pin, promoCode: kodePromoAktif, buyerData: buyerPayload 
-                        })
+                        body: JSON.stringify({ userId: user.id, eventId: currentEvent._id, tierName: selectedTierObj.tierName, price: totalTagihan, quantity: quantity, pin: formValues.pin, promoCode: formValues.promo, buyerData: checkoutData })
                     });
                     const data = await res.json();
 
                     if (res.ok && data.success) {
-                        userData.saldo = data.sisaSaldo; 
-                        localStorage.setItem('userData', JSON.stringify(userData));
-                        localStorage.removeItem('checkoutData'); 
+                        user.saldo = data.sisaSaldo; localStorage.setItem('userData', JSON.stringify(user));
                         Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html');
                     } else { Swal.fire('Gagal', data.message, 'error'); }
                 } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
 
-            } else if (selectedPayment === 'midtrans') {
+            } else if (paymentMethod === 'midtrans') {
                 Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 try {
-                    // Untuk Midtrans, kita akali ngirim harga per item yang udah dipotong diskon biar total gross_amount-nya bener
-                    let hargaMidtrans = checkoutData.price;
-                    if (diskonPromo > 0) { hargaMidtrans = totalTagihan / qty; }
-
                     const res = await fetch('/api/payment-token', { 
                         method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ 
-                            eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: hargaMidtrans, quantity: qty, 
-                            customerName: name, customerEmail: userData.email, customerPhone: phone, userId: userData.id 
-                        }) 
+                        body: JSON.stringify({ eventId: currentEvent._id, tierName: selectedTierObj.tierName, price: hargaDitagih, quantity: quantity, customerName: checkoutData.name, customerEmail: checkoutData.email, customerPhone: checkoutData.phone, userId: user.id }) 
                     });
                     const data = await res.json(); Swal.close(); 
                     
@@ -359,17 +443,10 @@
                                 Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                                 const saveRes = await fetch('/api/midtrans-success', {
                                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ 
-                                        eventId: checkoutData.eventId, userId: userData.id, 
-                                        customerName: name, customerEmail: userData.email, tierName: checkoutData.tierName, 
-                                        price: totalTagihan, quantity: qty, orderId: data.orderId, buyerData: buyerPayload 
-                                    })
+                                    body: JSON.stringify({ eventId: currentEvent._id, userId: user.id, customerName: checkoutData.name, customerEmail: checkoutData.email, tierName: selectedTierObj.tierName, price: totalTagihan, quantity: quantity, orderId: data.orderId, buyerData: checkoutData })
                                 });
                                 const saveData = await saveRes.json();
-                                if(saveData.success) { 
-                                    localStorage.removeItem('checkoutData');
-                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); 
-                                }
+                                if(saveData.success) { Swal.fire({icon:'success', title:'Sukses!', background:'var(--bg-card)', color:'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); }
                             }
                         }); 
                     } else { Swal.fire('Error', data.message, 'error'); }
