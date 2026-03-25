@@ -10,9 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
-
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
-
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
         :root {
@@ -64,7 +62,7 @@
         .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
 
-        /* 🔥 JURUS PAMUNGKAS DARK MODE (PAKAI !IMPORTANT) 🔥 */
+        /* Jurus Dark Mode Pamungkas */
         [data-theme="dark"] .text-muted { color: #9ca3af !important; }
         [data-theme="dark"] .text-dark { color: #f3f4f6 !important; }
         [data-theme="dark"] .fw-bold { color: #f3f4f6 !important; }
@@ -74,7 +72,6 @@
         [data-theme="dark"] .btn-outline-secondary { color: #f3f4f6 !important; border-color: #4b5563 !important; }
         [data-theme="dark"] .btn-outline-secondary:hover { background-color: #4b5563 !important; color: #fff !important; }
         [data-theme="dark"] .btn-secondary { background-color: #4b5563 !important; border-color: #4b5563 !important; color: #fff !important; }
-        [data-theme="dark"] .captcha-box { background-color: #1f2937 !important; border-color: #374151 !important; }
         [data-theme="dark"] .text-primary { color: #38bdf8 !important; }
         [data-theme="dark"] span { color: inherit; }
     </style>
@@ -114,13 +111,9 @@
                     </div>
 
                     <div class="mt-4">
-                        <label class="captcha-box user-select-none" for="chkRobot">
-                            <input type="checkbox" id="chkRobot" style="width: 24px; height: 24px; cursor: pointer;">
-                            <span class="fw-bold ms-2" style="font-size: 0.95rem; color: var(--text-main);">Saya bukan robot</span>
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/RecaptchaLogo.svg/1200px-RecaptchaLogo.svg.png" style="height: 25px; margin-left: auto; opacity: 0.8;" alt="captcha">
-                        </label>
+                        <div class="g-recaptcha" data-sitekey="SITE_KEY_KAKAK_DISINI"></div>
                     </div>
-                </div>
+                    </div>
 
                 <div class="glass-panel">
                     <h5 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front text-primary me-2"></i>Metode Pembayaran</h5>
@@ -137,7 +130,7 @@
                         <div class="payment-icon"><i class="bi bi-qr-code-scan"></i></div>
                         <div>
                             <h6 class="mb-0 fw-bold">QRIS / E-Wallet / VA</h6>
-                            <p class="mb-0 small text-muted">Otomatis & Instan (GoPay, DANA, BCA, dll)</p>
+                            <p class="mb-0 small text-muted">Otomatis & Instan</p>
                         </div>
                     </div>
                 </div>
@@ -196,12 +189,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        let userData = {};
-        let checkoutData = {};
-        let selectedPayment = null;
-        let qty = 1;
-        
-        let kodePromoAktif = "";
+        // Variabel Global
+        let userData = {}; 
+        let checkoutData = {}; 
+        let selectedPayment = null; 
+        let qty = 1; 
+        let kodePromoAktif = ""; 
         let diskonPromo = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -210,194 +203,264 @@
 
             const userRaw = localStorage.getItem('userData');
             const checkoutRaw = localStorage.getItem('checkoutData');
-
+            
+            // Tendang ke halaman utama jika data tidak ada
             if (!userRaw || !checkoutRaw) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            userData = JSON.parse(userRaw);
+            userData = JSON.parse(userRaw); 
             checkoutData = JSON.parse(checkoutRaw);
-
+            
             document.getElementById('chkName').value = userData.fullName || userData.username;
             document.getElementById('chkEmail').value = userData.email;
             document.getElementById('chkPhone').value = userData.phone || '';
             document.getElementById('txtSaldo').innerText = `Rp ${userData.saldo.toLocaleString('id-ID')}`;
-
+            
             document.getElementById('sumEventName').innerText = checkoutData.eventName;
             document.getElementById('sumTierName').innerText = checkoutData.tierName;
             document.getElementById('sumPrice').innerText = `Rp ${checkoutData.price.toLocaleString('id-ID')}`;
             
-            hitungTotal(); // (Ini kodingan yang udah ada)
-
-            // 👇 TAMBAHKAN 1 BARIS INI 👇
-            // Trik Ilusi: Mengubah tulisan URL di atas browser tanpa pindah halaman
-            window.history.replaceState(null, '', `detail.html?checkout=true&id=${checkoutData.eventId}`);   
+            hitungTotal();
+            
+            // Ilusi URL
+            window.history.replaceState(null, '', `detail.html?checkout=true&id=${checkoutData.eventId}`);
         });
 
-        function manualUpdateQty(val) {
-            const max = checkoutData.availableSeats || 1;
-            let newQty = parseInt(val);
-            if (isNaN(newQty) || newQty < 1) newQty = 1;
-            if (newQty > max) newQty = max;
-            
-            qty = newQty;
-            document.getElementById('chkQty').value = qty;
-            hitungTotal();
+        function manualUpdateQty(val) { 
+            const max = checkoutData.availableSeats || 1; 
+            let newQty = parseInt(val); 
+            if (isNaN(newQty) || newQty < 1) newQty = 1; 
+            if (newQty > max) newQty = max; 
+            qty = newQty; 
+            document.getElementById('chkQty').value = qty; 
+            hitungTotal(); 
         }
 
-        function updateQty(change) {
-            const max = checkoutData.availableSeats || 1;
-            let newQty = qty + change;
-            if (newQty >= 1 && newQty <= max) {
-                qty = newQty;
-                document.getElementById('chkQty').value = qty;
-                hitungTotal();
-            }
+        function updateQty(change) { 
+            const max = checkoutData.availableSeats || 1; 
+            let newQty = qty + change; 
+            if (newQty >= 1 && newQty <= max) { 
+                qty = newQty; 
+                document.getElementById('chkQty').value = qty; 
+                hitungTotal(); 
+            } 
         }
 
-        function hitungTotal() {
-            let total = (checkoutData.price * qty) - diskonPromo;
-            if(total < 0) total = 0;
-            document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        function hitungTotal() { 
+            let total = (checkoutData.price * qty) - diskonPromo; 
+            if(total < 0) total = 0; 
+            document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`; 
         }
 
         async function cekPromoLuar() {
-            const inputEl = document.getElementById('inputPromo');
-            const statusEl = document.getElementById('promoStatus');
-            const rowDiskon = document.getElementById('rowDiskon');
+            const inputEl = document.getElementById('inputPromo'); 
+            const statusEl = document.getElementById('promoStatus'); 
+            const rowDiskon = document.getElementById('rowDiskon'); 
             const code = inputEl.value.trim();
-
-            if(!code) return;
             
+            if(!code) return;
             statusEl.innerHTML = '<span class="text-info spinner-border spinner-border-sm me-1"></span> <span class="text-info small">Mengecek...</span>';
             
             try {
                 const res = await fetch('/api/check-promo', { 
-                    method: 'POST', headers: {'Content-Type':'application/json'}, 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
                     body: JSON.stringify({ code: code }) 
                 });
                 const data = await res.json();
                 
-                if(data.valid) {
-                    kodePromoAktif = code.toUpperCase();
-                    diskonPromo = data.discount;
-                    statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`;
-                    document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`;
-                    rowDiskon.classList.remove('d-none');
-                } else {
-                    kodePromoAktif = "";
-                    diskonPromo = 0;
-                    statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`;
-                    rowDiskon.classList.add('d-none');
+                if(data.valid) { 
+                    kodePromoAktif = code.toUpperCase(); 
+                    diskonPromo = data.discount; 
+                    statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`; 
+                    document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`; 
+                    rowDiskon.classList.remove('d-none'); 
+                } else { 
+                    kodePromoAktif = ""; 
+                    diskonPromo = 0; 
+                    statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`; 
+                    rowDiskon.classList.add('d-none'); 
                 }
                 hitungTotal();
-            } catch(e) {
-                statusEl.innerHTML = '<span class="text-danger">Gagal mengecek promo.</span>';
+            } catch(e) { 
+                statusEl.innerHTML = '<span class="text-danger">Gagal mengecek promo.</span>'; 
             }
         }
 
-        function selectPayment(method) {
-            selectedPayment = method;
-            document.getElementById('paySaldo').classList.remove('selected');
-            document.getElementById('payMidtrans').classList.remove('selected');
+        function selectPayment(method) { 
+            selectedPayment = method; 
+            document.getElementById('paySaldo').classList.remove('selected'); 
+            document.getElementById('payMidtrans').classList.remove('selected'); 
             
-            if (method === 'saldo') document.getElementById('paySaldo').classList.add('selected');
-            if (method === 'midtrans') document.getElementById('payMidtrans').classList.add('selected');
+            if (method === 'saldo') {
+                document.getElementById('paySaldo').classList.add('selected'); 
+            }
+            if (method === 'midtrans') {
+                document.getElementById('payMidtrans').classList.add('selected'); 
+            }
         }
 
         async function prosesBayar() {
             const name = document.getElementById('chkName').value;
             const phone = document.getElementById('chkPhone').value;
-            const isRobotChecked = document.getElementById('chkRobot').checked;
+            
+            // 👇 VALIDASI TOKEN RECAPTCHA 👇
+            const recaptchaToken = grecaptcha.getResponse();
 
-            if (!name || !phone) return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
-            if (!isRobotChecked) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
-            if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
+            if (!name || !phone) {
+                return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
+            }
+            if (!recaptchaToken) {
+                return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" dari Google terlebih dahulu! 🤖', 'error');
+            }
+            if (!selectedPayment) {
+                return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
+            }
 
             let totalTagihan = (checkoutData.price * qty) - diskonPromo;
             if (totalTagihan < 0) totalTagihan = 0;
             
             const buyerPayload = { name: name, phone: phone, email: userData.email, qty: qty };
 
+            // ==========================================
+            // JIKA BAYAR PAKAI SALDO
+            // ==========================================
             if (selectedPayment === 'saldo') {
-                if (userData.saldo < totalTagihan) return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
+                if (userData.saldo < totalTagihan) {
+                    return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
+                }
 
                 const { value: pin } = await Swal.fire({
-                    title: 'Konfirmasi PIN',
-                    html: `<input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px; background:var(--bg-input); color:var(--text-main);" placeholder="******">`,
-                    showCancelButton: true, confirmButtonText: 'Bayar', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
+                    title: 'Konfirmasi PIN', 
+                    html: `<input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px; background:var(--bg-input); color:var(--text-main);" placeholder="******">`, 
+                    showCancelButton: true, 
+                    confirmButtonText: 'Bayar', 
+                    confirmButtonColor: '#0049CC', 
+                    background: 'var(--bg-card)', 
+                    color: 'var(--text-main)',
                     preConfirm: () => document.getElementById('swal-input-pin').value
                 });
 
-                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                if (!pin || pin.length !== 6) {
+                    return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                }
 
                 Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
                 try {
                     const res = await fetch('/api/buy-ticket', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
-                            userId: userData.id, eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: (checkoutData.price * qty), quantity: qty, pin: pin, promoCode: kodePromoAktif, buyerData: buyerPayload 
+                            userId: userData.id, 
+                            eventId: checkoutData.eventId, 
+                            tierName: checkoutData.tierName, 
+                            price: (checkoutData.price * qty), 
+                            quantity: qty, 
+                            pin: pin, 
+                            promoCode: kodePromoAktif, 
+                            buyerData: buyerPayload,
+                            recaptchaToken: recaptchaToken // Kirim token ke backend!
                         })
                     });
+                    
                     const data = await res.json();
-
-                    if (res.ok && data.success) {
+                    
+                    if (res.ok && data.success) { 
                         userData.saldo = data.sisaSaldo; 
-                        localStorage.setItem('userData', JSON.stringify(userData));
+                        localStorage.setItem('userData', JSON.stringify(userData)); 
                         localStorage.removeItem('checkoutData'); 
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html');
-                    } else { Swal.fire('Gagal', data.message, 'error'); }
-                } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html'); 
+                    } else { 
+                        Swal.fire('Gagal', data.message, 'error'); 
+                        grecaptcha.reset(); // Reset captcha kalo error
+                    } 
+                } catch (err) { 
+                    Swal.fire('Error', 'Koneksi terputus', 'error'); 
+                    grecaptcha.reset(); 
+                }
 
+            // ==========================================
+            // JIKA BAYAR PAKAI MIDTRANS
+            // ==========================================
             } else if (selectedPayment === 'midtrans') {
                 Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
+                
                 try {
-                    let hargaMidtrans = checkoutData.price;
-                    if (diskonPromo > 0) { hargaMidtrans = totalTagihan / qty; }
-
+                    let hargaMidtrans = checkoutData.price; 
+                    if (diskonPromo > 0) { 
+                        hargaMidtrans = totalTagihan / qty; 
+                    }
+                    
                     const res = await fetch('/api/payment-token', { 
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
-                            eventId: checkoutData.eventId, tierName: checkoutData.tierName, 
-                            price: hargaMidtrans, quantity: qty, 
-                            customerName: name, customerEmail: userData.email, customerPhone: phone, userId: userData.id 
+                            eventId: checkoutData.eventId, 
+                            tierName: checkoutData.tierName, 
+                            price: hargaMidtrans, 
+                            quantity: qty, 
+                            customerName: name, 
+                            customerEmail: userData.email, 
+                            customerPhone: phone, 
+                            userId: userData.id,
+                            recaptchaToken: recaptchaToken // Kirim token ke backend!
                         }) 
                     });
-                    const data = await res.json(); Swal.close(); 
+                    
+                    const data = await res.json(); 
+                    Swal.close(); 
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
                             onSuccess: async function(result){ 
                                 Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
-                                const saveRes = await fetch('/api/midtrans-success', {
-                                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                
+                                const saveRes = await fetch('/api/midtrans-success', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
                                     body: JSON.stringify({ 
-                                        eventId: checkoutData.eventId, userId: userData.id, 
-                                        customerName: name, customerEmail: userData.email, tierName: checkoutData.tierName, 
-                                        price: totalTagihan, quantity: qty, orderId: data.orderId, buyerData: buyerPayload 
-                                    })
+                                        eventId: checkoutData.eventId, 
+                                        userId: userData.id, 
+                                        customerName: name, 
+                                        customerEmail: userData.email, 
+                                        tierName: checkoutData.tierName, 
+                                        price: totalTagihan, 
+                                        quantity: qty, 
+                                        orderId: data.orderId, 
+                                        buyerData: buyerPayload 
+                                    }) 
                                 });
+                                
                                 const saveData = await saveRes.json();
                                 if(saveData.success) { 
-                                    localStorage.removeItem('checkoutData');
+                                    localStorage.removeItem('checkoutData'); 
                                     Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); 
                                 }
                             },
-                            onPending: function(result){
-                                Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                            onPending: function(result){ 
+                                Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                grecaptcha.reset(); 
                             },
-                            onError: function(result){
-                                Swal.fire({icon: 'error', title: 'Pembayaran Gagal', text: 'Terjadi kesalahan dari pihak bank/pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                            onError: function(result){ 
+                                Swal.fire({icon: 'error', title: 'Pembayaran Gagal', text: 'Terjadi kesalahan dari pihak bank.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                grecaptcha.reset(); 
                             },
-                            onClose: function(){
-                                Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup halaman pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                            onClose: function(){ 
+                                Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup halaman pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                grecaptcha.reset(); 
                             }
                         }); 
-                    } else { Swal.fire('Error', data.message, 'error'); }
-                } catch (err) { Swal.fire('Error', 'Gagal memuat gateway', 'error'); }
+                    } else { 
+                        Swal.fire('Error', data.message, 'error'); 
+                        grecaptcha.reset(); 
+                    }
+                } catch (err) { 
+                    Swal.fire('Error', 'Gagal memuat gateway', 'error'); 
+                    grecaptcha.reset(); 
+                }
             }
         }
     </script>
