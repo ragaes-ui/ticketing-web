@@ -64,20 +64,17 @@
         .tier-label.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 15px var(--primary-light); }
         .tier-sold-out { opacity: 0.4; cursor: not-allowed; background-color: var(--bg-section); border-style: dashed; }
 
-        /* Payment Selector Swal - INI YANG TADI HILANG */
+        /* Payment Selector Swal */
         .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
         .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
         .payment-card:hover, .payment-card.selected { border-color: var(--primary); background: var(--primary-light); }
         .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); border-radius: 10px; }
         
-/* SweetAlert2 Styling Fix untuk Dark Mode */
+        /* SweetAlert2 Styling Fix untuk Dark Mode */
         .swal2-popup { border-radius: 24px !important; border: 1px solid var(--border-color) !important; background: var(--bg-card) !important; color: var(--text-main) !important; }
         .swal2-title { color: var(--text-main) !important; }
-        
-        /* INI KUNCINYA: Paksa teks di dalam pop-up jadi terang */
         .swal2-html-container { color: var(--text-main) !important; } 
         .swal2-html-container .text-muted { color: var(--text-muted) !important; }
-        
         .swal2-html-container .form-control { color: var(--text-main) !important; background-color: var(--bg-input) !important; border: 1px solid var(--border-color) !important; border-radius: 10px !important; }
         .swal2-html-container .form-control:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
         .swal2-html-container .form-label { color: var(--text-muted) !important; }
@@ -151,7 +148,7 @@
         let currentEvent = null;
         let selectedTierObj = null;
 
-              document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // 1. Ambil data URL satu kali saja (biar nggak tabrakan)
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -167,23 +164,6 @@
             updateThemeIcon(savedTheme);
             checkLoginStatus();
 
-            const eventId = urlParams.get('id');
-
-            if (!eventId) {
-                showError();
-                return;
-            }
-
-            await loadEventDetail(eventId);
-        });
-
-
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-            checkLoginStatus();
-
-            const urlParams = new URLSearchParams(window.location.search);
             const eventId = urlParams.get('id');
 
             if (!eventId) {
@@ -326,21 +306,7 @@
             btnBuy.onclick = () => startCheckout();
         }
 
-        async function cekPromo() {
-            const codeInput = document.getElementById('swal-input-promo');
-            const statusEl = document.getElementById('promo-status');
-            if(!codeInput.value) return;
-            
-            statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
-            try {
-                const res = await fetch('/api/check-promo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code: codeInput.value }) });
-                const data = await res.json();
-                statusEl.className = data.valid ? "text-success fw-bold mb-3 small" : "text-danger fw-bold mb-3 small";
-                statusEl.innerText = data.valid ? `✅ ${data.message}` : `❌ ${data.message}`;
-            } catch(e) { statusEl.innerText = "Error cek promo"; }
-        }
-
-// --- PROSES PINDAH KE HALAMAN CHECKOUT ---
+        // --- PROSES PINDAH KE HALAMAN CHECKOUT ---
         function startCheckout() {
             const userRaw = localStorage.getItem('userData');
             
