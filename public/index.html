@@ -606,35 +606,42 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
+        // 👇 FUNGSI PENERIMA DATA DARI BLOGGER (ANTI-BLOKIR CORS) 👇
+        window.handleBloggerNews = function(data) {
+            if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
+                const post = data.feed.entry[0];
+                const title = post.title.$t;
+                
+                let link = "#";
+                for (let i = 0; i < post.link.length; i++) {
+                    if (post.link[i].rel === "alternate") {
+                        link = post.link[i].href;
+                        break;
+                    }
+                }
+
+                document.getElementById('bloggerNewsLink').innerText = title;
+                document.getElementById('bloggerNewsLink').href = link;
+
+                setTimeout(() => {
+                    document.getElementById('bloggerNewsToast').classList.add('show');
+                }, 2500); 
+            } else {
+                console.log("Blog Rcellnews belum punya artikel yang dipublish kak!");
+            }
+        };
+
         // 👇 FUNGSI PENGAMBIL DATA BERITA DARI BLOGGER 👇
         function loadBloggerNews() {
             const urlBlogger = "https://rcellnews.blogspot.com"; 
-            const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json&max-results=1`;
+            
+            // PENTING: Kita pakai alt=json-in-script & callback biar ga di-blokir browser
+            const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json-in-script&max-results=1&callback=handleBloggerNews`;
 
-            fetch(feedUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.feed.entry && data.feed.entry.length > 0) {
-                        const post = data.feed.entry[0];
-                        const title = post.title.$t;
-                        
-                        let link = "#";
-                        for (let i = 0; i < post.link.length; i++) {
-                            if (post.link[i].rel === "alternate") {
-                                link = post.link[i].href;
-                                break;
-                            }
-                        }
-
-                        document.getElementById('bloggerNewsLink').innerText = title;
-                        document.getElementById('bloggerNewsLink').href = link;
-
-                        setTimeout(() => {
-                            document.getElementById('bloggerNewsToast').classList.add('show');
-                        }, 2500); 
-                    }
-                })
-                .catch(error => console.log("Gagal memuat berita:", error));
+            // Suntik script ke web secara otomatis
+            const scriptEl = document.createElement('script');
+            scriptEl.src = feedUrl;
+            document.body.appendChild(scriptEl);
         }
 
         function toggleLanguage() {
@@ -835,7 +842,6 @@
             });
         }
 
-        // 👇 FUNGSI POPUP / CHECKOUT / PROMO DIKEMBALIKAN UTUH 👇
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
