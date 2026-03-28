@@ -301,7 +301,7 @@
             cursor: not-allowed;
         }
 
-        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA (ANIMASI MENYAMPING) --- */
+        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA (ANIMASI MENYAMPING + GARIS WAKTU) --- */
         .news-toast {
             position: fixed;
             bottom: 30px;
@@ -316,19 +316,40 @@
             display: flex;
             align-items: flex-start;
             gap: 15px;
+            overflow: hidden; /* Biar garisnya nggak nembus keluar lengkungan kotak */
 
-            /* Animasi Sembunyi: Geser jauh ke kiri layar (-150%) dan memudar */
+            /* Animasi Sembunyi: Geser jauh ke kiri layar (-150%) */
             opacity: 0;
             visibility: hidden;
             transform: translateX(-150%);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efek membal mulus */
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
         }
         
         .news-toast.show {
-            /* Animasi Muncul: Geser masuk ke posisi normal (0) */
             opacity: 1;
             visibility: visible;
             transform: translateX(0);
+        }
+
+        /* 👇 CSS GARIS LOADING 10 DETIK 👇 */
+        .news-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary, #3b82f6);
+            width: 100%;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .news-toast.show .news-progress-bar {
+            /* Durasi 10 detik sejajar dengan Javascript */
+            animation: shrinkBar 10s linear forwards; 
+        }
+
+        @keyframes shrinkBar {
+            0% { width: 100%; }
+            100% { width: 0%; }
         }
 
         .news-icon {
@@ -350,6 +371,8 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 700;
+            position: relative;
+            z-index: 2;
         }
 
         .news-content a {
@@ -363,6 +386,8 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             transition: 0.2s;
+            position: relative;
+            z-index: 2;
         }
 
         .news-content a:hover {
@@ -378,11 +403,13 @@
             padding: 0;
             margin-left: auto;
             transition: 0.2s;
+            position: relative;
+            z-index: 2;
         }
 
         .close-news:hover { 
             color: var(--text-main); 
-            transform: scale(1.2); /* Tombol (X) sedikit membesar saat disentuh */
+            transform: scale(1.2); 
         }
 
     </style>
@@ -546,7 +573,7 @@
         </div>
     </div>
 
-        <div class="news-toast" id="bloggerNewsToast">
+    <div class="news-toast" id="bloggerNewsToast">
         <i class="bi bi-megaphone-fill news-icon"></i>
         <div class="news-content">
             <h6>BERITA TERBARU</h6>
@@ -555,7 +582,8 @@
         <button class="close-news" onclick="document.getElementById('bloggerNewsToast').classList.remove('show')">
             <i class="bi bi-x"></i>
         </button>
-        </div>
+        <div class="news-progress-bar"></div>
+    </div>
 
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
