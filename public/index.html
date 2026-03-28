@@ -532,9 +532,9 @@
             <h6>BERITA TERBARU</h6>
             <a href="#" id="bloggerNewsLink" target="_blank">Memuat berita...</a>
         </div>
-<button id="btnCloseNews" class="close-news" onclick="tutupDanIngatBerita(this)">
-    <i class="bi bi-x"></i>
-</button>
+        <button class="close-news" onclick="document.getElementById('bloggerNewsToast').classList.remove('show')">
+            <i class="bi bi-x"></i>
+        </button>
         </div>
 
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
@@ -606,12 +606,11 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // 👇 FUNGSI PENERIMA DATA (SISTEM UMUR ARTIKEL 1 HARI) 👇
+        // 👇 FUNGSI PENERIMA DATA (MURNI CEK UMUR ARTIKEL 24 JAM) 👇
         window.handleBloggerNews = function(data) {
             if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
                 const post = data.feed.entry[0];
                 const title = post.title.$t;
-                const postId = post.id.$t;
                 
                 // Ambil waktu kapan artikel ini dipublish di Blogger
                 const waktuPublishBlogger = post.published.$t; 
@@ -622,18 +621,12 @@
                 const umurArtikel = waktuSekarang - waktuPublish;
                 const batasSatuHari = 24 * 60 * 60 * 1000; // 24 Jam dalam milidetik
 
-                // Kalau umur artikelnya UDAH LEBIH dari 1 hari, JANGAN TAMPILKAN!
+                // Kalau umur artikelnya UDAH LEBIH dari 1 hari (udah basi), JANGAN TAMPILKAN!
                 if (umurArtikel > batasSatuHari) {
                     return; 
                 }
-
-                // 2. CEK INGATAN BROWSER (Biar nggak spam kalau user udah nge-klik X hari ini)
-                const beritaDitutup = localStorage.getItem('beritaDitutup');
-                if (beritaDitutup === postId) {
-                    return; // Udah ditutup user, diam aja
-                }
                 
-                // 3. AMBIL LINK DAN TAMPILKAN
+                // 2. KALAU MASIH BARU (< 24 JAM), AMBIL LINK DAN TAMPILKAN
                 let link = "#";
                 for (let i = 0; i < post.link.length; i++) {
                     if (post.link[i].rel === "alternate") {
@@ -644,33 +637,20 @@
 
                 document.getElementById('bloggerNewsLink').innerText = title;
                 document.getElementById('bloggerNewsLink').href = link;
-                
-                // Titipin ID artikel ke tombol Close
-                document.getElementById('btnCloseNews').setAttribute('data-postid', postId);
 
-                // Munculkan setelah 2.5 detik
+                // Munculkan popup setelah 2.5 detik
                 setTimeout(() => {
-                    document.getElementById('bloggerNewsToast').classList.add('show');
+                    const toast = document.getElementById('bloggerNewsToast');
+                    if (toast) toast.classList.add('show');
                 }, 2500); 
             }
         };
-
-        // 👇 FUNGSI BUAT NUTUP BERITA HARI INI 👇
-        function tutupDanIngatBerita(tombol) {
-            document.getElementById('bloggerNewsToast').classList.remove('show');
-            
-            // Simpan ID artikel biar besok-besok kalau ada artikel BARU, popupnya tetep bisa muncul
-            const postId = tombol.getAttribute('data-postid');
-            if (postId) {
-                localStorage.setItem('beritaDitutup', postId);
-            }
-        }
 
         // 👇 FUNGSI PENGAMBIL DATA BERITA DARI BLOGGER 👇
         function loadBloggerNews() {
             const urlBlogger = "https://rcellnews.blogspot.com"; 
             
-            // PENTING: Kita pakai alt=json-in-script & callback biar ga di-blokir browser
+            // PENTING: Pakai alt=json-in-script & callback biar ga di-blokir browser
             const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json-in-script&max-results=1&callback=handleBloggerNews`;
 
             // Suntik script ke web secara otomatis
@@ -678,6 +658,7 @@
             scriptEl.src = feedUrl;
             document.body.appendChild(scriptEl);
         }
+
 
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
