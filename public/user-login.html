@@ -376,7 +376,7 @@
                 ? { 
                     identifier: getVal('identifier'), 
                     password: getVal('password'),
-                    recaptchaToken: recaptchaToken // <--- TAMBAHAN TOKEN
+                    recaptchaToken: recaptchaToken 
                   }
                 : { 
                     username: getVal('identifier'), 
@@ -385,7 +385,7 @@
                     fullName: getVal('fullName'), 
                     phone: getVal('phone'), 
                     role: 'user',
-                    recaptchaToken: recaptchaToken // <--- TAMBAHAN TOKEN
+                    recaptchaToken: recaptchaToken 
                   };
 
             try {
@@ -398,11 +398,30 @@
 
                 if (data.success) {
                     if (isLogin) {
+                        // 👇 SATPAM PENJAGA PINTU DEPAN (Mencegah Admin Nyusup) 👇
+                        if (data.user.role === 'admin') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Upss ada yang salah nihh!',
+                                text: 'Ini halaman masuk untuk User biasa. Silakan gunakan link Portal Khusus Admin.',
+                                background: '#18181b',
+                                color: '#fff',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                            grecaptcha.reset();
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                            btn.style.opacity = "1";
+                            return; // ⛔ Hentikan, jangan biarkan Admin masuk dari sini!
+                        }
+                        // 👆 BATAS TAMBAHAN SATPAM 👆
+
+                        // Lolos pengecekan, ini murni USER BIASA
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
                         Toast.fire({ icon: 'success', title: 'Login Berhasil' });
                         setTimeout(() => {
-                             window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
+                             window.location.href = 'index.html'; // Paten ke index.html
                         }, 1000);
                     } else {
                         Toast.fire({ icon: 'success', title: 'Registrasi Berhasil! Silakan Login.' });
