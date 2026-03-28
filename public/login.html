@@ -144,10 +144,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Cek kalau udah login, langsung lempar
-        if(localStorage.getItem('userToken') && localStorage.getItem('userData')) {
-            const user = JSON.parse(localStorage.getItem('userData'));
-            if(user.role === 'admin') window.location.href = 'admin.html';
+        // Cek kalau udah login (Pakai adminToken lagi), langsung lempar
+        if(localStorage.getItem('adminToken')) {
+            window.location.href = 'admin.html';
         }
 
         const loginForm = document.getElementById('loginForm');
@@ -193,9 +192,8 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // Simpan data login layaknya user biasa tapi beda role
-                    localStorage.setItem('userToken', data.token);
-                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    // KEMBALIKAN KE adminToken SEPERTI ASLINYA
+                    localStorage.setItem('adminToken', data.token);
                     
                     // Alert Sukses
                     Swal.fire({
