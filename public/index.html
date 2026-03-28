@@ -301,7 +301,7 @@
             cursor: not-allowed;
         }
 
-        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA --- */
+        /* 👇 TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA (VERSI ANIMASI PREMIUM) 👇 */
         .news-toast {
             position: fixed;
             bottom: 30px;
@@ -313,58 +313,26 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 9998;
             max-width: 320px;
-            transform: translateX(-150%); 
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             display: flex;
             align-items: flex-start;
             gap: 15px;
+
+            /* 👇 KUNCI ANIMASI PREMIUM: Gabungan memudar dan merosot 👇 */
+            /* 1. Kondisi awal (Hidden/Sembunyi) */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.9); /* Sembunyi 20px di bawah dan sedikit mengecil */
+            
+            /* 2. Definisi Animasi Mulusnya: Durasi 0.4 detik, model 'ease' yang lembut */
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
         }
+
+        /* 👇 KONDISI KETIKA MUNCUL (Ditambahi Class .show) 👇 */
         .news-toast.show {
-            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1); /* Kembali ke posisi normal dan ukuran asli */
         }
-        .news-icon {
-            font-size: 1.5rem;
-            color: var(--primary, #3b82f6);
-            animation: pulseIcon 2s infinite;
-        }
-        @keyframes pulseIcon {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .news-content h6 {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin: 0 0 5px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-        .news-content a {
-            color: var(--text-main);
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            transition: 0.2s;
-        }
-        .news-content a:hover {
-            color: var(--primary, #3b82f6);
-        }
-        .close-news {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0;
-            margin-left: auto;
-        }
-        .close-news:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -606,7 +574,7 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // 👇 FUNGSI PENERIMA DATA (MURNI CEK UMUR ARTIKEL 24 JAM) 👇
+        // 👇 FUNGSI PENERIMA DATA (CEK UMUR 24 JAM + AUTO CLOSE 10 DETIK) 👇
         window.handleBloggerNews = function(data) {
             if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
                 const post = data.feed.entry[0];
@@ -641,7 +609,15 @@
                 // Munculkan popup setelah 2.5 detik
                 setTimeout(() => {
                     const toast = document.getElementById('bloggerNewsToast');
-                    if (toast) toast.classList.add('show');
+                    if (toast) {
+                        // 1. Tampilkan Popup-nya
+                        toast.classList.add('show');
+                        
+                        // 2. 👇 TAMBAHAN AUTO-CLOSE: Hitung mundur 10 detik (10000 ms) lalu tutup 👇
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                        }, 10000);
+                    }
                 }, 2500); 
             }
         };
