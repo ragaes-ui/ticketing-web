@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
+    
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <style>
@@ -124,8 +125,12 @@
                     <input type="password" class="form-control" id="password" placeholder="Password" required>
                     <label for="password">Password</label>
                 </div>
-               <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div> 
-                <button type="submit" class="btn btn-neon w-100" id="btnSubmit">
+                
+                <div class="mb-3 d-flex justify-content-center">
+                    <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs" data-theme="dark"></div> 
+                </div>
+
+                <button type="submit" class="btn-neon w-100" id="btnSubmit">
                     ACCESS DASHBOARD <i class="bi bi-arrow-right-short"></i>
                 </button>
             </form>
@@ -140,8 +145,9 @@
 
     <script>
         // Cek kalau udah login, langsung lempar
-        if(localStorage.getItem('adminToken')) {
-            window.location.href = 'admin.html';
+        if(localStorage.getItem('userToken') && localStorage.getItem('userData')) {
+            const user = JSON.parse(localStorage.getItem('userData'));
+            if(user.role === 'admin') window.location.href = 'admin.html';
         }
 
         const loginForm = document.getElementById('loginForm');
@@ -149,6 +155,21 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // 1. Ambil token reCAPTCHA dulu sebelum kirim data
+            const recaptchaToken = grecaptcha.getResponse();
+
+            // 2. Validasi kalau kotak belum dicentang
+            if (!recaptchaToken) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Tunggu!',
+                    text: 'Harap centang "Saya bukan robot" dulu bos! 🤖',
+                    background: '#16213e',
+                    color: '#fff',
+                    confirmButtonColor: '#ff0080'
+                });
+            }
 
             // Efek Loading di Tombol
             const originalText = btnSubmit.innerHTML;
@@ -162,14 +183,19 @@
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                    const recaptchaToken = grecaptcha.getResponse();
+                    body: JSON.stringify({ 
+                        identifier: username, // <--- Diubah jadi identifier biar sesuai sama backend
+                        password: password,
+                        recaptchaToken: recaptchaToken // <--- Tokennya diselipin di sini
+                    })
                 });
 
                 const data = await res.json();
 
                 if (data.success) {
-                    localStorage.setItem('adminToken', data.token);
+                    // Simpan data login layaknya user biasa tapi beda role
+                    localStorage.setItem('userToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
                     
                     // Alert Sukses
                     Swal.fire({
@@ -188,11 +214,14 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Access Denied',
-                        text: data.message, // "Password Salah" atau "User gak ada"
+                        text: data.message,
                         background: '#16213e',
                         color: '#fff',
                         confirmButtonColor: '#ff0080'
                     });
+                    
+                    // Reset reCAPTCHA biar bisa dicentang ulang
+                    grecaptcha.reset(); 
                     
                     // Balikin Tombol
                     btnSubmit.innerHTML = originalText;
@@ -200,6 +229,7 @@
                 }
             } catch (err) {
                 console.error(err);
+                grecaptcha.reset();
                 btnSubmit.innerHTML = originalText;
                 btnSubmit.disabled = false;
             }
