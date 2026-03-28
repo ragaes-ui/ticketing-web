@@ -526,16 +526,16 @@
         </div>
     </div>
 
-    <div class="news-toast" id="bloggerNewsToast">
+        <div class="news-toast" id="bloggerNewsToast">
         <i class="bi bi-megaphone-fill news-icon"></i>
         <div class="news-content">
             <h6>BERITA TERBARU</h6>
             <a href="#" id="bloggerNewsLink" target="_blank">Memuat berita...</a>
         </div>
-        <button class="close-news" onclick="document.getElementById('bloggerNewsToast').classList.remove('show')">
-            <i class="bi bi-x"></i>
-        </button>
-    </div>
+<button id="btnCloseNews" class="close-news" onclick="tutupDanIngatBerita(this)">
+    <i class="bi bi-x"></i>
+</button>
+        </div>
 
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
@@ -606,12 +606,34 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // 👇 FUNGSI PENERIMA DATA DARI BLOGGER (ANTI-BLOKIR CORS) 👇
+        // 👇 FUNGSI PENERIMA DATA (SISTEM UMUR ARTIKEL 1 HARI) 👇
         window.handleBloggerNews = function(data) {
             if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
                 const post = data.feed.entry[0];
                 const title = post.title.$t;
+                const postId = post.id.$t;
                 
+                // Ambil waktu kapan artikel ini dipublish di Blogger
+                const waktuPublishBlogger = post.published.$t; 
+                
+                // 1. CEK UMUR ARTIKEL (Batas 1 Hari / 24 Jam)
+                const waktuPublish = new Date(waktuPublishBlogger).getTime();
+                const waktuSekarang = Date.now();
+                const umurArtikel = waktuSekarang - waktuPublish;
+                const batasSatuHari = 24 * 60 * 60 * 1000; // 24 Jam dalam milidetik
+
+                // Kalau umur artikelnya UDAH LEBIH dari 1 hari, JANGAN TAMPILKAN!
+                if (umurArtikel > batasSatuHari) {
+                    return; 
+                }
+
+                // 2. CEK INGATAN BROWSER (Biar nggak spam kalau user udah nge-klik X hari ini)
+                const beritaDitutup = localStorage.getItem('beritaDitutup');
+                if (beritaDitutup === postId) {
+                    return; // Udah ditutup user, diam aja
+                }
+                
+                // 3. AMBIL LINK DAN TAMPILKAN
                 let link = "#";
                 for (let i = 0; i < post.link.length; i++) {
                     if (post.link[i].rel === "alternate") {
@@ -622,14 +644,27 @@
 
                 document.getElementById('bloggerNewsLink').innerText = title;
                 document.getElementById('bloggerNewsLink').href = link;
+                
+                // Titipin ID artikel ke tombol Close
+                document.getElementById('btnCloseNews').setAttribute('data-postid', postId);
 
+                // Munculkan setelah 2.5 detik
                 setTimeout(() => {
                     document.getElementById('bloggerNewsToast').classList.add('show');
                 }, 2500); 
-            } else {
-                console.log("Blog Rcellnews belum punya artikel yang dipublish kak!");
             }
         };
+
+        // 👇 FUNGSI BUAT NUTUP BERITA HARI INI 👇
+        function tutupDanIngatBerita(tombol) {
+            document.getElementById('bloggerNewsToast').classList.remove('show');
+            
+            // Simpan ID artikel biar besok-besok kalau ada artikel BARU, popupnya tetep bisa muncul
+            const postId = tombol.getAttribute('data-postid');
+            if (postId) {
+                localStorage.setItem('beritaDitutup', postId);
+            }
+        }
 
         // 👇 FUNGSI PENGAMBIL DATA BERITA DARI BLOGGER 👇
         function loadBloggerNews() {
