@@ -162,8 +162,8 @@
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    const recaptchaToken = grecaptcha.getResponse();
                     body: JSON.stringify({ username, password })
+                    const recaptchaToken = grecaptcha.getResponse();
                 });
 
                 const data = await res.json();
