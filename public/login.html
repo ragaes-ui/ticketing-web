@@ -191,8 +191,26 @@
 
                 const data = await res.json();
 
-                if (data.success) {
-                    // KEMBALIKAN KE adminToken SEPERTI ASLINYA
+                                if (data.success) {
+                    // 👇 TAMBAHAN SATPAM PENJAGA ROLE (JABATAN) 👇
+                    if (data.user.role !== 'admin') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Access Denied!',
+                            text: 'Akun ini bukan Admin! Silakan login di halaman portal user biasa.',
+                            background: '#16213e',
+                            color: '#fff',
+                            confirmButtonColor: '#ff0080'
+                        });
+                        
+                        grecaptcha.reset(); 
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
+                        return; // ⛔ Hentikan proses, jangan biarkan masuk!
+                    }
+                    // 👆 BATAS TAMBAHAN SATPAM 👆
+
+                    // Kalau dia BENERAN ADMIN, baru jalankan kodingan di bawah ini:
                     localStorage.setItem('adminToken', data.token);
                     
                     // Alert Sukses
@@ -208,28 +226,6 @@
                         window.location.href = 'admin.html';
                     });
                 } else {
-                    // Alert Gagal
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Access Denied',
-                        text: data.message,
-                        background: '#16213e',
-                        color: '#fff',
-                        confirmButtonColor: '#ff0080'
-                    });
-                    
-                    // Reset reCAPTCHA biar bisa dicentang ulang
-                    grecaptcha.reset(); 
-                    
-                    // Balikin Tombol
-                    btnSubmit.innerHTML = originalText;
-                    btnSubmit.disabled = false;
-                }
-            } catch (err) {
-                console.error(err);
-                grecaptcha.reset();
-                btnSubmit.innerHTML = originalText;
-                btnSubmit.disabled = false;
             }
         });
     </script>
