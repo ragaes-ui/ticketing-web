@@ -35,7 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="[SENSITIVE_DATA_HIDDEN]"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
     
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
@@ -301,6 +301,71 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA --- */
+        .news-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 30px; /* <--- Pindah ke kiri biar ga tabrakan sama Chatbot */
+            background: var(--bg-card, #18181b);
+            border: 1px solid var(--primary, #3b82f6);
+            border-radius: 16px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9998;
+            max-width: 320px;
+            transform: translateX(-150%); /* Munculnya dari samping kiri */
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .news-toast.show {
+            transform: translateX(0);
+        }
+        .news-icon {
+            font-size: 1.5rem;
+            color: var(--primary, #3b82f6);
+            animation: pulseIcon 2s infinite;
+        }
+        @keyframes pulseIcon {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .news-content h6 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .news-content a {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .news-content a:hover {
+            color: var(--primary, #3b82f6);
+        }
+        .close-news {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin-left: auto;
+        }
+        .close-news:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -462,6 +527,16 @@
         </div>
     </div>
 
+    <div class="news-toast" id="bloggerNewsToast">
+        <i class="bi bi-megaphone-fill news-icon"></i>
+        <div class="news-content">
+            <h6>BERITA TERBARU</h6>
+            <a href="#" id="bloggerNewsLink" target="_blank">Memuat berita...</a>
+        </div>
+        <button class="close-news" onclick="document.getElementById('bloggerNewsToast').classList.remove('show')">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
     </button>
@@ -525,10 +600,43 @@
 
             checkLoginStatus();
             await loadEvents();
+            loadBloggerNews(); // <--- Memanggil fungsi notifikasi berita
 
             const loader = document.getElementById('preloader');
             if(loader) loader.classList.add('hide-loader');
         });
+
+        // 👇 FUNGSI PENGAMBIL DATA BERITA DARI BLOGGER 👇
+        function loadBloggerNews() {
+            // 🚨 GANTI tulisan "NAMA-BLOG-KAKAK" dengan alamat blogspot kakak 🚨
+            const urlBlogger = "https://rcellnews.blogspot.com"; 
+            const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json&max-results=1`;
+
+            fetch(feedUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.feed.entry && data.feed.entry.length > 0) {
+                        const post = data.feed.entry[0];
+                        const title = post.title.$t;
+                        
+                        let link = "#";
+                        for (let i = 0; i < post.link.length; i++) {
+                            if (post.link[i].rel === "alternate") {
+                                link = post.link[i].href;
+                                break;
+                            }
+                        }
+
+                        document.getElementById('bloggerNewsLink').innerText = title;
+                        document.getElementById('bloggerNewsLink').href = link;
+
+                        setTimeout(() => {
+                            document.getElementById('bloggerNewsToast').classList.add('show');
+                        }, 2500); // Muncul 2.5 detik setelah web dibuka
+                    }
+                })
+                .catch(error => console.log("Gagal memuat berita:", error));
+        }
 
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
