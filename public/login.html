@@ -183,15 +183,15 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        identifier: username, // <--- Diubah jadi identifier biar sesuai sama backend
+                        identifier: username,
                         password: password,
-                        recaptchaToken: recaptchaToken // <--- Tokennya diselipin di sini
+                        recaptchaToken: recaptchaToken 
                     })
                 });
 
                 const data = await res.json();
 
-                                if (data.success) {
+                if (data.success) {
                     // 👇 TAMBAHAN SATPAM PENJAGA ROLE (JABATAN) 👇
                     if (data.user.role !== 'admin') {
                         Swal.fire({
@@ -226,6 +226,26 @@
                         window.location.href = 'admin.html';
                     });
                 } else {
+                    // Alert Gagal (Kalau password salah / user ga ada)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Access Denied',
+                        text: data.message,
+                        background: '#16213e',
+                        color: '#fff',
+                        confirmButtonColor: '#ff0080'
+                    });
+                    
+                    grecaptcha.reset(); 
+                    btnSubmit.innerHTML = originalText;
+                    btnSubmit.disabled = false;
+                }
+            } catch (err) {
+                // Alert Gagal (Kalau error jaringan / server mati)
+                console.error(err);
+                grecaptcha.reset();
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
             }
         });
     </script>
