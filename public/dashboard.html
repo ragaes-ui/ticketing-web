@@ -505,7 +505,31 @@
             </div>
         </div>
     </div>
-
+    
+<div class="modal fade" id="transferModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" data-i18n="modal_transfer_title">Transfer Tiket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-send-check display-4 text-primary mb-3"></i>
+                    <p class="text-muted small" data-i18n="modal_transfer_desc">Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!</p>
+                    
+                    <input type="hidden" id="transferTicketCode" value="">
+                    
+                    <div class="mb-3 text-start">
+                        <label class="text-muted mb-2 fw-bold" data-i18n="lbl_receiver_email">Email Penerima</label>
+                        <input type="email" id="receiverEmail" class="form-control text-center fw-bold" placeholder="email.teman@gmail.com" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="prosesTransfer()" id="btnKirimTiket" class="btn btn-primary-neon w-100" data-i18n="btn_send_ticket">Kirim Tiket Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -545,7 +569,8 @@
                 pdf_header: "E-TICKET RCELLFEST", pdf_info: "Tunjukkan QR Code ini di pintu masuk.", pdf_footer: "Terima kasih telah memesan.",
                 error_fetch: "Gagal mengambil data. Cek koneksi backend.", err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!",
                 tab_tickets: "Aset Digital", tab_history: "Riwayat Saldo", section_history_title: "Riwayat Mutasi Saldo", empty_history: "Belum ada riwayat mutasi.",
-                status_success: "BERHASIL", status_pending: "MENUNGGU", status_failed: "GAGAL"
+                status_success: "BERHASIL", status_pending: "MENUNGGU", status_failed: "GAGAL",
+                btn_transfer: "Transfer", modal_transfer_title: "Transfer Tiket", modal_transfer_desc: "Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!", lbl_receiver_email: "Email Penerima", btn_send_ticket: "Kirim Tiket Sekarang"
             },
             en: {
                 nav_home: "Home", nav_logout: "Logout",
@@ -562,7 +587,8 @@
                 pdf_header: "RCELLFEST E-TICKET", pdf_info: "Show this QR Code at the entrance.", pdf_footer: "Thank you for booking.",
                 error_fetch: "Failed to fetch data.", err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!",
                 tab_tickets: "My Assets", tab_history: "Balance History", section_history_title: "Balance Transaction History", empty_history: "No balance history found.",
-                status_success: "SUCCESS", status_pending: "PENDING", status_failed: "FAILED"
+                status_success: "SUCCESS", status_pending: "PENDING", status_failed: "FAILED",
+                btn_transfer: "Transfer", modal_transfer_title: "Transfer Ticket", modal_transfer_desc: "Send this ticket to a friend. Tickets cannot be pulled back once sent!", lbl_receiver_email: "Receiver Email", btn_send_ticket: "Send Ticket Now"
             }
         };
 
@@ -1006,7 +1032,7 @@
                         </div>
                     `;
 
-                    if (isStreaming) {
+if (isStreaming) {
                         mainContent += `
                             <div class="account-box mt-3">
                                 <small class="d-block mb-1 opacity-75">${t.lbl_credentials}</small>
@@ -1014,11 +1040,15 @@
                             </div>
                             <div class="d-flex gap-2 w-100 mt-2">
                                 <button onclick="copyToClipboard('${descClean}')" class="btn btn-outline-success btn-sm w-100 rounded-pill">
-                                    <i class="bi bi-copy me-1"></i> ${t.btn_copy}
+                                    <i class="bi bi-copy"></i>
                                 </button>
                                 <button onclick="downloadTicket('${ticketData}')" class="btn btn-glass btn-sm w-100 rounded-pill">
-                                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                                    <i class="bi bi-file-earmark-pdf"></i> PDF
                                 </button>
+                                ${ticket.status !== 'used' ? `
+                                <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-outline-warning btn-sm w-100 rounded-pill" title="Transfer Tiket">
+                                    <i class="bi bi-send"></i>
+                                </button>` : ''}
                             </div>
                         `;
                     } else {
@@ -1028,10 +1058,14 @@
                             <div class="qr-container">
                                 <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous">
                             </div>
-                            <div class="mt-3">
+                            <div class="mt-3 d-flex flex-column gap-2">
                                 <button onclick="downloadTicket('${ticketData}')" class="btn btn-primary-neon btn-sm w-100">
                                     <i class="bi bi-download me-2"></i> ${t.btn_pdf}
                                 </button>
+                                ${ticket.status !== 'used' ? `
+                                <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 text-warning border-warning">
+                                    <i class="bi bi-send me-2"></i> <span data-i18n="btn_transfer">${t.btn_transfer}</span>
+                                </button>` : ''}
                             </div>
                         `;
                     }
@@ -1064,6 +1098,79 @@
         }
 
         // --- PDF GENERATOR ---
+        // --- FUNGSI TRANSFER TIKET ---
+        const transferModalInstance = new bootstrap.Modal(document.getElementById('transferModal'));
+        
+        function openTransferModal(ticketCode) {
+            document.getElementById('transferTicketCode').value = ticketCode;
+            document.getElementById('receiverEmail').value = '';
+            transferModalInstance.show();
+        }
+
+        async function prosesTransfer() {
+            const ticketCode = document.getElementById('transferTicketCode').value;
+            const receiverEmail = document.getElementById('receiverEmail').value;
+            const btnKirim = document.getElementById('btnKirimTiket');
+            const lang = localStorage.getItem('lang') || 'id';
+
+            if (!receiverEmail) {
+                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Email penerima wajib diisi!', background: '#1c1c2d', color: '#fff'});
+            }
+
+            // Popup Konfirmasi Pakai SweetAlert biar keren
+            const confirmRes = await Swal.fire({
+                title: lang === 'id' ? 'Yakin Transfer?' : 'Confirm Transfer?',
+                text: lang === 'id' ? `Kirim tiket ke ${receiverEmail}?` : `Send ticket to ${receiverEmail}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0049CC',
+                cancelButtonColor: '#d33',
+                confirmButtonText: lang === 'id' ? 'Ya, Kirim!' : 'Yes, Send!',
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
+                background: '#1c1c2d', color: '#fff'
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            // Animasi Loading Tombol
+            btnKirim.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Processing...`;
+            btnKirim.disabled = true;
+
+            try {
+                // Tembak ke API Node.js yang udah kita bikin sebelumnya
+                const res = await fetch('/api/tickets/transfer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ticket_code: ticketCode,
+                        receiver_email: receiverEmail
+                    }),
+                    credentials: 'include' // Pakai ini kalau keamanan SSO berbasis Cookie aktif
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    transferModalInstance.hide();
+                    Swal.fire({
+                        icon: 'success', 
+                        title: 'Sukses!', 
+                        text: lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}`, 
+                        background: '#1c1c2d', color: '#fff'
+                    }).then(() => {
+                        // Refresh daftar tiket biar tiket yang ditransfer ngilang dari dashboard
+                        loadTickets(); 
+                    });
+                } else {
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff'});
+                }
+            } catch (error) {
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1c1c2d', color: '#fff'});
+            } finally {
+                btnKirim.innerText = translations[lang].btn_send_ticket;
+                btnKirim.disabled = false;
+            }
+        }
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
