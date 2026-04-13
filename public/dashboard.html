@@ -382,23 +382,26 @@
 
         <div class="tab-content" id="dashboardTabsContent">
             
-            <div class="tab-pane fade show active" id="tickets-pane" role="tabpanel">
+<div class="tab-pane fade show active" id="tickets-pane" role="tabpanel">
+                
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold mb-0" style="color: var(--text-main);"><span data-i18n="section_assets">Aset Digital Saya</span></h4>
                     <a href="index.html" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
-                </div>
+                </div> 
                 <div class="mb-4">
-    <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border);">
-        <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchTicketInput" class="form-control border-0 bg-transparent shadow-none" placeholder="Cari nama event, kode tiket..." onkeyup="searchTickets()">
-    </div>
-</div>
+                    <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border);">
+                        <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchTicketInput" class="form-control border-0 bg-transparent shadow-none" placeholder="Cari nama event, kode tiket..." onkeyup="searchTickets()">
+                    </div>
+                </div>
+
                 <div id="ticketList" class="row g-4">
                     <div class="col-12 text-center py-5">
                         <div class="spinner-border text-primary" role="status"></div>
                         <p class="mt-3 text-muted" data-i18n="loading_tickets">Mengambil data tiket...</p>
                     </div>
                 </div>
+
             </div>
 
             <div class="tab-pane fade" id="topups-pane" role="tabpanel">
