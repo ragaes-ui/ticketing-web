@@ -282,20 +282,23 @@ app.post('/api/tickets/transfer', async (req, res) => {
         }
 
         // 3. PROSES TRANSFER (SULAP!) 🪄
+        
+        // AMANKAN DULU EMAIL PENGIRIM SEBELUM DITIMPA!
+        const emailPengirimAsli = ticket.email; 
+
         // Ganti kepemilikan email dan nama di database tiketnya
         ticket.email = receiver.email;
         ticket.customerName = receiver.fullName || receiver.username;
-        
         await ticket.save();
-        // 👇 INI TAMBAHANNYA: CATAT KE RIWAYAT 👇
+
+        // CATAT KE RIWAYAT PAKAI EMAIL ASLI
         await TransferHistory.create({
-            senderId: req.body.userId, // Kita butuh ID pengirim
-            senderEmail: ticket.email, 
+            senderId: req.body.userId || "Sistem", 
+            senderEmail: emailPengirimAsli, // Patokan utama kita!
             receiverEmail: receiver_email,
             ticketCode: ticket.ticketCode,
-            eventName: ticket.eventId ? ticket.eventId.name : "Tiket RCELLFEST" // Jaga-jaga kalau eventId kosong
+            eventName: ticket.eventId ? ticket.eventId.name : "Tiket RCELLFEST"
         });
-        // 👆 SELESAI TAMBAHANNYA 👆
 
         res.json({ 
             success: true,
@@ -342,11 +345,16 @@ app.post('/api/balance-history', async (req, res) => {
             date: o.createdAt || o._id.getTimestamp(), // Waktu super akurat bawaan MongoDB
             id: o.ticketCode
         }));
-        // 👇 3. Ambil Riwayat Transfer (Keluar) - INI YANG BARU 👇
-        const transfers = await TransferHistory.find({ senderId: userId });
+        // 3. Ambil Riwayat Transfer (Keluar) - PAKAI EMAIL
+        const transfers = await TransferHistory.find({ senderEmail: user.email });
+        
         const historyTransfer = transfers.map(tr => ({
-            type: 'transfer_out', title: `Kirim Tiket: ${tr.eventName}`, amount: 0,
-            date: tr.timestamp || tr._id.getTimestamp(), id: tr.ticketCode, info: `Ke: ${tr.receiverEmail}`
+            type: 'transfer_out', 
+            title: `Kirim Tiket: ${tr.eventName}`, 
+            amount: 0,
+            date: tr.timestamp || tr._id.getTimestamp(), 
+            id: tr.ticketCode, 
+            info: `Ke: ${tr.receiverEmail}`
         }));
         // 3. Gabungkan dan Urutkan murni berdasarkan Angka Waktu (Milidetik)
         const fullHistory = [...historyTopup, ...historyOrder, ...historyTransfer].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
