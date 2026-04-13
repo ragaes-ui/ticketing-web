@@ -245,6 +245,49 @@ app.post('/api/my-tickets', async (req, res) => {
     try { const tickets = await Order.find({ email: req.body.email, status: { $in: ['valid', 'used'] } }).populate('eventId'); res.json(tickets); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
+// ==========================================
+// --- API TRANSFER TIKET ---
+// ==========================================
+app.post('/api/tickets/transfer', async (req, res) => {
+    try {
+        const { ticket_code, receiver_email } = req.body;
+
+        // 1. Pastikan email penerima beneran terdaftar di Rcellfest
+        const receiver = await User.findOne({ email: new RegExp('^' + receiver_email + '$', 'i') });
+        if (!receiver) {
+            return res.status(404).json({ message: "Email penerima tidak terdaftar di sistem!" });
+        }
+
+        // 2. Cari tiket yang mau ditransfer
+        const ticket = await Order.findOne({ ticketCode: ticket_code.toUpperCase() });
+        
+        if (!ticket) {
+            return res.status(404).json({ message: "Tiket tidak ditemukan." });
+        }
+        if (ticket.status !== 'valid') {
+            return res.status(400).json({ message: "Gagal: Tiket sudah terpakai atau hangus." });
+        }
+        if (ticket.email.toLowerCase() === receiver_email.toLowerCase()) {
+            return res.status(400).json({ message: "Nggak bisa transfer ke email sendiri dong!" });
+        }
+
+        // 3. PROSES TRANSFER (SULAP!) 🪄
+        // Ganti kepemilikan email dan nama di database tiketnya
+        ticket.email = receiver.email;
+        ticket.customerName = receiver.fullName || receiver.username;
+        
+        await ticket.save();
+
+        res.json({ 
+            success: true,
+            message: "Tiket berhasil dipindah tangan!", 
+            receiver: receiver.fullName || receiver.username 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Sistem Error: " + error.message });
+    }
+});
 
 // --- API RIWAYAT MUTASI SALDO (GABUNGAN TOPUP & BELI) ---
 app.post('/api/balance-history', async (req, res) => {
