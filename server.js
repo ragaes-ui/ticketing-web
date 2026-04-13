@@ -286,10 +286,17 @@ app.post('/api/tickets/transfer', async (req, res) => {
         // AMANKAN DULU EMAIL PENGIRIM SEBELUM DITIMPA!
         const emailPengirimAsli = ticket.email; 
 
-        // Ganti kepemilikan email dan nama di database tiketnya
-        ticket.email = receiver.email;
-        ticket.customerName = receiver.fullName || receiver.username;
-        await ticket.save();
+        // 3. PROSES TRANSFER (SULAP!) 🪄
+        // Pakai updateOne supaya Mongoose nggak rewel ngecek data 'price' yang kosong di tiket lama
+        await Order.updateOne(
+            { _id: ticket._id },
+            { 
+                $set: { 
+                    email: receiver.email, 
+                    customerName: receiver.fullName || receiver.username 
+                } 
+            }
+        );
 
         // CATAT KE RIWAYAT PAKAI EMAIL ASLI
         await TransferHistory.create({
