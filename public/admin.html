@@ -522,8 +522,20 @@
         function previewImage(url, imgId, textId) {
             const imgEl = document.getElementById(imgId);
             const textEl = document.getElementById(textId);
-            if (url && url.length > 5) { 
-                imgEl.src = url; 
+            let finalUrl = url;
+
+            // --- FITUR AUTO CONVERT GOOGLE DRIVE LINK ---
+            if (url && url.includes('drive.google.com/file/d/')) {
+                const match = url.match(/\/d\/(.*?)\//);
+                if (match && match[1]) {
+                    const fileId = match[1];
+                    finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                }
+            }
+            // --------------------------------------------
+
+            if (finalUrl && finalUrl.length > 5) { 
+                imgEl.src = finalUrl; 
                 imgEl.style.display = 'block'; 
                 if(textEl) textEl.style.display = 'none'; 
             } else { 
