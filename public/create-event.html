@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
@@ -21,6 +23,7 @@
             --text-muted: #6c757d;
             --border-color: #eef;
             --shadow-color: rgba(0, 73, 204, 0.08);
+            --input-bg: #f8f9fa;
         }
 
         [data-theme="dark"] {
@@ -31,6 +34,7 @@
             --text-muted: #cbd5e1;
             --border-color: #334155;
             --shadow-color: rgba(0,0,0,0.5);
+            --input-bg: #0f172a;
         }
 
         body {
@@ -64,36 +68,46 @@
         [data-theme="dark"] .nav-link { color: #cbd5e1; }
         [data-theme="dark"] .nav-link:hover { color: #60a5fa; }
 
-        /* Maintenance Content */
-        .maintenance-container {
-            flex-grow: 1; /* Agar footer terdorong ke bawah */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-        }
-        .maintenance-card {
-            background: var(--bg-card);
-            padding: 50px;
-            border-radius: 24px;
-            text-align: center;
-            max-width: 600px;
+        /* Form Container */
+        .form-container {
+            flex-grow: 1;
+            padding: 40px 15px;
+            max-width: 800px;
+            margin: 0 auto;
             width: 100%;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 24px;
             box-shadow: 0 15px 40px var(--shadow-color);
             border: 1px solid var(--border-color);
             transition: background-color 0.3s;
         }
-        .icon-maintenance {
-            font-size: 5rem;
-            color: #ffca2c; /* Warna Kuning Warning */
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
+
+        /* Custom Inputs */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
         
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border-color: #0049CC;
+            box-shadow: 0 0 0 3px rgba(0, 73, 204, 0.2);
         }
 
         /* Footer */
@@ -109,9 +123,7 @@
         .social-btn:hover { background: white; color: #0e1e3b; }
     </style>
 </head>
-<body>
-
-    <nav class="navbar navbar-expand-lg fixed-top">
+<body style="display: none;"> <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
@@ -139,54 +151,72 @@
                 </button>
 
                 <div id="navUserArea">
-                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
 
-    <div class="maintenance-container">
-        <div class="maintenance-card">
-            <div class="icon-maintenance">
-                <i class="bi bi-cone-striped"></i>
-            </div>
-            <h2 class="fw-bold mb-3" style="color: var(--text-main);" data-i18n="maint_title">Fitur Belum Tersedia</h2>
-            <p class="text-secondary mb-4 fs-6" data-i18n="maint_desc">
-                Mohon maaf, halaman <strong>Buat Event (Event Creator Dashboard)</strong> sedang dalam tahap pengembangan oleh tim kami. <br>Nantikan update selanjutnya!
-            </p>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="index.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold" data-i18n="btn_home">Kembali ke Beranda</a>
-                <a href="mailto:ragaes.dev@rcellfest.shop" class="btn btn-primary rounded-pill px-4 fw-bold" data-i18n="btn_contact">Hubungi Tim Partner</a>
-            </div>
+    <div class="form-container">
+        <div class="glass-card">
+            <h2 class="fw-bold mb-1 text-primary"><i class="bi bi-calendar2-plus-fill me-2"></i>Buat Event Baru</h2>
+            <p class="text-muted mb-4">Tambahkan acara baru ke dalam sistem Rcellfest. Mode: Penyelenggara</p>
+
+            <form id="createEventForm">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Nama Event <span class="text-danger">*</span></label>
+                        <input type="text" id="evName" class="form-control" placeholder="Cth: Konser Sheila On 7" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                        <select id="evCategory" class="form-select" required>
+                            <option value="Konser">Konser Musik</option>
+                            <option value="Streaming">Akun Streaming</option>
+                            <option value="Seminar">Seminar / Workshop</option>
+                            <option value="Olahraga">Olahraga</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Event <span class="text-danger">*</span></label>
+                        <input type="date" id="evDate" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Lokasi / Venue <span class="text-danger">*</span></label>
+                        <input type="text" id="evLocation" class="form-control" placeholder="Cth: GBK Senayan / Telegram" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Harga Tiket (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" id="evPrice" class="form-control" placeholder="Cth: 150000" min="0" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Kapasitas / Kuota <span class="text-danger">*</span></label>
+                        <input type="number" id="evCapacity" class="form-control" placeholder="Cth: 500" min="1" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Deskripsi Event <small class="text-muted">(Jika streaming, taruh info akun di sini)</small></label>
+                        <textarea id="evDescription" class="form-control" rows="4" placeholder="Jelaskan detail acara atau info kredensial di sini..."></textarea>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" id="btnSubmitEvent" class="btn btn-primary w-100 py-3 fw-bold rounded-pill" style="background: linear-gradient(135deg, #0049CC, #0072ff); border: none;">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i> Publikasikan Event
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-
     <footer class="footer-loket">
         <div class="container">
             <div class="row g-4">
-                <div class="col-6 col-lg-3">
-                    <div class="footer-head" data-i18n="footer_about">Tentang</div>
-                    <a href="about.html" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
-                    <a href="blog.html" class="footer-link">Blog</a>
-                    <a href="career.html" class="footer-link" data-i18n="footer_career">Karir</a>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="footer-head" data-i18n="footer_organizer">Penyelenggara</div>
-                    <a href="#" class="footer-link text-white" data-i18n="footer_create">Buat Event</a>
-                    <a href="guide.html" class="footer-link" data-i18n="nav_guide">Panduan</a>
-                    <a href="login.html" class="footer-link text-warning">Login Admin</a>
-                </div>
-                <div class="col-lg-3">
-                    <div class="footer-head" data-i18n="footer_follow">Ikuti Kami</div>
-                    <div class="mb-3">
-                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn"><i class="bi bi-instagram"></i></a>
-                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn"><i class="bi bi-twitter-x"></i></a>
-                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn"><i class="bi bi-youtube"></i></a>
-                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn"><i class="bi bi-tiktok"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <small class="text-white-50">&copy; 2026 RCELLTECH ID created with love.</small>
+                <div class="col-lg-12 text-center">
+                    <small class="text-white-50">&copy; 2026 RCELLTECH ID - Partner Portal</small>
                 </div>
             </div>
         </div>
@@ -198,20 +228,17 @@
         // --- KAMUS BAHASA ---
         const translations = {
             id: {
-                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar",
-                maint_title: "Fitur Belum Tersedia", maint_desc: "Mohon maaf, halaman <strong>Buat Event (Event Creator Dashboard)</strong> sedang dalam tahap pengembangan oleh tim kami. <br>Nantikan update selanjutnya!",
-                btn_home: "Kembali ke Beranda", btn_contact: "Hubungi Tim Partner",
-                footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_follow: "Ikuti Kami"
+                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan", nav_login: "Masuk / Daftar", nav_my_ticket: "Tiket Saya", nav_logout: "Keluar"
             },
             en: {
-                nav_explore: "Explore", nav_about: "About Us", nav_guide: "Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout",
-                maint_title: "Feature Not Available Yet", maint_desc: "We apologize, the <strong>Create Event (Event Creator Dashboard)</strong> page is currently under development by our team. <br>Stay tuned for updates!",
-                btn_home: "Back to Home", btn_contact: "Contact Partner Team",
-                footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_follow: "Follow Us"
+                nav_explore: "Explore", nav_about: "About Us", nav_guide: "Guide", nav_login: "Login / Register", nav_my_ticket: "My Tickets", nav_logout: "Logout"
             }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Jalankan proteksi keamanan dulu sebelum nampilin halaman
+            checkSecurityAccess();
+
             // Init Settings
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -219,11 +246,54 @@
 
             const savedLang = localStorage.getItem('lang') || 'id';
             updateLanguage(savedLang);
-
-            checkLoginStatus();
         });
 
-        // --- LANGUAGE LOGIC ---
+        // 👇 FUNGSI SATPAM (PROTEKSI AKSES) 👇
+        function checkSecurityAccess() {
+            const userRaw = localStorage.getItem('userData');
+            
+            // 1. Kalau belum login sama sekali
+            if (!userRaw) {
+                Swal.fire({
+                    icon: 'warning', title: 'Akses Ditolak!', text: 'Anda harus login sebagai Penyelenggara/Admin.', confirmButtonColor: '#0049CC', background: '#1c1c2d', color: '#fff'
+                }).then(() => { window.location.href = 'user-login.html'; });
+                return;
+            }
+
+            const user = JSON.parse(userRaw);
+            
+            // 2. Kalau dia login, TAPI rolenya cuma 'user' biasa
+            if (user.role === 'user') {
+                Swal.fire({
+                    icon: 'error', title: 'Akses Terlarang!', text: 'Halaman ini khusus untuk Penyelenggara Event.', confirmButtonColor: '#d33', background: '#1c1c2d', color: '#fff'
+                }).then(() => { window.location.href = 'index.html'; });
+                return;
+            }
+
+            // 3. Kalau dia lolos sensor (role = organizer / admin), TAMPILKAN HALAMAN
+            document.body.style.display = 'flex'; 
+
+            // Pasang navbar profile
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            const navArea = document.getElementById('navUserArea');
+            
+            navArea.innerHTML = `
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-briefcase-fill text-success"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                        <li><a class="dropdown-item rounded-2 small" href="dashboard.html">Dashboard Akun</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
+                    </ul>
+                </div>`;
+        }
+
+        function logout() { localStorage.removeItem('userData'); localStorage.removeItem('userToken'); window.location.href = 'index.html'; }
+
+        // --- LANGUAGE & THEME LOGIC ---
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
             const newLang = currentLang === 'id' ? 'en' : 'id';
@@ -233,26 +303,19 @@
 
         function updateLanguage(lang) {
             const t = translations[lang];
-            
-            // Update Text Statis
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(t[key]) el.innerHTML = t[key];
             });
-
-            // Update Tombol
             const langBtn = document.getElementById('lang-btn');
             langBtn.innerText = lang.toUpperCase();
             if(lang === 'en') {
-                langBtn.classList.add('btn-primary');
-                langBtn.classList.remove('btn-outline-secondary');
+                langBtn.classList.add('btn-primary'); langBtn.classList.remove('btn-outline-secondary');
             } else {
-                langBtn.classList.add('btn-outline-secondary');
-                langBtn.classList.remove('btn-primary');
+                langBtn.classList.add('btn-outline-secondary'); langBtn.classList.remove('btn-primary');
             }
         }
 
-        // --- THEME LOGIC ---
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
@@ -266,45 +329,87 @@
             const icon = document.getElementById('theme-icon');
             const btn = document.getElementById('theme-btn');
             if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill');
-                icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700";
-                btn.classList.add('btn-dark');
-                btn.classList.remove('btn-light');
+                icon.classList.remove('bi-moon-stars-fill'); icon.classList.add('bi-sun-fill');
+                icon.style.color = "#FFD700"; btn.classList.add('btn-dark'); btn.classList.remove('btn-light');
             } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "";
-                btn.classList.add('btn-light');
-                btn.classList.remove('btn-dark');
+                icon.classList.remove('bi-sun-fill'); icon.classList.add('bi-moon-stars-fill');
+                icon.style.color = ""; btn.classList.add('btn-light'); btn.classList.remove('btn-dark');
             }
         }
 
-        function checkLoginStatus() {
-            const userRaw = localStorage.getItem('userData');
-            const navArea = document.getElementById('navUserArea');
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
+        // 👇 LOGIKA UNTUK SUBMIT EVENT KE DATABASE 👇
+        document.getElementById('createEventForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Cegah halaman reload
+            
+            const btnSubmit = document.getElementById('btnSubmitEvent');
+            const originalText = btnSubmit.innerHTML;
+            
+            // Ambil data dari form
+            const name = document.getElementById('evName').value;
+            const category = document.getElementById('evCategory').value;
+            const date = document.getElementById('evDate').value;
+            const location = document.getElementById('evLocation').value;
+            const price = document.getElementById('evPrice').value;
+            const capacity = document.getElementById('evCapacity').value;
+            const description = document.getElementById('evDescription').value;
 
-            if (userRaw) {
-                const user = JSON.parse(userRaw);
-                navArea.innerHTML = `
-                    <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle text-primary"></i> <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
-                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
-                        </ul>
-                    </div>`;
-            } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">${t.nav_login}</a>`;
+            // Konfirmasi sebelum membuat
+            const confirmRes = await Swal.fire({
+                title: 'Publikasikan Event?',
+                text: "Pastikan semua data sudah benar sebelum dipublikasikan ke halaman utama.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0049CC',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Publikasikan!',
+                background: '#1c1c2d', color: '#fff'
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            // Loading state
+            btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...`;
+            btnSubmit.disabled = true;
+
+            try {
+                // Tembak ke API yang ada di server.js kakak
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        category: category,
+                        date: date,
+                        location: location,
+                        price: Number(price),
+                        capacity: Number(capacity),
+                        description: description
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Event Berhasil Dibuat!',
+                        text: 'Event kamu sekarang sudah muncul di halaman depan (Jelajah).',
+                        confirmButtonColor: '#0049CC', background: '#1c1c2d', color: '#fff'
+                    }).then(() => {
+                        window.location.href = 'index.html'; // Pindah ke halaman depan
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: result.error || 'Terjadi kesalahan sistem', background: '#1c1c2d', color: '#fff' });
+                }
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#1c1c2d', color: '#fff' });
+            } finally {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
             }
-        }
-
-        function logout() { localStorage.removeItem('userData'); localStorage.removeItem('userToken'); window.location.reload(); }
+        });
     </script>
 </body>
 </html>
