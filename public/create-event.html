@@ -123,7 +123,7 @@
         .social-btn:hover { background: white; color: #0e1e3b; }
     </style>
 </head>
-<body style="display: none;"> <nav class="navbar navbar-expand-lg fixed-top">
+<body> <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <i class="bi bi-ticket-detailed-fill"></i> RCELLFEST
@@ -156,8 +156,8 @@
         </div>
     </nav>
 
-    <div class="form-container">
-        <div class="glass-card">
+<div class="form-container" id="mainFormArea" style="display: none;">
+    <div class="glass-card">
             <h2 class="fw-bold mb-1 text-primary"><i class="bi bi-calendar2-plus-fill me-2"></i>Buat Event Baru</h2>
             <p class="text-muted mb-4">Tambahkan acara baru ke dalam sistem Rcellfest. Mode: Penyelenggara</p>
 
@@ -248,7 +248,7 @@
             updateLanguage(savedLang);
         });
 
-        // 👇 FUNGSI SATPAM (PROTEKSI AKSES) 👇
+// 👇 FUNGSI SATPAM (PROTEKSI AKSES) 👇
         function checkSecurityAccess() {
             const userRaw = localStorage.getItem('userData');
             
@@ -262,16 +262,16 @@
 
             const user = JSON.parse(userRaw);
             
-            // 2. Kalau dia login, TAPI rolenya cuma 'user' biasa
-            if (user.role === 'user') {
+            // 2. Kalau dia login, TAPI rolenya cuma 'user' biasa (atau belum punya role)
+            if (!user.role || user.role === 'user') {
                 Swal.fire({
                     icon: 'error', title: 'Akses Terlarang!', text: 'Halaman ini khusus untuk Penyelenggara Event.', confirmButtonColor: '#d33', background: '#1c1c2d', color: '#fff'
                 }).then(() => { window.location.href = 'index.html'; });
                 return;
             }
 
-            // 3. Kalau dia lolos sensor (role = organizer / admin), TAMPILKAN HALAMAN
-            document.body.style.display = 'flex'; 
+            // 3. Kalau dia lolos sensor (role = organizer / admin), TAMPILKAN FORM-NYA
+            document.getElementById('mainFormArea').style.display = 'block';
 
             // Pasang navbar profile
             const lang = localStorage.getItem('lang') || 'id';
