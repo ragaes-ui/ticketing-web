@@ -252,11 +252,9 @@
         function checkSecurityAccess() {
             const userRaw = localStorage.getItem('userData');
             
-            // 1. Kalau belum login sama sekali
+            // 1. Kalau belum login sama sekali -> LANGSUNG TENDANG KILAT (Tanpa Popup)
             if (!userRaw) {
-                Swal.fire({
-                    icon: 'warning', title: 'Akses Ditolak!', text: 'Anda harus login sebagai Penyelenggara/Admin.', confirmButtonColor: '#0049CC', background: '#1c1c2d', color: '#fff'
-                }).then(() => { window.location.href = 'organizer-login.html'; });
+                window.location.href = 'organizer-login.html';
                 return;
             }
 
