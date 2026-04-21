@@ -260,11 +260,25 @@ app.post('/api/my-tickets', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 // ==========================================
-// --- API TRANSFER TIKET ---
+// --- API TRANSFER TIKET (DENGAN KEAMANAN PIN) ---
 // ==========================================
 app.post('/api/tickets/transfer', async (req, res) => {
     try {
-        const { ticket_code, receiver_email } = req.body;
+        const { ticket_code, receiver_email, userId, pin } = req.body;
+
+        // 0. SATPAM PIN: Cek apakah PIN yang dikirim cocok
+        if (!userId || !pin) {
+            return res.status(400).json({ message: "Sistem menolak: PIN Keamanan tidak disertakan!" });
+        }
+        const sender = await User.findById(userId);
+        if (!sender || !sender.pin) {
+            return res.status(400).json({ message: "Akun kamu belum mengatur PIN. Silakan atur PIN di menu profile dulu!" });
+        }
+        const isPinMatch = await bcrypt.compare(pin, sender.pin);
+        if (!isPinMatch) {
+            return res.status(400).json({ message: "PIN Keamanan Salah! Transfer digagalkan." });
+        }
+        // --- BATAS AMAN ---
 
         // 1. Pastikan email penerima beneran terdaftar di Rcellfest
         const receiver = await User.findOne({ email: new RegExp('^' + receiver_email + '$', 'i') });
@@ -273,7 +287,7 @@ app.post('/api/tickets/transfer', async (req, res) => {
         }
 
         // 2. Cari tiket yang mau ditransfer
-        const ticket = await Order.findOne({ ticketCode: ticket_code.toUpperCase() });
+        const ticket = await Order.findOne({ ticketCode: ticket_code.toUpperCase() }).populate('eventId');
         
         if (!ticket) {
             return res.status(404).json({ message: "Tiket tidak ditemukan." });
@@ -286,12 +300,9 @@ app.post('/api/tickets/transfer', async (req, res) => {
         }
 
         // 3. PROSES TRANSFER (SULAP!) 🪄
-        
-        // AMANKAN DULU EMAIL PENGIRIM SEBELUM DITIMPA!
         const emailPengirimAsli = ticket.email; 
 
-        // 3. PROSES TRANSFER (SULAP!) 🪄
-        // Pakai updateOne supaya Mongoose nggak rewel ngecek data 'price' yang kosong di tiket lama
+        // Pakai updateOne supaya Mongoose nggak rewel
         await Order.updateOne(
             { _id: ticket._id },
             { 
@@ -302,11 +313,11 @@ app.post('/api/tickets/transfer', async (req, res) => {
             }
         );
 
-        // CATAT KE RIWAYAT PAKAI EMAIL ASLI
+        // CATAT KE RIWAYAT TRANSFER
         await TransferHistory.create({
-            senderId: req.body.userId || "Sistem", 
-            senderEmail: emailPengirimAsli, // Patokan utama kita!
-            receiverEmail: receiver_email,
+            senderId: sender._id, 
+            senderEmail: emailPengirimAsli, 
+            receiverEmail: receiver.email,
             ticketCode: ticket.ticketCode,
             eventName: ticket.eventId ? ticket.eventId.name : "Tiket RCELLFEST"
         });
