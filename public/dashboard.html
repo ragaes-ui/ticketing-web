@@ -150,7 +150,6 @@
             flex-direction: column; justify-content: center; color: var(--text-main); 
         }
 
-        /* --- TAMBAHAN: GRID INFO PEMESAN --- */
         .ticket-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -218,7 +217,6 @@
             color: var(--text-muted); font-weight: 500; 
         }
 
-        /* Buttons */
         .btn-glass { 
             background: rgba(128, 128, 128, 0.1); border: 1px solid var(--text-muted); 
             color: var(--text-main); border-radius: 50px; padding: 8px 20px; transition: 0.3s; 
@@ -238,7 +236,6 @@
             transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5); color: white; 
         }
 
-        /* Modals */
         .modal-content { 
             background: var(--bg-nav); backdrop-filter: blur(20px); 
             border: 1px solid var(--glass-border); border-radius: 24px; color: var(--text-main); 
@@ -260,7 +257,6 @@
             filter: invert(1); 
         }
         
-        /* Saldo Box */
         .saldo-box {
             background: rgba(0, 198, 255, 0.1);
             border: 1px solid rgba(0, 198, 255, 0.3);
@@ -272,7 +268,6 @@
             align-items: center;
         }
 
-        /* History Item Style */
         .history-item { 
             border-bottom: 1px solid var(--glass-border); 
             padding: 15px 0; 
@@ -294,6 +289,32 @@
             justify-content: center; 
             font-size: 1.2rem; 
         }
+
+        /* 👇 CSS CUSTOM SIGNAL INDICATOR (NEW DESIGN) 👇 */
+        .signal-badge {
+            background-color: #424242; /* Warna abu-abu gelap khas gambar */
+            color: #ffffff;
+            border-radius: 50px;
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .signal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
+        .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
+        /* 👆 SAMPAI SINI 👆 */
+
     </style>
 </head>
 <body>
@@ -308,6 +329,10 @@
             </a>
             
             <div class="d-flex align-items-center gap-2">
+                <div class="signal-badge d-none d-md-flex" title="Ping ke Server Rcellfest">
+                    <span id="networkDot" class="signal-dot dot-kuat"></span> 
+                    <span id="networkSpeed">Menghitung...</span>
+                </div>
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" id="lang-btn" style="min-width: 40px;">ID</button>
 
                 <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--text-muted);">
@@ -402,13 +427,13 @@
                         box-shadow: var(--card-shadow);
                     }
                     .custom-search-box:focus-within {
-                        border-color: #00c6ff; /* Nyala biru neon pas diklik */
+                        border-color: #00c6ff; 
                         box-shadow: 0 0 15px rgba(0, 198, 255, 0.2);
                     }
                     .custom-search-box input {
                         background: transparent;
                         border: none;
-                        color: var(--text-main); /* Otomatis ganti warna sesuai tema */
+                        color: var(--text-main); 
                         width: 100%;
                         padding: 12px 10px;
                         outline: none;
@@ -416,7 +441,7 @@
                         letter-spacing: 0.5px;
                     }
                     .custom-search-box input::placeholder {
-                        color: var(--text-muted); /* Warna abu-abu yang otomatis menyesuaikan */
+                        color: var(--text-muted); 
                     }
                     .custom-search-box i {
                         color: var(--text-muted);
@@ -596,7 +621,48 @@
             renderProfile();
             loadTickets();
             fetchLatestProfile(); 
+            
+            // 👇 SCRIPT MULAI PING OTOMATIS SAAT WEB DIBUKA 👇
+            checkServerPing();
+            setInterval(checkServerPing, 10000);
         });
+
+        // 👇 SCRIPT CEK PING SERVER VERCEL (NEW DESIGN) 👇
+        async function checkServerPing() {
+            const speedText = document.getElementById('networkSpeed');
+            const dot = document.getElementById('networkDot');
+
+            if (!navigator.onLine) {
+                speedText.innerText = "Offline";
+                dot.className = 'signal-dot dot-lemah';
+                return;
+            }
+
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch('/api/ping?t=' + startTime, { method: 'GET' });
+                
+                if (response.ok) {
+                    const pingTime = Date.now() - startTime;
+
+                    if (pingTime < 100) { // STANDAR KETAT < 100ms
+                        speedText.innerText = `Sinyal: Kuat (${pingTime}ms)`;
+                        dot.className = 'signal-dot dot-kuat';
+                    } else if (pingTime < 250) {
+                        speedText.innerText = `Sinyal: Sedang (${pingTime}ms)`;
+                        dot.className = 'signal-dot dot-sedang';
+                    } else {
+                        speedText.innerText = `Sinyal: Lemah (${pingTime}ms)`;
+                        dot.className = 'signal-dot dot-lemah';
+                    }
+                }
+            } catch (error) {
+                speedText.innerText = "Server Down";
+                dot.className = 'signal-dot dot-lemah';
+            }
+        }
+        // 👆 SAMPAI SINI 👆
 
         // --- KAMUS BAHASA ---
         const translations = {
@@ -1041,7 +1107,6 @@
                     const hargaTiket = ticket.price ? ticket.price : (event.price || 0);
                     const tierName = ticket.tierName || 'General';
                     const qty = ticket.quantity || 1;
-                    // 👇 TAMBAHKAN 'quantity: qty' DI SINI AGAR PDF TAHU JUMLAH TIKETNYA
 
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
@@ -1142,7 +1207,7 @@ if (isStreaming) {
                 list.innerHTML = `<div class="col-12 text-center text-danger py-5"><i class="bi bi-exclamation-triangle display-4"></i><p class="mt-2">${t.error_fetch}</p></div>`;
             }
         }
-        // 👇 PASTE FUNGSI SEARCH-NYA TEPAT DI SINI 👇
+        
         function searchTickets() {
             const input = document.getElementById('searchTicketInput').value.toLowerCase();
             const tickets = document.querySelectorAll('.ticket-card-wrapper');
@@ -1168,9 +1233,7 @@ if (isStreaming) {
                 emptyState.style.display = 'none';
             }
         }
-        // 👆 SAMPAI SINI 👆
 
-        // --- PDF GENERATOR ---
         // --- FUNGSI TRANSFER TIKET ---
         const transferModalInstance = new bootstrap.Modal(document.getElementById('transferModal'));
         
@@ -1397,4 +1460,4 @@ if (isStreaming) {
         })();
     </script>
 </body>
-</html> 
+</html>
