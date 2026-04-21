@@ -252,6 +252,11 @@
         .form-control:focus { 
             background: rgba(128, 128, 128, 0.1); color: var(--text-main); border-color: #00c6ff; box-shadow: none; 
         }
+        /* 👇 TAMBAHAN UNTUK WARNA PLACEHOLDER 👇 */
+        .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
         
         [data-theme="dark"] .btn-close { 
             filter: invert(1); 
@@ -586,12 +591,12 @@
                 </div>
                 <div class="modal-body text-center">
                     <i class="bi bi-send-check display-4 text-primary mb-3"></i>
-                    <p class="text-muted small" data-i18n="modal_transfer_desc">Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!</p>
+                    <p class="small" style="color: var(--text-muted);" data-i18n="modal_transfer_desc">Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!</p>
                     
                     <input type="hidden" id="transferTicketCode" value="">
                     
                     <div class="mb-3 text-start">
-                        <label class="text-muted mb-2 fw-bold" data-i18n="lbl_receiver_email">Email Penerima</label>
+                        <label class="mb-2 fw-bold" style="color: var(--text-muted);" data-i18n="lbl_receiver_email">Email Penerima</label>
                         <input type="email" id="receiverEmail" class="form-control text-center fw-bold" placeholder="email.teman@gmail.com" required>
                     </div>
                 </div>
