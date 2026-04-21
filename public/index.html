@@ -301,7 +301,7 @@
             cursor: not-allowed;
         }
 
-        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA (ANIMASI MENYAMPING + GARIS WAKTU) --- */
+        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA --- */
         .news-toast {
             position: fixed;
             bottom: 30px;
@@ -316,9 +316,8 @@
             display: flex;
             align-items: flex-start;
             gap: 15px;
-            overflow: hidden; /* Biar garisnya nggak nembus keluar lengkungan kotak */
+            overflow: hidden; 
 
-            /* Animasi Sembunyi: Geser jauh ke kiri layar (-150%) */
             opacity: 0;
             visibility: hidden;
             transform: translateX(-150%);
@@ -331,7 +330,6 @@
             transform: translateX(0);
         }
 
-        /* 👇 CSS GARIS LOADING 10 DETIK 👇 */
         .news-progress-bar {
             position: absolute;
             bottom: 0;
@@ -343,7 +341,6 @@
         }
 
         .news-toast.show .news-progress-bar {
-            /* Durasi 10 detik sejajar dengan Javascript */
             animation: shrinkBar 10s linear forwards; 
         }
 
@@ -441,6 +438,10 @@
                 </ul>
             </div>
             <div class="d-flex align-items-center gap-2">
+                <div id="networkStatus" class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex" title="Ping ke Server Vercel Rcellfest">
+                    <i class="bi bi-hdd-network" id="networkIcon"></i> 
+                    <span id="networkSpeed" class="fw-bold" style="font-size: 0.85rem;">Cek Ping...</span>
+                </div>
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
                 <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
                 <div id="navUserArea">
@@ -648,10 +649,55 @@
             
             // 👇 PANGGIL FUNGSI BERITA BLOGGER 👇
             loadBloggerNews();
+            
+            // 👇 PANGGIL FUNGSI CEK PING SERVER 👇
+            checkServerPing();
+            setInterval(checkServerPing, 10000);
 
             const loader = document.getElementById('preloader');
             if(loader) loader.classList.add('hide-loader');
         });
+
+        // 👇 SCRIPT CEK PING SERVER VERCEL 👇
+        async function checkServerPing() {
+            const speedText = document.getElementById('networkSpeed');
+            const statusBox = document.getElementById('networkStatus');
+            const icon = document.getElementById('networkIcon');
+
+            if (!navigator.onLine) {
+                speedText.innerText = "Offline";
+                statusBox.className = 'badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
+                icon.className = 'bi bi-wifi-off';
+                return;
+            }
+
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch('/api/ping?t=' + startTime, { method: 'GET' });
+                
+                if (response.ok) {
+                    const pingTime = Date.now() - startTime;
+                    speedText.innerText = `Ping: ${pingTime} ms`;
+
+                    statusBox.className = 'badge rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
+                    if (pingTime < 150) {
+                        statusBox.classList.add('bg-success', 'bg-opacity-10', 'text-success', 'border-success');
+                        icon.className = 'bi bi-hdd-network';
+                    } else if (pingTime < 400) {
+                        statusBox.classList.add('bg-warning', 'bg-opacity-10', 'text-warning', 'border-warning');
+                        icon.className = 'bi bi-hdd-network';
+                    } else {
+                        statusBox.classList.add('bg-danger', 'bg-opacity-10', 'text-danger', 'border-danger');
+                        icon.className = 'bi bi-hdd-network-fill';
+                    }
+                }
+            } catch (error) {
+                speedText.innerText = "Server Down";
+                statusBox.className = 'badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
+                icon.className = 'bi bi-exclamation-triangle-fill';
+            }
+        }
 
         // 👇 FUNGSI PENERIMA DATA (CEK UMUR 24 JAM + AUTO CLOSE 10 DETIK) 👇
         window.handleBloggerNews = function(data) {
@@ -713,7 +759,6 @@
             scriptEl.src = feedUrl;
             document.body.appendChild(scriptEl);
         }
-
 
         function toggleLanguage() {
             const currentLang = localStorage.getItem('lang') || 'id';
