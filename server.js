@@ -93,6 +93,10 @@ let snap = new midtransClient.Snap({
 // ==========================================
 // --- ROUTES API ---
 // ==========================================
+// API KHUSUS CEK PING SERVER
+app.get('/api/ping', (req, res) => {
+    res.status(200).send('pong');
+});
 
 app.get('/api/events', async (req, res) => {
     try { 
