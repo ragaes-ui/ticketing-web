@@ -678,17 +678,18 @@
                 if (response.ok) {
                     const pingTime = Date.now() - startTime;
 
-                    if (pingTime < 150) {
+                // Standar Ping Ketat (Level Pro)
+                    if (pingTime < 100) { // Di bawah 100ms = Hijau (Ngebut)
                         speedText.innerText = `Sinyal: Kuat (${pingTime}ms)`;
-                        dot.style.backgroundColor = '#2ecc71'; // Hijau
+                        dot.style.backgroundColor = '#2ecc71'; 
                         dot.style.boxShadow = '0 0 8px #2ecc71';
-                    } else if (pingTime < 400) {
+                    } else if (pingTime < 250) { // 100ms - 250ms = Kuning (Sedang)
                         speedText.innerText = `Sinyal: Sedang (${pingTime}ms)`;
-                        dot.style.backgroundColor = '#f1c40f'; // Kuning
+                        dot.style.backgroundColor = '#f1c40f'; 
                         dot.style.boxShadow = '0 0 8px #f1c40f';
-                    } else {
+                    } else { // Di atas 250ms = Merah (Lemot/Ngelag)
                         speedText.innerText = `Sinyal: Lemah (${pingTime}ms)`;
-                        dot.style.backgroundColor = '#e74c3c'; // Merah
+                        dot.style.backgroundColor = '#e74c3c'; 
                         dot.style.boxShadow = '0 0 8px #e74c3c';
                     }
                 }
