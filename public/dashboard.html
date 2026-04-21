@@ -1248,6 +1248,7 @@ if (isStreaming) {
             transferModalInstance.show();
         }
 
+        // 👇 FUNGSI TRANSFER DENGAN VALIDASI PIN 👇
         async function prosesTransfer() {
             const ticketCode = document.getElementById('transferTicketCode').value;
             const receiverEmail = document.getElementById('receiverEmail').value;
@@ -1258,35 +1259,47 @@ if (isStreaming) {
                 return Swal.fire({icon: 'warning', title: 'Oops', text: 'Email penerima wajib diisi!', background: '#1c1c2d', color: '#fff'});
             }
 
-            // Popup Konfirmasi Pakai SweetAlert biar keren
-            const confirmRes = await Swal.fire({
-                title: lang === 'id' ? 'Yakin Transfer?' : 'Confirm Transfer?',
-                text: lang === 'id' ? `Kirim tiket ke ${receiverEmail}?` : `Send ticket to ${receiverEmail}?`,
-                icon: 'warning',
+            // 1. MUNCULKAN POPUP MINTA PIN
+            const { value: pin } = await Swal.fire({
+                title: lang === 'id' ? 'Masukkan PIN' : 'Enter PIN',
+                html: `
+                    <p class="text-muted small mb-3">Kirim tiket ke: <br><b class="text-primary">${receiverEmail}</b></p>
+                    <input id="swal-transfer-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" inputmode="numeric" style="letter-spacing: 15px;">
+                `,
                 showCancelButton: true,
                 confirmButtonColor: '#0049CC',
-                cancelButtonColor: '#d33',
-                confirmButtonText: lang === 'id' ? 'Ya, Kirim!' : 'Yes, Send!',
+                cancelButtonColor: '#475569',
+                confirmButtonText: lang === 'id' ? 'Kirim Tiket' : 'Send Ticket',
                 cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1c1c2d', color: '#fff'
+                background: '#1e293b', color: '#fff',
+                preConfirm: () => {
+                    const inputPin = document.getElementById('swal-transfer-pin').value;
+                    if (!inputPin || inputPin.length !== 6) {
+                        Swal.showValidationMessage('PIN wajib 6 angka!');
+                        return false;
+                    }
+                    return inputPin;
+                }
             });
 
-            if (!confirmRes.isConfirmed) return;
+            // Kalau user klik batal / close popup
+            if (!pin) return;
 
             // Animasi Loading Tombol
             btnKirim.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Processing...`;
             btnKirim.disabled = true;
 
             try {
-                // Tembak ke API Node.js yang udah kita bikin sebelumnya
+                // Tembak ke API Node.js dengan membawa PIN
                 const res = await fetch('/api/tickets/transfer', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ticket_code: ticketCode,
-                        receiver_email: receiverEmail
-                    }),
-                    credentials: 'include' // Pakai ini kalau keamanan SSO berbasis Cookie aktif
+                        receiver_email: receiverEmail,
+                        userId: user.id, // ID pengirim
+                        pin: pin         // PIN pengirim untuk divalidasi server
+                    })
                 });
 
                 const data = await res.json();
@@ -1297,21 +1310,21 @@ if (isStreaming) {
                         icon: 'success', 
                         title: 'Sukses!', 
                         text: lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}`, 
-                        background: '#1c1c2d', color: '#fff'
+                        background: '#1e293b', color: '#fff'
                     }).then(() => {
-                        // Refresh daftar tiket biar tiket yang ditransfer ngilang dari dashboard
-                        loadTickets(); 
+                        loadTickets(); // Refresh tiket
                     });
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff'});
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1e293b', color: '#fff'});
                 }
             } catch (error) {
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1c1c2d', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1e293b', color: '#fff'});
             } finally {
                 btnKirim.innerText = translations[lang].btn_send_ticket;
                 btnKirim.disabled = false;
             }
         }
+        // 👆 SAMPAI SINI 👆
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
