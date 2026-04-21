@@ -408,7 +408,30 @@
             color: var(--text-main); 
             transform: scale(1.2); 
         }
-
+/* 👇 PASTE CSS-NYA DI SINI 👇 */
+        .signal-badge {
+            position: fixed;
+            bottom: 42px;
+            right: 105px;
+            z-index: 9998;
+            background-color: #424242; 
+            color: #ffffff;
+            border-radius: 50px;
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .signal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
+        .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
+        
     </style>
 </head>
 <body>
@@ -437,11 +460,6 @@
                     <li class="nav-item"><a class="nav-link" href="guide.html" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-            <div class="d-flex align-items-center gap-2">
-            <div id="networkStatus" class="d-flex align-items-center gap-2" style="background-color: #424242; color: #ffffff; border-radius: 50px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);" title="Ping ke Server Rcellfest">
-                    <span id="networkDot" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71;"></span> 
-                    <span id="networkSpeed">Menghitung...</span>
-                </div>
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
                 <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
                 <div id="navUserArea">
@@ -584,7 +602,10 @@
         </button>
         <div class="news-progress-bar"></div>
     </div>
-
+    <div class="signal-badge" id="floatingPing" title="Ping ke Server Rcellfest">
+        <span id="networkDot" class="signal-dot dot-kuat"></span> 
+        <span id="networkSpeed">Menghitung...</span>
+    </div>
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
     </button>
