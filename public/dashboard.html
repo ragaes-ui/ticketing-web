@@ -389,10 +389,47 @@
                     <a href="index.html" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
                 </div> 
                 
-                    <div class="mb-4">
-                    <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden; background: var(--glass-bg); border: var(--glass-border); backdrop-filter: blur(10px);">
-                        <span class="input-group-text border-0 text-muted ps-3" style="background: transparent;"><i class="bi bi-search"></i></span>
-                        <input type="text" id="searchTicketInput" class="form-control border-0 shadow-none" style="background: transparent; color: var(--text-main);" placeholder="Cari nama event, kode tiket..." onkeyup="searchTickets()">
+                <style>
+                    .custom-search-box {
+                        background: rgba(255, 255, 255, 0.08); 
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 50px; 
+                        padding: 4px 20px;
+                        display: flex;
+                        align-items: center;
+                        backdrop-filter: blur(15px);
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                    }
+                    .custom-search-box:focus-within {
+                        border-color: #00c6ff; /* Nyala biru neon pas diklik */
+                        box-shadow: 0 0 20px rgba(0, 198, 255, 0.3);
+                        background: rgba(255, 255, 255, 0.12);
+                    }
+                    .custom-search-box input {
+                        background: transparent;
+                        border: none;
+                        color: #ffffff;
+                        width: 100%;
+                        padding: 12px 10px;
+                        outline: none;
+                        font-size: 0.95rem;
+                        letter-spacing: 0.5px;
+                    }
+                    .custom-search-box input::placeholder {
+                        color: rgba(255, 255, 255, 0.5); /* Placeholder putih transparan biar jelas */
+                    }
+                    .custom-search-box i {
+                        color: rgba(255, 255, 255, 0.7);
+                        font-size: 1.2rem;
+                        margin-right: 5px;
+                    }
+                </style>
+
+                <div class="mb-4">
+                    <div class="custom-search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchTicketInput" placeholder="Cari nama event atau kode tiket..." onkeyup="searchTickets()">
                     </div>
                 </div>
 
