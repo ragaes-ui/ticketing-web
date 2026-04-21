@@ -438,9 +438,9 @@
                 </ul>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <div id="networkStatus" class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex" title="Ping ke Server Vercel Rcellfest">
-                    <i class="bi bi-hdd-network" id="networkIcon"></i> 
-                    <span id="networkSpeed" class="fw-bold" style="font-size: 0.85rem;">Cek Ping...</span>
+            <div id="networkStatus" class="d-none d-md-flex align-items-center gap-2" style="background-color: #424242; color: #ffffff; border-radius: 50px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);" title="Ping ke Server Rcellfest">
+                    <span id="networkDot" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71;"></span> 
+                    <span id="networkSpeed">Menghitung...</span>
                 </div>
                 <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
                 <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
@@ -658,16 +658,15 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-        // 👇 SCRIPT CEK PING SERVER VERCEL 👇
+// 👇 SCRIPT CEK PING SERVER VERCEL (NEW DESIGN) 👇
         async function checkServerPing() {
             const speedText = document.getElementById('networkSpeed');
-            const statusBox = document.getElementById('networkStatus');
-            const icon = document.getElementById('networkIcon');
+            const dot = document.getElementById('networkDot');
 
             if (!navigator.onLine) {
                 speedText.innerText = "Offline";
-                statusBox.className = 'badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
-                icon.className = 'bi bi-wifi-off';
+                dot.style.backgroundColor = '#e74c3c';
+                dot.style.boxShadow = '0 0 8px #e74c3c';
                 return;
             }
 
@@ -678,24 +677,25 @@
                 
                 if (response.ok) {
                     const pingTime = Date.now() - startTime;
-                    speedText.innerText = `Ping: ${pingTime} ms`;
 
-                    statusBox.className = 'badge rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
                     if (pingTime < 150) {
-                        statusBox.classList.add('bg-success', 'bg-opacity-10', 'text-success', 'border-success');
-                        icon.className = 'bi bi-hdd-network';
+                        speedText.innerText = `Sinyal: Kuat (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#2ecc71'; // Hijau
+                        dot.style.boxShadow = '0 0 8px #2ecc71';
                     } else if (pingTime < 400) {
-                        statusBox.classList.add('bg-warning', 'bg-opacity-10', 'text-warning', 'border-warning');
-                        icon.className = 'bi bi-hdd-network';
+                        speedText.innerText = `Sinyal: Sedang (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#f1c40f'; // Kuning
+                        dot.style.boxShadow = '0 0 8px #f1c40f';
                     } else {
-                        statusBox.classList.add('bg-danger', 'bg-opacity-10', 'text-danger', 'border-danger');
-                        icon.className = 'bi bi-hdd-network-fill';
+                        speedText.innerText = `Sinyal: Lemah (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#e74c3c'; // Merah
+                        dot.style.boxShadow = '0 0 8px #e74c3c';
                     }
                 }
             } catch (error) {
                 speedText.innerText = "Server Down";
-                statusBox.className = 'badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill d-flex align-items-center gap-2 px-3 py-2 d-none d-md-flex';
-                icon.className = 'bi bi-exclamation-triangle-fill';
+                dot.style.backgroundColor = '#e74c3c';
+                dot.style.boxShadow = '0 0 8px #e74c3c';
             }
         }
 
