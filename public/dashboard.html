@@ -322,7 +322,10 @@
         }
         .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
-        .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
+        /* 👇 FIX WARNA TULISAN LABEL DI DARK MODE 👇 */
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
         /* 👆 SAMPAI SINI 👆 */
 
     </style>
