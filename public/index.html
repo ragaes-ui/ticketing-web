@@ -460,10 +460,13 @@
                     <li class="nav-item"><a class="nav-link" href="guide.html" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 40px;" id="lang-btn">ID</button>
-                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--border-color);"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
+            <div class="d-flex align-items-center gap-1 gap-md-2 flex-nowrap">
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 36px; padding: 4px 8px;" id="lang-btn">ID</button>              
+                <button onclick="toggleTheme()" class="btn rounded-circle d-flex align-items-center justify-content-center" id="theme-btn" style="width: 36px; height: 36px; border: 1px solid var(--border-color); padding: 0;">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>                
                 <div id="navUserArea">
-                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm" data-i18n="nav_login">Masuk / Daftar</a>
+                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
                 </div>
             </div>
         </div>
@@ -848,9 +851,9 @@
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
                     <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-3 py-1" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle text-primary"></i>
-                            <span class="small fw-bold text-truncate" style="max-width:80px;">${user.username}</span>
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-2 px-md-3 py-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-primary fs-5"></i>
+                            <span class="small fw-bold text-truncate d-none d-sm-inline-block" style="max-width:80px;">${user.username}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
                             <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
@@ -860,7 +863,7 @@
                     </div>
                 `;
             } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">${t.nav_login}</a>`;
+                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
             }
         }
 
