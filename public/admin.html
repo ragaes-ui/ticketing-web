@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <script>
@@ -184,7 +184,56 @@
                 </div>
             </div>
         </div>
+<div class="row mb-4" id="laporan-print-area">
+            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-bar-chart-fill me-2 text-warning"></i> Laporan Keuangan</h5>
+                <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Cetak PDF
+                </button>
+            </div>
 
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #00c6ff;">
+                    <h6 class="opacity-75 fw-bold mb-2">TOTAL PENDAPATAN</h6>
+                    <h3 class="fw-bold text-info mb-0" id="totalPendapatan">Rp 0</h3>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #2ecc71;">
+                    <h6 class="opacity-75 fw-bold mb-2">TIKET TERJUAL</h6>
+                    <h3 class="fw-bold text-success mb-0" id="totalTiket">0 <small class="fs-6 fw-normal text-white">Tiket</small></h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f;">
+                    <h6 class="opacity-75 fw-bold mb-2">TOTAL USER AKTIF</h6>
+                    <h3 class="fw-bold text-warning mb-0" id="totalUser">0 <small class="fs-6 fw-normal text-white">Orang</small></h3>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <div class="glass-card">
+                    <h6 class="fw-bold mb-3 text-info">Riwayat Transaksi Terbaru</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kode Tiket</th>
+                                    <th>Pembeli</th>
+                                    <th>Event</th>
+                                    <th>Metode</th>
+                                    <th class="text-end">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelLaporan">
+                                <tr><td colspan="6" class="text-center py-4 text-white-50">Memuat data laporan...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="glass-card sticky-top" style="top: 110px; z-index: 10;">
@@ -617,7 +666,66 @@
                 }
             });
         }
-        
+// 👇 FUNGSI TARIK DATA LAPORAN & CETAK PDF 👇
+        async function loadLaporan() {
+            try {
+                // Nembak ke API backend untuk ambil rekap data
+                const res = await fetch('/api/admin/reports', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
+                    document.getElementById('totalTiket').innerHTML = `${data.totalTiket} <small class="fs-6 fw-normal text-white">Tiket</small>`;
+                    document.getElementById('totalUser').innerHTML = `${data.totalUser} <small class="fs-6 fw-normal text-white">Orang</small>`;
+
+                    let htmlTabel = '';
+                    data.transaksiTerbaru.forEach(trx => {
+                        const tanggal = new Date(trx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                        htmlTabel += `
+                            <tr>
+                                <td><span class="text-white-50 small">${tanggal}</span></td>
+                                <td><span class="badge bg-light text-dark border">${trx.ticketCode}</span></td>
+                                <td class="fw-bold">${trx.customerName}</td>
+                                <td>${trx.eventName}</td>
+                                <td><span class="badge ${trx.paymentMethod === 'SALDO' ? 'bg-primary' : 'bg-success'}">${trx.paymentMethod}</span></td>
+                                <td class="text-end fw-bold text-success">+ Rp ${trx.price.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Belum ada transaksi</td></tr>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+            }
+        }
+
+        function cetakLaporan() {
+            const elemen = document.getElementById('laporan-print-area');
+            
+            // Fix warna tulisan pas dicetak biar gak transparan
+            elemen.style.background = '#0f172a'; 
+            elemen.style.padding = '20px';
+            
+            const opt = {
+                margin: 10,
+                filename: 'Laporan_Keuangan_RCELLFEST.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f172a' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            
+            Swal.fire({ title: 'Membuat PDF...', didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
+            
+            html2pdf().set(opt).from(elemen).save().then(() => {
+                Swal.close();
+                elemen.style.background = 'transparent'; // Kembalikan style semula
+                elemen.style.padding = '0';
+            });
+        }
+        // 👆 SAMPAI SINI FUNGSI LAPORAN 👆        
         // --- LOAD TABEL EVENT ---
         async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id';
@@ -951,7 +1059,8 @@
             window.location.href = 'login.html'; 
         }
         
-        loadTable(); 
+        loadTable();
+        loadLaporan();
         checkMaintenanceStatus(); 
         checkCategory(document.getElementById('category'));
     </script>
