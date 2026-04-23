@@ -696,8 +696,7 @@
                     document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Belum ada transaksi</td></tr>';
                 } else {
                     // KALAU SERVER ERROR, TAMPILKAN PESANNYA DI TABEL
-                    document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning fw-bold py-4">Pesan Server: ${data.message}</td></tr>`;
-                }
+            document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning py-4">Error Status: ${res.status} <br> Detail: ${JSON.stringify(data)}</td></tr>`;                }
             } catch (error) {
                 console.error(error);
                 document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Pastikan server.js sudah jalan.</td></tr>`;
