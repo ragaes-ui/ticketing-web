@@ -901,8 +901,9 @@ app.get('/api/admin/reports', async (req, res) => {
                 namaEvent = order.eventName;
             }
 
-            return {
-                date: order.createdAt || order.date || new Date(),
+                return {
+                // 👇 Ekstrak waktu asli bawaan ID MongoDB 👇
+                date: order.createdAt || order.date || order._id.getTimestamp(),
                 ticketCode: order.ticketCode || '-',
                 customerName: order.customerName || '-',
                 eventName: namaEvent,
