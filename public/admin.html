@@ -214,8 +214,8 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f;">
-                    <h6 class="opacity-75 fw-bold mb-2">TOTAL USER AKTIF</h6>
+                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor: pointer; transition: 0.3s;" onclick="openUserModal()" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'" title="Klik untuk lihat daftar user">
+                    <h6 class="opacity-75 fw-bold mb-2">TOTAL USER AKTIF <i class="bi bi-box-arrow-up-right ms-1"></i></h6>
                     <h3 class="fw-bold text-warning mb-0" id="totalUser">0 <small class="fs-6 fw-normal text-white">Orang</small></h3>
                 </div>
             </div>
@@ -487,7 +487,33 @@
             </div>
         </div>
     </div>
-
+<div class="modal fade" id="userListModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-warning"><i class="bi bi-people-fill me-2"></i> Daftar User Terdaftar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                            <thead style="background: rgba(255, 255, 255, 0.1);">
+                                <tr>
+                                    <th class="ps-4 text-white-50">Nama & Username</th>
+                                    <th class="text-white-50">Kontak (Email / WA)</th>
+                                    <th class="text-white-50">Saldo</th>
+                                    <th class="text-white-50">Tgl Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableUserList">
+                                <tr><td colspan="4" class="text-center py-5 text-white-50">Memuat data user...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -1146,6 +1172,54 @@
         loadLaporan();
         checkMaintenanceStatus(); 
         checkCategory(document.getElementById('category'));
+        // 👇 FUNGSI BUKA DAFTAR USER 👇
+        const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));
+
+        async function openUserModal() {
+            userListModal.show();
+            const tbody = document.getElementById('tableUserList');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-white-50"><span class="spinner-border spinner-border-sm"></span> Memuat daftar...</td></tr>';
+
+            try {
+                const res = await fetch('/api/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    if (result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-white-50">Belum ada user yang mendaftar.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    result.data.forEach(u => {
+                        // Ekstrak tanggal daftar dari ID MongoDB
+                        const tglDaftar = new Date(u.createdAt || parseInt(u._id.substring(0, 8), 16) * 1000).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                        
+                        html += `
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold">${u.fullName || '-'}</div>
+                                    <small class="text-info">@${u.username}</small>
+                                </td>
+                                <td>
+                                    <div>${u.email}</div>
+                                    <small class="text-white-50"><i class="bi bi-whatsapp"></i> ${u.phone || 'Belum diisi'}</small>
+                                </td>
+                                <td class="text-success fw-bold">Rp ${(u.saldo || 0).toLocaleString('id-ID')}</td>
+                                <td class="text-white-50 small">${tglDaftar}</td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Koneksi Error.</td></tr>';
+            }
+        }
     </script>
 </body>
 </html>
