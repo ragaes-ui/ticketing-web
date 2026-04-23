@@ -906,12 +906,20 @@ app.get('/api/admin/reports', async (req, res) => {
             if (order.eventId && order.eventId.name) namaEvent = order.eventId.name;
             else if (order.eventName) namaEvent = order.eventName;
 
+        // Logika detektif: Cek apakah ID Midtransnya ngandung kata 'SALDO'
+            let metodeAsli = 'MIDTRANS';
+            if (order.paymentMethod) {
+                metodeAsli = order.paymentMethod.toUpperCase();
+            } else if (order.orderIdMidtrans && order.orderIdMidtrans.includes('SALDO')) {
+                metodeAsli = 'SALDO';
+            }
+
             return {
                 date: order.createdAt || order.date || order._id.getTimestamp(),
                 ticketCode: order.ticketCode || '-',
                 customerName: order.customerName || '-',
                 eventName: namaEvent,
-                paymentMethod: (order.paymentMethod || 'MIDTRANS').toUpperCase(),
+                paymentMethod: metodeAsli, // 👈 Pakai hasil detektif
                 price: order.price || 0
             };
         });
