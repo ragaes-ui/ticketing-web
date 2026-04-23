@@ -863,7 +863,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 // ==========================================
-// --- API LAPORAN ADMIN (REKAP & STATISTIK) ---
+// --- API LAPORAN ADMIN (REKAP, STATISTIK & GRAFIK) ---
 // ==========================================
 app.get('/api/admin/reports', async (req, res) => {
     try {
@@ -873,35 +873,27 @@ app.get('/api/admin/reports', async (req, res) => {
         }
 
         const totalUser = await User.countDocuments();
-
-        // Ambil filter tanggal dari query web
         const { start, end } = req.query;
 
-        // 1. Tarik semua transaksi sukses & urutkan dari yang terbaru
         const semuaOrders = await Order.find({
             status: { $in: ['valid', 'used'] }
         })
         .sort({ _id: -1 })
         .populate('eventId');
 
-        // 2. Lakukan Penyaringan (Filter) jika ada request tanggal
         let orderTersaring = semuaOrders;
         if (start && end) {
             const startDate = new Date(start).getTime();
-            
-            // Atur batas akhir hari ke 23:59:59 agar masuk semua
             const endDate = new Date(end);
             endDate.setHours(23, 59, 59, 999); 
             const endwaktu = endDate.getTime();
 
-            // Saring berdasarkan waktu asli bawaan MongoDB
             orderTersaring = semuaOrders.filter(order => {
                 const waktuAsli = order.createdAt ? new Date(order.createdAt).getTime() : order._id.getTimestamp().getTime();
                 return waktuAsli >= startDate && waktuAsli <= endwaktu;
             });
         }
 
-        // 3. Hitung Pendapatan & Tiket hanya dari data yang tersaring
         let totalPendapatan = 0;
         let totalTiket = 0;
         orderTersaring.forEach(order => {
@@ -909,17 +901,12 @@ app.get('/api/admin/reports', async (req, res) => {
             totalTiket += (order.quantity || 1);
         });
 
-        // 4. Ambil 20 transaksi terbaru dari data yang sudah difilter
         const transaksiTerbaru = orderTersaring.slice(0, 20).map(order => {
             let namaEvent = "Event RCELLFEST";
-            if (order.eventId && order.eventId.name) {
-                namaEvent = order.eventId.name;
-            } else if (order.eventName) {
-                namaEvent = order.eventName;
-            }
+            if (order.eventId && order.eventId.name) namaEvent = order.eventId.name;
+            else if (order.eventName) namaEvent = order.eventName;
 
             return {
-                // Ekstrak waktu asli bawaan ID MongoDB
                 date: order.createdAt || order.date || order._id.getTimestamp(),
                 ticketCode: order.ticketCode || '-',
                 customerName: order.customerName || '-',
@@ -929,12 +916,35 @@ app.get('/api/admin/reports', async (req, res) => {
             };
         });
 
+        // 👇 TAMBAHAN BARU: NGITUNG DATA GRAFIK 7 HARI TERAKHIR 👇
+        const chartData = {};
+        const hariIni = new Date();
+        // Buat template 7 hari ke belakang (misal: 17 Apr, 18 Apr, dst)
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(hariIni);
+            d.setDate(d.getDate() - i);
+            const tglString = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            chartData[tglString] = 0; 
+        }
+
+        // Isi pendapatan ke tanggal yang sesuai
+        semuaOrders.forEach(order => {
+            const waktuAsli = order.createdAt || order.date || order._id.getTimestamp();
+            const orderDate = new Date(waktuAsli);
+            const tglString = orderDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            
+            if (chartData[tglString] !== undefined) {
+                chartData[tglString] += (order.price || 0);
+            }
+        });
+
+        const chartLabels = Object.keys(chartData); // Label tanggal (Sumbu X)
+        const chartValues = Object.values(chartData); // Nilai Rupiah (Sumbu Y)
+
         res.json({
             success: true,
-            totalPendapatan: totalPendapatan,
-            totalTiket: totalTiket,
-            totalUser: totalUser,
-            transaksiTerbaru: transaksiTerbaru
+            totalPendapatan, totalTiket, totalUser, transaksiTerbaru,
+            chartLabels, chartValues // Kirim ke frontend
         });
 
     } catch (error) {
