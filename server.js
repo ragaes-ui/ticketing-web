@@ -876,11 +876,11 @@ app.get('/api/admin/reports', async (req, res) => {
         // 1. Hitung Total User yang terdaftar
         const totalUser = await User.countDocuments();
 
-        // 2. Ambil Semua Transaksi Sukses (Valid / Used)
-        // Kita hanya hitung orderan yang udah lunas/berhasil
         const suksesOrders = await Order.find({
-            status: { $in: ['valid', 'used'] }
-        }).sort({ createdAt: -1 }).populate('eventId'); // Urutkan dari yang paling baru
+        status: { $in: ['valid', 'used'] }
+        })
+        .sort({ _id: -1 }) // 👈 PAKSA SORTIR PAKAI ID (DIJAMIN PALING BARU DI ATAS)
+        .populate('eventId');
 
         // 3. Hitung Total Pendapatan & Tiket Terjual
         let totalPendapatan = 0;
