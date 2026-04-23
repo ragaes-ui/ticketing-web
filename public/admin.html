@@ -185,8 +185,17 @@
             </div>
         </div>
 <div class="row mb-4" id="laporan-print-area">
-            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+            <div class="col-12 d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                 <h5 class="fw-bold m-0"><i class="bi bi-bar-chart-fill me-2 text-warning"></i> Laporan Keuangan</h5>
+                
+                <div class="d-flex align-items-center gap-2 bg-dark bg-opacity-25 p-2 rounded-pill border border-secondary">
+                    <input type="date" id="filterStart" class="form-control form-control-sm bg-transparent text-white border-0" style="width: auto;">
+                    <span class="text-white-50 small">s/d</span>
+                    <input type="date" id="filterEnd" class="form-control form-control-sm bg-transparent text-white border-0" style="width: auto;">
+                    <button onclick="loadLaporan()" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filter</button>
+                    <button onclick="resetFilter()" class="btn btn-sm btn-outline-light rounded-pill px-3">Reset</button>
+                </div>
+
                 <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
                     <i class="bi bi-file-earmark-pdf-fill me-1"></i> Cetak PDF
                 </button>
@@ -666,10 +675,19 @@
                 }
             });
         }
-// 👇 FUNGSI TARIK DATA LAPORAN (DENGAN PENDETEKSI ERROR) 👇
+// 👇 FUNGSI TARIK DATA LAPORAN (DENGAN FILTER) 👇
         async function loadLaporan() {
             try {
-                const res = await fetch('/api/admin/reports', {
+                const startDate = document.getElementById('filterStart').value;
+                const endDate = document.getElementById('filterEnd').value;
+                
+                // Tambahkan query parameter jika filter diisi
+                let url = '/api/admin/reports';
+                if (startDate && endDate) {
+                    url += `?start=${startDate}&end=${endDate}`;
+                }
+
+                const res = await fetch(url, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
@@ -693,14 +711,20 @@
                             </tr>
                         `;
                     });
-                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Belum ada transaksi</td></tr>';
+                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Tidak ada transaksi di tanggal ini</td></tr>';
                 } else {
-                    // KALAU SERVER ERROR, TAMPILKAN PESANNYA DI TABEL
-            document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning py-4">Error Status: ${res.status} <br> Detail: ${JSON.stringify(data)}</td></tr>`;                }
+                    document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning fw-bold py-4">Pesan Server: ${data.message}</td></tr>`;
+                }
             } catch (error) {
-                console.error(error);
-                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Pastikan server.js sudah jalan.</td></tr>`;
+                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Gagal terhubung ke server.</td></tr>`;
             }
+        }
+
+        // Fungsi mengembalikan ke kondisi semula (tanpa filter)
+        function resetFilter() {
+            document.getElementById('filterStart').value = '';
+            document.getElementById('filterEnd').value = '';
+            loadLaporan();
         }
 
 // 👇 FUNGSI CETAK PDF (VERSI LAPORAN FORMAL KERTAS PUTIH) 👇
