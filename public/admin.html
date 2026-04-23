@@ -1220,6 +1220,13 @@
         loadLaporan();
         checkMaintenanceStatus(); 
         checkCategory(document.getElementById('category'));
+        setInterval(() => {
+            // Jangan auto-refresh kalau user lagi milih tanggal (lagi pakai filter)
+            if (!document.getElementById('filterStart').value) {
+                loadLaporan();
+                loadTable();
+            }
+        }, 10000);
         // 👇 FUNGSI BUKA DAFTAR USER 👇
         const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));
 
