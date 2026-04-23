@@ -867,33 +867,50 @@ app.post('/api/chat', async (req, res) => {
 // ==========================================
 app.get('/api/admin/reports', async (req, res) => {
     try {
-        // Cek Keamanan: Pastikan yang akses cuma admin (kalau pakai token admin)
         const authHeader = req.headers['authorization'];
         if (!authHeader || !authHeader.includes('Bearer ')) {
             return res.status(403).json({ success: false, message: "Akses ditolak!" });
         }
 
-        // 1. Hitung Total User yang terdaftar
         const totalUser = await User.countDocuments();
 
-        const suksesOrders = await Order.find({
-        status: { $in: ['valid', 'used'] }
+        // Ambil filter tanggal dari query web
+        const { start, end } = req.query;
+
+        // 1. Tarik semua transaksi sukses & urutkan dari yang terbaru
+        const semuaOrders = await Order.find({
+            status: { $in: ['valid', 'used'] }
         })
-        .sort({ _id: -1 }) // 👈 PAKSA SORTIR PAKAI ID (DIJAMIN PALING BARU DI ATAS)
+        .sort({ _id: -1 })
         .populate('eventId');
 
-        // 3. Hitung Total Pendapatan & Tiket Terjual
+        // 2. Lakukan Penyaringan (Filter) jika ada request tanggal
+        let orderTersaring = semuaOrders;
+        if (start && end) {
+            const startDate = new Date(start).getTime();
+            
+            // Atur batas akhir hari ke 23:59:59 agar masuk semua
+            const endDate = new Date(end);
+            endDate.setHours(23, 59, 59, 999); 
+            const endwaktu = endDate.getTime();
+
+            // Saring berdasarkan waktu asli bawaan MongoDB
+            orderTersaring = semuaOrders.filter(order => {
+                const waktuAsli = order.createdAt ? new Date(order.createdAt).getTime() : order._id.getTimestamp().getTime();
+                return waktuAsli >= startDate && waktuAsli <= endwaktu;
+            });
+        }
+
+        // 3. Hitung Pendapatan & Tiket hanya dari data yang tersaring
         let totalPendapatan = 0;
         let totalTiket = 0;
-
-        suksesOrders.forEach(order => {
+        orderTersaring.forEach(order => {
             totalPendapatan += (order.price || 0); 
-            totalTiket += (order.quantity || 1); // Default 1 kalau misal qty gak ada
+            totalTiket += (order.quantity || 1);
         });
 
-        // 4. Format 10 Transaksi Terbaru untuk Tabel
-        const transaksiTerbaru = suksesOrders.slice(0, 10).map(order => {
-            // Cari nama event, kalau eventId dipopulate, ambil name-nya
+        // 4. Ambil 20 transaksi terbaru dari data yang sudah difilter
+        const transaksiTerbaru = orderTersaring.slice(0, 20).map(order => {
             let namaEvent = "Event RCELLFEST";
             if (order.eventId && order.eventId.name) {
                 namaEvent = order.eventId.name;
@@ -901,8 +918,8 @@ app.get('/api/admin/reports', async (req, res) => {
                 namaEvent = order.eventName;
             }
 
-                return {
-                // 👇 Ekstrak waktu asli bawaan ID MongoDB 👇
+            return {
+                // Ekstrak waktu asli bawaan ID MongoDB
                 date: order.createdAt || order.date || order._id.getTimestamp(),
                 ticketCode: order.ticketCode || '-',
                 customerName: order.customerName || '-',
@@ -912,7 +929,6 @@ app.get('/api/admin/reports', async (req, res) => {
             };
         });
 
-        // 5. Kirim datanya ke file admin.html
         res.json({
             success: true,
             totalPendapatan: totalPendapatan,
