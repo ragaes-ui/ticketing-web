@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
 
     <script>
@@ -219,7 +220,14 @@
                     <h3 class="fw-bold text-warning mb-0" id="totalUser">0 <small class="fs-6 fw-normal text-white">Orang</small></h3>
                 </div>
             </div>
-
+<div class="col-12 mt-4">
+                <div class="glass-card">
+                    <h6 class="fw-bold mb-3 text-info"><i class="bi bi-graph-up-arrow me-2"></i>Grafik Pendapatan (7 Hari Terakhir)</h6>
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
             <div class="col-12 mt-4">
                 <div class="glass-card">
                     <h6 class="fw-bold mb-3 text-info">Riwayat Transaksi Terbaru</h6>
@@ -701,7 +709,9 @@
                 }
             });
         }
-// 👇 FUNGSI TARIK DATA LAPORAN (DENGAN FILTER) 👇
+// 👇 FUNGSI TARIK DATA LAPORAN (TABEL + GRAFIK + FILTER) 👇
+        let myChart = null; 
+        
         async function loadLaporan() {
             try {
                 const startDate = document.getElementById('filterStart').value;
@@ -719,10 +729,12 @@
                 const data = await res.json();
 
                 if (res.ok) {
+                    // 1. UPDATE KOTAK ANGKA RINGKASAN
                     document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
                     document.getElementById('totalTiket').innerHTML = `${data.totalTiket} <small class="fs-6 fw-normal text-white">Tiket</small>`;
                     document.getElementById('totalUser').innerHTML = `${data.totalUser} <small class="fs-6 fw-normal text-white">Orang</small>`;
 
+                    // 2. UPDATE TABEL TRANSAKSI TERBARU
                     let htmlTabel = '';
                     data.transaksiTerbaru.forEach(trx => {
                         const tanggal = new Date(trx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -738,10 +750,45 @@
                         `;
                     });
                     document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Tidak ada transaksi di tanggal ini</td></tr>';
+
+                    // 3. MENGGAMBAR GRAFIK (CHART.JS)
+                    const ctx = document.getElementById('revenueChart').getContext('2d');
+                    
+                    // Hapus grafik lama kalau ada (biar gak numpuk pas difilter)
+                    if (myChart) myChart.destroy();
+                    
+                    myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.chartLabels, // Sumbu X (Tanggal)
+                            datasets: [{
+                                label: 'Pendapatan Harian (Rp)',
+                                data: data.chartValues, // Sumbu Y (Rupiah)
+                                borderColor: '#00c6ff',
+                                backgroundColor: 'rgba(0, 198, 255, 0.2)',
+                                borderWidth: 3,
+                                pointBackgroundColor: '#ff9800',
+                                pointRadius: 5,
+                                fill: true,
+                                tension: 0.4 // Garis melengkung
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#aaa' } },
+                                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#aaa' } }
+                            }
+                        }
+                    });
+
                 } else {
                     document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning fw-bold py-4">Pesan Server: ${data.message}</td></tr>`;
                 }
             } catch (error) {
+                console.error(error);
                 document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Gagal terhubung ke server.</td></tr>`;
             }
         }
@@ -752,6 +799,7 @@
             document.getElementById('filterEnd').value = '';
             loadLaporan();
         }
+
 
 // 👇 FUNGSI CETAK PDF (VERSI LAPORAN FORMAL KERTAS PUTIH) 👇
         function cetakLaporan() {
