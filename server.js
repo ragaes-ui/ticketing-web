@@ -862,20 +862,6 @@ app.post('/api/chat', async (req, res) => {
         res.json({ reply: "Sinyal putus kak! 📶" });
     }
 });
-
-
-
-
-// ROUTE HANDLER TERAKHIR
-app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-});
-
-// 404 Handler
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-});
 // ==========================================
 // --- API LAPORAN ADMIN (REKAP & STATISTIK) ---
 // ==========================================
@@ -939,6 +925,20 @@ app.get('/api/admin/reports', async (req, res) => {
         res.status(500).json({ success: false, message: "Gagal mengambil data laporan backend." });
     }
 });
+
+
+
+// ROUTE HANDLER TERAKHIR
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+});
+
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
+
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
