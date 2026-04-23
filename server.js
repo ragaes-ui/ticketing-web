@@ -876,7 +876,69 @@ app.get('*', (req, res) => {
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
+// ==========================================
+// --- API LAPORAN ADMIN (REKAP & STATISTIK) ---
+// ==========================================
+app.get('/api/admin/reports', async (req, res) => {
+    try {
+        // Cek Keamanan: Pastikan yang akses cuma admin (kalau pakai token admin)
+        const authHeader = req.headers['authorization'];
+        if (!authHeader || !authHeader.includes('Bearer ')) {
+            return res.status(403).json({ success: false, message: "Akses ditolak!" });
+        }
 
+        // 1. Hitung Total User yang terdaftar
+        const totalUser = await User.countDocuments();
+
+        // 2. Ambil Semua Transaksi Sukses (Valid / Used)
+        // Kita hanya hitung orderan yang udah lunas/berhasil
+        const suksesOrders = await Order.find({
+            status: { $in: ['valid', 'used'] }
+        }).sort({ createdAt: -1 }).populate('eventId'); // Urutkan dari yang paling baru
+
+        // 3. Hitung Total Pendapatan & Tiket Terjual
+        let totalPendapatan = 0;
+        let totalTiket = 0;
+
+        suksesOrders.forEach(order => {
+            totalPendapatan += (order.price || 0); 
+            totalTiket += (order.quantity || 1); // Default 1 kalau misal qty gak ada
+        });
+
+        // 4. Format 10 Transaksi Terbaru untuk Tabel
+        const transaksiTerbaru = suksesOrders.slice(0, 10).map(order => {
+            // Cari nama event, kalau eventId dipopulate, ambil name-nya
+            let namaEvent = "Event RCELLFEST";
+            if (order.eventId && order.eventId.name) {
+                namaEvent = order.eventId.name;
+            } else if (order.eventName) {
+                namaEvent = order.eventName;
+            }
+
+            return {
+                date: order.createdAt || order.date || new Date(),
+                ticketCode: order.ticketCode || '-',
+                customerName: order.customerName || '-',
+                eventName: namaEvent,
+                paymentMethod: (order.paymentMethod || 'MIDTRANS').toUpperCase(),
+                price: order.price || 0
+            };
+        });
+
+        // 5. Kirim datanya ke file admin.html
+        res.json({
+            success: true,
+            totalPendapatan: totalPendapatan,
+            totalTiket: totalTiket,
+            totalUser: totalUser,
+            transaksiTerbaru: transaksiTerbaru
+        });
+
+    } catch (error) {
+        console.error("Error Load Laporan Admin:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil data laporan backend." });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
