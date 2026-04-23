@@ -703,30 +703,88 @@
             }
         }
 
+// 👇 FUNGSI CETAK PDF (VERSI LAPORAN FORMAL KERTAS PUTIH) 👇
         function cetakLaporan() {
-            const elemen = document.getElementById('laporan-print-area');
+            Swal.fire({ title: 'Menyiapkan Dokumen...', didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
+
+            // 1. Ambil angka-angka dari dashboard
+            const valPendapatan = document.getElementById('totalPendapatan').innerText;
+            const valTiket = document.getElementById('totalTiket').innerText.replace('Tiket', '').trim();
+            const valUser = document.getElementById('totalUser').innerText.replace('Orang', '').trim();
             
-            // Fix warna tulisan pas dicetak biar gak transparan
-            elemen.style.background = '#0f172a'; 
-            elemen.style.padding = '20px';
-            
+            // Ambil isi tabel dan buang class warna putih bawaan dark mode
+            let isiTabel = document.getElementById('tabelLaporan').innerHTML;
+            isiTabel = isiTabel.replace(/text-white-50/g, 'text-secondary').replace(/text-white/g, 'text-dark');
+
+            // 2. Buat "Kertas Putih" virtual khusus untuk di-print
+            const kertasPDF = document.createElement('div');
+            kertasPDF.innerHTML = `
+                <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #333;">
+                    
+                    <div style="border-bottom: 3px solid #0049CC; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div>
+                            <h2 style="margin: 0; color: #0049CC; font-weight: 800; font-size: 28px;">RCELLFEST</h2>
+                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Laporan Keuangan & Penjualan Tiket Digital</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; color: #666; font-size: 12px;">Dicetak pada:</p>
+                            <p style="margin: 2px 0 0 0; font-weight: bold; font-size: 14px;">${new Date().toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
+                        <div style="text-align: center; width: 33%;">
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TOTAL PENDAPATAN</p>
+                            <h3 style="margin: 0; color: #0049CC; font-size: 20px;">${valPendapatan}</h3>
+                        </div>
+                        <div style="text-align: center; width: 33%; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TIKET TERJUAL</p>
+                            <h3 style="margin: 0; color: #2ecc71; font-size: 20px;">${valTiket} <small style="font-size:12px; color:#666;">Tiket</small></h3>
+                        </div>
+                        <div style="text-align: center; width: 33%;">
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TOTAL USER AKTIF</p>
+                            <h3 style="margin: 0; color: #f39c12; font-size: 20px;">${valUser} <small style="font-size:12px; color:#666;">Orang</small></h3>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Rincian 10 Transaksi Terakhir</h4>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #0049CC; color: #ffffff; text-align: left;">
+                                <th style="padding: 12px; border: 1px solid #ddd;">Tanggal</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Kode Tiket</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Pembeli</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Event</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Metode</th>
+                                <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: #000;">
+                            ${isiTabel}
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 40px; text-align: center; color: #aaa; font-size: 10px;">
+                        <p>Dokumen ini di-generate otomatis oleh Sistem RCELLFEST.</p>
+                    </div>
+                </div>
+            `;
+
+            // 3. Konfigurasi Cetak
             const opt = {
-                margin: 10,
-                filename: 'Laporan_Keuangan_RCELLFEST.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f172a' },
+                margin: 0,
+                filename: 'Laporan_Resmi_RCELLFEST.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
             
-            Swal.fire({ title: 'Membuat PDF...', didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
-            
-            html2pdf().set(opt).from(elemen).save().then(() => {
+            // Eksekusi Cetak dari Kertas Virtual
+            html2pdf().set(opt).from(kertasPDF).save().then(() => {
                 Swal.close();
-                elemen.style.background = 'transparent'; // Kembalikan style semula
-                elemen.style.padding = '0';
             });
         }
-        // 👆 SAMPAI SINI FUNGSI LAPORAN 👆        
+        // 👆 SAMPAI SINI FUNGSI LAPORANNYA 👆     
         // --- LOAD TABEL EVENT ---
         async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id';
