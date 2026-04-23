@@ -942,7 +942,26 @@ app.get('/api/admin/reports', async (req, res) => {
         res.status(500).json({ success: false, message: "Gagal mengambil data laporan backend." });
     }
 });
+// ==========================================
+// --- API DAFTAR USER TERDAFTAR (ADMIN) ---
+// ==========================================
+app.get('/api/admin/users', async (req, res) => {
+    try {
+        // Cek Keamanan
+        const authHeader = req.headers['authorization'];
+        if (!authHeader || !authHeader.includes('Bearer ')) {
+            return res.status(403).json({ success: false, message: "Akses ditolak!" });
+        }
 
+        // Ambil semua data user dari database (kecuali password demi keamanan)
+        const users = await User.find({}, '-password').sort({ _id: -1 });
+        
+        res.json({ success: true, data: users });
+    } catch (error) {
+        console.error("Error Load Users:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil data user." });
+    }
+});
 
 
 // ROUTE HANDLER TERAKHIR
