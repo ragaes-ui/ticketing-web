@@ -666,10 +666,9 @@
                 }
             });
         }
-// 👇 FUNGSI TARIK DATA LAPORAN & CETAK PDF 👇
+// 👇 FUNGSI TARIK DATA LAPORAN (DENGAN PENDETEKSI ERROR) 👇
         async function loadLaporan() {
             try {
-                // Nembak ke API backend untuk ambil rekap data
                 const res = await fetch('/api/admin/reports', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
@@ -695,10 +694,13 @@
                         `;
                     });
                     document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Belum ada transaksi</td></tr>';
+                } else {
+                    // KALAU SERVER ERROR, TAMPILKAN PESANNYA DI TABEL
+                    document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning fw-bold py-4">Pesan Server: ${data.message}</td></tr>`;
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Pastikan server.js sudah jalan.</td></tr>`;
             }
         }
 
