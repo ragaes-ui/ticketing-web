@@ -54,6 +54,44 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// ==========================================
+// 🛡️ KONFIGURASI KEYCLOAK SSO (SINGLE SIGN-ON)
+// ==========================================
+const session = require('express-session');
+const Keycloak = require('keycloak-connect');
+
+// 1. Buat penyimpanan sesi login
+const memoryStore = new session.MemoryStore();
+app.use(session({
+    secret: 'rcellfest-rahasia-super-aman', 
+    resave: false,
+    saveUninitialized: true,
+    store: memoryStore
+}));
+
+// 2. Data sambungan ke Cloud-IAM Kakak
+const keycloakConfig = {
+    "realm": "auth-rcellpublic", // 👈 Ganti dengan nama Realm kakak
+    "auth-server-url": "https://lemur-7.cloud-iam.com/auth/", // 👈 Ganti dengan URL Cloud-IAM kakak
+    "ssl-required": "external",
+    "resource": "rcellfest-app", // 👈 Ganti dengan Client ID kakak
+    "credentials": {
+        "secret": "91Q168SjaK78v6PPs0kcFLKnynhmyNb0" // 👈 Paste Secret Key yang dicopy tadi!
+    },
+    "confidential-port": 0
+};
+
+// 3. Nyalakan mesin Keycloak
+const keycloak = new Keycloak({ store: memoryStore }, keycloakConfig);
+app.use(keycloak.middleware());
+// ==========================================
+
+// 👇 Pindahkan app.use(express.static) ke BAWAH konfigurasi Keycloak
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 // ==========================================
@@ -93,6 +131,16 @@ let snap = new midtransClient.Snap({
 // ==========================================
 // --- ROUTES API ---
 // ==========================================
+// ==========================================
+// 🔒 RUTE TERKUNCI OLEH KEYCLOAK
+// ==========================================
+// Jika ada yang buka admin.html, harus lewat Keycloak dulu!
+app.get('/admin.html', keycloak.protect(), (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
+});
+
+// Jika mau amankan API laporan admin juga:
+// app.get('/api/admin/reports', keycloak.protect(), async (req, res) => { ... });
 // API KHUSUS CEK PING SERVER
 app.get('/api/ping', (req, res) => {
     res.status(200).send('pong');
