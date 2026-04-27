@@ -728,25 +728,26 @@ document.getElementById('category').addEventListener('change', function() {
         }
 
 async function loadBuyers() {
-            const token = localStorage.getItem('adminToken'); // Sesuaikan dengan tokenmu
+            const token = localStorage.getItem('adminToken'); 
             const tbody = document.getElementById('tableBuyerList');
             
-            // 1. Munculkan efek "Loading" agar admin tahu data sedang ditarik
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-white-50"><div class="spinner-border text-info spinner-border-sm me-2"></div> Mengambil semua data pembeli...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-white-50"><div class="spinner-border text-info spinner-border-sm me-2"></div> Mengambil data pembeli...</td></tr>';
 
             try {
-                // (Ganti '/api/admin/transactions' dengan endpoint API aslimu)
                 const res = await fetch('/api/admin/reports', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (res.ok) {
-                    buyersData = await res.json();
+                    const responseData = await res.json();
                     
-                    // 2. LANGSUNG render SEMUA data ke tabel (Tanpa filter)
+                    // KUNCI PERBAIKANNYA DI SINI:
+                    // Cek apakah API mengembalikan array langsung, atau dibungkus di dalam responseData.data
+                    buyersData = Array.isArray(responseData) ? responseData : (responseData.data || []);
+                    
                     renderBuyerTable(buyersData);
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data dari server. Cek API kamu.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data dari server.</td></tr>';
                 }
             } catch (err) {
                 console.error("Gagal load transaksi", err);
