@@ -772,7 +772,7 @@ app.post('/api/chat', async (req, res) => {
 // ==========================================
 // 🛡️ API LAPORAN (Dilindungi Keycloak)
 // ==========================================
-app.get('/api/admin/reports', keycloak.protect(), async (req, res) => {
+app.get('/api/admin/reports', async (req, res) => {
     try {
         const totalUser = await User.countDocuments();
         const { start, end, limit } = req.query;
@@ -852,7 +852,7 @@ app.get('/api/admin/reports', keycloak.protect(), async (req, res) => {
 // ==========================================
 // 🛡️ API DATA USERS (Dilindungi Keycloak)
 // ==========================================
-app.get('/api/admin/users', keycloak.protect(), async (req, res) => {
+app.get('/api/admin/users', async (req, res) => {
     try {
         const users = await User.find({}, '-password').sort({ _id: -1 });
         res.json({ success: true, data: users });
