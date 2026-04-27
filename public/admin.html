@@ -309,25 +309,26 @@
                 </div>
                 <div class="modal-body p-4">
                     
-                    <div class="row g-3 mb-4 bg-dark bg-opacity-25 p-3 rounded-4 border border-secondary">
+      <div class="row g-3 mb-4 bg-dark bg-opacity-25 p-3 rounded-4 border border-secondary">
                         <div class="col-md-3">
-                            <label class="small text-white-50 mb-1">Filter Harian (Tgl/Bln/Thn)</label>
+                            <label class="small text-white-50 mb-1">Filter Harian</label>
                             <input type="date" id="filterDay" class="form-control form-control-sm">
                         </div>
                         <div class="col-md-3">
-                            <label class="small text-white-50 mb-1">Filter Bulanan (Bulan/Tahun)</label>
+                            <label class="small text-white-50 mb-1">Filter Bulanan</label>
                             <input type="month" id="filterMonth" class="form-control form-control-sm">
                         </div>
-                        <div class="col-md-4">
-                            <label class="small text-white-50 mb-1">Cari (Nama/Email/Event)</label>
+                        <div class="col-md-3">
+                            <label class="small text-white-50 mb-1">Cari Data</label>
                             <input type="text" id="searchBuyer" class="form-control form-control-sm" placeholder="Ketik kata kunci...">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button class="btn btn-outline-light btn-sm w-100 py-2" onclick="resetBuyerFilter()">Reset</button>
+                        <div class="col-md-3 d-flex align-items-end gap-2">
+                            <button class="btn btn-outline-light btn-sm w-50 py-2" onclick="resetBuyerFilter()">Reset</button>
+                            <button class="btn btn-danger btn-sm w-50 py-2 fw-bold" onclick="cetakPDFPembeli()"><i class="bi bi-file-pdf"></i> PDF</button>
                         </div>
                     </div>
 
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <div id="areaCetakPembeli" class="table-responsive rounded-3" style="max-height: 400px; overflow-y: auto;">
                         <table class="table mb-0 align-middle text-nowrap">
                             <thead class="text-white-50 small" style="position: sticky; top: 0; background: #1c1c2d; z-index: 1;">
                                 <tr>
@@ -344,7 +345,6 @@
                                 </tfoot>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -852,6 +852,34 @@ function renderBuyerTable(data) {
             fMonth.value = '';
             fSearch.value = '';
             renderBuyerTable(buyersData);
+        }
+        // --- FUNGSI CETAK PDF DATA PEMBELI ---
+        function cetakPDFPembeli() {
+            const element = document.getElementById('areaCetakPembeli');
+            
+            // 1. Simpan pengaturan scroll asli
+            const oldMaxHeight = element.style.maxHeight;
+            const oldOverflow = element.style.overflowY;
+            
+            // 2. Hilangkan batas scroll sementara agar SEMUA BARIS ikut ke-print (tidak terpotong)
+            element.style.maxHeight = 'none';
+            element.style.overflowY = 'visible';
+
+            // 3. Pengaturan PDF
+            const opt = {
+                margin:       0.3,
+                filename:     'Data_Transaksi_RCELLFEST.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#1c1c2d' }, // Background disamakan dengan tema web
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            // 4. Eksekusi Print
+            html2pdf().set(opt).from(element).save().then(() => {
+                // 5. Kembalikan scroll bar setelah file PDF berhasil didownload
+                element.style.maxHeight = oldMaxHeight;
+                element.style.overflowY = oldOverflow;
+            });
         }
         // Initialization
         addTierRow('addTiers');
