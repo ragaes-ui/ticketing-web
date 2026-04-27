@@ -612,7 +612,7 @@ document.getElementById('category').addEventListener('change', function() {
         }
 
         function logout() { window.location.href = '/logout'; }
-// --- LOGIC MAINTENANCE MODE (KEYCLOAK VERSION) ---
+// --- LOGIC MAINTENANCE MODE (LOCALSTORAGE TOKEN) ---
         const switchMaint = document.getElementById('switchMaintenance');
         
         // 1. Cek status maintenance saat halaman dimuat
@@ -633,23 +633,22 @@ document.getElementById('category').addEventListener('change', function() {
             switchMaint.addEventListener('change', async function() {
                 const isActive = this.checked;
                 
+                // Ambil token Keycloak yang sudah disimpan di localStorage
+                // Pastikan nama key-nya ('adminToken') sesuai dengan yang kamu pakai saat login
+                const token = localStorage.getItem('adminToken'); 
+
+                if (!token) {
+                    Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
+                    this.checked = !isActive;
+                    return;
+                }
+                
                 try {
-                    // Cek apakah object keycloak ada dan user sudah login
-                    if (typeof keycloak === 'undefined' || !keycloak.authenticated) {
-                        Swal.fire('Error', 'Sesi Keycloak tidak valid atau belum login.', 'error');
-                        this.checked = !isActive;
-                        return;
-                    }
-
-                    // PRAKTIK TERBAIK: Refresh token jika akan expired dalam 30 detik
-                    await keycloak.updateToken(30);
-
-                    // Kirim request dengan token asli dari Keycloak
                     const res = await fetch('/api/maintenance', { 
-                        method: 'POST', // Ganti ke PUT jika backend kamu pakai PUT
+                        method: 'POST', // Ganti ke 'PUT' kalau API Backend-mu mintanya PUT
                         headers: { 
                             'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + keycloak.token // Ambil token dari Keycloak
+                            'Authorization': `Bearer ${token}` // Kirim token ke backend
                         }, 
                         body: JSON.stringify({ isActive }) 
                     });
@@ -663,12 +662,12 @@ document.getElementById('category').addEventListener('change', function() {
                         });
                     } else {
                         this.checked = !isActive;
-                        Swal.fire('Error', 'Backend menolak request (Cek akses admin Keycloak)', 'error');
+                        Swal.fire('Error', 'Gagal merubah status. Token mungkin expired.', 'error');
                     }
                 } catch (err) {
                     this.checked = !isActive;
                     console.error(err);
-                    Swal.fire('Error', 'Gagal memverifikasi token Keycloak atau koneksi terputus', 'error');
+                    Swal.fire('Error', 'Koneksi ke server terputus', 'error');
                 }
             });
         }
