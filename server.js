@@ -62,14 +62,19 @@ app.use(express.json());
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 
-// 1. Buat penyimpanan sesi login
-const memoryStore = new session.MemoryStore();
+// 1. Buat penyimpanan sesi login di MONGODB (Biar Vercel ga pelupa)
+const MongoStore = require('connect-mongo');
+const sessionStore = MongoStore.create({ 
+    mongoUrl: "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority" 
+});
+
 app.use(session({
     secret: 'rcellfest-rahasia-super-aman', 
     resave: false,
     saveUninitialized: true,
-    store: memoryStore
+    store: sessionStore
 }));
+
 
 // 2. Data sambungan ke Cloud-IAM Kakak
 const keycloakConfig = {
