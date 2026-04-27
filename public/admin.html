@@ -1090,7 +1090,7 @@
                 tickets: tiersData 
             };
 
-            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify(data) });
+            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json' }, body: JSON.stringify(data) });
             
             loadTable(); 
             e.target.reset(); 
