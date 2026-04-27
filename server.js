@@ -39,6 +39,7 @@ const promoSchema = new mongoose.Schema({
     expiresAt: { type: Date, required: true } 
 });
 const Promo = mongoose.model('Promo', promoSchema);
+
 // --- MODEL BARU: RIWAYAT TRANSFER TIKET ---
 const transferSchema = new mongoose.Schema({
     senderId: String,
@@ -51,11 +52,6 @@ const transferSchema = new mongoose.Schema({
 const TransferHistory = mongoose.model('TransferHistory', transferSchema);
 
 const app = express();
-
-app.use(cors());
-app.use(express.json());
-const app = express();
-
 app.use(cors());
 app.use(express.json());
 
@@ -76,12 +72,12 @@ app.use(session({
 
 // 2. Data sambungan ke Cloud-IAM Kakak
 const keycloakConfig = {
-    "realm": "auth-rcellpublic", // 👈 Ganti dengan nama Realm kakak
-    "auth-server-url": "https://lemur-7.cloud-iam.com/auth/", // 👈 Ganti dengan URL Cloud-IAM kakak
+    "realm": "auth-rcellpublic", 
+    "auth-server-url": "https://lemur-7.cloud-iam.com/auth/", 
     "ssl-required": "external",
-    "resource": "rcellfest-app", // 👈 Ganti dengan Client ID kakak
+    "resource": "rcellfest-app", 
     "credentials": {
-        "secret": "91Q168SjaK78v6PPs0kcFLKnynhmyNb0" // 👈 Paste Secret Key yang dicopy tadi!
+        "secret": "91Q168SjaK78v6PPs0kcFLKnynhmyNb0" 
     },
     "confidential-port": 0
 };
@@ -91,7 +87,15 @@ const keycloak = new Keycloak({ store: memoryStore }, keycloakConfig);
 app.use(keycloak.middleware());
 // ==========================================
 
-// 👇 Pindahkan app.use(express.static) ke BAWAH konfigurasi Keycloak
+// ==========================================
+// 🔒 RUTE TERKUNCI OLEH KEYCLOAK
+// ==========================================
+// Jika ada yang buka admin.html, harus lewat Keycloak dulu!
+app.get('/admin.html', keycloak.protect(), (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
+});
+
+// 👇 FOLDER PUBLIC (Di bawah pelindung admin)
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 // ==========================================
@@ -131,16 +135,7 @@ let snap = new midtransClient.Snap({
 // ==========================================
 // --- ROUTES API ---
 // ==========================================
-// ==========================================
-// 🔒 RUTE TERKUNCI OLEH KEYCLOAK
-// ==========================================
-// Jika ada yang buka admin.html, harus lewat Keycloak dulu!
-app.get('/admin.html', keycloak.protect(), (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
-});
 
-// Jika mau amankan API laporan admin juga:
-// app.get('/api/admin/reports', keycloak.protect(), async (req, res) => { ... });
 // API KHUSUS CEK PING SERVER
 app.get('/api/ping', (req, res) => {
     res.status(200).send('pong');
@@ -160,6 +155,7 @@ app.get('/api/events', async (req, res) => {
     } 
     catch (err) { res.status(500).json({ error: err.message }); }
 });
+
 // --- API BACA 1 EVENT DETAIL ---
 app.get('/api/events/:id', async (req, res) => {
     try {
@@ -178,6 +174,7 @@ app.get('/api/events/:id', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 app.post('/api/events', async (req, res) => {
     try {
         const { name, date, price, capacity, description, category, location, tickets } = req.body;
@@ -220,10 +217,8 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     try {
-        // 1. Tangkap token dari frontend
         const { identifier, password, recaptchaToken } = req.body;
 
-        // 2. Tanya Google, ini yang login robot bukan?
         if (!recaptchaToken) {
              return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
         }
@@ -237,8 +232,6 @@ app.post('/api/login', async (req, res) => {
         if (!googleData.success) {
              return res.status(400).json({ success: false, message: "Verifikasi gagal! Sistem mendeteksi aktivitas robot." });
         }
-        
-        // --- BATAS PENGECEKAN GOOGLE ---
         
         const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan" });
@@ -263,36 +256,22 @@ app.post('/api/login', async (req, res) => {
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
-// --- API RESET PASSWORD (LUPA PASSWORD) ---
-// --- API RESET PASSWORD (DENGAN KEAMANAN PIN) ---
+
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { username, pin, newPassword } = req.body;
-
-        // 1. Cari user berdasarkan username
         const user = await User.findOne({ username: new RegExp('^' + username + '$', 'i') });
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Username tidak ditemukan." });
-        }
+        if (!user) return res.status(404).json({ success: false, message: "Username tidak ditemukan." });
 
-        // 2. CEK KEAMANAN PIN
-        if (!user.pin) {
-            return res.status(400).json({ success: false, message: "Akun ini belum mengatur PIN. Silakan hubungi Admin untuk reset manual." });
-        }
+        if (!user.pin) return res.status(400).json({ success: false, message: "Akun ini belum mengatur PIN. Silakan hubungi Admin untuk reset manual." });
 
         const isPinMatch = await bcrypt.compare(pin, user.pin);
-        if (!isPinMatch) {
-            return res.status(400).json({ success: false, message: "PIN Keamanan salah! Akses ditolak." });
-        }
+        if (!isPinMatch) return res.status(400).json({ success: false, message: "PIN Keamanan salah! Akses ditolak." });
 
-        // 3. Jika PIN benar, ganti passwordnya
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
-
         res.json({ success: true, message: "Password berhasil direset." });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
-    }
+    } catch (error) { res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." }); }
 });
 
 app.post('/api/history', async (req, res) => {
@@ -307,61 +286,33 @@ app.post('/api/my-tickets', async (req, res) => {
     try { const tickets = await Order.find({ email: req.body.email, status: { $in: ['valid', 'used'] } }).populate('eventId'); res.json(tickets); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
-// ==========================================
-// --- API TRANSFER TIKET (DENGAN KEAMANAN PIN) ---
-// ==========================================
+
 app.post('/api/tickets/transfer', async (req, res) => {
     try {
         const { ticket_code, receiver_email, userId, pin } = req.body;
 
-        // 0. SATPAM PIN: Cek apakah PIN yang dikirim cocok
-        if (!userId || !pin) {
-            return res.status(400).json({ message: "Sistem menolak: PIN Keamanan tidak disertakan!" });
-        }
+        if (!userId || !pin) return res.status(400).json({ message: "Sistem menolak: PIN Keamanan tidak disertakan!" });
         const sender = await User.findById(userId);
-        if (!sender || !sender.pin) {
-            return res.status(400).json({ message: "Akun kamu belum mengatur PIN. Silakan atur PIN di menu profile dulu!" });
-        }
-        const isPinMatch = await bcrypt.compare(pin, sender.pin);
-        if (!isPinMatch) {
-            return res.status(400).json({ message: "PIN Keamanan Salah! Transfer digagalkan." });
-        }
-        // --- BATAS AMAN ---
-
-        // 1. Pastikan email penerima beneran terdaftar di Rcellfest
-        const receiver = await User.findOne({ email: new RegExp('^' + receiver_email + '$', 'i') });
-        if (!receiver) {
-            return res.status(404).json({ message: "Email penerima tidak terdaftar di sistem!" });
-        }
-
-        // 2. Cari tiket yang mau ditransfer
-        const ticket = await Order.findOne({ ticketCode: ticket_code.toUpperCase() }).populate('eventId');
+        if (!sender || !sender.pin) return res.status(400).json({ message: "Akun kamu belum mengatur PIN. Silakan atur PIN di menu profile dulu!" });
         
-        if (!ticket) {
-            return res.status(404).json({ message: "Tiket tidak ditemukan." });
-        }
-        if (ticket.status !== 'valid') {
-            return res.status(400).json({ message: "Gagal: Tiket sudah terpakai atau hangus." });
-        }
-        if (ticket.email.toLowerCase() === receiver_email.toLowerCase()) {
-            return res.status(400).json({ message: "Nggak bisa transfer ke email sendiri dong!" });
-        }
+        const isPinMatch = await bcrypt.compare(pin, sender.pin);
+        if (!isPinMatch) return res.status(400).json({ message: "PIN Keamanan Salah! Transfer digagalkan." });
 
-        // 3. PROSES TRANSFER (SULAP!) 🪄
+        const receiver = await User.findOne({ email: new RegExp('^' + receiver_email + '$', 'i') });
+        if (!receiver) return res.status(404).json({ message: "Email penerima tidak terdaftar di sistem!" });
+
+        const ticket = await Order.findOne({ ticketCode: ticket_code.toUpperCase() }).populate('eventId');
+        if (!ticket) return res.status(404).json({ message: "Tiket tidak ditemukan." });
+        if (ticket.status !== 'valid') return res.status(400).json({ message: "Gagal: Tiket sudah terpakai atau hangus." });
+        if (ticket.email.toLowerCase() === receiver_email.toLowerCase()) return res.status(400).json({ message: "Nggak bisa transfer ke email sendiri dong!" });
+
         const emailPengirimAsli = ticket.email; 
 
-        // Pakai updateOne supaya Mongoose nggak rewel
         await Order.updateOne(
             { _id: ticket._id },
-            { 
-                $set: { 
-                    email: receiver.email, 
-                    customerName: receiver.fullName || receiver.username 
-                } 
-            }
+            { $set: { email: receiver.email, customerName: receiver.fullName || receiver.username } }
         );
 
-        // CATAT KE RIWAYAT TRANSFER
         await TransferHistory.create({
             senderId: sender._id, 
             senderEmail: emailPengirimAsli, 
@@ -370,54 +321,39 @@ app.post('/api/tickets/transfer', async (req, res) => {
             eventName: ticket.eventId ? ticket.eventId.name : "Tiket RCELLFEST"
         });
 
-        res.json({ 
-            success: true,
-            message: "Tiket berhasil dipindah tangan!", 
-            receiver: receiver.fullName || receiver.username 
-        });
-
-    } catch (error) {
-        res.status(500).json({ message: "Sistem Error: " + error.message });
-    }
+        res.json({ success: true, message: "Tiket berhasil dipindah tangan!", receiver: receiver.fullName || receiver.username });
+    } catch (error) { res.status(500).json({ message: "Sistem Error: " + error.message }); }
 });
 
-// --- API RIWAYAT MUTASI SALDO (GABUNGAN TOPUP & BELI) ---
 app.post('/api/balance-history', async (req, res) => {
     try {
         const { userId } = req.body;
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // 1. Ambil data Uang Masuk (Top Up) - Hapus .lean() agar bisa ambil waktu dari ID
         const topups = await Topup.find({ userId: userId, status: 'success' });
         const historyTopup = topups.map(t => ({
             type: 'in', 
             title: 'Top Up Saldo', 
             amount: t.amount, 
-            // Ambil dari timestamp, kalau kosong ambil dari DNA waktu pembuatan ID-nya
             date: t.timestamp || t._id.getTimestamp(), 
             id: t.orderId
         }));
 
-        // 2. Ambil data Uang Keluar (Beli Tiket pakai Saldo) - Hapus .lean()
         const orders = await Order.find({ 
             email: new RegExp('^' + user.email + '$', 'i'), 
-            $or: [
-                { paymentMethod: { $regex: /saldo/i } },
-                { orderIdMidtrans: { $regex: /SALDO/i } }
-            ]
+            $or: [{ paymentMethod: { $regex: /saldo/i } }, { orderIdMidtrans: { $regex: /SALDO/i } }]
         }).populate('eventId');
         
         const historyOrder = orders.map(o => ({
             type: 'out', 
             title: `Beli: ${o.eventId ? o.eventId.name : 'Tiket Event'}`, 
             amount: o.price || 0, 
-            date: o.createdAt || o._id.getTimestamp(), // Waktu super akurat bawaan MongoDB
+            date: o.createdAt || o._id.getTimestamp(), 
             id: o.ticketCode
         }));
-        // 3. Ambil Riwayat Transfer (Keluar) - PAKAI EMAIL
+
         const transfers = await TransferHistory.find({ senderEmail: user.email });
-        
         const historyTransfer = transfers.map(tr => ({
             type: 'transfer_out', 
             title: `Kirim Tiket: ${tr.eventName}`, 
@@ -426,25 +362,17 @@ app.post('/api/balance-history', async (req, res) => {
             id: tr.ticketCode, 
             info: `Ke: ${tr.receiverEmail}`
         }));
-        // 3. Gabungkan dan Urutkan murni berdasarkan Angka Waktu (Milidetik)
+
         const fullHistory = [...historyTopup, ...historyOrder, ...historyTransfer].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         res.json(fullHistory);
-
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
-
-// ==========================================
-// --- API SALDO BARU (TOP UP, BELI & PIN) ---
-// ==========================================
 
 app.get('/api/user/profile/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-        res.json({ 
-            id: user._id, username: user.username, email: user.email, 
-            fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin 
-        });
+        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
@@ -486,37 +414,20 @@ app.post('/api/user/set-pin', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-
-// ==========================================
-// --- API PEMBELIAN TIKET ---
-// ==========================================
-
 // 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-                // 1. Ambil token dari frontend
-        const { recaptchaToken, ...dataLainnya } = req.body; // Sesuaikan dengan variabel req.body kakak yang asli
+        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName } = req.body; 
         
-        // 2. Tanya Google, ini robot apa manusia?
-        if (!recaptchaToken) {
-             return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
-        }
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-        // GANTI PAKAI SECRET KEY DARI GOOGLE
         const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
         const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
         
         const googleRes = await fetch(verifyUrl, { method: 'POST' });
         const googleData = await googleRes.json();
         
-        if (!googleData.success) {
-             return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
-        }
-        
-        // --- BATAS PENGECEKAN GOOGLE ---
-        // Lanjut ke kodingan kakak yang biasa (potong saldo / bikin token midtrans) ...
-
-        const { userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName } = req.body; 
+        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
         const userCheck = await User.findById(userId);
         if (!userCheck) return res.status(404).json({ success: false, message: "User tidak ditemukan" });
@@ -527,7 +438,6 @@ app.post('/api/buy-ticket', async (req, res) => {
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        // Temukan Index dari Tipe Tiket
         let selectedTierIndex = -1;
         if (tierName && event.tickets && event.tickets.length > 0) {
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
@@ -572,7 +482,6 @@ app.post('/api/buy-ticket', async (req, res) => {
         });
         await newOrder.save();
         
-        // POTONG KUOTA TIKET
         event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
@@ -580,36 +489,24 @@ app.post('/api/buy-ticket', async (req, res) => {
         await event.save();
 
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
-
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-                // 1. Ambil token dari frontend
-        const { recaptchaToken, ...dataLainnya } = req.body; // Sesuaikan dengan variabel req.body kakak yang asli
+        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName } = req.body; 
         
-        // 2. Tanya Google, ini robot apa manusia?
-        if (!recaptchaToken) {
-             return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
-        }
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-        // GANTI PAKAI SECRET KEY DARI GOOGLE
         const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
         const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
         
         const googleRes = await fetch(verifyUrl, { method: 'POST' });
         const googleData = await googleRes.json();
         
-        if (!googleData.success) {
-             return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
-        }
+        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
-        // --- BATAS PENGECEKAN GOOGLE ---
-        // Lanjut ke kodingan kakak yang biasa (potong saldo / bikin token midtrans) ...
-
-        const { eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName } = req.body;
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
@@ -646,7 +543,7 @@ app.post('/api/midtrans-success', async (req, res) => {
         const newOrder = new Order({
             ticketCode: ticketCode,
             eventId: eventId,
-            price: price, // Total harga
+            price: price, 
             tierName: tierName || 'General',
             quantity: quantity,
             customerName: customerName,
@@ -659,7 +556,6 @@ app.post('/api/midtrans-success', async (req, res) => {
         });
         await newOrder.save();
 
-        // POTONG KUOTA TIKET
         event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
@@ -669,7 +565,6 @@ app.post('/api/midtrans-success', async (req, res) => {
         res.json({ success: true, ticketCode });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
-
 
 // ==========================================
 // 🔔 WEBHOOK MIDTRANS 
@@ -681,7 +576,6 @@ app.post('/api/payment-notification', async (req, res) => {
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
 
-        // 1. CEK JIKA TOP UP
         if (orderId.startsWith('TOPUP-')) {
             const topup = await Topup.findOne({ orderId: orderId });
             if (!topup) return res.status(404).json({ message: "Data Top Up tidak ditemukan" });
@@ -697,7 +591,6 @@ app.post('/api/payment-notification', async (req, res) => {
                 topup.status = 'failed'; await topup.save();
             }
         } 
-        // 2. CEK JIKA PEMBELIAN TIKET
         else {
             const order = await Order.findOne({ orderIdMidtrans: orderId });
             if (order) {
@@ -717,54 +610,21 @@ app.post('/api/payment-notification', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ==========================================
-// --- API VERIFIKASI TIKET (CHECK-IN) ---
-// ==========================================
-// ==========================================
-// --- API GATE CHECK-IN (SCANNER) ---
-// ==========================================
 app.post('/api/validate', async (req, res) => {
     try {
         const { ticketCode } = req.body;
         if (!ticketCode) return res.status(400).json({ valid: false, message: "KODE KOSONG", detail: "Harap masukkan kode tiket." });
 
-        // Cari tiket di database berdasarkan kode
         const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
 
-        // 1. Jika tiket tidak ditemukan
-        if (!ticket) {
-            return res.json({
-                valid: false,
-                message: "TIKET TIDAK DITEMUKAN",
-                detail: "Kode tiket tidak terdaftar di sistem kami."
-            });
-        }
+        if (!ticket) return res.json({ valid: false, message: "TIKET TIDAK DITEMUKAN", detail: "Kode tiket tidak terdaftar di sistem kami." });
+        if (ticket.status === 'used') return res.json({ valid: false, message: "TIKET SUDAH DIPAKAI", detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!" });
 
-        // 2. Jika tiket sudah pernah di-scan / dipakai
-        if (ticket.status === 'used') {
-            return res.json({
-                valid: false,
-                message: "TIKET SUDAH DIPAKAI",
-                detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!"
-            });
-        }
-
-        // 3. Jika tiket valid, langsung otomatis hanguskan tiket (ubah status jadi used)
         ticket.status = 'used';
         await ticket.save();
 
-        // Kirim jawaban sukses ke HTML Scanner
-        res.json({
-            valid: true,
-            data: {
-                event: ticket.eventId ? ticket.eventId.name : "RCELLFEST Event",
-                name: ticket.customerName
-            }
-        });
-
-    } catch (error) {
-        res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." });
-    }
+        res.json({ valid: true, data: { event: ticket.eventId ? ticket.eventId.name : "RCELLFEST Event", name: ticket.customerName } });
+    } catch (error) { res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." }); }
 });
 
 app.post('/api/verify-ticket', async (req, res) => {
@@ -804,7 +664,6 @@ app.post('/api/use-ticket', async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Terjadi kesalahan.' }); }
 });
 
-// --- API LAINNYA ---
 app.put('/api/user/update-name', async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
@@ -841,7 +700,6 @@ app.post('/api/maintenance', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- API KODE PROMO ---
 app.post('/api/check-promo', async (req, res) => {
     try {
         const { code } = req.body;
@@ -874,68 +732,48 @@ app.delete('/api/promos/:id', async (req, res) => {
     try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
+
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
-
         if (!apiKey) return res.json({ reply: "Kunci AI belum ada di Vercel! 🔑" });
 
-        // FIX TOTAL: Kita pakai model generasi terbaru sesuai daftar rahasia Google!
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ 
-                        text: `Kamu adalah RCELL-Bot, asisten website tiket RCELLFEST. Jawab dengan sangat ramah, gaul, singkat, dan gunakan emoji. Pertanyaan user: ${message}` 
-                    }]
-                }]
+                contents: [{ parts: [{ text: `Kamu adalah RCELL-Bot, asisten website tiket RCELLFEST. Jawab dengan sangat ramah, gaul, singkat, dan gunakan emoji. Pertanyaan user: ${message}` }] }]
             })
         });
 
         const data = await response.json();
-
         if (data.candidates && data.candidates[0].content) {
-            const replyText = data.candidates[0].content.parts[0].text;
-            res.json({ reply: replyText });
+            res.json({ reply: data.candidates[0].content.parts[0].text });
         } else {
-            const detailError = data.error ? data.error.message : "Respon kosong.";
-            res.json({ reply: "Duh, masih ada yang nyangkut kak: " + detailError });
+            res.json({ reply: "Duh, masih ada yang nyangkut kak: " + (data.error ? data.error.message : "Respon kosong.") });
         }
-
-    } catch (error) {
-        res.json({ reply: "Sinyal putus kak! 📶" });
-    }
+    } catch (error) { res.json({ reply: "Sinyal putus kak! 📶" }); }
 });
+
 // ==========================================
-// --- API LAPORAN ADMIN (REKAP, STATISTIK & GRAFIK) ---
+// 🛡️ API LAPORAN (Dilindungi Keycloak)
 // ==========================================
-app.get('/api/admin/reports', async (req, res) => {
+app.get('/api/admin/reports', keycloak.protect(), async (req, res) => {
     try {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader || !authHeader.includes('Bearer ')) {
-            return res.status(403).json({ success: false, message: "Akses ditolak!" });
-        }
-
         const totalUser = await User.countDocuments();
-        const { start, end } = req.query;
+        const { start, end, limit } = req.query;
+        const maxRows = parseInt(limit) || 10;
 
-        const semuaOrders = await Order.find({
-            status: { $in: ['valid', 'used'] }
-        })
-        .sort({ _id: -1 })
-        .populate('eventId');
-
+        const semuaOrders = await Order.find({ status: { $in: ['valid', 'used'] } }).sort({ _id: -1 }).populate('eventId');
         let orderTersaring = semuaOrders;
+        
         if (start && end) {
             const startDate = new Date(start).getTime();
             const endDate = new Date(end);
             endDate.setHours(23, 59, 59, 999); 
             const endwaktu = endDate.getTime();
-
             orderTersaring = semuaOrders.filter(order => {
                 const waktuAsli = order.createdAt ? new Date(order.createdAt).getTime() : order._id.getTimestamp().getTime();
                 return waktuAsli >= startDate && waktuAsli <= endwaktu;
@@ -949,12 +787,11 @@ app.get('/api/admin/reports', async (req, res) => {
             totalTiket += (order.quantity || 1);
         });
 
-        const transaksiTerbaru = orderTersaring.slice(0, 20).map(order => {
+        const transaksiTerbaru = orderTersaring.slice(0, maxRows).map(order => {
             let namaEvent = "Event RCELLFEST";
             if (order.eventId && order.eventId.name) namaEvent = order.eventId.name;
             else if (order.eventName) namaEvent = order.eventName;
 
-        // Logika detektif: Cek apakah ID Midtransnya ngandung kata 'SALDO'
             let metodeAsli = 'MIDTRANS';
             if (order.paymentMethod) {
                 metodeAsli = order.paymentMethod.toUpperCase();
@@ -967,15 +804,13 @@ app.get('/api/admin/reports', async (req, res) => {
                 ticketCode: order.ticketCode || '-',
                 customerName: order.customerName || '-',
                 eventName: namaEvent,
-                paymentMethod: metodeAsli, // 👈 Pakai hasil detektif
+                paymentMethod: metodeAsli, 
                 price: order.price || 0
             };
         });
 
-        // 👇 TAMBAHAN BARU: NGITUNG DATA GRAFIK 7 HARI TERAKHIR 👇
         const chartData = {};
         const hariIni = new Date();
-        // Buat template 7 hari ke belakang (misal: 17 Apr, 18 Apr, dst)
         for (let i = 6; i >= 0; i--) {
             const d = new Date(hariIni);
             d.setDate(d.getDate() - i);
@@ -983,52 +818,34 @@ app.get('/api/admin/reports', async (req, res) => {
             chartData[tglString] = 0; 
         }
 
-        // Isi pendapatan ke tanggal yang sesuai
         semuaOrders.forEach(order => {
             const waktuAsli = order.createdAt || order.date || order._id.getTimestamp();
             const orderDate = new Date(waktuAsli);
             const tglString = orderDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-            
             if (chartData[tglString] !== undefined) {
                 chartData[tglString] += (order.price || 0);
             }
         });
 
-        const chartLabels = Object.keys(chartData); // Label tanggal (Sumbu X)
-        const chartValues = Object.values(chartData); // Nilai Rupiah (Sumbu Y)
-
         res.json({
             success: true,
             totalPendapatan, totalTiket, totalUser, transaksiTerbaru,
-            chartLabels, chartValues // Kirim ke frontend
+            chartLabels: Object.keys(chartData), 
+            chartValues: Object.values(chartData) 
         });
 
-    } catch (error) {
-        console.error("Error Load Laporan Admin:", error);
-        res.status(500).json({ success: false, message: "Gagal mengambil data laporan backend." });
-    }
+    } catch (error) { res.status(500).json({ success: false, message: "Gagal mengambil data laporan backend." }); }
 });
+
 // ==========================================
-// --- API DAFTAR USER TERDAFTAR (ADMIN) ---
+// 🛡️ API DATA USERS (Dilindungi Keycloak)
 // ==========================================
-app.get('/api/admin/users', async (req, res) => {
+app.get('/api/admin/users', keycloak.protect(), async (req, res) => {
     try {
-        // Cek Keamanan
-        const authHeader = req.headers['authorization'];
-        if (!authHeader || !authHeader.includes('Bearer ')) {
-            return res.status(403).json({ success: false, message: "Akses ditolak!" });
-        }
-
-        // Ambil semua data user dari database (kecuali password demi keamanan)
         const users = await User.find({}, '-password').sort({ _id: -1 });
-        
         res.json({ success: true, data: users });
-    } catch (error) {
-        console.error("Error Load Users:", error);
-        res.status(500).json({ success: false, message: "Gagal mengambil data user." });
-    }
+    } catch (error) { res.status(500).json({ success: false, message: "Gagal mengambil data user." }); }
 });
-
 
 // ROUTE HANDLER TERAKHIR
 app.get('*', (req, res) => {
@@ -1036,11 +853,9 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
-// 404 Handler
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
-
 
 const PORT = process.env.PORT || 5000;
 module.exports = app;
