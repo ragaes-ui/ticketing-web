@@ -340,6 +340,8 @@
                             </thead>
                             <tbody id="tableBuyerList">
                                 </tbody>
+                            <tfoot id="tableBuyerFoot" style="position: sticky; bottom: 0; background: rgba(28, 28, 45, 0.95); z-index: 1;">
+                                </tfoot>
                         </table>
                     </div>
 
@@ -757,14 +759,22 @@ document.getElementById('category').addEventListener('change', function() {
             }
         }
 
-        function renderBuyerTable(data) {
+function renderBuyerTable(data) {
             const tbody = document.getElementById('tableBuyerList');
+            const tfoot = document.getElementById('tableBuyerFoot'); // Panggil elemen tfoot
+            
             if (!data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-white-50 py-5">Tidak ada data transaksi ditemukan.</td></tr>';
+                if(tfoot) tfoot.innerHTML = ''; // Kosongkan total jika tidak ada data
                 return;
             }
 
+            let totalRupiah = 0; // Siapkan wadah untuk hitung total uang
+
             tbody.innerHTML = data.map(b => {
+                // Hitung akumulasi total pendapatan
+                totalRupiah += (b.price || 0);
+
                 // Konversi tanggal
                 const dateObj = new Date(b.date);
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -784,8 +794,17 @@ document.getElementById('category').addEventListener('change', function() {
                     </tr>
                 `;
             }).join('');
-        }
 
+            // Tampilkan baris Total di bagian bawah tabel
+            if(tfoot) {
+                tfoot.innerHTML = `
+                    <tr class="border-top border-info border-2">
+                        <td colspan="3" class="text-end fw-bold text-white py-3">Total (${data.length} Transaksi):</td>
+                        <td colspan="2" class="fw-bold text-warning fs-5 py-3">Rp ${totalRupiah.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            }
+        }
         // --- FUNGSI FILTER ---
         const fDay = document.getElementById('filterDay');
         const fMonth = document.getElementById('filterMonth');
