@@ -731,7 +731,7 @@ document.getElementById('category').addEventListener('change', function() {
             const token = localStorage.getItem('adminToken'); // Sesuaikan dengan tokenmu
             try {
                 // (Ganti '/api/admin/transactions' dengan endpoint API aslimu)
-                const res = await fetch('/api/admin/transactions', {
+                const res = await fetch('/api/admin/reports', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
