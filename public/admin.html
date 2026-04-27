@@ -153,9 +153,9 @@
                     <h3 class="fw-bold text-info mb-0" id="totalPendapatan">Rp 0</h3>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <div class="glass-card text-center" style="border-bottom: 4px solid #2ecc71;">
-                    <h6 class="opacity-75 small fw-bold tracking-wide" data-i18n="stat_ticket">TIKET TERJUAL</h6>
+                <div class="col-md-4 mb-3">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #2ecc71; cursor:pointer;" onclick="openBuyerModal()">
+                    <h6 class="opacity-75 small fw-bold tracking-wide"><span data-i18n="stat_ticket">TIKET TERJUAL</span> <i class="bi bi-receipt"></i></h6>
                     <h3 class="fw-bold text-success mb-0" id="totalTiket">0</h3>
                 </div>
             </div>
@@ -297,6 +297,53 @@
                 <input type="password" id="oldP" class="form-control mb-3" placeholder="Password Lama" data-i18n-ph="ph_oldpass">
                 <input type="password" id="newP" class="form-control mb-4" placeholder="Password Baru" data-i18n-ph="ph_newpass">
                 <button onclick="saveAdminPassword()" class="btn btn-warning w-100 rounded-pill fw-bold" data-i18n="btn_update">Update</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="buyerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold text-success"><i class="bi bi-receipt me-2"></i>Data Pembeli Tiket</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    
+                    <div class="row g-3 mb-4 bg-dark bg-opacity-25 p-3 rounded-4 border border-secondary">
+                        <div class="col-md-3">
+                            <label class="small text-white-50 mb-1">Filter Harian (Tgl/Bln/Thn)</label>
+                            <input type="date" id="filterDay" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-white-50 mb-1">Filter Bulanan (Bulan/Tahun)</label>
+                            <input type="month" id="filterMonth" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-white-50 mb-1">Cari (Nama/Email/Event)</label>
+                            <input type="text" id="searchBuyer" class="form-control form-control-sm" placeholder="Ketik kata kunci...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-outline-light btn-sm w-100 py-2" onclick="resetBuyerFilter()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table mb-0 align-middle text-nowrap">
+                            <thead class="text-white-50 small" style="position: sticky; top: 0; background: #1c1c2d; z-index: 1;">
+                                <tr>
+                                    <th>Tgl. Pembelian</th>
+                                    <th>Pembeli</th>
+                                    <th>Event & Tiket</th>
+                                    <th>Total Bayar</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBuyerList">
+                                </tbody>
+                        </table>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -670,6 +717,116 @@ document.getElementById('category').addEventListener('change', function() {
                     Swal.fire('Error', 'Koneksi ke server terputus', 'error');
                 }
             });
+        }
+        // --- LOGIC DATA PEMBELI & FILTER TRANSAKSI ---
+        let buyersData = [];
+        const bModal = new bootstrap.Modal(document.getElementById('buyerModal'));
+
+        function openBuyerModal() {
+            bModal.show();
+            loadBuyers();
+        }
+
+        async function loadBuyers() {
+            const token = localStorage.getItem('adminToken'); // Sesuaikan dengan tokenmu
+            try {
+                // (Ganti '/api/admin/transactions' dengan endpoint API aslimu)
+                const res = await fetch('/api/admin/transactions', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    buyersData = await res.json();
+                    renderBuyerTable(buyersData);
+                } else {
+                    document.getElementById('tableBuyerList').innerHTML = '<tr><td colspan="5" class="text-center text-danger py-3">Gagal mengambil data dari server.</td></tr>';
+                }
+            } catch (err) {
+                console.error("Gagal load transaksi", err);
+            }
+        }
+
+        function renderBuyerTable(data) {
+            const tbody = document.getElementById('tableBuyerList');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-white-50 py-5">Tidak ada data transaksi ditemukan.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(b => {
+                // Ambil tanggal (Sesuaikan 'b.createdAt' dengan field date di DB kamu)
+                const dateObj = new Date(b.createdAt || b.date);
+                const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                // Ambil status
+                const isSuccess = b.status === 'SUCCESS' || b.status === 'LUNAS';
+                const badgeClass = isSuccess ? 'bg-success' : 'bg-warning text-dark';
+                
+                // Sesuaikan 'b.user.name', 'b.eventName' dengan struktur respon API kamu
+                return `
+                    <tr>
+                        <td class="small">${dateStr}</td>
+                        <td class="small">
+                            <b>${b.buyerName || b.user?.name || '-'}</b><br>
+                            <span class="text-white-50">${b.buyerEmail || b.user?.email || '-'}</span>
+                        </td>
+                        <td class="small">
+                            <b>${b.eventName || '-'}</b><br>
+                            <span class="text-white-50">${b.ticketName || '-'}</span>
+                        </td>
+                        <td class="small fw-bold text-info">Rp ${(b.totalPrice || b.amount || 0).toLocaleString('id-ID')}</td>
+                        <td><span class="badge ${badgeClass}">${b.status || 'PENDING'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- FUNGSI FILTER ---
+        const fDay = document.getElementById('filterDay');
+        const fMonth = document.getElementById('filterMonth');
+        const fSearch = document.getElementById('searchBuyer');
+
+        // Jika user pilih harian, kosongkan bulanan (dan sebaliknya)
+        fDay.addEventListener('change', () => { fMonth.value = ''; filterBuyers(); });
+        fMonth.addEventListener('change', () => { fDay.value = ''; filterBuyers(); });
+        fSearch.addEventListener('keyup', filterBuyers);
+
+        function filterBuyers() {
+            const dayVal = fDay.value;     // format: YYYY-MM-DD
+            const monthVal = fMonth.value; // format: YYYY-MM
+            const searchVal = fSearch.value.toLowerCase();
+
+            const filtered = buyersData.filter(b => {
+                let matchDate = true;
+                let matchSearch = true;
+                const bDateObj = new Date(b.createdAt || b.date);
+
+                // Filter Tanggal / Bulan
+                if (dayVal) {
+                    const bDateStr = bDateObj.toISOString().split('T')[0];
+                    matchDate = (bDateStr === dayVal);
+                } else if (monthVal) {
+                    const bMonthStr = bDateObj.toISOString().slice(0, 7);
+                    matchDate = (bMonthStr === monthVal);
+                }
+
+                // Filter Pencarian (Nama, Email, Event)
+                if (searchVal) {
+                    const str = `${b.buyerName || b.user?.name || ''} ${b.buyerEmail || b.user?.email || ''} ${b.eventName || ''}`.toLowerCase();
+                    matchSearch = str.includes(searchVal);
+                }
+
+                return matchDate && matchSearch;
+            });
+
+            renderBuyerTable(filtered);
+        }
+
+        function resetBuyerFilter() {
+            fDay.value = '';
+            fMonth.value = '';
+            fSearch.value = '';
+            renderBuyerTable(buyersData);
         }
         // Initialization
         addTierRow('addTiers');
