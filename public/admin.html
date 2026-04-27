@@ -718,7 +718,7 @@ document.getElementById('category').addEventListener('change', function() {
                 }
             });
         }
-        // --- LOGIC DATA PEMBELI & FILTER TRANSAKSI ---
+// --- LOGIC DATA PEMBELI (HISTORY TRANSAKSI) ---
         let buyersData = [];
         const bModal = new bootstrap.Modal(document.getElementById('buyerModal'));
 
@@ -727,75 +727,60 @@ document.getElementById('category').addEventListener('change', function() {
             loadBuyers();
         }
 
-async function loadBuyers() {
-            const token = localStorage.getItem('adminToken'); 
+        async function loadBuyers() {
+            // Karena rutenya dilindungi Keycloak, gunakan logika Keycloak
             const tbody = document.getElementById('tableBuyerList');
-            
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-white-50"><div class="spinner-border text-info spinner-border-sm me-2"></div> Mengambil data pembeli...</td></tr>';
 
             try {
-                const res = await fetch('/api/admin/reports', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                // Di server.js kamu, data transaksi ada di rute reports
+                const res = await fetch('/api/admin/reports?limit=500', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` } 
                 });
                 
                 if (res.ok) {
                     const responseData = await res.json();
                     
-                    // --- PENCARI ARRAY OTOMATIS ---
-                    let dataArray = [];
-                    if (Array.isArray(responseData)) {
-                        // Jika respons API langsung berupa array
-                        dataArray = responseData;
+                    if (responseData.success) {
+                        // Ambil array transaksiTerbaru sesuai response backend
+                        buyersData = responseData.transaksiTerbaru || [];
+                        renderBuyerTable(buyersData);
                     } else {
-                        // Jika berupa Object, cari properti mana yang isinya Array
-                        for (let key in responseData) {
-                            if (Array.isArray(responseData[key])) {
-                                dataArray = responseData[key];
-                                break; // Berhenti mencari jika sudah ketemu array-nya
-                            }
-                        }
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Sistem gagal mengambil data.</td></tr>';
                     }
-                    
-                    buyersData = dataArray;
-                    renderBuyerTable(buyersData);
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data dari server.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal autentikasi/mengambil data dari server (Status: ' + res.status + ').</td></tr>';
                 }
             } catch (err) {
                 console.error("Gagal load transaksi", err);
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Koneksi ke server terputus.</td></tr>';
             }
         }
+
         function renderBuyerTable(data) {
             const tbody = document.getElementById('tableBuyerList');
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-white-50 py-5">Tidak ada data transaksi ditemukan.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = data.map(b => {
-                // Ambil tanggal (Sesuaikan 'b.createdAt' dengan field date di DB kamu)
-                const dateObj = new Date(b.createdAt || b.date);
+                // Konversi tanggal
+                const dateObj = new Date(b.date);
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
                 
-                // Ambil status
-                const isSuccess = b.status === 'SUCCESS' || b.status === 'LUNAS';
-                const badgeClass = isSuccess ? 'bg-success' : 'bg-warning text-dark';
-                
-                // Sesuaikan 'b.user.name', 'b.eventName' dengan struktur respon API kamu
                 return `
                     <tr>
                         <td class="small">${dateStr}</td>
                         <td class="small">
-                            <b>${b.buyerName || b.user?.name || '-'}</b><br>
-                            <span class="text-white-50">${b.buyerEmail || b.user?.email || '-'}</span>
+                            <b>${b.customerName || '-'}</b>
                         </td>
                         <td class="small">
                             <b>${b.eventName || '-'}</b><br>
-                            <span class="text-white-50">${b.ticketName || '-'}</span>
+                            <span class="text-white-50 text-uppercase" style="font-size: 0.7rem;">KODE: ${b.ticketCode || '-'}</span>
                         </td>
-                        <td class="small fw-bold text-info">Rp ${(b.totalPrice || b.amount || 0).toLocaleString('id-ID')}</td>
-                        <td><span class="badge ${badgeClass}">${b.status || 'PENDING'}</span></td>
+                        <td class="small fw-bold text-info">Rp ${(b.price || 0).toLocaleString('id-ID')}</td>
+                        <td><span class="badge bg-success">${b.paymentMethod || 'VALID'}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -811,17 +796,18 @@ async function loadBuyers() {
         fMonth.addEventListener('change', () => { fDay.value = ''; filterBuyers(); });
         fSearch.addEventListener('keyup', filterBuyers);
 
-        function filterBuyers() {
-            const dayVal = fDay.value;     // format: YYYY-MM-DD
-            const monthVal = fMonth.value; // format: YYYY-MM
+            function filterBuyers() {
+            const dayVal = fDay.value;     
+            const monthVal = fMonth.value; 
             const searchVal = fSearch.value.toLowerCase();
 
             const filtered = buyersData.filter(b => {
                 let matchDate = true;
                 let matchSearch = true;
-                const bDateObj = new Date(b.createdAt || b.date);
+                
+                // Gunakan b.date sesuai field dari backend
+                const bDateObj = new Date(b.date);
 
-                // Filter Tanggal / Bulan
                 if (dayVal) {
                     const bDateStr = bDateObj.toISOString().split('T')[0];
                     matchDate = (bDateStr === dayVal);
@@ -830,9 +816,9 @@ async function loadBuyers() {
                     matchDate = (bMonthStr === monthVal);
                 }
 
-                // Filter Pencarian (Nama, Email, Event)
                 if (searchVal) {
-                    const str = `${b.buyerName || b.user?.name || ''} ${b.buyerEmail || b.user?.email || ''} ${b.eventName || ''}`.toLowerCase();
+                    // Hanya cari berdasarkan customerName, eventName, dan ticketCode (karena email tidak dikirim backend)
+                    const str = `${b.customerName || ''} ${b.eventName || ''} ${b.ticketCode || ''}`.toLowerCase();
                     matchSearch = str.includes(searchVal);
                 }
 
