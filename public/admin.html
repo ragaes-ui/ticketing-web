@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | RCELLFEST</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
@@ -14,9 +14,9 @@
 
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --glass-bg: rgba(25, 25, 40, 0.4);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             --text-color: #ffffff;
             --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
         }
@@ -28,7 +28,7 @@
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            padding-top: 90px;
+            padding-top: 100px;
             overflow-x: hidden;
         }
 
@@ -38,78 +38,97 @@
             100% { background-position: 0% 50%; }
         }
 
+        .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5; }
+        .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #7f00ff; }
+        .blob-2 { bottom: -10%; right: -10%; width: 300px; height: 300px; background: #00c6ff; }
+
         .glass-card { 
             background: var(--glass-bg); 
-            backdrop-filter: blur(16px); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
             border: var(--glass-border); 
-            border-radius: 20px; 
+            border-radius: 24px; 
             box-shadow: var(--glass-shadow); 
             padding: 25px; 
             color: white; 
         }
         
         .navbar { 
-            background: rgba(15, 12, 41, 0.7); 
+            background: rgba(15, 12, 41, 0.85); 
             backdrop-filter: blur(20px); 
             border-bottom: 1px solid rgba(255,255,255,0.05); 
             padding: 15px 0; 
         }
         
         .form-control, .form-select { 
-            background: rgba(0, 0, 0, 0.3) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
+            background: rgba(255, 255, 255, 0.05) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
             color: white !important; 
             border-radius: 12px; 
-            padding: 10px; 
+            padding: 12px 15px; 
+            font-size: 0.9rem;
         }
         
-        .btn-primary { background: var(--primary-gradient); border: none; border-radius: 12px; font-weight: 600; transition: 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
+        .form-control:focus, .form-select:focus { 
+            border-color: #00c6ff; 
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.2); 
+        }
+        
+        ::placeholder { color: rgba(255,255,255,0.4) !important; }
 
-        .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.1); }
-        .table-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; }
+        .btn { border-radius: 12px; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: var(--primary-gradient); border: none; font-weight: 600; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 114, 255, 0.5); }
+
+        .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.05); }
+        .table tbody tr:hover { background: rgba(255,255,255,0.02); }
+        .table-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
 
         .modal-content { 
-            background: rgba(28, 28, 45, 0.95); 
-            backdrop-filter: blur(20px); 
+            background: rgba(28, 28, 45, 0.98); 
+            backdrop-filter: blur(25px); 
             border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 24px; 
             color: white; 
         }
         
-        .btn-close { filter: invert(1); }
+        .btn-close { filter: invert(1); opacity: 0.8; }
 
         .img-preview-box { 
-            width: 100%; height: 120px; border: 2px dashed rgba(255,255,255,0.2); 
-            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
-            overflow: hidden; margin-top: 5px; background: rgba(0,0,0,0.2); 
+            width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.15); 
+            border-radius: 16px; display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; margin-top: 8px; background: rgba(0,0,0,0.2); 
         }
         .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .tier-row { 
-            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 10px; border-radius: 12px; margin-bottom: 8px; position: relative; 
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); 
+            padding: 15px; border-radius: 16px; margin-bottom: 12px; position: relative; 
         }
-        .btn-remove-tier { position: absolute; top: -5px; right: -5px; border-radius: 50%; padding: 0 6px; font-size: 10px; }
+        .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         
         .promo-ticket { 
-            border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.1); 
-            border-radius: 12px; padding: 12px; margin-bottom: 10px; 
+            border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.05); 
+            border-radius: 16px; padding: 15px; margin-bottom: 12px; 
             display: flex; justify-content: space-between; align-items: center; 
         }
     </style>
 </head>
 <body class="pb-5">
 
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold text-white d-flex align-items-center gap-2" href="#">
                 <i class="bi bi-shield-lock-fill text-info"></i> ADMIN PORTAL
             </a>
-            <div class="d-flex gap-2">
-                <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3"><i class="bi bi-ticket-perforated"></i> Promo</button>
-                <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="bi bi-key"></i> Password</button>
-                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-power"></i> Logout</button>
+            <div class="d-flex gap-2 align-items-center">
+                <button onclick="toggleLanguage()" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold me-2" id="lang-btn" style="padding: 6px 15px;">ID</button>
+                <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3"><i class="bi bi-ticket-perforated"></i> <span data-i18n="nav_promo">Promo</span></button>
+                <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="bi bi-key"></i> <span data-i18n="nav_pass">Password</span></button>
+                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-power"></i> <span data-i18n="nav_logout">Logout</span></button>
             </div>
         </div>
     </nav>
@@ -117,12 +136,12 @@
     <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-12">
-                <div class="glass-card d-flex justify-content-between align-items-center" style="border-left: 5px solid #ff9800;">
+                <div class="glass-card d-flex justify-content-between align-items-center" style="border-left: 5px solid #ff9800; padding: 15px 25px;">
                     <div>
                         <h5 class="fw-bold mb-0">Maintenance Mode</h5>
-                        <small class="text-white-50">Matikan akses publik sementara.</small>
+                        <small class="text-white-50" data-i18n="maint_desc">Matikan akses publik sementara.</small>
                     </div>
-                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="switchMaintenance"></div>
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="switchMaintenance" style="width: 3em; height: 1.5em;"></div>
                 </div>
             </div>
         </div>
@@ -130,48 +149,48 @@
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
                 <div class="glass-card text-center" style="border-bottom: 4px solid #00c6ff;">
-                    <h6 class="opacity-75 small">TOTAL PENDAPATAN</h6>
-                    <h3 class="fw-bold text-info" id="totalPendapatan">Rp 0</h3>
+                    <h6 class="opacity-75 small fw-bold tracking-wide" data-i18n="stat_rev">TOTAL PENDAPATAN</h6>
+                    <h3 class="fw-bold text-info mb-0" id="totalPendapatan">Rp 0</h3>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
                 <div class="glass-card text-center" style="border-bottom: 4px solid #2ecc71;">
-                    <h6 class="opacity-75 small">TIKET TERJUAL</h6>
-                    <h3 class="fw-bold text-success" id="totalTiket">0 Tiket</h3>
+                    <h6 class="opacity-75 small fw-bold tracking-wide" data-i18n="stat_ticket">TIKET TERJUAL</h6>
+                    <h3 class="fw-bold text-success mb-0" id="totalTiket">0</h3>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
                 <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor:pointer;" onclick="openUserModal()">
-                    <h6 class="opacity-75 small">USER AKTIF <i class="bi bi-box-arrow-in-right"></i></h6>
-                    <h3 class="fw-bold text-warning" id="totalUser">0 Orang</h3>
+                    <h6 class="opacity-75 small fw-bold tracking-wide"><span data-i18n="stat_user">USER AKTIF</span> <i class="bi bi-box-arrow-in-right"></i></h6>
+                    <h3 class="fw-bold text-warning mb-0" id="totalUser">0</h3>
                 </div>
             </div>
         </div>
 
         <div class="row mb-4">
             <div class="col-12">
-                <div class="glass-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-info">Grafik Pendapatan (7 Hari)</h6>
-                        <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-file-pdf"></i> Cetak PDF</button>
+                <div class="glass-card" id="laporanArea">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold text-info m-0" data-i18n="chart_title">Grafik Pendapatan (7 Hari)</h6>
+                        <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-4"><i class="bi bi-file-pdf me-1"></i> <span data-i18n="btn_print">Cetak PDF</span></button>
                     </div>
-                    <div style="height: 250px;"><canvas id="revenueChart"></canvas></div>
+                    <div style="height: 280px;"><canvas id="revenueChart"></canvas></div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="glass-card">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">Tambah Produk</h5>
+                <div class="glass-card sticky-top" style="top: 110px;">
+                    <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3" data-i18n="form_title"><i class="bi bi-plus-circle text-info me-2"></i>Tambah Produk</h5>
                     <form id="formEvent">
                         <div class="mb-3">
-                            <label class="small text-white-50">Link Gambar</label>
-                            <input type="text" id="image" class="form-control" oninput="previewImage(this.value, 'addPreview')">
-                            <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt">Preview</span></div>
+                            <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_img">Link Gambar</label>
+                            <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview')">
+                            <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-white-50 small"><i class="bi bi-image fs-4"></i></span></div>
                         </div>
                         <div class="mb-3">
-                            <label class="small text-white-50">Kategori</label>
+                            <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_cat">Kategori</label>
                             <select id="category" class="form-select">
                                 <option value="General">General</option>
                                 <option value="Konser">Konser</option>
@@ -179,33 +198,39 @@
                                 <option value="Streaming">Streaming</option>
                             </select>
                         </div>
-                        <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" required></div>
-                        <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" required></div>
+                        <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" data-i18n-ph="ph_name" required></div>
+                        <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" data-i18n-ph="ph_loc" required></div>
                         <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
-                        <div class="mb-3"><textarea id="description" class="form-control" rows="2" placeholder="Deskripsi"></textarea></div>
+                        <div class="mb-3"><textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea></div>
                         
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-2">
-                                <label class="small fw-bold text-warning">Tiket & Stok</label>
-                                <button type="button" class="btn btn-sm btn-warning py-0" onclick="addTierRow('addTiers')">+</button>
+                        <div class="mb-4 mt-4 pt-3 border-top border-secondary">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label class="small fw-bold text-warning m-0" data-i18n="lbl_ticket">Tiket & Stok</label>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('addTiers')"><i class="bi bi-plus"></i></button>
                             </div>
                             <div id="addTiers"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Publish Produk</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-6 rounded-pill"><i class="bi bi-rocket-takeoff me-2"></i><span data-i18n="btn_publish">Publish Produk</span></button>
                     </form>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="glass-card">
-                    <div class="d-flex justify-content-between mb-4">
-                        <h5 class="fw-bold">Database Item</h5>
-                        <input type="text" id="searchBox" class="form-control form-control-sm w-25" placeholder="Cari..." onkeyup="filterTable()">
+                <div class="glass-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0" data-i18n="table_title"><i class="bi bi-database-fill me-2 text-primary"></i>Database Item</h5>
+                        <input type="text" id="searchBox" class="form-control form-control-sm rounded-pill px-3" placeholder="Cari..." data-i18n-ph="ph_search" style="width: 200px;" onkeyup="filterTable()">
                     </div>
                     <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr><th>Cover</th><th>Info</th><th>Harga</th><th class="text-center">Stok</th><th class="text-end">Aksi</th></tr>
+                        <table class="table align-middle text-nowrap">
+                            <thead class="text-white-50 small">
+                                <tr>
+                                    <th data-i18n="th_cover">Cover</th>
+                                    <th data-i18n="th_info">Info Produk</th>
+                                    <th data-i18n="th_price">Harga</th>
+                                    <th class="text-center" data-i18n="th_stock">Stok</th>
+                                    <th class="text-end" data-i18n="th_action">Aksi</th>
+                                </tr>
                             </thead>
                             <tbody id="tableBody"></tbody>
                         </table>
@@ -217,55 +242,57 @@
 
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content p-3">
-                <h5 class="fw-bold mb-3">Edit Produk</h5>
+            <div class="modal-content p-4">
+                <h5 class="fw-bold mb-4" data-i18n="modal_edit_title"><i class="bi bi-pencil-square me-2"></i>Edit Produk</h5>
                 <input type="hidden" id="editId">
                 <div class="mb-3"><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"></div>
                 <div class="img-preview-box mb-3"><img id="editPreview"></div>
                 <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
                 <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
-                <div id="editTiers" class="mb-3"></div>
-                <button onclick="saveEdit()" class="btn btn-primary w-100">Simpan Perubahan</button>
+                <div id="editTiers" class="mb-4"></div>
+                <button onclick="saveEdit()" class="btn btn-primary w-100 rounded-pill py-2" data-i18n="btn_save">Simpan Perubahan</button>
             </div>
         </div>
     </div>
 
     <div class="modal fade" id="promoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content p-4">
-                <h5 class="fw-bold text-success mb-3">Kelola Promo</h5>
+                <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i><span data-i18n="modal_promo_title">Kelola Promo</span></h5>
                 <form id="formPromo" class="row g-2 mb-4">
                     <div class="col-md-3"><input type="text" id="promoCode" class="form-control" placeholder="KODE" required></div>
-                    <div class="col-md-3"><input type="number" id="promoDisc" class="form-control" placeholder="Potongan" required></div>
+                    <div class="col-md-3"><input type="number" id="promoDisc" class="form-control" placeholder="Potongan (Rp)" required></div>
                     <div class="col-md-3"><input type="number" id="promoQuota" class="form-control" placeholder="Kuota" required></div>
-                    <div class="col-md-3"><button type="submit" class="btn btn-success w-100">Buat</button></div>
+                    <div class="col-md-3"><button type="submit" class="btn btn-success w-100 rounded-pill"><i class="bi bi-plus-lg"></i> Buat</button></div>
                 </form>
-                <div id="promoList" class="overflow-auto" style="max-height: 300px;"></div>
+                <div id="promoList" class="overflow-auto" style="max-height: 300px; padding-right: 5px;"></div>
             </div>
         </div>
     </div>
 
     <div class="modal fade" id="userListModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="fw-bold">Daftar User</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body p-0">
-                    <table class="table mb-0">
-                        <thead class="bg-white bg-opacity-10"><tr><th class="ps-3">User</th><th>Kontak</th><th>Saldo</th></tr></thead>
-                        <tbody id="tableUserList"></tbody>
-                    </table>
+                <div class="modal-header border-0 pb-0"><h5 class="fw-bold" data-i18n="modal_user_title">Daftar User</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-4">
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead class="text-white-50 small"><tr><th>User</th><th>Kontak</th><th>Saldo</th></tr></thead>
+                            <tbody id="tableUserList"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="modal fade" id="adminPassModal" tabindex="-1">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content p-3">
-                <h6 class="fw-bold mb-3">Ganti Password Admin</h6>
-                <input type="password" id="oldP" class="form-control mb-2" placeholder="Lama">
-                <input type="password" id="newP" class="form-control mb-2" placeholder="Baru">
-                <button onclick="saveAdminPassword()" class="btn btn-warning w-100">Update</button>
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h6 class="fw-bold mb-4 text-warning"><i class="bi bi-key me-2"></i><span data-i18n="modal_pass_title">Ganti Password</span></h6>
+                <input type="password" id="oldP" class="form-control mb-3" placeholder="Password Lama" data-i18n-ph="ph_oldpass">
+                <input type="password" id="newP" class="form-control mb-4" placeholder="Password Baru" data-i18n-ph="ph_newpass">
+                <button onclick="saveAdminPassword()" class="btn btn-warning w-100 rounded-pill fw-bold" data-i18n="btn_update">Update</button>
             </div>
         </div>
     </div>
@@ -274,119 +301,165 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        // --- TRANSLATION DICTIONARY ---
+        const translations = {
+            id: {
+                nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
+                maint_desc: "Matikan akses publik sementara.",
+                stat_rev: "TOTAL PENDAPATAN", stat_ticket: "TIKET TERJUAL", stat_user: "USER AKTIF",
+                chart_title: "Grafik Pendapatan (7 Hari)", btn_print: "Cetak PDF",
+                form_title: "Tambah Produk", lbl_img: "Link Gambar", lbl_cat: "Kategori",
+                ph_name: "Nama Event", ph_loc: "Lokasi", ph_desc: "Deskripsi", ph_search: "Cari...",
+                lbl_ticket: "Tiket & Stok", btn_publish: "Publish Produk",
+                table_title: "Database Item", th_cover: "Cover", th_info: "Info Produk", th_price: "Harga", th_stock: "Stok", th_action: "Aksi",
+                modal_edit_title: "Edit Produk", btn_save: "Simpan Perubahan",
+                modal_promo_title: "Kelola Promo", modal_user_title: "Daftar User",
+                modal_pass_title: "Ganti Password", ph_oldpass: "Password Lama", ph_newpass: "Password Baru", btn_update: "Update",
+                btn_open: "Buka"
+            },
+            en: {
+                nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
+                maint_desc: "Disable public access temporarily.",
+                stat_rev: "TOTAL REVENUE", stat_ticket: "TICKETS SOLD", stat_user: "ACTIVE USERS",
+                chart_title: "Revenue Chart (7 Days)", btn_print: "Print PDF",
+                form_title: "Add Product", lbl_img: "Image Link", lbl_cat: "Category",
+                ph_name: "Event Name", ph_loc: "Location", ph_desc: "Description", ph_search: "Search...",
+                lbl_ticket: "Tickets & Stock", btn_publish: "Publish Product",
+                table_title: "Item Database", th_cover: "Cover", th_info: "Product Info", th_price: "Price", th_stock: "Stock", th_action: "Action",
+                modal_edit_title: "Edit Product", btn_save: "Save Changes",
+                modal_promo_title: "Manage Promo", modal_user_title: "User List",
+                modal_pass_title: "Change Password", ph_oldpass: "Old Password", ph_newpass: "New Password", btn_update: "Update",
+                btn_open: "Reopen"
+            }
+        };
+
+        const savedLang = localStorage.getItem('lang') || 'id';
+        updateLanguage(savedLang);
+
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLanguage(newLang);
+            loadTable(); 
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerHTML = t[key];
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if(t[key]) el.placeholder = t[key];
+            });
+            const langBtn = document.getElementById('lang-btn');
+            langBtn.innerText = lang.toUpperCase();
+            if(lang === 'en') {
+                langBtn.classList.add('btn-light', 'text-dark');
+                langBtn.classList.remove('btn-outline-light');
+            } else {
+                langBtn.classList.add('btn-outline-light');
+                langBtn.classList.remove('btn-light', 'text-dark');
+            }
+        }
+
+        // --- DASHBOARD REAL LOGIC ---
         let eventsData = []; let myChart = null;
         const eModal = new bootstrap.Modal(document.getElementById('editModal'));
         const pModal = new bootstrap.Modal(document.getElementById('promoModal'));
         const uModal = new bootstrap.Modal(document.getElementById('userListModal'));
         const apModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
 
-        // --- CORE FUNCTIONS ---
+        // API Laporan Asli
         async function loadLaporan() {
-            const res = await fetch('/api/admin/reports');
-            const data = await res.json();
-            if (res.ok) {
-                document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
-                document.getElementById('totalTiket').innerText = `${data.totalTiket} Tiket`;
-                document.getElementById('totalUser').innerText = `${data.totalUser} Orang`;
-                updateChart(data.chartLabels, data.chartValues);
+            try {
+                const res = await fetch('/api/admin/reports');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
+                    document.getElementById('totalTiket').innerText = `${data.totalTiket}`;
+                    document.getElementById('totalUser').innerText = `${data.totalUser}`;
+                    updateChart(data.chartLabels || [], data.chartValues || []);
+                }
+            } catch (err) { console.error("Gagal load laporan", err); }
+        }
+
+        // API Tabel Event Asli
+        async function loadTable() {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            try {
+                const res = await fetch('/api/events');
+                if(res.ok){
+                    eventsData = await res.json();
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = '';
+                    eventsData.forEach(ev => {
+                        let statusBadge = '';
+                        let actionBtn = '';
+                        if(ev.availableSeats === -1) {
+                            statusBadge = '<span class="badge bg-secondary">SELESAI</span>';
+                            actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1" title="${t.btn_open}"><i class="bi bi-play-fill"></i></button>`;
+                        } else if(ev.availableSeats === -2) {
+                            statusBadge = '<span class="badge bg-info text-dark">SOON</span>';
+                            actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1" title="${t.btn_open}"><i class="bi bi-play-fill"></i></button>`;
+                        } else {
+                            statusBadge = `<span class="text-success fw-bold">${ev.availableSeats}</span>`;
+                            actionBtn = `
+                                <button onclick="tandaiSoon('${ev._id}')" class="btn btn-sm btn-info me-1"><i class="bi bi-clock"></i></button>
+                                <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-warning me-1"><i class="bi bi-calendar-check"></i></button>`;
+                        }
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
+                                <td><div class="fw-bold small">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
+                                <td class="fw-bold small">Rp ${ev.price.toLocaleString('id-ID')}</td>
+                                <td class="text-center">${statusBadge}</td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end">
+                                        ${actionBtn}
+                                        <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil"></i></button>
+                                        <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                    });
+                }
+            } catch (err) { console.error("Gagal load tabel", err); }
+        }
+
+        // Auto-convert Google Drive Link
+        function previewImage(u, i) { 
+            const img = document.getElementById(i); 
+            const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : '');
+            let finalUrl = u;
+            if (u && u.includes('drive.google.com/file/d/')) {
+                const match = u.match(/\/d\/(.*?)\//);
+                if (match && match[1]) finalUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+            if(finalUrl){ 
+                img.src = finalUrl; 
+                img.style.display = 'block'; 
+                if(txt) txt.style.display = 'none'; 
+            } else {
+                img.style.display = 'none';
+                if(txt) txt.style.display = 'block';
             }
         }
 
-        async function loadTable() {
-            const res = await fetch('/api/events');
-            eventsData = await res.json();
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            eventsData.forEach(ev => {
-                let statusBadge = '';
-                let actionBtn = '';
-                if(ev.availableSeats === -1) {
-                    statusBadge = '<span class="badge bg-secondary">SELESAI</span>';
-                    actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1"><i class="bi bi-play-fill"></i> Buka</button>`;
-                } else if(ev.availableSeats === -2) {
-                    statusBadge = '<span class="badge bg-info text-dark">SOON</span>';
-                    actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1"><i class="bi bi-play-fill"></i> Buka</button>`;
-                } else {
-                    statusBadge = `<span class="text-success fw-bold">${ev.availableSeats}</span>`;
-                    actionBtn = `
-                        <button onclick="tandaiSoon('${ev._id}')" class="btn btn-sm btn-info me-1"><i class="bi bi-clock"></i></button>
-                        <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-warning me-1"><i class="bi bi-calendar-check"></i></button>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
-                        <td><div class="fw-bold small">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
-                        <td class="fw-bold small">Rp ${ev.price.toLocaleString('id-ID')}</td>
-                        <td class="text-center">${statusBadge}</td>
-                        <td class="text-end">
-                            <div class="d-flex justify-content-end">
-                                ${actionBtn}
-                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil"></i></button>
-                                <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        // --- ACTIONS ---
-        async function tandaiSelesai(id) {
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -1 }) });
-            loadTable();
-        }
-        async function tandaiSoon(id) {
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -2 }) });
-            loadTable();
-        }
-        async function batalSelesai(id) {
-            const ev = eventsData.find(e => e._id === id);
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: ev.capacity || 10 }) });
-            loadTable();
-        }
-        async function hapusKonser(id) {
-            if(confirm('Hapus item ini?')) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); }
-        }
-
-        // --- MODAL TRIGGERS ---
-        function openPromoModal() { pModal.show(); loadPromos(); }
-        async function loadPromos() {
-            const res = await fetch('/api/promos');
-            const data = await res.json();
-            document.getElementById('promoList').innerHTML = data.map(p => `
-                <div class="promo-ticket">
-                    <div class="small"><b>${p.code}</b><br>Rp ${p.discount.toLocaleString()} | Sisa: ${p.quota}</div>
-                    <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger">X</button>
-                </div>`).join('');
-        }
-        async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
-
-        function openUserModal() { uModal.show(); loadUsers(); }
-        async function loadUsers() {
-            const res = await fetch('/api/admin/users');
-            const result = await res.json();
-            document.getElementById('tableUserList').innerHTML = result.data.map(u => `
-                <tr><td class="ps-3 small"><b>${u.fullName}</b><br>@${u.username}</td>
-                <td class="small">${u.email}</td><td class="text-success fw-bold small">Rp ${u.saldo.toLocaleString()}</td></tr>`).join('');
-        }
-
-        function openAdminPassModal() { apModal.show(); }
-        async function saveAdminPassword() {
-            const res = await fetch('/api/user/change-password', {
-                method: 'PUT', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ oldPassword: document.getElementById('oldP').value, newPassword: document.getElementById('newP').value })
-            });
-            if(res.ok) { Swal.fire('Berhasil'); apModal.hide(); } else { Swal.fire('Gagal'); }
-        }
-
-        // --- HELPERS ---
+        // Tiers Logic
         function addTierRow(id, n='', p='', s='') {
             document.getElementById(id).insertAdjacentHTML('beforeend', `
                 <div class="tier-row">
-                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">x</button>
-                    <input type="text" class="form-control form-control-sm mb-1 tier-name" value="${n}" placeholder="Nama Tiket" required>
-                    <div class="row g-1"><div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga"></div>
-                    <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok"></div></div>
+                    <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+                    <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required>
+                    <div class="row g-2">
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div>
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
+                    </div>
                 </div>`);
         }
         function getTiers(id) {
@@ -396,9 +469,12 @@
             }));
         }
 
+        // API Events form post
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
             const tiers = getTiers('addTiers');
+            if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
+            
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value,
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
@@ -406,24 +482,119 @@
                 price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0),
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
             };
-            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = '';
+            try {
+                await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+                loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers');
+                previewImage('', 'addPreview');
+                Swal.fire('Berhasil!', 'Produk ditambahkan.', 'success');
+            } catch (err) { Swal.fire('Error', 'Gagal menyimpan', 'error'); }
         });
 
+        // API Actions
+        async function tandaiSelesai(id) { await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -1 }) }); loadTable(); }
+        async function tandaiSoon(id) { await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -2 }) }); loadTable(); }
+        async function batalSelesai(id) {
+            const ev = eventsData.find(e => e._id === id);
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: ev.capacity || 10 }) });
+            loadTable();
+        }
+        async function hapusKonser(id) { if(confirm('Hapus item ini?')) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); } }
+
+        // Modal Edit Setup
+        function bukaModalEdit(id) {
+            const ev = eventsData.find(e => e._id === id);
+            if(ev) {
+                document.getElementById('editId').value = ev._id;
+                document.getElementById('editName').value = ev.name;
+                if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
+                document.getElementById('editImage').value = ev.image || '';
+                previewImage(ev.image, 'editPreview');
+                document.getElementById('editTiers').innerHTML = '';
+                if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
+                eModal.show();
+            }
+        }
+        async function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const tiers = getTiers('editTiers');
+            const data = {
+                name: document.getElementById('editName').value, date: document.getElementById('editDate').value,
+                image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
+            };
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            eModal.hide(); loadTable();
+        }
+
+        // Modals API
+        function openPromoModal() { pModal.show(); loadPromos(); }
+        async function loadPromos() {
+            try {
+                const res = await fetch('/api/promos');
+                const data = await res.json();
+                document.getElementById('promoList').innerHTML = data.map(p => `
+                    <div class="promo-ticket">
+                        <div class="small"><b>${p.code}</b><br>Rp ${p.discount.toLocaleString()} | Sisa: ${p.quota}</div>
+                        <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                    </div>`).join('');
+            } catch(e) {}
+        }
+        document.getElementById('formPromo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = { code: document.getElementById('promoCode').value, discount: document.getElementById('promoDisc').value, quota: document.getElementById('promoQuota').value };
+            await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            e.target.reset(); loadPromos();
+        });
+        async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
+
+        function openUserModal() { uModal.show(); loadUsers(); }
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users');
+                const result = await res.json();
+                document.getElementById('tableUserList').innerHTML = result.data.map(u => `
+                    <tr><td class="small"><b>${u.fullName}</b><br>@${u.username}</td>
+                    <td class="small">${u.email}</td><td class="text-success fw-bold small">Rp ${u.saldo.toLocaleString()}</td></tr>`).join('');
+            } catch (e) {}
+        }
+
+        function openAdminPassModal() { apModal.show(); }
+        async function saveAdminPassword() {
+            const res = await fetch('/api/user/change-password', {
+                method: 'PUT', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ oldPassword: document.getElementById('oldP').value, newPassword: document.getElementById('newP').value })
+            });
+            if(res.ok) { Swal.fire('Berhasil', 'Password terupdate', 'success'); apModal.hide(); } else { Swal.fire('Gagal', 'Cek password lama', 'error'); }
+        }
+
+        // Chart Function
         function updateChart(l, v) {
             const ctx = document.getElementById('revenueChart');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
-                type: 'line', data: { labels: l, datasets: [{ data: v, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.1)', fill: true, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                type: 'line', data: { labels: l, datasets: [{ data: v, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#0072ff', pointRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.6)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)' } } } }
             });
         }
-        function previewImage(u, i) { const img = document.getElementById(i); if(u){ img.src=u; img.style.display='block'; if(document.getElementById('addTxt')) document.getElementById('addTxt').style.display='none'; } }
+
+        function cetakLaporan() {
+            const el = document.getElementById('laporanArea');
+            html2pdf().from(el).set({ margin: 1, filename: 'Laporan_RCELLFEST.pdf', html2canvas: { scale: 2, backgroundColor: '#1c1c2d' }, jsPDF: { orientation: 'landscape' } }).save();
+        }
+
+        function filterTable() {
+            const term = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+            });
+        }
+
         function logout() { window.location.href = '/logout'; }
-        
-        // Init
+
+        // Initialization
         addTierRow('addTiers');
-        loadLaporan(); loadTable();
+        loadLaporan(); 
+        loadTable();
     </script>
 </body>
 </html>
