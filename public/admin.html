@@ -741,10 +741,22 @@ async function loadBuyers() {
                 if (res.ok) {
                     const responseData = await res.json();
                     
-                    // KUNCI PERBAIKANNYA DI SINI:
-                    // Cek apakah API mengembalikan array langsung, atau dibungkus di dalam responseData.data
-                    buyersData = Array.isArray(responseData) ? responseData : (responseData.data || []);
+                    // --- PENCARI ARRAY OTOMATIS ---
+                    let dataArray = [];
+                    if (Array.isArray(responseData)) {
+                        // Jika respons API langsung berupa array
+                        dataArray = responseData;
+                    } else {
+                        // Jika berupa Object, cari properti mana yang isinya Array
+                        for (let key in responseData) {
+                            if (Array.isArray(responseData[key])) {
+                                dataArray = responseData[key];
+                                break; // Berhenti mencari jika sudah ketemu array-nya
+                            }
+                        }
+                    }
                     
+                    buyersData = dataArray;
                     renderBuyerTable(buyersData);
                 } else {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data dari server.</td></tr>';
