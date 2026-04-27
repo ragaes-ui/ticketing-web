@@ -94,7 +94,13 @@ app.use(keycloak.middleware());
 app.get('/admin.html', keycloak.protect(), (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
 });
-
+// 👇 TAMBAHKAN RUTE LOGOUT DI SINI 👇
+app.get('/logout', (req, res) => {
+    if (req.session) {
+        req.session.destroy(); // Menghapus memori login admin
+    }
+    res.redirect('/'); // Nendang admin balik ke halaman utama (index.html)
+});
 // 👇 FOLDER PUBLIC (Di bawah pelindung admin)
 app.use(express.static(path.join(process.cwd(), 'public')));
 
