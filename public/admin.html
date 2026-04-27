@@ -487,12 +487,22 @@ document.getElementById('category').addEventListener('change', function() {
             const tiers = getTiers('addTiers');
             if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
             
+// Ambil elemen secretData, cek apakah ada (supaya tidak error)
+            const secretEl = document.getElementById('secretData');
+            const secretValue = secretEl ? secretEl.value : '';
+
             const data = {
-                name: document.getElementById('name').value, category: document.getElementById('category').value,
-                location: document.getElementById('location').value, date: document.getElementById('date').value,
-                description: document.getElementById('description').value, image: document.getElementById('image').value,
-                price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0),
-                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
+                name: document.getElementById('name').value, 
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value, 
+                date: document.getElementById('date').value,
+                description: document.getElementById('description').value, 
+                image: document.getElementById('image').value,
+                secretData: secretValue, // <--- INI TAMBAHANNYA
+                price: tiers[0]?.price || 0, 
+                capacity: tiers.reduce((a,b)=>a+b.totalSeats,0),
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+                tickets: tiers
             };
             try {
                 await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
