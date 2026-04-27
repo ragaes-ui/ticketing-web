@@ -590,11 +590,55 @@
         }
 
         function logout() { window.location.href = '/logout'; }
+// --- LOGIC MAINTENANCE MODE ---
+        const switchMaint = document.getElementById('switchMaintenance');
+        
+        // 1. Cek status maintenance saat halaman dimuat
+        async function checkMaintenanceStatus() {
+            try {
+                const res = await fetch('/api/maintenance');
+                if (res.ok) {
+                    const data = await res.json();
+                    switchMaint.checked = data.isActive;
+                }
+            } catch (err) { console.error("Gagal cek maintenance", err); }
+        }
 
+        // 2. Simpan status ke database saat tombol diklik
+        if (switchMaint) {
+            switchMaint.addEventListener('change', async function() {
+                const isActive = this.checked;
+                try {
+                    const res = await fetch('/api/maintenance', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        // Tambahkan header Authorization di sini jika API kamu butuh token admin
+                        // 'Authorization': 'Bearer ' + localStorage.getItem('adminToken'),
+                        body: JSON.stringify({ isActive }) 
+                    });
+                    
+                    if (res.ok) {
+                        Swal.fire({
+                            toast: true, position: 'top-end', showConfirmButton: false, 
+                            timer: 3000, icon: 'success', 
+                            title: isActive ? 'Maintenance Aktif 🔴' : 'Website Online 🟢',
+                            background: '#1c1c2d', color: '#fff'
+                        });
+                    } else {
+                        this.checked = !isActive; // Kembalikan posisi tombol jika gagal
+                        Swal.fire('Error', 'Gagal merubah status maintenance', 'error');
+                    }
+                } catch (err) {
+                    this.checked = !isActive;
+                    Swal.fire('Error', 'Terjadi kesalahan koneksi', 'error');
+                }
+            });
+        }
         // Initialization
         addTierRow('addTiers');
         loadLaporan(); 
         loadTable();
+        checkMaintenanceStatus(); // Tambahkan baris ini
     </script>
 </body>
 </html>
