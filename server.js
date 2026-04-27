@@ -89,7 +89,7 @@ const keycloakConfig = {
 };
 
 // 3. Nyalakan mesin Keycloak
-const keycloak = new Keycloak({ store: memoryStore }, keycloakConfig);
+const keycloak = new Keycloak({ store: sessionStore }, keycloakConfig);
 app.use(keycloak.middleware());
 // ==========================================
 
