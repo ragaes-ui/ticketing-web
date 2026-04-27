@@ -38,10 +38,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.6; }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; }
-        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; }
-
         .glass-card { 
             background: var(--glass-bg); 
             backdrop-filter: blur(16px); 
@@ -64,29 +60,11 @@
             border: 1px solid rgba(255, 255, 255, 0.2); 
             color: white !important; 
             border-radius: 12px; 
-            padding: 12px; 
+            padding: 10px; 
         }
         
-        .form-control:focus { 
-            border-color: #00c6ff; 
-            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3); 
-        }
-        
-        ::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
-
-        .btn-primary { 
-            background: var(--primary-gradient); 
-            border: none; 
-            padding: 12px; 
-            border-radius: 12px; 
-            font-weight: 600; 
-            transition: 0.3s; 
-        }
-        
-        .btn-primary:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); 
-        }
+        .btn-primary { background: var(--primary-gradient); border: none; border-radius: 12px; font-weight: 600; transition: 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
 
         .table { --bs-table-bg: transparent; --bs-table-color: white; border-color: rgba(255,255,255,0.1); }
         .table-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; }
@@ -99,67 +77,39 @@
             color: white; 
         }
         
-        .modal-header, .modal-footer { border-color: rgba(255,255,255,0.1); }
         .btn-close { filter: invert(1); }
 
         .img-preview-box { 
-            width: 100%; height: 150px; 
-            border: 2px dashed rgba(255,255,255,0.2); 
-            border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            overflow: hidden; margin-top: 10px; background: rgba(0,0,0,0.2); 
+            width: 100%; height: 120px; border: 2px dashed rgba(255,255,255,0.2); 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; margin-top: 5px; background: rgba(0,0,0,0.2); 
         }
-        .img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
-
-        .form-check-input { height: 1.8em; width: 3.5em; background-color: rgba(255,255,255,0.2); border: none; }
-        .form-check-input:checked { background-color: #ff0055; }
-
-        .promo-ticket { 
-            border: 1px dashed #00c6ff; 
-            background: rgba(0, 198, 255, 0.1); 
-            border-radius: 12px; padding: 12px; margin-bottom: 10px; 
-            display: flex; justify-content: space-between; align-items: center; transition: 0.2s; 
-        }
-        .promo-ticket:hover { background: rgba(0, 198, 255, 0.2); }
-        .promo-code { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #ffeb3b; letter-spacing: 1px; }
+        .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .tier-row { 
-            background: rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 15px; border-radius: 12px; margin-bottom: 10px; position: relative; 
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 10px; border-radius: 12px; margin-bottom: 8px; position: relative; 
         }
-        .btn-remove-tier { 
-            position: absolute; top: -10px; right: -10px; 
-            border-radius: 50%; width: 25px; height: 25px; 
-            display: flex; align-items: center; justify-content: center; padding: 0; font-size: 12px; 
+        .btn-remove-tier { position: absolute; top: -5px; right: -5px; border-radius: 50%; padding: 0 6px; font-size: 10px; }
+        
+        .promo-ticket { 
+            border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.1); 
+            border-radius: 12px; padding: 12px; margin-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center; 
         }
     </style>
 </head>
 <body class="pb-5">
-
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold text-white d-flex align-items-center gap-2" href="#">
                 <i class="bi bi-shield-lock-fill text-info"></i> ADMIN PORTAL
             </a>
-            
-            <div class="d-flex gap-2 align-items-center">
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-light rounded-pill fw-bold me-2" id="lang-btn" style="min-width: 40px;">ID</button>
-                <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3" target="_blank">
-                    <i class="bi bi-box-arrow-up-right me-1"></i> <span data-i18n="nav_website">Website</span>
-                </a>
-                <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3">
-                    <i class="bi bi-ticket-perforated-fill me-1"></i> <span data-i18n="nav_promo">Kelola Promo</span>
-                </button>
-                <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3">
-                    <i class="bi bi-key me-1"></i> <span data-i18n="nav_password">Password</span>
-                </button>
-                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-4">
-                    <i class="bi bi-power"></i> <span data-i18n="nav_logout">Logout</span>
-                </button>
+            <div class="d-flex gap-2">
+                <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3"><i class="bi bi-ticket-perforated"></i> Promo</button>
+                <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="bi bi-key"></i> Password</button>
+                <button onclick="logout()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-power"></i> Logout</button>
             </div>
         </div>
     </nav>
@@ -168,176 +118,94 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="glass-card d-flex justify-content-between align-items-center" style="border-left: 5px solid #ff9800;">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="bg-warning bg-opacity-25 p-3 rounded-circle text-warning"><i class="bi bi-cone-striped fs-4"></i></div>
-                        <div>
-                            <h5 class="fw-bold mb-0" data-i18n="maint_title">Maintenance Mode</h5>
-                            <small class="text-white-50" data-i18n="maint_desc">Matikan akses publik sementara.</small>
-                        </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Maintenance Mode</h5>
+                        <small class="text-white-50">Matikan akses publik sementara.</small>
                     </div>
                     <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="switchMaintenance"></div>
                 </div>
             </div>
         </div>
 
-        <div class="row mb-4" id="laporan-print-area">
-            <div class="col-12 d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                <h5 class="fw-bold m-0"><i class="bi bi-bar-chart-fill me-2 text-warning"></i> Laporan Keuangan</h5>
-                
-                <div class="d-flex align-items-center gap-2 bg-dark bg-opacity-25 p-2 rounded-pill border border-secondary">
-                    <input type="date" id="filterStart" class="form-control form-control-sm bg-transparent text-white border-0" style="width: auto;">
-                    <span class="text-white-50 small">s/d</span>
-                    <input type="date" id="filterEnd" class="form-control form-control-sm bg-transparent text-white border-0" style="width: auto;">
-                    <button onclick="loadLaporan()" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filter</button>
-                    <button onclick="resetFilter()" class="btn btn-sm btn-outline-light rounded-pill px-3">Reset</button>
-                </div>
-
-                <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
-                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Cetak PDF
-                </button>
-            </div>
-
-            <div class="col-md-4 mb-3 mb-md-0">
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
                 <div class="glass-card text-center" style="border-bottom: 4px solid #00c6ff;">
-                    <h6 class="opacity-75 fw-bold mb-2">TOTAL PENDAPATAN</h6>
-                    <h3 class="fw-bold text-info mb-0" id="totalPendapatan">Rp 0</h3>
+                    <h6 class="opacity-75 small">TOTAL PENDAPATAN</h6>
+                    <h3 class="fw-bold text-info" id="totalPendapatan">Rp 0</h3>
                 </div>
             </div>
-            <div class="col-md-4 mb-3 mb-md-0">
+            <div class="col-md-4 mb-3">
                 <div class="glass-card text-center" style="border-bottom: 4px solid #2ecc71;">
-                    <h6 class="opacity-75 fw-bold mb-2">TIKET TERJUAL</h6>
-                    <h3 class="fw-bold text-success mb-0" id="totalTiket">0 <small class="fs-6 fw-normal text-white">Tiket</small></h3>
+                    <h6 class="opacity-75 small">TIKET TERJUAL</h6>
+                    <h3 class="fw-bold text-success" id="totalTiket">0 Tiket</h3>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor: pointer; transition: 0.3s;" onclick="openUserModal()">
-                    <h6 class="opacity-75 fw-bold mb-2">TOTAL USER AKTIF <i class="bi bi-box-arrow-up-right ms-1"></i></h6>
-                    <h3 class="fw-bold text-warning mb-0" id="totalUser">0 <small class="fs-6 fw-normal text-white">Orang</small></h3>
+            <div class="col-md-4 mb-3">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor:pointer;" onclick="openUserModal()">
+                    <h6 class="opacity-75 small">USER AKTIF <i class="bi bi-box-arrow-in-right"></i></h6>
+                    <h3 class="fw-bold text-warning" id="totalUser">0 Orang</h3>
                 </div>
             </div>
+        </div>
 
-            <div class="col-12 mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
                 <div class="glass-card">
-                    <h6 class="fw-bold mb-3 text-info"><i class="bi bi-graph-up-arrow me-2"></i>Grafik Pendapatan (7 Hari Terakhir)</h6>
-                    <div style="height: 300px; width: 100%;">
-                        <canvas id="revenueChart"></canvas>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-info">Grafik Pendapatan (7 Hari)</h6>
+                        <button onclick="cetakLaporan()" class="btn btn-danger btn-sm rounded-pill px-3"><i class="bi bi-file-pdf"></i> Cetak PDF</button>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-12 mt-4">
-                <div class="glass-card">
-                    <h6 class="fw-bold mb-3 text-info">Riwayat Transaksi Terbaru</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Kode Tiket</th>
-                                    <th>Pembeli</th>
-                                    <th>Event</th>
-                                    <th>Metode</th>
-                                    <th class="text-end">Nominal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelLaporan">
-                                <tr><td colspan="6" class="text-center py-4 text-white-50">Memuat data laporan...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div style="height: 250px;"><canvas id="revenueChart"></canvas></div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="glass-card sticky-top" style="top: 110px; z-index: 10;">
-                    <div class="d-flex align-items-center gap-2 mb-4 border-bottom border-secondary pb-3">
-                        <i class="bi bi-plus-circle-fill text-info fs-5"></i>
-                        <h5 class="fw-bold m-0" data-i18n="form_title">Tambah Produk</h5>
-                    </div>
-                    
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2">Tambah Produk</h5>
                     <form id="formEvent">
                         <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_image">Link Gambar</label>
-                            <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview', 'addPreviewText')">
-                            <div class="img-preview-box">
-                                <span id="addPreviewText" data-i18n="txt_preview">Preview Gambar</span>
-                                <img id="addPreview" src="" alt="Preview">
-                            </div>
+                            <label class="small text-white-50">Link Gambar</label>
+                            <input type="text" id="image" class="form-control" oninput="previewImage(this.value, 'addPreview')">
+                            <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt">Preview</span></div>
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_category">Kategori</label>
-                            <select id="category" class="form-select" onchange="checkCategory(this)">
+                            <label class="small text-white-50">Kategori</label>
+                            <select id="category" class="form-select">
                                 <option value="General">General</option>
-                                <option value="Konser">Konser Musik</option>
+                                <option value="Konser">Konser</option>
                                 <option value="Olahraga">Olahraga</option>
-                                <option value="Workshop">Workshop</option>
-                                <option value="Streaming" class="fw-bold text-info">🎥 Akun Streaming</option>
+                                <option value="Streaming">Streaming</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_name">Nama Event/Produk</label>
-                            <input type="text" id="name" class="form-control" placeholder="..." required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_location">Lokasi / Platform</label>
-                            <input type="text" id="location" class="form-control" placeholder="TBA / Aplikasi" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_date">Tanggal / Expired</label>
-                            <input type="datetime-local" id="date" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" data-i18n="lbl_desc">Deskripsi / Akun</label>
-                            <textarea id="description" class="form-control" rows="3" placeholder="..."></textarea>
-                            <small class="text-info fst-italic" id="descHint" style="font-size: 0.75rem;"></small>
-                        </div>
+                        <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" required></div>
+                        <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" required></div>
+                        <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
+                        <div class="mb-3"><textarea id="description" class="form-control" rows="2" placeholder="Deskripsi"></textarea></div>
                         
-                        <div class="mb-3 pt-3 border-top border-secondary">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-bold m-0 text-warning">Tipe Tiket & Harga</label>
-                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0" onclick="addTierRow('addTiersContainer')">+ Tambah</button>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <label class="small fw-bold text-warning">Tiket & Stok</label>
+                                <button type="button" class="btn btn-sm btn-warning py-0" onclick="addTierRow('addTiers')">+</button>
                             </div>
-                            
-                            <div id="addTiersContainer">
-                                <div class="tier-row">
-                                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (VIP, Regular)" required>
-                                    <div class="row g-2">
-                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" placeholder="Harga (Rp)" required></div>
-                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Stok" required></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div id="addTiers"></div>
                         </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mt-2" id="btnPublish">
-                            <i class="bi bi-rocket-takeoff me-2"></i> <span data-i18n="btn_publish">Publish Sekarang</span>
-                        </button>
+                        <button type="submit" class="btn btn-primary w-100">Publish Produk</button>
                     </form>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="glass-card h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold m-0"><i class="bi bi-database-fill me-2 text-primary"></i> <span data-i18n="table_title">Database Item</span></h5>
-                        <div class="d-flex gap-2">
-                            <input type="text" id="searchBox" class="form-control form-control-sm" placeholder="..." style="width: 150px;" onkeyup="filterTable()">
-                            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="loadTable()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
-                        </div>
+                <div class="glass-card">
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="fw-bold">Database Item</h5>
+                        <input type="text" id="searchBox" class="form-control form-control-sm w-25" placeholder="Cari..." onkeyup="filterTable()">
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table align-middle">
                             <thead>
-                                <tr>
-                                    <th width="60" data-i18n="th_cover">Cover</th>
-                                    <th data-i18n="th_info">Produk Info</th>
-                                    <th data-i18n="th_price">Harga (Mulai)</th>
-                                    <th class="text-center" data-i18n="th_stock">Status/Stok</th>
-                                    <th class="text-end" data-i18n="th_action">Aksi</th>
-                                </tr>
+                                <tr><th>Cover</th><th>Info</th><th>Harga</th><th class="text-center">Stok</th><th class="text-end">Aksi</th></tr>
                             </thead>
                             <tbody id="tableBody"></tbody>
                         </table>
@@ -348,64 +216,56 @@
     </div>
 
     <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <h5 class="fw-bold mb-3">Edit Produk</h5>
+                <input type="hidden" id="editId">
+                <div class="mb-3"><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"></div>
+                <div class="img-preview-box mb-3"><img id="editPreview"></div>
+                <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
+                <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
+                <div id="editTiers" class="mb-3"></div>
+                <button onclick="saveEdit()" class="btn btn-primary w-100">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="promoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content p-4">
+                <h5 class="fw-bold text-success mb-3">Kelola Promo</h5>
+                <form id="formPromo" class="row g-2 mb-4">
+                    <div class="col-md-3"><input type="text" id="promoCode" class="form-control" placeholder="KODE" required></div>
+                    <div class="col-md-3"><input type="number" id="promoDisc" class="form-control" placeholder="Potongan" required></div>
+                    <div class="col-md-3"><input type="number" id="promoQuota" class="form-control" placeholder="Kuota" required></div>
+                    <div class="col-md-3"><button type="submit" class="btn btn-success w-100">Buat</button></div>
+                </form>
+                <div id="promoList" class="overflow-auto" style="max-height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="userListModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> <span data-i18n="modal_edit_title">Edit Data</span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header"><h5 class="fw-bold">Daftar User</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-0">
+                    <table class="table mb-0">
+                        <thead class="bg-white bg-opacity-10"><tr><th class="ps-3">User</th><th>Kontak</th><th>Saldo</th></tr></thead>
+                        <tbody id="tableUserList"></tbody>
+                    </table>
                 </div>
-                <div class="modal-body p-4">
-                    <form id="formEdit">
-                        <input type="hidden" id="editId">
-                        <div class="mb-3">
-                            <label data-i18n="lbl_image">Link Gambar</label>
-                            <input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview', 'editPreviewText')">
-                            <div class="img-preview-box" style="height: 120px;">
-                                <span id="editPreviewText" data-i18n="txt_preview">Preview</span>
-                                <img id="editPreview" src="" alt="Preview">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label data-i18n="lbl_name">Nama Event</label>
-                            <input type="text" id="editName" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label data-i18n="lbl_category">Kategori</label>
-                            <select id="editCategory" class="form-select">
-                                <option value="General">General</option>
-                                <option value="Konser">Konser</option>
-                                <option value="Olahraga">Olahraga</option>
-                                <option value="Workshop">Workshop</option>
-                                <option value="Streaming">Streaming</option>
-                            </select>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label data-i18n="lbl_location">Lokasi</label>
-                                <input type="text" id="editLocation" class="form-control">
-                            </div>
-                            <div class="col-6">
-                                <label data-i18n="lbl_date">Tanggal</label>
-                                <input type="datetime-local" id="editDate" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label data-i18n="lbl_desc">Deskripsi</label>
-                            <textarea id="editDescription" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3 pt-3 border-top border-secondary">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-bold m-0 text-warning">Edit Tipe Tiket</label>
-                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0" onclick="addTierRow('editTiersContainer')">+ Tambah</button>
-                            </div>
-                            <div id="editTiersContainer"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Batal</button>
-                    <button onclick="saveEdit()" class="btn btn-primary px-4">Simpan Perubahan</button>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="adminPassModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content p-3">
+                <h6 class="fw-bold mb-3">Ganti Password Admin</h6>
+                <input type="password" id="oldP" class="form-control mb-2" placeholder="Lama">
+                <input type="password" id="newP" class="form-control mb-2" placeholder="Baru">
+                <button onclick="saveAdminPassword()" class="btn btn-warning w-100">Update</button>
             </div>
         </div>
     </div>
@@ -414,205 +274,156 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-        let eventsData = []; 
-        let myChart = null;
-        const switchMaint = document.getElementById('switchMaintenance');
+        let eventsData = []; let myChart = null;
+        const eModal = new bootstrap.Modal(document.getElementById('editModal'));
+        const pModal = new bootstrap.Modal(document.getElementById('promoModal'));
+        const uModal = new bootstrap.Modal(document.getElementById('userListModal'));
+        const apModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
 
-        const translations = {
-            id: {
-                nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password", nav_promo: "Kelola Promo",
-                maint_title: "Maintenance Mode", maint_desc: "Matikan akses publik sementara.",
-                form_title: "Tambah Produk", lbl_image: "Thumbnail", txt_preview: "Preview Gambar", lbl_category: "Kategori",
-                lbl_name: "Nama Produk", lbl_location: "Lokasi", lbl_date: "Waktu", lbl_desc: "Deskripsi",
-                btn_publish: "Publish Sekarang", table_title: "Database Item",
-                th_cover: "Cover", th_info: "Produk Info", th_price: "Harga", th_stock: "Stok", th_action: "Aksi",
-                modal_edit_title: "Edit Data", btn_save_changes: "Simpan Perubahan",
-                empty_table: "Belum ada data."
-            },
-            en: {
-                nav_website: "Website", nav_logout: "Logout", nav_password: "Password", nav_promo: "Promo",
-                maint_title: "Maintenance", maint_desc: "Maintenance mode.",
-                form_title: "Add Product", lbl_image: "Thumbnail", txt_preview: "Preview", lbl_category: "Category",
-                lbl_name: "Product Name", lbl_location: "Location", lbl_date: "Time", lbl_desc: "Description",
-                btn_publish: "Publish", table_title: "Database Items",
-                th_cover: "Cover", th_info: "Info", th_price: "Price", th_stock: "Stock", th_action: "Action",
-                modal_edit_title: "Edit", btn_save_changes: "Save Changes",
-                empty_table: "No data."
-            }
-        };
-
-        // --- FUNGSI UTAMA ---
+        // --- CORE FUNCTIONS ---
         async function loadLaporan() {
-            try {
-                const startDate = document.getElementById('filterStart').value;
-                const endDate = document.getElementById('filterEnd').value;
-                let url = `/api/admin/reports${startDate && endDate ? `?start=${startDate}&end=${endDate}` : ''}`;
-
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if (res.ok) {
-                    document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
-                    document.getElementById('totalTiket').innerHTML = `${data.totalTiket} <small class="fs-6 fw-normal text-white">Tiket</small>`;
-                    document.getElementById('totalUser').innerHTML = `${data.totalUser} <small class="fs-6 fw-normal text-white">Orang</small>`;
-
-                    let htmlTabel = '';
-                    data.transaksiTerbaru.forEach(trx => {
-                        htmlTabel += `
-                            <tr>
-                                <td><span class="text-white-50 small">${new Date(trx.date).toLocaleDateString()}</span></td>
-                                <td><span class="badge bg-light text-dark">${trx.ticketCode}</span></td>
-                                <td class="fw-bold">${trx.customerName}</td>
-                                <td>${trx.eventName}</td>
-                                <td><span class="badge bg-primary">${trx.paymentMethod}</span></td>
-                                <td class="text-end fw-bold text-success">+ Rp ${trx.price.toLocaleString('id-ID')}</td>
-                            </tr>`;
-                    });
-                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center py-3">Kosong</td></tr>';
-
-                    updateChart(data.chartLabels, data.chartValues);
-                }
-            } catch (e) { console.error("Laporan Error:", e); }
+            const res = await fetch('/api/admin/reports');
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
+                document.getElementById('totalTiket').innerText = `${data.totalTiket} Tiket`;
+                document.getElementById('totalUser').innerText = `${data.totalUser} Orang`;
+                updateChart(data.chartLabels, data.chartValues);
+            }
         }
 
         async function loadTable() {
-            try {
-                const res = await fetch('/api/events');
-                eventsData = await res.json();
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = '';
-                
-                eventsData.forEach(ev => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
-                            <td><div class="fw-bold">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
-                            <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
-                            <td class="text-center">${ev.availableSeats}</td>
-                            <td class="text-end">
-                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light"><i class="bi bi-pencil"></i></button>
-                                <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>`;
-                });
-            } catch (e) { console.error("Table Error:", e); }
-        }
+            const res = await fetch('/api/events');
+            eventsData = await res.json();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            eventsData.forEach(ev => {
+                let statusBadge = '';
+                let actionBtn = '';
+                if(ev.availableSeats === -1) {
+                    statusBadge = '<span class="badge bg-secondary">SELESAI</span>';
+                    actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1"><i class="bi bi-play-fill"></i> Buka</button>`;
+                } else if(ev.availableSeats === -2) {
+                    statusBadge = '<span class="badge bg-info text-dark">SOON</span>';
+                    actionBtn = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-success me-1"><i class="bi bi-play-fill"></i> Buka</button>`;
+                } else {
+                    statusBadge = `<span class="text-success fw-bold">${ev.availableSeats}</span>`;
+                    actionBtn = `
+                        <button onclick="tandaiSoon('${ev._id}')" class="btn btn-sm btn-info me-1"><i class="bi bi-clock"></i></button>
+                        <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-warning me-1"><i class="bi bi-calendar-check"></i></button>`;
+                }
 
-        // --- CRUD ACTIONS ---
-        async function saveEdit() {
-            const id = document.getElementById('editId').value;
-            const tiers = getTiersData('editTiersContainer');
-            const data = {
-                name: document.getElementById('editName').value,
-                category: document.getElementById('editCategory').value,
-                location: document.getElementById('editLocation').value,
-                date: document.getElementById('editDate').value,
-                description: document.getElementById('editDescription').value,
-                image: document.getElementById('editImage').value,
-                price: tiers[0]?.price || 0,
-                availableSeats: tiers.reduce((a, b) => a + b.availableSeats, 0),
-                tickets: tiers
-            };
-
-            const res = await fetch(`/api/events/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
+                        <td><div class="fw-bold small">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
+                        <td class="fw-bold small">Rp ${ev.price.toLocaleString('id-ID')}</td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end">
+                                ${actionBtn}
+                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil"></i></button>
+                                <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
             });
-
-            if (res.ok) {
-                editModal.hide();
-                loadTable();
-                Swal.fire('Berhasil', 'Data diperbarui', 'success');
-            }
         }
 
+        // --- ACTIONS ---
+        async function tandaiSelesai(id) {
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -1 }) });
+            loadTable();
+        }
+        async function tandaiSoon(id) {
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: -2 }) });
+            loadTable();
+        }
+        async function batalSelesai(id) {
+            const ev = eventsData.find(e => e._id === id);
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ availableSeats: ev.capacity || 10 }) });
+            loadTable();
+        }
         async function hapusKonser(id) {
-            const res = await Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true });
-            if (res.isConfirmed) {
-                await fetch(`/api/events/${id}`, { method: 'DELETE' });
-                loadTable();
-            }
+            if(confirm('Hapus item ini?')) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); }
+        }
+
+        // --- MODAL TRIGGERS ---
+        function openPromoModal() { pModal.show(); loadPromos(); }
+        async function loadPromos() {
+            const res = await fetch('/api/promos');
+            const data = await res.json();
+            document.getElementById('promoList').innerHTML = data.map(p => `
+                <div class="promo-ticket">
+                    <div class="small"><b>${p.code}</b><br>Rp ${p.discount.toLocaleString()} | Sisa: ${p.quota}</div>
+                    <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger">X</button>
+                </div>`).join('');
+        }
+        async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
+
+        function openUserModal() { uModal.show(); loadUsers(); }
+        async function loadUsers() {
+            const res = await fetch('/api/admin/users');
+            const result = await res.json();
+            document.getElementById('tableUserList').innerHTML = result.data.map(u => `
+                <tr><td class="ps-3 small"><b>${u.fullName}</b><br>@${u.username}</td>
+                <td class="small">${u.email}</td><td class="text-success fw-bold small">Rp ${u.saldo.toLocaleString()}</td></tr>`).join('');
+        }
+
+        function openAdminPassModal() { apModal.show(); }
+        async function saveAdminPassword() {
+            const res = await fetch('/api/user/change-password', {
+                method: 'PUT', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ oldPassword: document.getElementById('oldP').value, newPassword: document.getElementById('newP').value })
+            });
+            if(res.ok) { Swal.fire('Berhasil'); apModal.hide(); } else { Swal.fire('Gagal'); }
+        }
+
+        // --- HELPERS ---
+        function addTierRow(id, n='', p='', s='') {
+            document.getElementById(id).insertAdjacentHTML('beforeend', `
+                <div class="tier-row">
+                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">x</button>
+                    <input type="text" class="form-control form-control-sm mb-1 tier-name" value="${n}" placeholder="Nama Tiket" required>
+                    <div class="row g-1"><div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga"></div>
+                    <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok"></div></div>
+                </div>`);
+        }
+        function getTiers(id) {
+            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
+                tierName: r.querySelector('.tier-name').value, price: parseInt(r.querySelector('.tier-price').value),
+                availableSeats: parseInt(r.querySelector('.tier-stock').value), totalSeats: parseInt(r.querySelector('.tier-stock').value)
+            }));
         }
 
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const tiers = getTiersData('addTiersContainer');
+            const tiers = getTiers('addTiers');
             const data = {
-                name: document.getElementById('name').value,
-                category: document.getElementById('category').value,
-                location: document.getElementById('location').value,
-                date: document.getElementById('date').value,
-                description: document.getElementById('description').value,
-                image: document.getElementById('image').value,
-                price: tiers[0]?.price || 0,
-                capacity: tiers.reduce((a, b) => a + b.totalSeats, 0),
-                availableSeats: tiers.reduce((a, b) => a + b.totalSeats, 0),
-                tickets: tiers
+                name: document.getElementById('name').value, category: document.getElementById('category').value,
+                location: document.getElementById('location').value, date: document.getElementById('date').value,
+                description: document.getElementById('description').value, image: document.getElementById('image').value,
+                price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0),
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
             };
-
-            const res = await fetch('/api/events', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                e.target.reset();
-                loadTable();
-                Swal.fire('Berhasil', 'Produk ditambahkan', 'success');
-            }
+            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = '';
         });
 
-        // --- HELPERS ---
-        function updateChart(labels, values) {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
+        function updateChart(l, v) {
+            const ctx = document.getElementById('revenueChart');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: 'Revenue', data: values, borderColor: '#00c6ff', fill: true }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                type: 'line', data: { labels: l, datasets: [{ data: v, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.1)', fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
-
-        function previewImage(url, imgId, textId) {
-            const img = document.getElementById(imgId);
-            const txt = document.getElementById(textId);
-            if (url) { img.src = url; img.style.display = 'block'; if(txt) txt.style.display = 'none'; }
-        }
-
-        function addTierRow(id, name='', price='', stock='') {
-            const container = document.getElementById(id);
-            container.insertAdjacentHTML('beforeend', `
-                <div class="tier-row">
-                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">X</button>
-                    <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${name}" placeholder="Nama Tiket" required>
-                    <div class="row g-2">
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${price}" placeholder="Harga" required></div>
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${stock}" placeholder="Stok" required></div>
-                    </div>
-                </div>`);
-        }
-
-        function getTiersData(id) {
-            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(row => ({
-                tierName: row.querySelector('.tier-name').value,
-                price: parseInt(row.querySelector('.tier-price').value),
-                totalSeats: parseInt(row.querySelector('.tier-stock').value),
-                availableSeats: parseInt(row.querySelector('.tier-stock').value)
-            }));
-        }
-
+        function previewImage(u, i) { const img = document.getElementById(i); if(u){ img.src=u; img.style.display='block'; if(document.getElementById('addTxt')) document.getElementById('addTxt').style.display='none'; } }
         function logout() { window.location.href = '/logout'; }
-
-        // Initial Load
-        loadLaporan();
-        loadTable();
-        setInterval(() => { if(!document.getElementById('filterStart').value) loadLaporan(); }, 15000);
+        
+        // Init
+        addTierRow('addTiers');
+        loadLaporan(); loadTable();
     </script>
 </body>
 </html>
