@@ -52,6 +52,7 @@ const transferSchema = new mongoose.Schema({
 const TransferHistory = mongoose.model('TransferHistory', transferSchema);
 
 const app = express();
+app.set('trust proxy', true);
 app.use(cors());
 app.use(express.json());
 
