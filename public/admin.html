@@ -8,11 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
-
-
 
     <style>
         :root {
@@ -116,7 +114,6 @@
         .form-check-input { height: 1.8em; width: 3.5em; background-color: rgba(255,255,255,0.2); border: none; }
         .form-check-input:checked { background-color: #ff0055; }
 
-        /* --- PROMO & TIER STYLES --- */
         .promo-ticket { 
             border: 1px dashed #00c6ff; 
             background: rgba(0, 198, 255, 0.1); 
@@ -182,7 +179,8 @@
                 </div>
             </div>
         </div>
-<div class="row mb-4" id="laporan-print-area">
+
+        <div class="row mb-4" id="laporan-print-area">
             <div class="col-12 d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                 <h5 class="fw-bold m-0"><i class="bi bi-bar-chart-fill me-2 text-warning"></i> Laporan Keuangan</h5>
                 
@@ -212,12 +210,13 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor: pointer; transition: 0.3s;" onclick="openUserModal()" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'" title="Klik untuk lihat daftar user">
+                <div class="glass-card text-center" style="border-bottom: 4px solid #f1c40f; cursor: pointer; transition: 0.3s;" onclick="openUserModal()">
                     <h6 class="opacity-75 fw-bold mb-2">TOTAL USER AKTIF <i class="bi bi-box-arrow-up-right ms-1"></i></h6>
                     <h3 class="fw-bold text-warning mb-0" id="totalUser">0 <small class="fs-6 fw-normal text-white">Orang</small></h3>
                 </div>
             </div>
-<div class="col-12 mt-4">
+
+            <div class="col-12 mt-4">
                 <div class="glass-card">
                     <h6 class="fw-bold mb-3 text-info"><i class="bi bi-graph-up-arrow me-2"></i>Grafik Pendapatan (7 Hari Terakhir)</h6>
                     <div style="height: 300px; width: 100%;">
@@ -225,6 +224,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-12 mt-4">
                 <div class="glass-card">
                     <h6 class="fw-bold mb-3 text-info">Riwayat Transaksi Terbaru</h6>
@@ -248,6 +248,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="glass-card sticky-top" style="top: 110px; z-index: 10;">
@@ -302,10 +303,10 @@
                             
                             <div id="addTiersContainer">
                                 <div class="tier-row">
-                                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (Misal: VIP, Regular)" required>
+                                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (VIP, Regular)" required>
                                     <div class="row g-2">
                                         <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" placeholder="Harga (Rp)" required></div>
-                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Kuota / Stok" required></div>
+                                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Stok" required></div>
                                     </div>
                                 </div>
                             </div>
@@ -356,7 +357,6 @@
                 <div class="modal-body p-4">
                     <form id="formEdit">
                         <input type="hidden" id="editId">
-                        
                         <div class="mb-3">
                             <label data-i18n="lbl_image">Link Gambar</label>
                             <input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview', 'editPreviewText')">
@@ -365,12 +365,10 @@
                                 <img id="editPreview" src="" alt="Preview">
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label data-i18n="lbl_name">Nama Event</label>
                             <input type="text" id="editName" class="form-control">
                         </div>
-                        
                         <div class="mb-3">
                             <label data-i18n="lbl_category">Kategori</label>
                             <select id="editCategory" class="form-select">
@@ -381,7 +379,6 @@
                                 <option value="Streaming">Streaming</option>
                             </select>
                         </div>
-                        
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label data-i18n="lbl_location">Lokasi</label>
@@ -392,12 +389,10 @@
                                 <input type="datetime-local" id="editDate" class="form-control">
                             </div>
                         </div>
-                        
                         <div class="mb-3">
                             <label data-i18n="lbl_desc">Deskripsi</label>
                             <textarea id="editDescription" class="form-control" rows="3"></textarea>
                         </div>
-                        
                         <div class="mb-3 pt-3 border-top border-secondary">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label fw-bold m-0 text-warning">Edit Tipe Tiket</label>
@@ -408,870 +403,216 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button>
-                    <button onclick="saveEdit()" class="btn btn-primary px-4" data-i18n="btn_save_changes">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Batal</button>
+                    <button onclick="saveEdit()" class="btn btn-primary px-4">Simpan Perubahan</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="promoModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-success"><i class="bi bi-ticket-perforated-fill me-2"></i> Kelola Kode Promo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row">
-                        <div class="col-md-5 border-end border-secondary mb-4 mb-md-0">
-                            <h6 class="fw-bold mb-3 text-warning">Buat Promo Baru</h6>
-                            <form id="formPromo">
-                                <div class="mb-2">
-                                    <label class="small text-muted">Kode Promo (Unik)</label>
-                                    <input type="text" id="promoCode" class="form-control text-uppercase fw-bold" placeholder="Misal: DISKON10" required>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">Nominal Diskon</label>
-                                    <input type="number" id="promoDisc" class="form-control" placeholder="Rp" required>
-                                </div>
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="small text-muted">Kuota</label>
-                                        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="small text-muted">Aktif (Hari)</label>
-                                        <input type="number" id="promoDays" class="form-control" placeholder="7" required>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-success w-100 fw-bold">Buat Promo</button>
-                            </form>
-                        </div>
-                        
-                        <div class="col-md-7 ps-md-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="fw-bold text-info m-0">Daftar Promo Aktif</h6>
-                                <button onclick="loadPromos()" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise"></i></button>
-                            </div>
-                            <div style="max-height: 350px; overflow-y: auto;" id="promoListContainer">
-                                <div class="text-center text-muted small py-4">Memuat data promo...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="adminPassModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-warning"><i class="bi bi-shield-lock me-2"></i> <span data-i18n="modal_admin_pass_title">Ganti Password Admin</span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label data-i18n="lbl_old_pass">Password Lama</label>
-                        <input type="password" id="adminOldPass" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label data-i18n="lbl_new_pass">Password Baru</label>
-                        <input type="password" id="adminNewPass" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label data-i18n="lbl_confirm_pass">Konfirmasi Password Baru</label>
-                        <input type="password" id="adminConfirmPass" class="form-control">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" data-i18n="btn_cancel">Batal</button>
-                    <button onclick="saveAdminPassword()" class="btn btn-warning px-4 text-dark fw-bold" data-i18n="btn_save_pass">Update Password</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<div class="modal fade" id="userListModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-warning"><i class="bi bi-people-fill me-2"></i> Daftar User Terdaftar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
-                            <thead style="background: rgba(255, 255, 255, 0.1);">
-                                <tr>
-                                    <th class="ps-4 text-white-50">Nama & Username</th>
-                                    <th class="text-white-50">Kontak (Email / WA)</th>
-                                    <th class="text-white-50">Saldo</th>
-                                    <th class="text-white-50">Tgl Daftar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableUserList">
-                                <tr><td colspan="4" class="text-center py-5 text-white-50">Memuat data user...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-        const adminPassModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
-        const promoModal = new bootstrap.Modal(document.getElementById('promoModal'));
         let eventsData = []; 
+        let myChart = null;
         const switchMaint = document.getElementById('switchMaintenance');
 
-        // --- KAMUS BAHASA ---
         const translations = {
             id: {
                 nav_website: "Website", nav_logout: "Keluar", nav_password: "Ganti Password", nav_promo: "Kelola Promo",
                 maint_title: "Maintenance Mode", maint_desc: "Matikan akses publik sementara.",
-                form_title: "Tambah Produk", lbl_image: "Link Gambar / Thumbnail", txt_preview: "Preview Gambar", lbl_category: "Kategori",
-                lbl_name: "Nama Event/Produk", lbl_location: "Lokasi / Platform", lbl_date: "Tanggal / Expired", lbl_desc: "Deskripsi / Akun",
-                lbl_price: "Harga (IDR)", lbl_stock: "Stok", btn_publish: "Publish Sekarang", table_title: "Database Item",
+                form_title: "Tambah Produk", lbl_image: "Thumbnail", txt_preview: "Preview Gambar", lbl_category: "Kategori",
+                lbl_name: "Nama Produk", lbl_location: "Lokasi", lbl_date: "Waktu", lbl_desc: "Deskripsi",
+                btn_publish: "Publish Sekarang", table_title: "Database Item",
                 th_cover: "Cover", th_info: "Produk Info", th_price: "Harga", th_stock: "Stok", th_action: "Aksi",
-                modal_edit_title: "Edit Data", lbl_update_stock: "Update Stok Sisa", btn_cancel: "Batal", btn_save_changes: "Simpan Perubahan",
-                desc_hint_stream: "💡 Info: Masukkan kredensial akun di sini agar user bisa melihatnya setelah bayar.",
-                desc_hint_default: "", ph_desc_stream: "Format: Email | Password | Expired\nContoh: user@gmail.com | pass123 | 30 Hari",
-                ph_desc_default: "Deskripsi lengkap event...", toast_maint_on: "Maintenance Aktif 🔴", toast_maint_off: "Website Online 🟢",
-                alert_success_title: "Berhasil!", alert_success_add: "Produk berhasil ditambahkan.", alert_success_edit: "Data telah diperbarui.",
-                alert_del_title: "Hapus Data?", alert_del_text: "Data tidak bisa dikembalikan!", btn_confirm_del: "Ya, Hapus!", btn_cancel_del: "Batal",
-                empty_table: "Belum ada data event/produk.",
-                modal_admin_pass_title: "Ganti Password Admin", lbl_old_pass: "Password Lama", lbl_new_pass: "Password Baru", lbl_confirm_pass: "Konfirmasi Password Baru",
-                btn_save_pass: "Update Password", err_pass_match: "Password baru tidak cocok!", err_pass_empty: "Harap isi semua kolom password!",
-                success_pass: "Password berhasil diubah! Silakan login kembali."
+                modal_edit_title: "Edit Data", btn_save_changes: "Simpan Perubahan",
+                empty_table: "Belum ada data."
             },
             en: {
-                nav_website: "Website", nav_logout: "Logout", nav_password: "Change Password", nav_promo: "Manage Promo",
-                maint_title: "Maintenance Mode", maint_desc: "Disable public access temporarily.",
-                form_title: "Add Product", lbl_image: "Image Link / Thumbnail", txt_preview: "Image Preview", lbl_category: "Category",
-                lbl_name: "Event/Product Name", lbl_location: "Location / Platform", lbl_date: "Date / Expired", lbl_desc: "Description / Account",
-                lbl_price: "Price (IDR)", lbl_stock: "Stock", btn_publish: "Publish Now", table_title: "Items Database",
-                th_cover: "Cover", th_info: "Product Info", th_price: "Price", th_stock: "Stock", th_action: "Action",
-                modal_edit_title: "Edit Data", lbl_update_stock: "Update Remaining Stock", btn_cancel: "Cancel", btn_save_changes: "Save Changes",
-                desc_hint_stream: "💡 Info: Enter account credentials here so users can see them after payment.",
-                desc_hint_default: "", ph_desc_stream: "Format: Email | Password | Expired\nExample: user@gmail.com | pass123 | 30 Days",
-                ph_desc_default: "Full event description...", toast_maint_on: "Maintenance Active 🔴", toast_maint_off: "Website Online 🟢",
-                alert_success_title: "Success!", alert_success_add: "Product added successfully.", alert_success_edit: "Data has been updated.",
-                alert_del_title: "Delete Data?", alert_del_text: "Data cannot be recovered!", btn_confirm_del: "Yes, Delete!", btn_cancel_del: "Cancel",
-                empty_table: "No events/products data found.",
-                modal_admin_pass_title: "Change Admin Password", lbl_old_pass: "Old Password", lbl_new_pass: "New Password", lbl_confirm_pass: "Confirm New Password",
-                btn_save_pass: "Update Password", err_pass_match: "New passwords do not match!", err_pass_empty: "Please fill in all password fields!",
-                success_pass: "Password changed successfully! Please login again."
+                nav_website: "Website", nav_logout: "Logout", nav_password: "Password", nav_promo: "Promo",
+                maint_title: "Maintenance", maint_desc: "Maintenance mode.",
+                form_title: "Add Product", lbl_image: "Thumbnail", txt_preview: "Preview", lbl_category: "Category",
+                lbl_name: "Product Name", lbl_location: "Location", lbl_date: "Time", lbl_desc: "Description",
+                btn_publish: "Publish", table_title: "Database Items",
+                th_cover: "Cover", th_info: "Info", th_price: "Price", th_stock: "Stock", th_action: "Action",
+                modal_edit_title: "Edit", btn_save_changes: "Save Changes",
+                empty_table: "No data."
             }
         };
 
-        const savedLang = localStorage.getItem('lang') || 'id';
-        updateLanguage(savedLang);
-
-        function toggleLanguage() {
-            const currentLang = localStorage.getItem('lang') || 'id';
-            const newLang = currentLang === 'id' ? 'en' : 'id';
-            localStorage.setItem('lang', newLang);
-            updateLanguage(newLang);
-            loadTable(); 
-            checkCategory(document.getElementById('category'));
-        }
-
-        function updateLanguage(lang) {
-            const t = translations[lang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(t[key]) {
-                    if(el.querySelector('i')) {
-                        const icon = el.querySelector('i').outerHTML;
-                        el.innerHTML = `${icon} ${t[key]}`;
-                    } else {
-                        el.innerHTML = t[key];
-                    }
-                }
-            });
-            const searchBox = document.getElementById('searchBox');
-            if(searchBox) searchBox.placeholder = lang === 'id' ? 'Cari...' : 'Search...';
-            const langBtn = document.getElementById('lang-btn');
-            langBtn.innerText = lang.toUpperCase();
-            
-            if(lang === 'en') { 
-                langBtn.classList.remove('btn-outline-light'); 
-                langBtn.classList.add('btn-light'); 
-            } else { 
-                langBtn.classList.add('btn-outline-light'); 
-                langBtn.classList.remove('btn-light'); 
-            }
-        }
-
-        function previewImage(url, imgId, textId) {
-            const imgEl = document.getElementById(imgId);
-            const textEl = document.getElementById(textId);
-            let finalUrl = url;
-
-            // --- FITUR AUTO CONVERT GOOGLE DRIVE LINK ---
-            if (url && url.includes('drive.google.com/file/d/')) {
-                const match = url.match(/\/d\/(.*?)\//);
-                if (match && match[1]) {
-                    const fileId = match[1];
-                    finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-                }
-            }
-            // --------------------------------------------
-
-            if (finalUrl && finalUrl.length > 5) { 
-                imgEl.src = finalUrl; 
-                imgEl.style.display = 'block'; 
-                if(textEl) textEl.style.display = 'none'; 
-            } else { 
-                imgEl.style.display = 'none'; 
-                if(textEl) textEl.style.display = 'block'; 
-            }
-        }
-
-        function filterTable() {
-            const term = document.getElementById('searchBox').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => { 
-                row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; 
-            });
-        }
-
-        function checkCategory(select) {
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
-            const desc = document.getElementById('description');
-            if (select.value === 'Streaming') { 
-                desc.placeholder = t.ph_desc_stream; 
-                document.getElementById('descHint').innerText = t.desc_hint_stream; 
-            } else { 
-                desc.placeholder = t.ph_desc_default; 
-                document.getElementById('descHint').innerText = t.desc_hint_default; 
-            }
-        }
-
-        function addTierRow(containerId, tierName = '', price = '', stock = '') {
-            const container = document.getElementById(containerId);
-            const rowHtml = `
-                <div class="tier-row">
-                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">X</button>
-                    <input type="text" class="form-control form-control-sm mb-2 tier-name" placeholder="Nama Tiket (Misal: VIP, Regular)" value="${tierName}" required>
-                    <div class="row g-2">
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" placeholder="Harga (Rp)" value="${price}" required></div>
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" placeholder="Kuota" value="${stock}" required></div>
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', rowHtml);
-        }
-
-        function getTiersData(containerId) {
-            const container = document.getElementById(containerId);
-            const rows = container.querySelectorAll('.tier-row');
-            let tiers = [];
-            rows.forEach(row => {
-                const name = row.querySelector('.tier-name').value;
-                const price = row.querySelector('.tier-price').value;
-                const stock = row.querySelector('.tier-stock').value;
-                if(name && price && stock) {
-                    tiers.push({ tierName: name, price: parseInt(price), totalSeats: parseInt(stock), availableSeats: parseInt(stock) });
-                }
-            });
-            return tiers;
-        }
-
-        async function checkMaintenanceStatus() {
-            try { 
-                const res = await fetch('/api/maintenance'); 
-                const data = await res.json(); 
-                if(switchMaint) switchMaint.checked = data.isActive; 
-            } catch (err) {}
-        }
-
-        if(switchMaint) {
-            switchMaint.addEventListener('change', async function() {
-                const lang = localStorage.getItem('lang') || 'id';
-                const t = translations[lang];
-                const isActive = this.checked;
-                try { 
-                    await fetch('/api/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ isActive }) }); 
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#1c1c2d', color: '#fff' });
-                    Toast.fire({ icon: 'success', title: isActive ? t.toast_maint_on : t.toast_maint_off });
-                } catch (err) { 
-                    this.checked = !isActive; 
-                }
-            });
-        }
-// 👇 FUNGSI TARIK DATA LAPORAN (TABEL + GRAFIK + FILTER) 👇
-        let myChart = null; 
-        
+        // --- FUNGSI UTAMA ---
         async function loadLaporan() {
             try {
                 const startDate = document.getElementById('filterStart').value;
                 const endDate = document.getElementById('filterEnd').value;
-                
-                // Tambahkan query parameter jika filter diisi
-                let url = '/api/admin/reports';
-                if (startDate && endDate) {
-                    url += `?start=${startDate}&end=${endDate}`;
-                }
+                let url = `/api/admin/reports${startDate && endDate ? `?start=${startDate}&end=${endDate}` : ''}`;
 
-                const res = await fetch(url, {
-                    const res = await fetch(url);
-                });
+                const res = await fetch(url);
                 const data = await res.json();
 
                 if (res.ok) {
-                    // 1. UPDATE KOTAK ANGKA RINGKASAN
                     document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
                     document.getElementById('totalTiket').innerHTML = `${data.totalTiket} <small class="fs-6 fw-normal text-white">Tiket</small>`;
                     document.getElementById('totalUser').innerHTML = `${data.totalUser} <small class="fs-6 fw-normal text-white">Orang</small>`;
 
-                    // 2. UPDATE TABEL TRANSAKSI TERBARU
                     let htmlTabel = '';
                     data.transaksiTerbaru.forEach(trx => {
-                        const tanggal = new Date(trx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                         htmlTabel += `
                             <tr>
-                                <td><span class="text-white-50 small">${tanggal}</span></td>
-                                <td><span class="badge bg-light text-dark border">${trx.ticketCode}</span></td>
+                                <td><span class="text-white-50 small">${new Date(trx.date).toLocaleDateString()}</span></td>
+                                <td><span class="badge bg-light text-dark">${trx.ticketCode}</span></td>
                                 <td class="fw-bold">${trx.customerName}</td>
                                 <td>${trx.eventName}</td>
-                                <td><span class="badge ${trx.paymentMethod === 'SALDO' ? 'bg-primary' : 'bg-success'}">${trx.paymentMethod}</span></td>
+                                <td><span class="badge bg-primary">${trx.paymentMethod}</span></td>
                                 <td class="text-end fw-bold text-success">+ Rp ${trx.price.toLocaleString('id-ID')}</td>
-                            </tr>
-                        `;
+                            </tr>`;
                     });
-                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center text-white-50 py-3">Tidak ada transaksi di tanggal ini</td></tr>';
+                    document.getElementById('tabelLaporan').innerHTML = htmlTabel || '<tr><td colspan="6" class="text-center py-3">Kosong</td></tr>';
 
-                    // 3. MENGGAMBAR GRAFIK (CHART.JS)
-                    const ctx = document.getElementById('revenueChart').getContext('2d');
-                    
-                    // Hapus grafik lama kalau ada (biar gak numpuk pas difilter)
-                    if (myChart) myChart.destroy();
-                    
-                    myChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.chartLabels, // Sumbu X (Tanggal)
-                            datasets: [{
-                                label: 'Pendapatan Harian (Rp)',
-                                data: data.chartValues, // Sumbu Y (Rupiah)
-                                borderColor: '#00c6ff',
-                                backgroundColor: 'rgba(0, 198, 255, 0.2)',
-                                borderWidth: 3,
-                                pointBackgroundColor: '#ff9800',
-                                pointRadius: 5,
-                                fill: true,
-                                tension: 0.4 // Garis melengkung
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#aaa' } },
-                                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#aaa' } }
-                            }
-                        }
-                    });
-
-                } else {
-                    document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-warning fw-bold py-4">Pesan Server: ${data.message}</td></tr>`;
+                    updateChart(data.chartLabels, data.chartValues);
                 }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('tabelLaporan').innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">Koneksi Error: Gagal terhubung ke server.</td></tr>`;
-            }
+            } catch (e) { console.error("Laporan Error:", e); }
         }
 
-        // Fungsi mengembalikan ke kondisi semula (tanpa filter)
-        function resetFilter() {
-            document.getElementById('filterStart').value = '';
-            document.getElementById('filterEnd').value = '';
-            loadLaporan();
-        }
-
-
-// 👇 FUNGSI CETAK PDF (VERSI LAPORAN FORMAL KERTAS PUTIH) 👇
-        function cetakLaporan() {
-            Swal.fire({ title: 'Menyiapkan Dokumen...', didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
-
-            // 1. Ambil angka-angka dari dashboard
-            const valPendapatan = document.getElementById('totalPendapatan').innerText;
-            const valTiket = document.getElementById('totalTiket').innerText.replace('Tiket', '').trim();
-            const valUser = document.getElementById('totalUser').innerText.replace('Orang', '').trim();
-            
-            // Ambil isi tabel dan buang class warna putih bawaan dark mode
-            let isiTabel = document.getElementById('tabelLaporan').innerHTML;
-            isiTabel = isiTabel.replace(/text-white-50/g, 'text-secondary').replace(/text-white/g, 'text-dark');
-
-            // 2. Buat "Kertas Putih" virtual khusus untuk di-print
-            const kertasPDF = document.createElement('div');
-            kertasPDF.innerHTML = `
-                <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; color: #333;">
-                    
-                    <div style="border-bottom: 3px solid #0049CC; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
-                        <div>
-                            <h2 style="margin: 0; color: #0049CC; font-weight: 800; font-size: 28px;">RCELLFEST</h2>
-                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Laporan Keuangan & Penjualan Tiket Digital</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0; color: #666; font-size: 12px;">Dicetak pada:</p>
-                            <p style="margin: 2px 0 0 0; font-weight: bold; font-size: 14px;">${new Date().toLocaleString('id-ID')}</p>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
-                        <div style="text-align: center; width: 33%;">
-                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TOTAL PENDAPATAN</p>
-                            <h3 style="margin: 0; color: #0049CC; font-size: 20px;">${valPendapatan}</h3>
-                        </div>
-                        <div style="text-align: center; width: 33%; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
-                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TIKET TERJUAL</p>
-                            <h3 style="margin: 0; color: #2ecc71; font-size: 20px;">${valTiket} <small style="font-size:12px; color:#666;">Tiket</small></h3>
-                        </div>
-                        <div style="text-align: center; width: 33%;">
-                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666; font-weight: bold;">TOTAL USER AKTIF</p>
-                            <h3 style="margin: 0; color: #f39c12; font-size: 20px;">${valUser} <small style="font-size:12px; color:#666;">Orang</small></h3>
-                        </div>
-                    </div>
-
-                    <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Rincian 10 Transaksi Terakhir</h4>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                        <thead>
-                            <tr style="background: #0049CC; color: #ffffff; text-align: left;">
-                                <th style="padding: 12px; border: 1px solid #ddd;">Tanggal</th>
-                                <th style="padding: 12px; border: 1px solid #ddd;">Kode Tiket</th>
-                                <th style="padding: 12px; border: 1px solid #ddd;">Pembeli</th>
-                                <th style="padding: 12px; border: 1px solid #ddd;">Event</th>
-                                <th style="padding: 12px; border: 1px solid #ddd;">Metode</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody style="color: #000;">
-                            ${isiTabel}
-                        </tbody>
-                    </table>
-                    
-                    <div style="margin-top: 40px; text-align: center; color: #aaa; font-size: 10px;">
-                        <p>Dokumen ini di-generate otomatis oleh Sistem RCELLFEST.</p>
-                    </div>
-                </div>
-            `;
-
-            // 3. Konfigurasi Cetak
-            const opt = {
-                margin: 0,
-                filename: 'Laporan_Resmi_RCELLFEST.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            };
-            
-            // Eksekusi Cetak dari Kertas Virtual
-            html2pdf().set(opt).from(kertasPDF).save().then(() => {
-                Swal.close();
-            });
-        }
-        // 👆 SAMPAI SINI FUNGSI LAPORANNYA 👆     
-        // --- LOAD TABEL EVENT ---
         async function loadTable() {
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
             try {
-                const res = await fetch('/api/events'); 
+                const res = await fetch('/api/events');
                 eventsData = await res.json();
-                const tbody = document.getElementById('tableBody'); 
+                const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = '';
                 
-                if(eventsData.length === 0) { 
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-white-50">${t.empty_table}</td></tr>`; 
-                    return; 
-                }
-                
                 eventsData.forEach(ev => {
-                    let icon = ev.category === 'Streaming' ? '<span class="badge bg-info text-dark me-2" style="font-size:0.6rem">STREAM</span>' : '<span class="badge bg-primary me-2" style="font-size:0.6rem">EVENT</span>';
-                    
-                    let stokClass = ev.availableSeats < 5 && ev.availableSeats >= 0 ? 'text-danger fw-bold' : 'text-success';
-                    
-                    let stokDisplay = ev.availableSeats;
-                    if (ev.availableSeats === -1) stokDisplay = '<span class="badge bg-secondary">SELESAI</span>';
-                    if (ev.availableSeats === -2) stokDisplay = '<span class="badge bg-info text-dark">COMING SOON</span>';
-                    
-                    let imgUrl = ev.image ? ev.image : "https://placehold.co/100x100?text=No+Img";
-
-                    let btnStatus = '';
-                    if (ev.availableSeats === -1 || ev.availableSeats === -2) {
-                        btnStatus = `<button onclick="batalSelesai('${ev._id}')" class="btn btn-sm btn-outline-success me-1" title="Buka Kembali Event"><i class="bi bi-arrow-counterclockwise"></i> Buka</button>`;
-                    } else {
-                        btnStatus = `
-                            <button onclick="tandaiBelumDimulai('${ev._id}')" class="btn btn-sm btn-outline-info me-1" title="Tandai Belum Dimulai"><i class="bi bi-clock-fill"></i></button>
-                            <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-outline-warning me-1" title="Tandai Selesai"><i class="bi bi-calendar-check-fill"></i></button>
-                        `;
-                    }
-                    
                     tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${imgUrl}" class="table-thumb" alt="Thumb"></td>
-                        <td>
-                            <div class="fw-bold text-truncate" style="max-width: 200px;">${ev.name}</div>
-                            <small class="text-white-50 d-flex align-items-center gap-1">${icon} <i class="bi bi-geo-alt" style="font-size:0.7rem"></i> ${ev.location}</small>
-                        </td>
-                        <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
-                        <td class="text-center ${stokClass}">${stokDisplay}</td>
-                        <td class="text-end">
-                            ${btnStatus}
-                            <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil-fill"></i></button>
-                            <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
-                        </td>
-                    </tr>`;
+                        <tr>
+                            <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
+                            <td><div class="fw-bold">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
+                            <td class="fw-bold">Rp ${ev.price.toLocaleString('id-ID')}</td>
+                            <td class="text-center">${ev.availableSeats}</td>
+                            <td class="text-end">
+                                <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light"><i class="bi bi-pencil"></i></button>
+                                <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
                 });
-            } catch (err) { console.error(err); }
+            } catch (e) { console.error("Table Error:", e); }
         }
 
-        // --- TANDAI SELESAI ---
-        async function tandaiSelesai(id) { 
-            const lang = localStorage.getItem('lang') || 'id';
-            const result = await Swal.fire({ 
-                title: lang === 'id' ? 'Selesaikan Event?' : 'Finish Event?', 
-                text: lang === 'id' ? 'Tiket tidak bisa dibeli lagi dan berstatus Selesai.' : 'Tickets will no longer be purchasable.', 
-                icon:'warning', 
-                showCancelButton:true, 
-                confirmButtonColor: '#f39c12', 
-                cancelButtonColor: '#3085d6', 
-                confirmButtonText: lang === 'id' ? 'Ya, Selesaikan' : 'Yes, Finish',
-                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1c1c2d', color: '#fff' 
-            });
-            
-            if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: -1 }) }); 
-                loadTable(); 
-                Swal.fire({icon: 'success', title: 'Berhasil', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
-            } 
-        }
-
-        // --- TANDAI BELUM DIMULAI ---
-        async function tandaiBelumDimulai(id) { 
-            const result = await Swal.fire({ 
-                title: 'Jadikan Coming Soon?', 
-                text: 'Status event akan menjadi Belum Dimulai.', 
-                icon:'info', showCancelButton:true, confirmButtonColor: '#0dcaf0', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Tunda', background: '#1c1c2d', color: '#fff' 
-            });
-            if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: -2 }) }); 
-                loadTable(); 
-                Swal.fire({icon: 'success', title: 'Status Diubah', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
-            } 
-        }
-
-        // --- BATAL SELESAI / BUKA KEMBALI ---
-        async function batalSelesai(id) { 
-            const ev = eventsData.find(e => e._id === id);
-            let restoredSeats = 0;
-            if (ev.tickets && ev.tickets.length > 0) {
-                restoredSeats = ev.tickets.reduce((acc, curr) => acc + curr.availableSeats, 0);
-            }
-
-            const lang = localStorage.getItem('lang') || 'id';
-            const result = await Swal.fire({ 
-                title: lang === 'id' ? 'Buka Kembali Event?' : 'Reopen Event?', 
-                text: lang === 'id' ? 'Tiket bisa dibeli lagi sesuai sisa kuota yang ada.' : 'The event will be active again.', 
-                icon:'question', 
-                showCancelButton:true, 
-                confirmButtonColor: '#28a745', 
-                cancelButtonColor: '#3085d6', 
-                confirmButtonText: lang === 'id' ? 'Ya, Buka Kembali' : 'Yes, Reopen',
-                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1c1c2d', color: '#fff' 
-            });
-            
-            if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify({ availableSeats: restoredSeats }) }); 
-                loadTable(); 
-                Swal.fire({icon: 'success', title: 'Berhasil Dibuka', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff'});
-            } 
-        }
-
-        // --- BUKA EDIT MODAL ---
-        function bukaModalEdit(id) {
-            const ev = eventsData.find(e => e._id === id);
-            if (ev) {
-                document.getElementById('editId').value = ev._id;
-                document.getElementById('editName').value = ev.name;
-                document.getElementById('editCategory').value = ev.category;
-                document.getElementById('editLocation').value = ev.location;
-                if (ev.date) { 
-                    const d = new Date(ev.date); 
-                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); 
-                    document.getElementById('editDate').value = d.toISOString().slice(0, 16); 
-                } else { 
-                    document.getElementById('editDate').value = ''; 
-                }
-                document.getElementById('editDescription').value = ev.description;
-                document.getElementById('editImage').value = ev.image || '';
-                previewImage(ev.image || '', 'editPreview', 'editPreviewText');
-                
-                const tiersContainer = document.getElementById('editTiersContainer');
-                tiersContainer.innerHTML = '';
-                if (ev.tickets && ev.tickets.length > 0) {
-                    ev.tickets.forEach(t => addTierRow('editTiersContainer', t.tierName, t.price, t.availableSeats));
-                } else {
-                    addTierRow('editTiersContainer', 'General', ev.price, (ev.availableSeats === -1 || ev.availableSeats === -2) ? 0 : ev.availableSeats);
-                }
-                editModal.show();
-            }
-        }
-
-        // --- SIMPAN EDIT EVENT ---
+        // --- CRUD ACTIONS ---
         async function saveEdit() {
-            const lang = localStorage.getItem('lang') || 'id'; 
-            const t = translations[lang];
             const id = document.getElementById('editId').value;
-            const rawDate = document.getElementById('editDate').value;
-            const isoDate = rawDate ? new Date(rawDate).toISOString() : null;
-            
-            const tiersData = getTiersData('editTiersContainer');
-            if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
-            
-            const startFromPrice = Math.min(...tiersData.map(t => t.price));
-            const totalAvailCap = tiersData.reduce((acc, curr) => acc + curr.availableSeats, 0);
-
-            const data = { 
-                name: document.getElementById('editName').value, 
-                category: document.getElementById('editCategory').value, 
-                location: document.getElementById('editLocation').value, 
-                date: isoDate, 
-                description: document.getElementById('editDescription').value, 
-                image: document.getElementById('editImage').value, 
-                price: startFromPrice, 
-                availableSeats: totalAvailCap, 
-                tickets: tiersData 
+            const tiers = getTiersData('editTiersContainer');
+            const data = {
+                name: document.getElementById('editName').value,
+                category: document.getElementById('editCategory').value,
+                location: document.getElementById('editLocation').value,
+                date: document.getElementById('editDate').value,
+                description: document.getElementById('editDescription').value,
+                image: document.getElementById('editImage').value,
+                price: tiers[0]?.price || 0,
+                availableSeats: tiers.reduce((a, b) => a + b.availableSeats, 0),
+                tickets: tiers
             };
 
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json', 'Authorization': 'Bearer ' + token}, body: JSON.stringify(data) });
-            editModal.hide(); 
-            loadTable(); 
-            Swal.fire({ title: t.alert_success_title, text: t.alert_success_edit, icon: 'success', background: '#1c1c2d', color: '#fff' });
-        }
+            const res = await fetch(`/api/events/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-        // --- TAMBAH EVENT ---
-        document.getElementById('formEvent').addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const lang = localStorage.getItem('lang') || 'id'; 
-            const t = translations[lang];
-            
-            const tiersData = getTiersData('addTiersContainer');
-            if (tiersData.length === 0) return Swal.fire('Error', 'Minimal tambahkan 1 tipe tiket!', 'error');
-            
-            const startFromPrice = Math.min(...tiersData.map(t => t.price));
-            const totalCap = tiersData.reduce((acc, curr) => acc + curr.totalSeats, 0);
-
-            const btn = document.getElementById('btnPublish'); 
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
-            
-            const data = { 
-                name: document.getElementById('name').value, 
-                category: document.getElementById('category').value, 
-                location: document.getElementById('location').value, 
-                date: document.getElementById('date').value, 
-                description: document.getElementById('description').value, 
-                image: document.getElementById('image').value, 
-                price: startFromPrice, 
-                capacity: totalCap, 
-                availableSeats: totalCap, 
-                tickets: tiersData 
-            };
-
-            await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json' }, body: JSON.stringify(data) });
-            
-            loadTable(); 
-            e.target.reset(); 
-            document.getElementById('addTiersContainer').innerHTML = ''; 
-            addTierRow('addTiersContainer'); 
-            document.getElementById('addPreview').style.display = 'none'; 
-            document.getElementById('addPreviewText').style.display = 'block';
-            
-            btn.innerHTML = originalText; 
-            Swal.fire({ title: t.alert_success_title, text: t.alert_success_add, icon: 'success', background: '#1c1c2d', color: '#fff' });
-        });
-
-        // --- HAPUS EVENT ---
-        async function hapusKonser(id) { 
-            const lang = localStorage.getItem('lang') || 'id'; 
-            const t = translations[lang];
-            const result = await Swal.fire({ title: t.alert_del_title, text: t.alert_del_text, icon:'warning', showCancelButton:true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: t.btn_confirm_del, cancelButtonText: t.btn_cancel_del, background: '#1c1c2d', color: '#fff' });
-            
-            if(result.isConfirmed) { 
-                await fetch(`/api/events/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer ' + token} }); 
-                loadTable(); 
-            } 
-        }
-
-        // --- MANAJEMEN PROMO ---
-        function openPromoModal() { promoModal.show(); loadPromos(); }
-        
-        async function loadPromos() {
-            const container = document.getElementById('promoListContainer');
-            try {
-                const res = await fetch('/api/promos'); 
-                const promos = await res.json();
-                if(promos.length === 0) { 
-                    container.innerHTML = '<div class="text-center text-muted small py-4">Belum ada promo aktif.</div>'; 
-                    return; 
-                }
-                let html = '';
-                promos.forEach(p => {
-                    const date = new Date(p.expiresAt).toLocaleDateString();
-                    html += `<div class="promo-ticket"><div><div class="promo-code">${p.code}</div><div class="small text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} | Kuota: ${p.quota}</div><div class="small text-muted" style="font-size:0.7rem">Exp: ${date}</div></div><button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></div>`;
-                });
-                container.innerHTML = html;
-            } catch (e) { container.innerHTML = '<div class="text-danger small">Gagal memuat data.</div>'; }
-        }
-
-        document.getElementById('formPromo').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = { 
-                code: document.getElementById('promoCode').value, 
-                discount: document.getElementById('promoDisc').value, 
-                quota: document.getElementById('promoQuota').value, 
-                daysActive: document.getElementById('promoDays').value 
-            };
-            try { 
-                await fetch('/api/promos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); 
-                e.target.reset(); 
-                loadPromos(); 
-                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); 
-                Toast.fire({ icon: 'success', title: 'Promo Berhasil Dibuat!' }); 
-            } catch (e) { Swal.fire('Error', 'Gagal membuat promo', 'error'); }
-        });
-
-        async function hapusPromo(id) { 
-            if(confirm('Yakin ingin menghapus promo ini?')) { 
-                await fetch(`/api/promos/${id}`, { method: 'DELETE' }); 
-                loadPromos(); 
-            } 
-        }
-
-        // --- GANTI PASSWORD ---
-        function openAdminPassModal() { 
-            document.getElementById('adminOldPass').value = ''; 
-            document.getElementById('adminNewPass').value = ''; 
-            document.getElementById('adminConfirmPass').value = ''; 
-            adminPassModal.show(); 
-        }
-
-        async function saveAdminPassword() {
-            const lang = localStorage.getItem('lang') || 'id'; 
-            const t = translations[lang];
-            const oldPass = document.getElementById('adminOldPass').value; 
-            const newPass = document.getElementById('adminNewPass').value; 
-            const confirmPass = document.getElementById('adminConfirmPass').value;
-            
-            if (!oldPass || !newPass || !confirmPass) { 
-                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_pass_empty, background: '#1c1c2d', color: '#fff'}); 
-            }
-            if (newPass !== confirmPass) { 
-                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pass_match, background: '#1c1c2d', color: '#fff'}); 
-            }
-            try {
-                let adminId = ''; 
-                if (token && token.includes('token-rahasia-')) { adminId = token.split('token-rahasia-')[1]; } 
-                else { 
-                    const adminData = JSON.parse(localStorage.getItem('adminData') || '{}'); 
-                    if (adminData.id) { adminId = adminData.id; } 
-                    else { const userData = JSON.parse(localStorage.getItem('userData') || '{}'); adminId = userData.id || ''; } 
-                }
-                
-                if (!adminId) { return Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'ID Admin tidak ditemukan. Silakan Logout dan Login kembali.', background: '#1c1c2d', color: '#fff'}); }
-                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-                
-                const res = await fetch('/api/user/change-password', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ userId: adminId, oldPassword: oldPass, newPassword: newPass }) });
-                const data = await res.json();
-                
-                if (res.ok && data.success) { 
-                    adminPassModal.hide(); 
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: t.success_pass, background: '#1c1c2d', color: '#fff' }).then(() => { logout(); }); 
-                } else { 
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || data.error || 'Password lama salah.', background: '#1c1c2d', color: '#fff'}); 
-                }
-            } catch (error) { 
-                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1c1c2d', color: '#fff'}); 
+            if (res.ok) {
+                editModal.hide();
+                loadTable();
+                Swal.fire('Berhasil', 'Data diperbarui', 'success');
             }
         }
-        
-        function logout() { 
-            localStorage.removeItem('adminToken'); 
-            localStorage.removeItem('adminData'); 
-            window.location.href = '/logout';; 
-        }
-        
-        loadTable();
-        loadLaporan();
-        checkMaintenanceStatus(); 
-        checkCategory(document.getElementById('category'));
-        setInterval(() => {
-            // Jangan auto-refresh kalau user lagi milih tanggal (lagi pakai filter)
-            if (!document.getElementById('filterStart').value) {
-                loadLaporan();
+
+        async function hapusKonser(id) {
+            const res = await Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true });
+            if (res.isConfirmed) {
+                await fetch(`/api/events/${id}`, { method: 'DELETE' });
                 loadTable();
             }
-        }, 10000);
-        // 👇 FUNGSI BUKA DAFTAR USER 👇
-        const userListModal = new bootstrap.Modal(document.getElementById('userListModal'));
-
-        async function openUserModal() {
-            userListModal.show();
-            const tbody = document.getElementById('tableUserList');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-white-50"><span class="spinner-border spinner-border-sm"></span> Memuat daftar...</td></tr>';
-
-            try {
-                const res = await fetch('/api/admin/users', {
-                    const res = await fetch('/api/admin/users');
-                });
-                const result = await res.json();
-
-                if (res.ok && result.success) {
-                    if (result.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-white-50">Belum ada user yang mendaftar.</td></tr>';
-                        return;
-                    }
-
-                    let html = '';
-                    result.data.forEach(u => {
-                        // Ekstrak tanggal daftar dari ID MongoDB
-                        const tglDaftar = new Date(u.createdAt || parseInt(u._id.substring(0, 8), 16) * 1000).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-                        
-                        html += `
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="fw-bold">${u.fullName || '-'}</div>
-                                    <small class="text-info">@${u.username}</small>
-                                </td>
-                                <td>
-                                    <div>${u.email}</div>
-                                    <small class="text-white-50"><i class="bi bi-whatsapp"></i> ${u.phone || 'Belum diisi'}</small>
-                                </td>
-                                <td class="text-success fw-bold">Rp ${(u.saldo || 0).toLocaleString('id-ID')}</td>
-                                <td class="text-white-50 small">${tglDaftar}</td>
-                            </tr>
-                        `;
-                    });
-                    tbody.innerHTML = html;
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${result.message}</td></tr>`;
-                }
-            } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Koneksi Error.</td></tr>';
-            }
         }
+
+        document.getElementById('formEvent').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const tiers = getTiersData('addTiersContainer');
+            const data = {
+                name: document.getElementById('name').value,
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                description: document.getElementById('description').value,
+                image: document.getElementById('image').value,
+                price: tiers[0]?.price || 0,
+                capacity: tiers.reduce((a, b) => a + b.totalSeats, 0),
+                availableSeats: tiers.reduce((a, b) => a + b.totalSeats, 0),
+                tickets: tiers
+            };
+
+            const res = await fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                e.target.reset();
+                loadTable();
+                Swal.fire('Berhasil', 'Produk ditambahkan', 'success');
+            }
+        });
+
+        // --- HELPERS ---
+        function updateChart(labels, values) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Revenue', data: values, borderColor: '#00c6ff', fill: true }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function previewImage(url, imgId, textId) {
+            const img = document.getElementById(imgId);
+            const txt = document.getElementById(textId);
+            if (url) { img.src = url; img.style.display = 'block'; if(txt) txt.style.display = 'none'; }
+        }
+
+        function addTierRow(id, name='', price='', stock='') {
+            const container = document.getElementById(id);
+            container.insertAdjacentHTML('beforeend', `
+                <div class="tier-row">
+                    <button type="button" class="btn btn-danger btn-remove-tier" onclick="this.parentElement.remove()">X</button>
+                    <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${name}" placeholder="Nama Tiket" required>
+                    <div class="row g-2">
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${price}" placeholder="Harga" required></div>
+                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${stock}" placeholder="Stok" required></div>
+                    </div>
+                </div>`);
+        }
+
+        function getTiersData(id) {
+            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(row => ({
+                tierName: row.querySelector('.tier-name').value,
+                price: parseInt(row.querySelector('.tier-price').value),
+                totalSeats: parseInt(row.querySelector('.tier-stock').value),
+                availableSeats: parseInt(row.querySelector('.tier-stock').value)
+            }));
+        }
+
+        function logout() { window.location.href = '/logout'; }
+
+        // Initial Load
+        loadLaporan();
+        loadTable();
+        setInterval(() => { if(!document.getElementById('filterStart').value) loadLaporan(); }, 15000);
     </script>
 </body>
 </html>
