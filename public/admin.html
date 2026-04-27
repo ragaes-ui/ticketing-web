@@ -202,6 +202,10 @@
                         <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" data-i18n-ph="ph_loc" required></div>
                         <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
                         <div class="mb-3"><textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea></div>
+                        <div class="mb-3" id="streamingAccountBox" style="display: none;">
+    <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Akun Streaming)</label>
+    <textarea id="secretData" class="form-control border-danger" rows="2" placeholder="Email: ... | Pass: ... (Hanya terlihat setelah user BAYAR)"></textarea>
+</div>
                         
                         <div class="mb-4 mt-4 pt-3 border-top border-secondary">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -468,7 +472,15 @@
                 availableSeats: parseInt(r.querySelector('.tier-stock').value), totalSeats: parseInt(r.querySelector('.tier-stock').value)
             }));
         }
-
+document.getElementById('category').addEventListener('change', function() {
+    const box = document.getElementById('streamingAccountBox');
+    if(this.value === 'Streaming') {
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+        document.getElementById('secretData').value = ''; // Kosongkan jika bukan streaming
+    }
+});
         // API Events form post
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
