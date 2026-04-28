@@ -126,6 +126,9 @@
                 <i class="bi bi-shield-lock-fill text-info"></i> ADMIN PORTAL
             </a>
             <div class="d-flex gap-2 align-items-center">
+                <a href="https://rcellfest.vercel.app" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold text-decoration-none">
+                    <i class="bi bi-globe"></i> <span data-i18n="nav_web">Website</span>
+                </a>
                 <button onclick="toggleLanguage()" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold me-2" id="lang-btn" style="padding: 6px 15px;">ID</button>
                 <button onclick="openPromoModal()" class="btn btn-outline-success btn-sm rounded-pill px-3"><i class="bi bi-ticket-perforated"></i> <span data-i18n="nav_promo">Promo</span></button>
                 <button onclick="openAdminPassModal()" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="bi bi-key"></i> <span data-i18n="nav_pass">Password</span></button>
@@ -369,6 +372,7 @@
         // --- TRANSLATION DICTIONARY ---
         const translations = {
             id: {
+                nav_web: "Website", // <--- Tambahkan ini
                 nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
                 maint_desc: "Matikan akses publik sementara.",
                 stat_rev: "TOTAL PENDAPATAN", stat_ticket: "TIKET TERJUAL", stat_user: "USER AKTIF",
@@ -383,6 +387,7 @@
                 btn_open: "Buka"
             },
             en: {
+                nav_web: "Website", // <--- Tambahkan ini
                 nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
                 maint_desc: "Disable public access temporarily.",
                 stat_rev: "TOTAL REVENUE", stat_ticket: "TICKETS SOLD", stat_user: "ACTIVE USERS",
