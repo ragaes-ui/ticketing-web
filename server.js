@@ -100,13 +100,19 @@ app.use(keycloak.middleware());
 app.get('/admin.html', keycloak.protect(), (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
 });
-// 👇 TAMBAHKAN RUTE LOGOUT DI SINI 👇
 app.get('/logout', (req, res) => {
     if (req.session) {
-        req.session.destroy(); // Menghapus memori login admin
+        // 1. Hapus sesi di MongoDB dengan callback agar aman
+        req.session.destroy((err) => {
+            if (err) console.error("Gagal menghapus session di DB:", err);
+            
+            // 2. Tendang juga sesi di server Keycloak, lalu arahkan ke index.html
+            const logoutUrl = keycloak.logoutUrl('https://rcellfest.vercel.app/index.html');
+            res.redirect(logoutUrl); 
+        });
+    } else {
+        res.redirect('/index.html');
     }
-    // Arahkan spesifik ke index.html
-    res.redirect('/index.html'); 
 });
 // 👇 FOLDER PUBLIC (Di bawah pelindung admin)
 app.use(express.static(path.join(process.cwd(), 'public')));
