@@ -105,7 +105,8 @@ app.get('/logout', (req, res) => {
     if (req.session) {
         req.session.destroy(); // Menghapus memori login admin
     }
-    res.redirect('/'); // Nendang admin balik ke halaman utama (index.html)
+    // Arahkan spesifik ke index.html
+    res.redirect('/index.html'); 
 });
 // 👇 FOLDER PUBLIC (Di bawah pelindung admin)
 app.use(express.static(path.join(process.cwd(), 'public')));
