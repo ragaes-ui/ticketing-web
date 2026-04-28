@@ -699,7 +699,13 @@ document.getElementById('category').addEventListener('change', function() {
             });
         }
 
-        function logout() { window.location.href = '/logout'; }
+        function logout() { 
+    // 1. Hapus token admin dari memori browser biar gak bisa di-back
+    localStorage.removeItem('adminToken'); 
+    
+    // 2. Tembak rute logout di server
+    window.location.href = '/logout'; 
+}
 // --- LOGIC MAINTENANCE MODE (LOCALSTORAGE TOKEN) ---
         const switchMaint = document.getElementById('switchMaintenance');
         
