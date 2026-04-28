@@ -341,7 +341,7 @@
                     </div>
 
                     <div id="areaCetakPembeli" class="table-responsive rounded-3" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table mb-0 align-middle text-nowrap">
+                        <table id="tabelDataPembeli" class="table mb-0 align-middle text-nowrap">
                             <thead class="text-white-50 small" style="position: sticky; top: 0; background: #1c1c2d; z-index: 1;">
                                 <tr>
                                     <th>Tgl. Pembelian</th>
@@ -904,8 +904,9 @@ function renderBuyerTable(data) {
             doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 22);
 
             // Ambil data dari tabel HTML
+            // Ambil data dari tabel HTML
             doc.autoTable({
-                html: '#tableBuyerList', // Target id `tbody`
+                html: '#tabelDataPembeli', // Berubah jadi ini biar Headernya ikut
                 startY: 28,
                 theme: 'grid',
                 headStyles: { fillColor: [0, 73, 204] }, // Warna biru RCELLFEST
