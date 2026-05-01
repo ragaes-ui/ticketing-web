@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
@@ -215,9 +215,9 @@
                         <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
                         <div class="mb-3"><textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea></div>
                         <div class="mb-3" id="streamingAccountBox" style="display: none;">
-    <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Akun Streaming)</label>
-    <textarea id="secretData" class="form-control border-danger" rows="2" placeholder="Email: ... | Pass: ... (Hanya terlihat setelah user BAYAR)"></textarea>
-</div>
+                            <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Akun Streaming)</label>
+                            <textarea id="secretData" class="form-control border-danger" rows="2" placeholder="Email: ... | Pass: ... (Hanya terlihat setelah user BAYAR)"></textarea>
+                        </div>
                         
                         <div class="mb-4 mt-4 pt-3 border-top border-secondary">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -256,16 +256,31 @@
         </div>
     </div>
 
+    <!-- MODAL EDIT DIPERBARUI: ADA LOKASI & DESKRIPSI -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
                 <h5 class="fw-bold mb-4" data-i18n="modal_edit_title"><i class="bi bi-pencil-square me-2"></i>Edit Produk</h5>
                 <input type="hidden" id="editId">
+                
+                <label class="small text-white-50 fw-bold mb-1">Link Gambar</label>
                 <div class="mb-3"><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"></div>
                 <div class="img-preview-box mb-3"><img id="editPreview"></div>
+                
+                <label class="small text-white-50 fw-bold mb-1">Nama Event</label>
                 <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
+                
+                <label class="small text-white-50 fw-bold mb-1">Lokasi</label>
+                <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
+                
+                <label class="small text-white-50 fw-bold mb-1">Tanggal</label>
                 <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
-                <div id="editTiers" class="mb-4"></div>
+                
+                <label class="small text-white-50 fw-bold mb-1">Deskripsi</label>
+                <div class="mb-3"><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
+
+                <div id="editTiers" class="mb-4 mt-3 pt-3 border-top border-secondary"></div>
+                
                 <button onclick="saveEdit()" class="btn btn-primary w-100 rounded-pill py-2" data-i18n="btn_save">Simpan Perubahan</button>
             </div>
         </div>
@@ -275,7 +290,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content p-4">
                 <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i><span data-i18n="modal_promo_title">Kelola Promo</span></h5>
-      <form id="formPromo" class="row g-2 mb-4">
+                <form id="formPromo" class="row g-2 mb-4">
                     <div class="col-md-3">
                         <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="KODE" required>
                     </div>
@@ -323,6 +338,7 @@
             </div>
         </div>
     </div>
+    
     <div class="modal fade" id="buyerModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
@@ -332,7 +348,7 @@
                 </div>
                 <div class="modal-body p-4">
                     
-      <div class="row g-3 mb-4 bg-dark bg-opacity-25 p-3 rounded-4 border border-secondary">
+                    <div class="row g-3 mb-4 bg-dark bg-opacity-25 p-3 rounded-4 border border-secondary">
                         <div class="col-md-3">
                             <label class="small text-white-50 mb-1">Filter Harian</label>
                             <input type="date" id="filterDay" class="form-control form-control-sm">
@@ -363,9 +379,9 @@
                                 </tr>
                             </thead>
                             <tbody id="tableBuyerList">
-                                </tbody>
+                            </tbody>
                             <tfoot id="tableBuyerFoot" style="position: sticky; bottom: 0; background: rgba(28, 28, 45, 0.95); z-index: 1;">
-                                </tfoot>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -380,7 +396,8 @@
         // --- TRANSLATION DICTIONARY ---
         const translations = {
             id: {
-                nav_web: "Website", // <--- Tambahkan ini
+                nav_web: "Website", 
+                nav_scan: "Scan",
                 nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
                 maint_desc: "Matikan akses publik sementara.",
                 stat_rev: "TOTAL PENDAPATAN", stat_ticket: "TIKET TERJUAL", stat_user: "USER AKTIF",
@@ -395,7 +412,8 @@
                 btn_open: "Buka"
             },
             en: {
-                nav_web: "Website", // <--- Tambahkan ini
+                nav_web: "Website", 
+                nav_scan: "Scan",
                 nav_promo: "Promo", nav_pass: "Password", nav_logout: "Logout",
                 maint_desc: "Disable public access temporarily.",
                 stat_rev: "TOTAL REVENUE", stat_ticket: "TICKETS SOLD", stat_user: "ACTIVE USERS",
@@ -546,22 +564,23 @@
                 availableSeats: parseInt(r.querySelector('.tier-stock').value), totalSeats: parseInt(r.querySelector('.tier-stock').value)
             }));
         }
-document.getElementById('category').addEventListener('change', function() {
-    const box = document.getElementById('streamingAccountBox');
-    if(this.value === 'Streaming') {
-        box.style.display = 'block';
-    } else {
-        box.style.display = 'none';
-        document.getElementById('secretData').value = ''; // Kosongkan jika bukan streaming
-    }
-});
+
+        document.getElementById('category').addEventListener('change', function() {
+            const box = document.getElementById('streamingAccountBox');
+            if(this.value === 'Streaming') {
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+                document.getElementById('secretData').value = ''; 
+            }
+        });
+
         // API Events form post
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault();
             const tiers = getTiers('addTiers');
             if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
             
-// Ambil elemen secretData, cek apakah ada (supaya tidak error)
             const secretEl = document.getElementById('secretData');
             const secretValue = secretEl ? secretEl.value : '';
 
@@ -572,7 +591,7 @@ document.getElementById('category').addEventListener('change', function() {
                 date: document.getElementById('date').value,
                 description: document.getElementById('description').value, 
                 image: document.getElementById('image').value,
-                secretData: secretValue, // <--- INI TAMBAHANNYA
+                secretData: secretValue, 
                 price: tiers[0]?.price || 0, 
                 capacity: tiers.reduce((a,b)=>a+b.totalSeats,0),
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
@@ -596,30 +615,52 @@ document.getElementById('category').addEventListener('change', function() {
         }
         async function hapusKonser(id) { if(confirm('Hapus item ini?')) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); loadTable(); } }
 
-        // Modal Edit Setup
+        // FUNGSI EDIT DIPERBARUI: ADA LOKASI & DESKRIPSI
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if(ev) {
                 document.getElementById('editId').value = ev._id;
                 document.getElementById('editName').value = ev.name;
+                
+                // Tarik data Lokasi & Deskripsi
+                document.getElementById('editLocation').value = ev.location || '';
+                document.getElementById('editDescription').value = ev.description || '';
+                
                 if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
                 document.getElementById('editImage').value = ev.image || '';
                 previewImage(ev.image, 'editPreview');
+                
                 document.getElementById('editTiers').innerHTML = '';
                 if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
+                
                 eModal.show();
             }
         }
+
         async function saveEdit() {
             const id = document.getElementById('editId').value;
             const tiers = getTiers('editTiers');
+            
             const data = {
-                name: document.getElementById('editName').value, date: document.getElementById('editDate').value,
-                image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
-                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
+                name: document.getElementById('editName').value, 
+                date: document.getElementById('editDate').value,
+                location: document.getElementById('editLocation').value,
+                description: document.getElementById('editDescription').value,
+                image: document.getElementById('editImage').value, 
+                price: tiers[0]?.price || 0,
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+                tickets: tiers
             };
-            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-            eModal.hide(); loadTable();
+            
+            await fetch(`/api/events/${id}`, { 
+                method: 'PUT', 
+                headers: {'Content-Type':'application/json'}, 
+                body: JSON.stringify(data) 
+            });
+            
+            eModal.hide(); 
+            loadTable();
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Perubahan disimpan!', background: '#1c1c2d', color: '#fff' });
         }
 
         // Modals API
@@ -638,12 +679,11 @@ document.getElementById('category').addEventListener('change', function() {
         document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Ambil semua data, termasuk promoDays yang tadi hilang
             const data = { 
                 code: document.getElementById('promoCode').value, 
                 discount: document.getElementById('promoDisc').value, 
                 quota: document.getElementById('promoQuota').value,
-                daysActive: document.getElementById('promoDays').value // <-- INI KUNCINYA
+                daysActive: document.getElementById('promoDays').value 
             };
 
             try {
@@ -713,16 +753,13 @@ document.getElementById('category').addEventListener('change', function() {
         }
 
         function logout() { 
-    // 1. Hapus token admin dari memori browser biar gak bisa di-back
-    localStorage.removeItem('adminToken'); 
-    
-    // 2. Tembak rute logout di server
-    window.location.href = '/logout'; 
-}
-// --- LOGIC MAINTENANCE MODE (LOCALSTORAGE TOKEN) ---
+            localStorage.removeItem('adminToken'); 
+            window.location.href = '/logout'; 
+        }
+
+        // --- LOGIC MAINTENANCE MODE ---
         const switchMaint = document.getElementById('switchMaintenance');
         
-        // 1. Cek status maintenance saat halaman dimuat
         async function checkMaintenanceStatus() {
             try {
                 const res = await fetch('/api/maintenance');
@@ -735,28 +772,14 @@ document.getElementById('category').addEventListener('change', function() {
             }
         }
 
-        // 2. Simpan status ke database saat tombol diklik
         if (switchMaint) {
+            // DIPERBARUI: Header Authorization manual dihapus agar tidak error 403
             switchMaint.addEventListener('change', async function() {
                 const isActive = this.checked;
-                
-                // Ambil token Keycloak yang sudah disimpan di localStorage
-                // Pastikan nama key-nya ('adminToken') sesuai dengan yang kamu pakai saat login
-                const token = localStorage.getItem('adminToken'); 
-
-                if (!token) {
-                    Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
-                    this.checked = !isActive;
-                    return;
-                }
-                
                 try {
                     const res = await fetch('/api/maintenance', { 
-                        method: 'POST', // Ganti ke 'PUT' kalau API Backend-mu mintanya PUT
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` // Kirim token ke backend
-                        }, 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ isActive }) 
                     });
                     
@@ -769,7 +792,7 @@ document.getElementById('category').addEventListener('change', function() {
                         });
                     } else {
                         this.checked = !isActive;
-                        Swal.fire('Error', 'Gagal merubah status. Token mungkin expired.', 'error');
+                        Swal.fire('Error', 'Gagal merubah status.', 'error');
                     }
                 } catch (err) {
                     this.checked = !isActive;
@@ -778,7 +801,8 @@ document.getElementById('category').addEventListener('change', function() {
                 }
             });
         }
-// --- LOGIC DATA PEMBELI (HISTORY TRANSAKSI) ---
+
+        // --- LOGIC DATA PEMBELI (HISTORY TRANSAKSI) ---
         let buyersData = [];
         const bModal = new bootstrap.Modal(document.getElementById('buyerModal'));
 
@@ -788,21 +812,16 @@ document.getElementById('category').addEventListener('change', function() {
         }
 
         async function loadBuyers() {
-            // Karena rutenya dilindungi Keycloak, gunakan logika Keycloak
             const tbody = document.getElementById('tableBuyerList');
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-white-50"><div class="spinner-border text-info spinner-border-sm me-2"></div> Mengambil data pembeli...</td></tr>';
 
             try {
-                // Di server.js kamu, data transaksi ada di rute reports
-                const res = await fetch('/api/admin/reports?limit=500', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` } 
-                });
+                // DIPERBARUI: Header Authorization manual dihapus agar tidak error 403
+                const res = await fetch('/api/admin/reports?limit=500');
                 
                 if (res.ok) {
                     const responseData = await res.json();
-                    
                     if (responseData.success) {
-                        // Ambil array transaksiTerbaru sesuai response backend
                         buyersData = responseData.transaksiTerbaru || [];
                         renderBuyerTable(buyersData);
                     } else {
@@ -817,23 +836,21 @@ document.getElementById('category').addEventListener('change', function() {
             }
         }
 
-function renderBuyerTable(data) {
+        function renderBuyerTable(data) {
             const tbody = document.getElementById('tableBuyerList');
-            const tfoot = document.getElementById('tableBuyerFoot'); // Panggil elemen tfoot
+            const tfoot = document.getElementById('tableBuyerFoot'); 
             
             if (!data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-white-50 py-5">Tidak ada data transaksi ditemukan.</td></tr>';
-                if(tfoot) tfoot.innerHTML = ''; // Kosongkan total jika tidak ada data
+                if(tfoot) tfoot.innerHTML = ''; 
                 return;
             }
 
-            let totalRupiah = 0; // Siapkan wadah untuk hitung total uang
+            let totalRupiah = 0; 
 
             tbody.innerHTML = data.map(b => {
-                // Hitung akumulasi total pendapatan
                 totalRupiah += (b.price || 0);
 
-                // Konversi tanggal
                 const dateObj = new Date(b.date);
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
                 
@@ -853,7 +870,6 @@ function renderBuyerTable(data) {
                 `;
             }).join('');
 
-            // Tampilkan baris Total di bagian bawah tabel
             if(tfoot) {
                 tfoot.innerHTML = `
                     <tr class="border-top border-info border-2">
@@ -863,17 +879,17 @@ function renderBuyerTable(data) {
                 `;
             }
         }
+
         // --- FUNGSI FILTER ---
         const fDay = document.getElementById('filterDay');
         const fMonth = document.getElementById('filterMonth');
         const fSearch = document.getElementById('searchBuyer');
 
-        // Jika user pilih harian, kosongkan bulanan (dan sebaliknya)
         fDay.addEventListener('change', () => { fMonth.value = ''; filterBuyers(); });
         fMonth.addEventListener('change', () => { fDay.value = ''; filterBuyers(); });
         fSearch.addEventListener('keyup', filterBuyers);
 
-            function filterBuyers() {
+        function filterBuyers() {
             const dayVal = fDay.value;     
             const monthVal = fMonth.value; 
             const searchVal = fSearch.value.toLowerCase();
@@ -882,7 +898,6 @@ function renderBuyerTable(data) {
                 let matchDate = true;
                 let matchSearch = true;
                 
-                // Gunakan b.date sesuai field dari backend
                 const bDateObj = new Date(b.date);
 
                 if (dayVal) {
@@ -894,7 +909,6 @@ function renderBuyerTable(data) {
                 }
 
                 if (searchVal) {
-                    // Hanya cari berdasarkan customerName, eventName, dan ticketCode (karena email tidak dikirim backend)
                     const str = `${b.customerName || ''} ${b.eventName || ''} ${b.ticketCode || ''}`.toLowerCase();
                     matchSearch = str.includes(searchVal);
                 }
@@ -911,35 +925,30 @@ function renderBuyerTable(data) {
             fSearch.value = '';
             renderBuyerTable(buyersData);
         }
-// --- FUNGSI CETAK PDF DATA PEMBELI (PDF ASLI / TEXT-BASED) ---
+
+        // --- FUNGSI CETAK PDF DATA PEMBELI ---
         function cetakPDFPembeli() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape'); // Kertas A4 mode horizontal
+            const doc = new jsPDF('landscape'); 
 
-            // Judul Laporan
             doc.setFontSize(16);
             doc.text("Laporan Transaksi RCELLFEST", 14, 15);
             doc.setFontSize(10);
             doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 22);
 
-            // Ambil data dari tabel HTML
-            // Ambil data dari tabel HTML
             doc.autoTable({
-                html: '#tabelDataPembeli', // Berubah jadi ini biar Headernya ikut
+                html: '#tabelDataPembeli',
                 startY: 28,
                 theme: 'grid',
-                headStyles: { fillColor: [0, 73, 204] }, // Warna biru RCELLFEST
+                headStyles: { fillColor: [0, 73, 204] }, 
                 styles: { fontSize: 9 },
-                // Format kolom agar lebih rapi (menyesuaikan isi baris tabel)
                 didParseCell: function(data) {
-                    // Karena di HTML kita pakai <br> dan tag <b>, kita bersihkan tag HTML-nya
                     if (data.cell.raw && data.cell.raw.innerText) {
                         data.cell.text = data.cell.raw.innerText;
                     }
                 }
             });
 
-            // Ambil total dari footer tabel dan tambahkan di bawah laporan PDF
             const finalY = doc.lastAutoTable.finalY || 28;
             const tfoot = document.getElementById('tableBuyerFoot');
             if (tfoot && tfoot.innerText) {
@@ -949,14 +958,14 @@ function renderBuyerTable(data) {
                 doc.text(totalText, 14, finalY + 10);
             }
 
-            // Download file
             doc.save('Data_Transaksi_RCELLFEST.pdf');
         }
+
         // Initialization
         addTierRow('addTiers');
         loadLaporan(); 
         loadTable();
-        checkMaintenanceStatus(); // Tambahkan baris ini
+        checkMaintenanceStatus(); 
     </script>
 </body>
 </html>
