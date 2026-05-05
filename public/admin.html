@@ -555,7 +555,7 @@
         const apModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
 
         // API Laporan Asli
-        async function loadLaporan() {
+async function loadLaporan() {
             try {
                 const res = await fetch('/api/admin/reports');
                 if (res.ok) {
@@ -563,9 +563,23 @@
                     document.getElementById('totalPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
                     document.getElementById('totalTiket').innerText = `${data.totalTiket}`;
                     document.getElementById('totalUser').innerText = `${data.totalUser}`;
+                    
+                    // PERBAIKAN: Tier sekarang dinamis ngambil dari database (trx.tierName)
+                    document.getElementById('tabelLaporan').innerHTML = data.transaksiTerbaru.map(trx => `
+                        <tr>
+                            <td>${new Date(trx.date).toLocaleDateString()}</td>
+                            <td>${trx.customerName}</td>
+                            <td>${trx.eventName}</td>
+                            <td><span class="badge bg-primary">${trx.paymentMethod}</span></td>
+                            <td class="text-end">
+                                <button onclick="cetakGelang('${trx.ticketCode}', '${trx.eventName.replace(/'/g,"\\'")}', '${trx.customerName.replace(/'/g,"\\'")}', '${trx.tierName || trx.ticketName || 'TIKET'}', '${trx.date}')" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2 me-2" title="Cetak Gelang"><i class="bi bi-printer"></i></button>
+                                <span class="text-success fw-bold">+Rp ${trx.price.toLocaleString('id-ID')}</span>
+                            </td>
+                        </tr>`).join('');
+                    
                     updateChart(data.chartLabels || [], data.chartValues || []);
                 }
-            } catch (err) { console.error("Gagal load laporan", err); }
+            } catch (err) {}
         }
 
         // API Tabel Event Asli
@@ -922,7 +936,7 @@
             }
         }
 
-        function renderBuyerTable(data) {
+function renderBuyerTable(data) {
             const tbody = document.getElementById('tableBuyerList');
             const tfoot = document.getElementById('tableBuyerFoot'); 
             
@@ -940,6 +954,13 @@
                 const dateObj = new Date(b.date);
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
                 
+                // 1. Tarik nama TIER asli dari database (VIP, VVIP, Presale, dll)
+                const tierAsli = b.tierName || b.ticketName || 'TIKET';
+                
+                // 2. Cegah error JavaScript kalau nama pembeli/event pakai tanda petik (contoh: "Raga's Event")
+                const amanEventName = b.eventName ? b.eventName.replace(/'/g, "\\'") : '-';
+                const amanCustomerName = b.customerName ? b.customerName.replace(/'/g, "\\'") : '-';
+
                 return `
                     <tr>
                         <td class="small">${dateStr}</td>
@@ -948,11 +969,17 @@
                         </td>
                         <td class="small">
                             <b>${b.eventName || '-'}</b><br>
-                            <span class="text-white-50 text-uppercase" style="font-size: 0.7rem;">KODE: ${b.ticketCode || '-'}</span>
+                            <span class="text-white-50 text-uppercase" style="font-size: 0.7rem;">
+                                KODE: ${b.ticketCode || '-'} | TIER: ${tierAsli}
+                            </span>
                         </td>
                         <td class="small fw-bold text-info">Rp ${(b.price || 0).toLocaleString('id-ID')}</td>
-                        <td><span class="badge bg-success">${b.paymentMethod || 'VALID'}</span></td>
-                        <button onclick="cetakGelang('${b.ticketCode}', '${b.eventName}', '${b.customerName}', 'General')" class="btn btn-sm btn-info py-0 px-2" style="font-size:0.7rem;" title="Cetak Tiket Gelang"><i class="bi bi-printer"></i> Gelang</button>
+                        <td>
+                            <span class="badge bg-success mb-1">${b.paymentMethod || 'VALID'}</span><br>
+                            <button onclick="cetakGelang('${b.ticketCode}', '${amanEventName}', '${amanCustomerName}', '${tierAsli}', '${b.date}')" class="btn btn-sm btn-info py-0 px-2 fw-bold text-dark mt-1" style="font-size:0.7rem;" title="Cetak Tiket Gelang">
+                                <i class="bi bi-printer"></i> PRINT GELANG
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
