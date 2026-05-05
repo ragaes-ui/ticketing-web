@@ -119,29 +119,66 @@
             border-radius: 16px; padding: 15px; margin-bottom: 12px; 
             display: flex; justify-content: space-between; align-items: center; 
         }
-/* 👇 CSS KHUSUS TIKET GELANG (TSC PRINTER) 👇 */
+/* 🔥 DESAIN BARU TIKET GELANG (WRISTBAND) TSC PRINTER 🔥 */
         #printGelangArea { display: none; }
 
         @media print {
             body * { visibility: hidden; } 
+            body, html { margin: 0; padding: 0; background: white; }
+            
             #printGelangArea, #printGelangArea * { visibility: visible; }
             #printGelangArea {
-                position: absolute; left: 0; top: 0;
-                width: 250mm; height: 25mm;
-                display: flex; align-items: center; justify-content: space-between;
-                padding: 2mm 15mm;
+                position: fixed; left: 0; top: 0;
+                width: 250mm; height: 25mm; /* Standar TSC Wristband */
+                display: flex; align-items: center;
                 background-color: white; color: black;
-                font-family: 'Poppins', sans-serif;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                box-sizing: border-box; overflow: hidden;
             }
-            .gelang-kiri { display: flex; flex-direction: column; justify-content: center; width: 60%; }
-            .gelang-kiri h2 { font-size: 14px; font-weight: 800; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
-            .gelang-kiri p { font-size: 10px; margin: 0; color: #333; }
-            .gelang-kiri .tier-badge { font-size: 10px; font-weight: bold; padding: 2px 5px; border: 1px solid black; border-radius: 4px; display: inline-block; margin-top: 2px; width: fit-content; }
+
+            /* Bagian Kiri (Strap Hitam / Logo) */
+            .gelang-logo {
+                width: 45mm; height: 100%;
+                background-color: #000; color: #fff;
+                display: flex; align-items: center; justify-content: center;
+                writing-mode: vertical-rl; transform: rotate(180deg);
+            }
+            .gelang-logo h1 { margin: 0; font-size: 14px; font-weight: 900; letter-spacing: 2px; }
+
+            /* Bagian Tengah (Informasi Utama) */
+            .gelang-info {
+                width: 130mm; height: 100%;
+                padding: 2mm 5mm;
+                display: flex; flex-direction: column; justify-content: center;
+            }
+            .gelang-info h2 { font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; color: #000;}
+            .gelang-info .customer-box { border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 3px; display: inline-block; width: fit-content; }
+            .gelang-info .customer-name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 0; color: #333;}
             
-            .gelang-kanan { display: flex; align-items: center; gap: 10px; }
-            .gelang-kanan #qrcode { width: 22mm; height: 22mm; }
-            .gelang-kanan .ticket-code { font-size: 8px; font-weight: bold; writing-mode: vertical-rl; transform: rotate(180deg); margin: 0; }
+            .gelang-bottom { display: flex; align-items: center; gap: 8px; margin-top: 1px;}
+            .gelang-bottom .tier-badge { background: #000; color: #fff; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
+            .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
+
+            /* Garis Putus-Putus (Area Sobekan / Lipatan) */
+            .gelang-divider {
+                width: 0; height: 20mm;
+                border-left: 2px dashed #000;
+                margin: 0 5mm;
+            }
+
+            /* Bagian Kanan (QR Code & Serial) */
+            .gelang-qr-section {
+                width: 60mm; height: 100%;
+                display: flex; align-items: center; justify-content: flex-end;
+                padding-right: 5mm;
+            }
+            .qr-text-box { display: flex; flex-direction: column; align-items: flex-end; margin-right: 8px; }
+            .qr-text-box span.lbl { font-size: 6px; font-weight: bold; margin-bottom: 2px; color: #555; }
+            .qr-text-box span.code { font-size: 11px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: #000;}
             
+            #qrcode { width: 21mm; height: 21mm; }
+            #qrcode img { width: 100%; height: 100%; }
+
             @page { size: 250mm 25mm landscape; margin: 0; }
         }
     </style>
@@ -281,15 +318,27 @@
             </div>
         </div>
     </div>
-<!-- 👇 AREA TEMPLATE TIKET GELANG (SEMBUNYI) 👇 -->
+<!-- 🔥 KERTAS CETAK GELANG (HIDDEN DARI LAYAR) 🔥 -->
     <div id="printGelangArea">
-        <div class="gelang-kiri">
-            <h2 id="gelangEventName">RCELLFEST EVENT</h2>
-            <p id="gelangCustomerName">Nama Pembeli</p>
-            <div class="tier-badge" id="gelangTierName">VIP</div>
+        <div class="gelang-logo">
+            <h1>RCELLFEST</h1>
         </div>
-        <div class="gelang-kanan">
-            <p class="ticket-code" id="gelangCodeText">TIKET-XXX</p>
+        <div class="gelang-info">
+            <h2 id="gelangEventName">EVENT NAME</h2>
+            <div class="customer-box">
+                <p class="customer-name" id="gelangCustomerName">CUSTOMER NAME</p>
+            </div>
+            <div class="gelang-bottom">
+                <span class="tier-badge" id="gelangTierName">VIP</span>
+                <span class="date-text" id="gelangDate">01 JAN 2024</span>
+            </div>
+        </div>
+        <div class="gelang-divider"></div>
+        <div class="gelang-qr-section">
+            <div class="qr-text-box">
+                <span class="lbl">TICKET CODE</span>
+                <span class="code" id="gelangCodeText">XXX-123</span>
+            </div>
             <div id="qrcode"></div>
         </div>
     </div>
@@ -998,27 +1047,34 @@
 
             doc.save('Data_Transaksi_RCELLFEST.pdf');
         }
-        // --- 👇 FUNGSI SAKTI CETAK TIKET GELANG (TSC PRINTER) 👇 ---
-        function cetakGelang(ticketCode, eventName, customerName, tierName) {
-            // 1. Masukkan data ke template gelang
+// 🔥 FUNGSI CETAK TIKET GELANG (TSC PRINTER) 🔥
+        function cetakGelang(ticketCode, eventName, customerName, tierName, dateStr) {
             document.getElementById('gelangEventName').innerText = eventName;
             document.getElementById('gelangCustomerName').innerText = customerName;
-            document.getElementById('gelangTierName').innerText = tierName || 'TICKET';
+            document.getElementById('gelangTierName').innerText = tierName;
             document.getElementById('gelangCodeText').innerText = ticketCode;
+            
+            // Format Tanggal untuk Gelang
+            if(dateStr) {
+                const d = new Date(dateStr);
+                document.getElementById('gelangDate').innerText = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+            } else {
+                document.getElementById('gelangDate').innerText = '';
+            }
 
-            // 2. Bersihkan QR Code lama & Buat QR Code baru
+            // Generate QR Baru
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; 
             new QRCode(qrContainer, {
                 text: ticketCode,
-                width: 80, // Ukuran pixel QR
-                height: 80,
+                width: 100,
+                height: 100,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
 
-            // 3. Tunda setengah detik biar gambar QR selesai render, lalu print!
+            // Delay sebentar untuk nunggu QR selesai digambar lalu Print
             setTimeout(() => {
                 window.print();
             }, 500);
