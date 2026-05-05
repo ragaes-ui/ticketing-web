@@ -65,21 +65,28 @@
         .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🔥 CSS TIKET GELANG (TSC PRINTER) - REVISI FINAL 🔥 */
+        
+/* 🔥 CSS TIKET GELANG (TSC PRINTER) - REVISI FINAL 🔥 */
         #printGelangArea { display: none; }
         
         @media print {
             body > *:not(#printGelangArea) { display: none !important; }
             
-            /* WAJIB: Paksa browser mencetak warna background */
+            /* WAJIB: Kunci tinggi kertas biar gak molor & Paksa warna hitam keluar */
             body, html { 
                 margin: 0 !important; padding: 0 !important; 
+                width: 250mm !important; height: 25mm !important; 
                 background: white !important; 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
+                overflow: hidden !important; 
             }
             
-            #printGelangArea { display: block !important; position: relative !important; width: 100%; }
+            #printGelangArea { 
+                display: block !important; position: relative !important; 
+                width: 250mm !important; height: 25mm !important; 
+                overflow: hidden !important;
+            }
             
             .gelang-item {
                 width: 250mm; height: 25mm; /* Standar TSC Wristband */
@@ -88,6 +95,7 @@
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 box-sizing: border-box; overflow: hidden;
                 page-break-after: always;
+                page-break-inside: avoid;
             }
             .gelang-item:last-child { page-break-after: auto; }
 
@@ -108,7 +116,7 @@
             /* ZONA 2: TENGAH (BLOK HITAM BRANDING) */
             .gelang-brand {
                 flex: 1; height: 100%;
-                background-color: #000 !important; /* Blok hitam dipaksa muncul */
+                background-color: #000 !important;
                 color: #fff !important;
                 display: flex; align-items: center; justify-content: center;
                 overflow: hidden;
@@ -133,7 +141,8 @@
             .gelang-bottom .tier-badge { background: #000 !important; color: #fff !important; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
 
-            @page { size: 250mm 25mm landscape; margin: 0; }
+            /* Hapus tulisan landscape, paksa baca width 250 x height 25 */
+            @page { size: 250mm 25mm; margin: 0; }
         }
     </style>
 </head>
