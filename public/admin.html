@@ -462,8 +462,7 @@
         const apModal = new bootstrap.Modal(document.getElementById('adminPassModal'));
         const bModal = new bootstrap.Modal(document.getElementById('buyerModal'));
 
-        // --- DASHBOARD DATA ---
-        async function loadLaporan() {
+async function loadLaporan() {
             try {
                 const res = await fetch('/api/admin/reports');
                 if (res.ok) {
@@ -473,7 +472,9 @@
                     document.getElementById('totalUser').innerText = `${data.totalUser}`;
                     
                     document.getElementById('tabelLaporan').innerHTML = data.transaksiTerbaru.map(trx => {
-                        const tier = trx.tierName || trx.ticketName || 'TIKET';
+                        // KITA COBA SEMUA KEMUNGKINAN NAMA VARIABEL DARI DATABASE MAS RAGA
+                        const tier = trx.tierName || trx.ticketName || trx.tier || trx.ticketType || trx.type || 'GENERAL ADMISSION';
+                        
                         const evt = (trx.eventName || '').replace(/'/g, "\\'");
                         const cst = (trx.customerName || '').replace(/'/g, "\\'");
                         return `
@@ -488,6 +489,7 @@
                                 </td>
                             </tr>`;
                     }).join('');
+                    
                     updateChart(data.chartLabels || [], data.chartValues || []);
                 }
             } catch (err) {}
@@ -690,14 +692,17 @@
             } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${t.alert_err_conn}</td></tr>`; }
         }
 
-        function renderBuyerTable(data) {
+function renderBuyerTable(data) {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             const tbody = document.getElementById('tableBuyerList'); const tfoot = document.getElementById('tableBuyerFoot'); 
             if (!data || data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-white-50 py-5">${t.empty_buyer}</td></tr>`; if(tfoot) tfoot.innerHTML = ''; return; }
             let totalRupiah = 0; 
             tbody.innerHTML = data.map(b => {
                 totalRupiah += (b.price || 0); const dateStr = new Date(b.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-                const tierAsli = b.tierName || b.ticketName || 'TIKET';
+                
+                // KITA COBA SEMUA KEMUNGKINAN NAMA VARIABEL DARI DATABASE MAS RAGA
+                const tierAsli = b.tierName || b.ticketName || b.tier || b.ticketType || b.type || 'GENERAL ADMISSION';
+                
                 const amanEventName = b.eventName ? b.eventName.replace(/'/g, "\\'") : '-';
                 const amanCustomerName = b.customerName ? b.customerName.replace(/'/g, "\\'") : '-';
 
