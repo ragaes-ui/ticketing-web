@@ -65,63 +65,73 @@
         .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🔥 CSS TIKET GELANG (TSC PRINTER) - DESAIN FESTIVAL PREMIUM 🔥 */
+        /* 🔥 CSS TIKET GELANG (TSC PRINTER) - REVISI FINAL 🔥 */
         #printGelangArea { display: none; }
         
         @media print {
             body > *:not(#printGelangArea) { display: none !important; }
-            body, html { margin: 0 !important; padding: 0 !important; min-height: auto !important; height: auto !important; background: white !important; }
+            
+            /* WAJIB: Paksa browser mencetak warna background */
+            body, html { 
+                margin: 0 !important; padding: 0 !important; 
+                background: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
+            
             #printGelangArea { display: block !important; position: relative !important; width: 100%; }
             
             .gelang-item {
                 width: 250mm; height: 25mm; /* Standar TSC Wristband */
                 display: flex; align-items: center; justify-content: space-between;
                 background-color: white; color: black;
-                font-family: 'Arial', sans-serif;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 box-sizing: border-box; overflow: hidden;
                 page-break-after: always;
             }
             .gelang-item:last-child { page-break-after: auto; }
 
-            /* ZONA 1: Kiri (Area QR Code & Scanning) */
-            .gelang-qr {
-                width: 45mm; height: 100%;
-                display: flex; flex-direction: column; align-items: center; justify-content: center;
+            /* ZONA 1: KIRI (QR Code) */
+            .gelang-qr-section {
+                width: 50mm; height: 100%;
+                display: flex; align-items: center; justify-content: center; gap: 4px;
                 background: #fff;
-                border-right: 2px dashed #000; /* Garis sobekan / lipatan */
+                border-right: 2px dashed #000;
+                padding-right: 2mm;
             }
-            .gelang-qr .code { font-size: 8px; font-weight: 900; margin-bottom: 2px; color: #000; letter-spacing: 1px; }
             .qrcode-container { width: 18mm; height: 18mm; }
             .qrcode-container img { width: 100%; height: 100%; }
+            .qr-text-box { display: flex; flex-direction: column; justify-content: center; }
+            .qr-text-box span.lbl { font-size: 6px; font-weight: bold; color: #555; margin-bottom: 1px;}
+            .qr-text-box span.code { font-size: 9px; font-weight: 900; color: #000; }
 
-            /* ZONA 2: Tengah (Branding Blok Hitam ala Festival) */
+            /* ZONA 2: TENGAH (BLOK HITAM BRANDING) */
             .gelang-brand {
-                flex: 1; height: 100%; /* Mengisi sisa ruang di tengah */
-                background-color: #000; /* BLOK HITAM PEKAT */
-                color: #fff;
+                flex: 1; height: 100%;
+                background-color: #000 !important; /* Blok hitam dipaksa muncul */
+                color: #fff !important;
                 display: flex; align-items: center; justify-content: center;
-                padding: 0 10px; overflow: hidden;
+                overflow: hidden;
             }
             .gelang-brand h2 {
-                font-size: 18px; font-weight: 900;
-                margin: 0; text-transform: uppercase;
-                letter-spacing: 2px; white-space: nowrap;
+                font-size: 18px; font-weight: 900; margin: 0;
+                text-transform: uppercase; letter-spacing: 2px;
+                color: #fff !important; white-space: nowrap;
             }
 
-            /* ZONA 3: Kanan (Detail Penumpang & Tiket) */
+            /* ZONA 3: KANAN (INFO PEMBELI & EVENT) */
             .gelang-details {
-                width: 85mm; height: 100%;
+                width: 100mm; height: 100%;
                 display: flex; flex-direction: column; justify-content: center;
                 background: #fff; padding: 0 5mm;
-                border-left: 2px dashed #000; /* Garis sobekan / lipatan */
+                border-left: 2px dashed #000;
             }
-            .gelang-details .tier {
-                font-size: 14px; font-weight: 900; text-transform: uppercase;
-                border: 2px solid #000; padding: 1px 6px; display: inline-block;
-                width: fit-content; margin-bottom: 2px; line-height: 1;
-            }
-            .gelang-details .customer { font-size: 10px; font-weight: bold; margin: 0; text-transform: uppercase; line-height: 1.2;}
-            .gelang-details .meta { font-size: 8px; color: #333; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; line-height: 1.2;}
+            .gelang-details .location-text { font-size: 8px; font-weight: bold; color: #444; margin: 0 0 2px 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .gelang-details .customer-box { border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 3px; display: inline-block; width: fit-content; }
+            .gelang-details .customer-name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 0; color: #000;}
+            .gelang-bottom { display: flex; align-items: center; gap: 8px; margin-top: 1px;}
+            .gelang-bottom .tier-badge { background: #000 !important; color: #fff !important; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
+            .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
 
             @page { size: 250mm 25mm landscape; margin: 0; }
         }
@@ -790,23 +800,23 @@
             
             return `
             <div class="gelang-item">
-                <div class="gelang-logo"><h1>RCELLFEST</h1></div>
-                <div class="gelang-info">
-                    <h2>${eventName}</h2>
-                    <p class="location-text"><i class="bi bi-geo-alt-fill"></i> ${locationStr}</p>
+                <div class="gelang-qr-section">
+                    <div id="qr-${index}" class="qrcode-container" data-code="${ticketCode}"></div>
+                    <div class="qr-text-box">
+                        <span class="lbl">TICKET CODE</span>
+                        <span class="code">${ticketCode}</span>
+                    </div>
+                </div>
+                <div class="gelang-brand">
+                    <h2>RCELLFEST</h2>
+                </div>
+                <div class="gelang-details">
+                    <p class="location-text"><i class="bi bi-geo-alt-fill"></i> ${locationStr} - ${eventName}</p>
                     <div class="customer-box"><p class="customer-name">${customerName}</p></div>
                     <div class="gelang-bottom">
                         <span class="tier-badge">${tierName}</span>
                         <span class="date-text">${tgl}</span>
                     </div>
-                </div>
-                <div class="gelang-divider"></div>
-                <div class="gelang-qr-section">
-                    <div class="qr-text-box">
-                        <span class="lbl">TICKET CODE</span>
-                        <span class="code">${ticketCode}</span>
-                    </div>
-                    <div id="qr-${index}" class="qrcode-container" data-code="${ticketCode}"></div>
                 </div>
             </div>`;
         }
