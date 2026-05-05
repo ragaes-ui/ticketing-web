@@ -65,49 +65,41 @@
         .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🔥 CSS TIKET GELANG (TSC PRINTER) - DIPERBAIKI 🔥 */
+        /* 🔥 CSS TIKET GELANG (TSC PRINTER) - DIPERBAIKI (ADA LOKASI) 🔥 */
         #printGelangArea { display: none; }
         
         @media print {
-            /* Sembunyikan SEMUA elemen body KECUALI container print kita */
             body > *:not(#printGelangArea) { display: none !important; }
+            body, html { margin: 0 !important; padding: 0 !important; min-height: auto !important; height: auto !important; background: white !important; }
+            #printGelangArea { display: block !important; position: relative !important; width: 100%; }
             
-            /* Hapus semua padding/margin bawaan web supaya kertas gak jadi 3 lembar */
-            body, html { 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                min-height: auto !important; 
-                height: auto !important; 
-                background: white !important; 
-            }
-            
-            #printGelangArea { 
-                display: block !important; 
-                position: relative !important; 
-                width: 100%; 
-            }
-            
-            /* Ini kotak 1 gelang. Kalau print banyak, ini akan terduplikasi ke bawah */
             .gelang-item {
                 width: 250mm; height: 25mm; /* Standar TSC Wristband */
                 display: flex; align-items: center;
                 background-color: white; color: black;
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                 box-sizing: border-box; overflow: hidden;
-                page-break-after: always; /* WAJIB! Supaya 1 gelang 1 kali tarik (kertas potong) */
+                page-break-after: always;
             }
-            .gelang-item:last-child { page-break-after: auto; } /* Gelang terakhir gak usah nambah kertas kosong */
+            .gelang-item:last-child { page-break-after: auto; }
 
             .gelang-logo { width: 45mm; height: 100%; background-color: #000; color: #fff; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; transform: rotate(180deg); }
             .gelang-logo h1 { margin: 0; font-size: 14px; font-weight: 900; letter-spacing: 2px; }
+            
             .gelang-info { width: 130mm; height: 100%; padding: 2mm 5mm; display: flex; flex-direction: column; justify-content: center; }
-            .gelang-info h2 { font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; color: #000;}
-            .gelang-info .customer-box { border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 3px; display: inline-block; width: fit-content; }
+            /* Ukuran H2 sedikit dikecilkan dari 16px ke 14px agar lokasi muat */
+            .gelang-info h2 { font-size: 14px; font-weight: 900; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; color: #000;}
+            /* Style baru untuk Lokasi Event */
+            .gelang-info .location-text { font-size: 8px; font-weight: bold; color: #444; margin: 0 0 2px 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            .gelang-info .customer-box { border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 3px; display: inline-block; width: fit-content; }
             .gelang-info .customer-name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 0; color: #333;}
             .gelang-bottom { display: flex; align-items: center; gap: 8px; margin-top: 1px;}
             .gelang-bottom .tier-badge { background: #000; color: #fff; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
+            
             .gelang-divider { width: 0; height: 20mm; border-left: 2px dashed #000; margin: 0 5mm; }
+            
             .gelang-qr-section { width: 60mm; height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 5mm; }
             .qr-text-box { display: flex; flex-direction: column; align-items: flex-end; margin-right: 8px; }
             .qr-text-box span.lbl { font-size: 6px; font-weight: bold; margin-bottom: 2px; color: #555; }
@@ -367,7 +359,6 @@
                             <label class="small text-white-50 mb-1" data-i18n="lbl_filter_search">Cari Data</label>
                             <input type="text" id="searchBuyer" class="form-control form-control-sm" placeholder="Ketik Event..." data-i18n-ph="ph_search_key">
                         </div>
-                        <!-- 🔥 TAMBAHAN TOMBOL PRINT SEMUA 🔥 -->
                         <div class="col-md-5 d-flex align-items-end gap-2">
                             <button class="btn btn-outline-light btn-sm flex-grow-1 py-2" onclick="resetBuyerFilter()" data-i18n="btn_reset">Reset</button>
                             <button class="btn btn-danger btn-sm flex-grow-1 py-2 fw-bold" onclick="cetakPDFPembeli()"><i class="bi bi-file-pdf"></i> PDF</button>
@@ -478,7 +469,7 @@
         // --- GLOBAL VARIABLES & MODALS ---
         let eventsData = []; let myChart = null; 
         let buyersData = []; 
-        let currentFilteredBuyers = []; // <-- GLOBAL TRACKER UTK BATCH PRINT
+        let currentFilteredBuyers = []; 
 
         const eModal = new bootstrap.Modal(document.getElementById('editModal'));
         const pModal = new bootstrap.Modal(document.getElementById('promoModal'));
@@ -500,6 +491,7 @@
                         const tier = trx.tierName || trx.ticketName || trx.tier || trx.type || 'GENERAL ADMISSION';
                         const evt = (trx.eventName || '').replace(/'/g, "\\'");
                         const cst = (trx.customerName || '').replace(/'/g, "\\'");
+                        const loc = (trx.location || 'LOKASI TBA').replace(/'/g, "\\'"); // LOKASI
                         return `
                             <tr>
                                 <td>${new Date(trx.date).toLocaleDateString()}</td>
@@ -507,7 +499,7 @@
                                 <td>${trx.eventName}<br><span class="text-info" style="font-size:0.7rem;">${tier}</span></td>
                                 <td><span class="badge bg-primary">${trx.paymentMethod}</span></td>
                                 <td class="text-end">
-                                    <button onclick="cetakGelang('${trx.ticketCode}', '${evt}', '${cst}', '${tier}', '${trx.date}')" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2 me-2" title="Cetak Gelang"><i class="bi bi-printer"></i></button>
+                                    <button onclick="cetakGelang('${trx.ticketCode}', '${evt}', '${cst}', '${tier}', '${trx.date}', '${loc}')" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2 me-2" title="Cetak Gelang"><i class="bi bi-printer"></i></button>
                                     <span class="text-success fw-bold">+Rp ${trx.price.toLocaleString('id-ID')}</span>
                                 </td>
                             </tr>`;
@@ -711,7 +703,7 @@
                     const responseData = await res.json();
                     if (responseData.success) { 
                         buyersData = responseData.transaksiTerbaru || []; 
-                        currentFilteredBuyers = buyersData; // Setup global tracker
+                        currentFilteredBuyers = buyersData; 
                         renderBuyerTable(buyersData); 
                     } 
                     else { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${t.alert_err_conn}</td></tr>`; }
@@ -729,6 +721,7 @@
                 const tierAsli = b.tierName || b.ticketName || b.tier || b.type || 'GENERAL ADMISSION';
                 const amanEventName = b.eventName ? b.eventName.replace(/'/g, "\\'") : '-';
                 const amanCustomerName = b.customerName ? b.customerName.replace(/'/g, "\\'") : '-';
+                const loc = (b.location || 'LOKASI TBA').replace(/'/g, "\\'"); // LOKASI
 
                 return `<tr>
                     <td class="small">${dateStr}</td>
@@ -737,7 +730,7 @@
                     <td class="small fw-bold text-info">Rp ${(b.price || 0).toLocaleString('id-ID')}</td>
                     <td>
                         <span class="badge bg-success mb-1">${b.paymentMethod || 'VALID'}</span><br>
-                        <button onclick="cetakGelang('${b.ticketCode}', '${amanEventName}', '${amanCustomerName}', '${tierAsli}', '${b.date}')" class="btn btn-sm btn-info py-0 px-2 fw-bold text-dark mt-1" style="font-size:0.7rem;" title="Cetak Tiket Gelang"><i class="bi bi-printer"></i> PRINT</button>
+                        <button onclick="cetakGelang('${b.ticketCode}', '${amanEventName}', '${amanCustomerName}', '${tierAsli}', '${b.date}', '${loc}')" class="btn btn-sm btn-info py-0 px-2 fw-bold text-dark mt-1" style="font-size:0.7rem;" title="Cetak Tiket Gelang"><i class="bi bi-printer"></i> PRINT</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -756,7 +749,7 @@
                 if (sVal) mS = `${b.customerName||''} ${b.eventName||''} ${b.ticketCode||''}`.toLowerCase().includes(sVal); 
                 return mD && mS; 
             }); 
-            currentFilteredBuyers = filtered; // Update data yg mau di print BATCH
+            currentFilteredBuyers = filtered; 
             renderBuyerTable(filtered); 
         }
         function resetBuyerFilter() { 
@@ -776,8 +769,7 @@
 
         // 🔥 FUNGSI CETAK TIKET GELANG (TSC PRINTER) 🔥
         
-        // Template HTML untuk 1 gelang
-        function getGelangHTML(ticketCode, eventName, customerName, tierName, dateStr, index) {
+        function getGelangHTML(ticketCode, eventName, customerName, tierName, dateStr, locationStr, index) {
             let tgl = '';
             if(dateStr) { const d = new Date(dateStr); tgl = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(); }
             
@@ -786,6 +778,7 @@
                 <div class="gelang-logo"><h1>RCELLFEST</h1></div>
                 <div class="gelang-info">
                     <h2>${eventName}</h2>
+                    <p class="location-text"><i class="bi bi-geo-alt-fill"></i> ${locationStr}</p>
                     <div class="customer-box"><p class="customer-name">${customerName}</p></div>
                     <div class="gelang-bottom">
                         <span class="tier-badge">${tierName}</span>
@@ -803,16 +796,14 @@
             </div>`;
         }
 
-        // Cetak 1 Gelang
-        function cetakGelang(ticketCode, eventName, customerName, tierName, dateStr) {
+        function cetakGelang(ticketCode, eventName, customerName, tierName, dateStr, locationStr) {
             const area = document.getElementById('printGelangArea');
-            area.innerHTML = getGelangHTML(ticketCode, eventName, customerName, tierName, dateStr, 0);
+            area.innerHTML = getGelangHTML(ticketCode, eventName, customerName, tierName, dateStr, locationStr, 0);
 
             new QRCode(document.getElementById('qr-0'), { text: ticketCode, width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
             setTimeout(() => { window.print(); }, 500);
         }
 
-        // Cetak SEMUA Gelang yang ada di Tabel Filter
         function cetakSemuaGelang() {
             if(currentFilteredBuyers.length === 0) return Swal.fire('Kosong', 'Tidak ada data tiket untuk diprint!', 'info');
             
@@ -831,19 +822,17 @@
                     const area = document.getElementById('printGelangArea');
                     let htmlList = '';
                     
-                    // 1. Kumpulin semua HTML gelangnya
                     currentFilteredBuyers.forEach((b, i) => {
                         const tier = b.tierName || b.ticketName || b.tier || b.type || 'GENERAL ADMISSION';
-                        htmlList += getGelangHTML(b.ticketCode, b.eventName, b.customerName, tier, b.date, i);
+                        const loc = b.location || 'LOKASI TBA';
+                        htmlList += getGelangHTML(b.ticketCode, b.eventName, b.customerName, tier, b.date, loc, i);
                     });
                     area.innerHTML = htmlList;
 
-                    // 2. Render SEMUA QR Code nya sekaligus
                     currentFilteredBuyers.forEach((b, i) => {
                         new QRCode(document.getElementById(`qr-${i}`), { text: b.ticketCode, width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
                     });
 
-                    // 3. Print! Dikasih delay agak lama supaya semua QR selesai digambar di layar
                     setTimeout(() => { window.print(); }, 1500); 
                 }
             });
