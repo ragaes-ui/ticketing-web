@@ -65,14 +65,12 @@
         .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .promo-ticket { border: 1px dashed #00c6ff; background: rgba(0, 198, 255, 0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        
-/* 🔥 CSS TIKET GELANG (TSC PRINTER) - REVISI FINAL 🔥 */
+        /* 🔥 CSS TIKET GELANG (TSC PRINTER) 🔥 */
         #printGelangArea { display: none; }
         
         @media print {
             body > *:not(#printGelangArea) { display: none !important; }
             
-            /* WAJIB: Kunci tinggi kertas biar gak molor & Paksa warna hitam keluar */
             body, html { 
                 margin: 0 !important; padding: 0 !important; 
                 width: 250mm !important; height: 25mm !important; 
@@ -89,7 +87,7 @@
             }
             
             .gelang-item {
-                width: 250mm; height: 25mm; /* Standar TSC Wristband */
+                width: 250mm; height: 25mm;
                 display: flex; align-items: center; justify-content: space-between;
                 background-color: white; color: black;
                 font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -113,21 +111,24 @@
             .qr-text-box span.lbl { font-size: 6px; font-weight: bold; color: #555; margin-bottom: 1px;}
             .qr-text-box span.code { font-size: 9px; font-weight: 900; color: #000; }
 
-            /* ZONA 2: TENGAH (BLOK HITAM BRANDING) */
+            /* ZONA 2: TENGAH (BLOK HITAM NAMA EVENT DINAMIS) */
             .gelang-brand {
                 flex: 1; height: 100%;
                 background-color: #000 !important;
                 color: #fff !important;
                 display: flex; align-items: center; justify-content: center;
-                overflow: hidden;
+                overflow: hidden; padding: 0 10px;
             }
             .gelang-brand h2 {
-                font-size: 18px; font-weight: 900; margin: 0;
-                text-transform: uppercase; letter-spacing: 2px;
-                color: #fff !important; white-space: nowrap;
+                font-size: 16px; /* Disesuaikan agar nama event panjang muat */
+                font-weight: 900; margin: 0;
+                text-transform: uppercase; letter-spacing: 1px;
+                color: #fff !important; 
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                max-width: 100%;
             }
 
-            /* ZONA 3: KANAN (INFO PEMBELI & EVENT) */
+            /* ZONA 3: KANAN (INFO PEMBELI) */
             .gelang-details {
                 width: 100mm; height: 100%;
                 display: flex; flex-direction: column; justify-content: center;
@@ -141,7 +142,6 @@
             .gelang-bottom .tier-badge { background: #000 !important; color: #fff !important; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
 
-            /* Hapus tulisan landscape, paksa baca width 250 x height 25 */
             @page { size: 250mm 25mm; margin: 0; }
         }
     </style>
@@ -817,10 +817,10 @@
                     </div>
                 </div>
                 <div class="gelang-brand">
-                    <h2>RCELLFEST</h2>
+                    <h2>${eventName}</h2>
                 </div>
                 <div class="gelang-details">
-                    <p class="location-text"><i class="bi bi-geo-alt-fill"></i> ${locationStr} - ${eventName}</p>
+                    <p class="location-text"><i class="bi bi-geo-alt-fill"></i> ${locationStr}</p>
                     <div class="customer-box"><p class="customer-name">${customerName}</p></div>
                     <div class="gelang-bottom">
                         <span class="tier-badge">${tierName}</span>
