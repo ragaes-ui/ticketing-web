@@ -824,7 +824,8 @@ app.get('/api/admin/reports', async (req, res) => {
                 customerName: order.customerName || '-',
                 eventName: namaEvent,
                 paymentMethod: metodeAsli, 
-                price: order.price || 0
+                price: order.price || 0,
+                tierName: order.tierName || 'GENERAL'
             };
         });
 
