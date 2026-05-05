@@ -825,7 +825,8 @@ app.get('/api/admin/reports', async (req, res) => {
                 eventName: namaEvent,
                 paymentMethod: metodeAsli, 
                 price: order.price || 0,
-                tierName: order.tierName || 'GENERAL'
+                tierName: order.tierName || 'GENERAL',
+                location: order.eventId ? order.eventId.location : 'Lokasi TBA'
             };
         });
 
