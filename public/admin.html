@@ -543,7 +543,7 @@
             } catch (err) {}
         }
 
-        async function loadTable() {
+async function loadTable() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             try {
                 const res = await fetch('/api/events');
@@ -563,14 +563,20 @@
                                          <button onclick="tandaiSelesai('${ev._id}')" class="btn btn-sm btn-warning me-1"><i class="bi bi-calendar-check"></i></button>`;
                         }
 
+                        // 🔥 LOGIKA TOMBOL PIN 🔥
+                        let pinBtnClass = ev.isPinned ? 'btn-warning text-dark' : 'btn-outline-warning';
+                        let pinIcon = ev.isPinned ? 'bi-pin-angle-fill' : 'bi-pin-angle';
+                        let pinBadge = ev.isPinned ? '<span class="badge bg-warning text-dark ms-2" style="font-size:0.6rem;"><i class="bi bi-pin-angle-fill"></i> PINNED</span>' : '';
+
                         tbody.innerHTML += `
                             <tr>
                                 <td><img src="${ev.image || 'https://placehold.co/50'}" class="table-thumb"></td>
-                                <td><div class="fw-bold small">${ev.name}</div><small class="text-white-50">${ev.category}</small></td>
+                                <td><div class="fw-bold small">${ev.name} ${pinBadge}</div><small class="text-white-50">${ev.category}</small></td>
                                 <td class="fw-bold small">Rp ${ev.price.toLocaleString('id-ID')}</td>
                                 <td class="text-center">${statusBadge}</td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end">
+                                        <button onclick="togglePin('${ev._id}', ${ev.isPinned || false})" class="btn btn-sm ${pinBtnClass} me-1" title="Pin Event"><i class="bi ${pinIcon}"></i></button>
                                         ${actionBtn}
                                         <button onclick="bukaModalEdit('${ev._id}')" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil"></i></button>
                                         <button onclick="hapusKonser('${ev._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
@@ -580,6 +586,21 @@
                     });
                 }
             } catch (err) {}
+        }
+
+        // 🔥 FUNGSI BARU UNTUK KLIK PIN 🔥
+        async function togglePin(id, currentState) {
+            const newState = !currentState; // Kebalikannya (kalo false jadi true, dst)
+            try {
+                await fetch(`/api/events/${id}`, { 
+                    method: 'PUT', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ isPinned: newState }) 
+                });
+                loadTable(); // Refresh tabel setelah tombol diklik
+            } catch (err) {
+                console.error("Gagal nge-pin event", err);
+            }
         }
 
 function previewImage(u, i) { 
