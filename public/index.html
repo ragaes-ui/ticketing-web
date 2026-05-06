@@ -219,100 +219,37 @@
         @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
         [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
 
-        /* --- TAMBAHAN CUSTOM CSS UNTUK PAYMENT CARDS & TIERING --- */
-        .payment-selector { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            margin-top: 15px; 
-        }
-        .payment-card { 
-            border: 2px solid var(--border-color); 
-            border-radius: 12px; 
-            padding: 15px; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            text-align: left; 
-            background: var(--bg-card); 
-        }
-        .payment-card:hover { 
-            border-color: var(--primary); 
-            background: var(--hover-cat); 
-            transform: translateY(-2px); 
-        }
-        .payment-card.selected { 
-            border-color: var(--primary); 
-            background: #e6f0ff; 
-        }
-        [data-theme="dark"] .payment-card.selected { 
-            background: #1e293b; 
-            border-color: var(--primary); 
-        }
-        .payment-icon { 
-            font-size: 1.5rem; 
-            color: var(--primary); 
-            width: 40px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: rgba(0, 73, 204, 0.1); 
-            border-radius: 10px; 
-        }
-        .payment-details h6 { 
-            margin: 0; 
-            font-weight: 700; 
-            font-size: 0.95rem; 
-            color: var(--text-main); 
-        }
-        .payment-details p { 
-            margin: 0; 
-            font-size: 0.8rem; 
-            color: var(--text-muted); 
-        }
+        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
+        .payment-card:hover { border-color: var(--primary); background: var(--hover-cat); transform: translateY(-2px); }
+        .payment-card.selected { border-color: var(--primary); background: #e6f0ff; }
+        [data-theme="dark"] .payment-card.selected { background: #1e293b; border-color: var(--primary); }
+        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(0, 73, 204, 0.1); border-radius: 10px; }
+        .payment-details h6 { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .payment-details p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
         
-        .swal2-html-container .form-control { 
-            color: var(--text-main); 
-            background-color: var(--bg-input); 
-            border: 1px solid var(--border-color); 
-        }
-        .swal2-html-container .form-label { 
-            color: var(--text-muted); 
-        }
+        .swal2-html-container .form-control { color: var(--text-main); background-color: var(--bg-input); border: 1px solid var(--border-color); }
+        .swal2-html-container .form-label { color: var(--text-muted); }
 
-        .tier-label { 
-            cursor: pointer; 
-            transition: 0.2s; 
-            border: 2px solid var(--border-color); 
-            background-color: var(--bg-card); 
-        }
-        .tier-label:hover { 
-            border-color: var(--primary); 
-        }
-        .tier-label input:checked + div { 
-            font-weight: bold; 
-        }
-        .tier-sold-out {
-            background-color: var(--bg-section);
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .tier-label { cursor: pointer; transition: 0.2s; border: 2px solid var(--border-color); background-color: var(--bg-card); }
+        .tier-label:hover { border-color: var(--primary); }
+        .tier-label input:checked + div { font-weight: bold; }
+        .tier-sold-out { background-color: var(--bg-section); opacity: 0.5; cursor: not-allowed; }
 
-        /* --- TAMBAHAN CUSTOM CSS WIDGET NOTIFIKASI BERITA --- */
+        /* 🔥 REVISI CSS WIDGET NOTIFIKASI BERITA (POSISI DI ATAS) 🔥 */
         .news-toast {
             position: fixed;
-            bottom: 30px;
-            left: 30px; 
+            top: 90px; /* Diatur berada pas di bawah Navbar */
+            left: 50%; /* Di HP maupun PC posisinya ke tengah */
+            
             background: var(--bg-card, #18181b);
             border: 1px solid var(--primary, #3b82f6);
             border-radius: 16px;
             padding: 15px 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 9998;
-            max-width: 320px;
+            width: 90%; /* Responsif untuk layar HP */
+            max-width: 350px;
             display: flex;
             align-items: flex-start;
             gap: 15px;
@@ -320,14 +257,16 @@
 
             opacity: 0;
             visibility: hidden;
-            transform: translateX(-150%);
+            
+            /* Animasi masuk turun dari atas, bukan dari samping lagi */
+            transform: translate(-50%, -150%);
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
         }
         
         .news-toast.show {
             opacity: 1;
             visibility: visible;
-            transform: translateX(0);
+            transform: translate(-50%, 0); /* Posisi stabil di tengah-atas */
         }
 
         .news-progress-bar {
@@ -387,9 +326,7 @@
             z-index: 2;
         }
 
-        .news-content a:hover {
-            color: var(--primary, #3b82f6);
-        }
+        .news-content a:hover { color: var(--primary, #3b82f6); }
 
         .close-news {
             background: none;
@@ -408,7 +345,8 @@
             color: var(--text-main); 
             transform: scale(1.2); 
         }
-/* 👇 PASTE CSS-NYA DI SINI 👇 */
+
+        /* Ping Signal Tetap Di Bawah */
         .signal-badge {
             position: fixed;
             bottom: 42px;
@@ -594,6 +532,7 @@
         </div>
     </div>
 
+    <!-- 🔥 INI POPUP BERITA BLOGGER NYA (Sudah di atas) 🔥 -->
     <div class="news-toast" id="bloggerNewsToast">
         <i class="bi bi-megaphone-fill news-icon"></i>
         <div class="news-content">
@@ -605,10 +544,12 @@
         </button>
         <div class="news-progress-bar"></div>
     </div>
+
     <div class="signal-badge" id="floatingPing" title="Ping ke Server Rcellfest">
         <span id="networkDot" class="signal-dot dot-kuat"></span> 
         <span id="networkSpeed">Menghitung...</span>
     </div>
+    
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
     </button>
@@ -671,10 +612,7 @@
             checkLoginStatus();
             await loadEvents();
             
-            // 👇 PANGGIL FUNGSI BERITA BLOGGER 👇
             loadBloggerNews();
-            
-            // 👇 PANGGIL FUNGSI CEK PING SERVER 👇
             checkServerPing();
             setInterval(checkServerPing, 10000);
 
@@ -682,7 +620,6 @@
             if(loader) loader.classList.add('hide-loader');
         });
 
-// 👇 SCRIPT CEK PING SERVER VERCEL (NEW DESIGN) 👇
         async function checkServerPing() {
             const speedText = document.getElementById('networkSpeed');
             const dot = document.getElementById('networkDot');
@@ -701,17 +638,15 @@
                 
                 if (response.ok) {
                     const pingTime = Date.now() - startTime;
-
-                // Standar Ping Ketat (Level Pro)
-                    if (pingTime < 100) { // Di bawah 100ms = Hijau (Ngebut)
+                    if (pingTime < 100) { 
                         speedText.innerText = `Sinyal: Kuat (${pingTime}ms)`;
                         dot.style.backgroundColor = '#2ecc71'; 
                         dot.style.boxShadow = '0 0 8px #2ecc71';
-                    } else if (pingTime < 250) { // 100ms - 250ms = Kuning (Sedang)
+                    } else if (pingTime < 250) { 
                         speedText.innerText = `Sinyal: Sedang (${pingTime}ms)`;
                         dot.style.backgroundColor = '#f1c40f'; 
                         dot.style.boxShadow = '0 0 8px #f1c40f';
-                    } else { // Di atas 250ms = Merah (Lemot/Ngelag)
+                    } else { 
                         speedText.innerText = `Sinyal: Lemah (${pingTime}ms)`;
                         dot.style.backgroundColor = '#e74c3c'; 
                         dot.style.boxShadow = '0 0 8px #e74c3c';
@@ -724,27 +659,21 @@
             }
         }
 
-        // 👇 FUNGSI PENERIMA DATA (CEK UMUR 24 JAM + AUTO CLOSE 10 DETIK) 👇
         window.handleBloggerNews = function(data) {
             if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
                 const post = data.feed.entry[0];
                 const title = post.title.$t;
                 
-                // Ambil waktu kapan artikel ini dipublish di Blogger
                 const waktuPublishBlogger = post.published.$t; 
-                
-                // 1. CEK UMUR ARTIKEL (Batas 1 Hari / 24 Jam)
                 const waktuPublish = new Date(waktuPublishBlogger).getTime();
                 const waktuSekarang = Date.now();
                 const umurArtikel = waktuSekarang - waktuPublish;
-                const batasSatuHari = 24 * 60 * 60 * 1000; // 24 Jam dalam milidetik
+                const batasSatuHari = 24 * 60 * 60 * 1000; 
 
-                // Kalau umur artikelnya UDAH LEBIH dari 1 hari (udah basi), JANGAN TAMPILKAN!
                 if (umurArtikel > batasSatuHari) {
                     return; 
                 }
                 
-                // 2. KALAU MASIH BARU (< 24 JAM), AMBIL LINK DAN TAMPILKAN
                 let link = "#";
                 for (let i = 0; i < post.link.length; i++) {
                     if (post.link[i].rel === "alternate") {
@@ -756,14 +685,10 @@
                 document.getElementById('bloggerNewsLink').innerText = title;
                 document.getElementById('bloggerNewsLink').href = link;
 
-                // Munculkan popup setelah 2.5 detik
                 setTimeout(() => {
                     const toast = document.getElementById('bloggerNewsToast');
                     if (toast) {
-                        // 1. Tampilkan Popup-nya
                         toast.classList.add('show');
-                        
-                        // 2. 👇 TAMBAHAN AUTO-CLOSE: Hitung mundur 10 detik (10000 ms) lalu tutup 👇
                         setTimeout(() => {
                             toast.classList.remove('show');
                         }, 10000);
@@ -772,14 +697,9 @@
             }
         };
 
-        // 👇 FUNGSI PENGAMBIL DATA BERITA DARI BLOGGER 👇
         function loadBloggerNews() {
             const urlBlogger = "https://rcellnews.blogspot.com"; 
-            
-            // PENTING: Pakai alt=json-in-script & callback biar ga di-blokir browser
             const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json-in-script&max-results=1&callback=handleBloggerNews`;
-
-            // Suntik script ke web secara otomatis
             const scriptEl = document.createElement('script');
             scriptEl.src = feedUrl;
             document.body.appendChild(scriptEl);
