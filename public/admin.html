@@ -140,6 +140,7 @@
             .gelang-details .customer-name { font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 0; color: #000;}
             .gelang-bottom { display: flex; align-items: center; gap: 8px; margin-top: 1px;}
             .gelang-bottom .tier-badge { background: #000 !important; color: #fff !important; padding: 2px 6px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; }
+            .gelang-bottom .day-badge { background: #fff !important; color: #000 !important; border: 1.5px solid #000 !important; padding: 1px 5px; font-size: 10px; font-weight: 900; border-radius: 3px; text-transform: uppercase; }
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
 
             @page { size: 250mm 25mm; margin: 0; }
@@ -840,7 +841,13 @@ function previewImage(u, i) {
         function getGelangHTML(ticketCode, eventName, customerName, tierName, dateStr, locationStr, index) {
             let tgl = '';
             if(dateStr) { const d = new Date(dateStr); tgl = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(); }
-            
+            // 🔥 LOGIKA PENDETEKSI "DAY" OTOMATIS 🔥
+            let dayText = "DAY 1"; // Default kalau nggak ditulis
+            const textToSearch = (eventName + " " + tierName).toLowerCase();
+            const dayMatch = textToSearch.match(/day\s*[-_]?\s*([0-9]+)/);
+            if(dayMatch) {
+                dayText = "DAY " + dayMatch[1]; // Jika ketemu angka Day, ambil angkanya
+            }
             return `
             <div class="gelang-item">
                 <div class="gelang-qr-section">
@@ -858,6 +865,7 @@ function previewImage(u, i) {
                     <div class="customer-box"><p class="customer-name">${customerName}</p></div>
                     <div class="gelang-bottom">
                         <span class="tier-badge">${tierName}</span>
+                        <span class="day-badge">${dayText}</span>
                         <span class="date-text">${tgl}</span>
                     </div>
                 </div>
