@@ -446,7 +446,13 @@
                 <p class="mt-2 text-secondary small" data-i18n="loading_text">Memuat event...</p>
             </div>
         </div>
-    </div>
+        <!-- 👇 TAMBAHAN WADAH EVENT AKAN DATANG 👇 -->
+        <div id="section-coming-soon" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3 px-2 mt-5 border-top pt-4">
+                <h5 class="fw-bold m-0 text-info"><i class="bi bi-hourglass-split"></i> Akan Datang</h5>
+            </div>
+            <div class="row g-3" id="event-coming-soon-list"></div>
+        </div>
 
     <section class="partner-section">
         <div class="container-fluid p-0">
@@ -837,22 +843,31 @@ async function loadEvents() {
             }
         }
 
-        function renderEvents(data) {
+function renderEvents(data) {
             const container = document.getElementById('event-list');
+            const containerSoon = document.getElementById('event-coming-soon-list');
+            const sectionSoon = document.getElementById('section-coming-soon');
+            
             container.innerHTML = ''; 
+            if (containerSoon) containerSoon.innerHTML = '';
+            
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
-            if(data.length === 0) {
-                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
-                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
-                return;
+            // PISAHKAN DATA: Yang aktif vs Yang "Coming Soon" (Stok -2)
+            const activeEvents = data.filter(e => e.availableSeats !== -2);
+            const soonEvents = data.filter(e => e.availableSeats === -2);
+
+            // Tampilkan atau Sembunyikan bagian "Akan Datang"
+            if (soonEvents.length > 0 && sectionSoon) {
+                sectionSoon.style.display = 'block';
+            } else if (sectionSoon) {
+                sectionSoon.style.display = 'none';
             }
 
-            data.forEach(event => {
+            // FUNGSI BANTUAN BIKIN KARTU TIKET
+            const buildCard = (event) => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
-                
                 const isFinished = event.availableSeats === -1;
                 const isComingSoon = event.availableSeats === -2;
                 const isSoldOut = event.availableSeats === 0;
@@ -867,7 +882,6 @@ async function loadEvents() {
                 const catName = event.category || 'General'; 
                 const locationName = event.location || t.txt_tba;
                 const imageUrl = getEventImage(event);
-                
                 const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
                 
                 let btnText = 'BELI';
@@ -881,15 +895,18 @@ async function loadEvents() {
                     btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
                 }
 
+                // Munculkan badge pin jika event di-pin
+                const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
                 const namaAman = event.name ? event.name : "event";
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
 
-                container.innerHTML += `
+                return `
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="card-event" onclick="window.location.href='${linkDetail}'">
                         <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
+                            ${pinBadge}
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
                         </div>
@@ -905,7 +922,21 @@ async function loadEvents() {
                         </div>
                     </div>
                 </div>`;
-            });
+            };
+
+            // RENDER 1: Event Aktif ke atas
+            if (activeEvents.length === 0) {
+                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
+                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
+                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
+            } else {
+                activeEvents.forEach(event => { container.innerHTML += buildCard(event); });
+            }
+
+            // RENDER 2: Event Akan Datang ke bawah
+            if (soonEvents.length > 0 && containerSoon) {
+                soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event); });
+            }
         }
 
         function showDetail(eventId) {
