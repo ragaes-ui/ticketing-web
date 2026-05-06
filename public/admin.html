@@ -590,7 +590,7 @@ function previewImage(u, i) {
     // OTOMATIS KONVERSI LINK GDRIVE KE LINK GAMBAR
     if (u && u.includes('drive.google.com')) {
         const m = u.match(/[-\w]{25,}/); // Mengambil ID unik file GDrive
-        if (m) fUrl = `https://drive.google.com/uc?export=view&id=${m[0]}`;
+        if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`;
     }
 
     if(fUrl){ 
