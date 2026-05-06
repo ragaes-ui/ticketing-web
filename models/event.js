@@ -62,9 +62,9 @@ const eventSchema = new mongoose.Schema({
         price: { type: Number, required: true },         // Harga spesifik untuk kategori ini
         totalSeats: { type: Number, required: true },    // Kuota khusus kategori ini
         availableSeats: { type: Number, required: true } // Sisa tiket kategori ini
-    }]
+    }],
     // ----------------------------------------------------
-    
+    isPinned: { type: Boolean, default: false }
     // ---------------------------
     
 }, { timestamps: true });
