@@ -582,12 +582,25 @@
             } catch (err) {}
         }
 
-        // --- FORM LOGIC ---
-        function previewImage(u, i) { 
-            const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : '');
-            let fUrl = u; if (u && u.includes('drive.google.com/file/d/')) { const m = u.match(/\/d\/(.*?)\//); if (m && m[1]) fUrl = `https://drive.google.com/uc?export=view&id=${m[1]}`; }
-            if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
-        }
+function previewImage(u, i) { 
+    const img = document.getElementById(i); 
+    const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : '');
+    let fUrl = u;
+
+    // OTOMATIS KONVERSI LINK GDRIVE KE LINK GAMBAR
+    if (u && u.includes('drive.google.com')) {
+        const m = u.match(/[-\w]{25,}/); // Mengambil ID unik file GDrive
+        if (m) fUrl = `https://drive.google.com/uc?export=view&id=${m[0]}`;
+    }
+
+    if(fUrl){ 
+        img.src = fUrl; img.style.display = 'block'; 
+        if(txt) txt.style.display = 'none'; 
+    } else { 
+        img.style.display = 'none'; 
+        if(txt) txt.style.display = 'block'; 
+    }
+}
 
         function addTierRow(id, n='', p='', s='') {
             document.getElementById(id).insertAdjacentHTML('beforeend', `
