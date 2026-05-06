@@ -793,10 +793,15 @@
             window.location.reload();
         }
 
-        async function loadEvents() {
+async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
-                allEvents = await res.json();
+                let dataEventCetak = await res.json();
+                
+                // 👇 TAMBAHKAN 1 BARIS INI BIAR YANG DI-PIN NAIK KE ATAS 👇
+                dataEventCetak.sort((a, b) => (b.isPinned === true ? 1 : 0) - (a.isPinned === true ? 1 : 0));
+                
+                allEvents = dataEventCetak;
                 renderEvents(allEvents);
             } catch (err) { 
                 console.error("Gagal memuat event:", err);
