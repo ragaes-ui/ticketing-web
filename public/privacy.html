@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,24 +7,45 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230049CC'/%3E%3Cstop offset='100%25' stop-color='%23007bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23a)'/%3E%3Cpath d='M21 18h8c5 0 9 3.5 9 8 0 3-1.8 5.7-4.5 7.2l5 8.8h-5l-4.2-7.5h-3.3v7.5h-5V18zm5 4v7h3c2.5 0 4.5-1.8 4.5-3.5S31.5 22 29 22h-3z' fill='white'/%3E%3Cpath d='M36 18h13v4h-8v6h7v4h-7v10h-5V18z' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
-
     <style>
-        :root { --primary: #0049CC; --bg: #f8f9fa; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); padding-top: 90px; color: #333; line-height: 1.7; }
-        .navbar { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        :root { 
+            --primary: #0049CC; 
+            --bg: #f8f9fa; 
+            --text-main: #333; 
+            --text-muted: #6c757d;
+            --card-bg: #fff; 
+            --border-color: #eee;
+        }
+        [data-theme="dark"] { 
+            --primary: #60a5fa; 
+            --bg: #0f172a; 
+            --text-main: #f8f9fa; 
+            --text-muted: #cbd5e1;
+            --card-bg: #1e293b; 
+            --border-color: #334155; 
+        }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); padding-top: 90px; color: var(--text-main); line-height: 1.7; transition: 0.3s; }
+        .navbar { background: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: 0.3s; border-bottom: 1px solid var(--border-color); }
         .navbar-brand { font-weight: 800; color: var(--primary) !important; }
-        .content-card { background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        h1 { font-weight: 800; color: #2ecc71; margin-bottom: 30px; } /* Warna hijau untuk kesan aman */
-        h4 { font-weight: 700; margin-top: 25px; color: #111; }
+        .content-card { background: var(--card-bg); border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: 0.3s; }
+        h1 { font-weight: 800; color: #2ecc71; margin-bottom: 30px; }
+        h4 { font-weight: 700; margin-top: 25px; color: var(--text-main); }
+        p { color: var(--text-muted); }
         .footer { background: #0e1e3b; color: white; padding: 40px 0; margin-top: 60px; }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
+        <div class="container d-flex justify-content-between">
             <a class="navbar-brand" href="index.html"><i class="bi bi-shield-lock-fill"></i> RCELLFEST</a>
-            <a href="index.html" class="btn btn-outline-success btn-sm rounded-pill">Kembali</a>
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 36px; padding: 4px 8px;" id="lang-btn">ID</button>
+                <button onclick="toggleTheme()" class="btn rounded-circle d-flex align-items-center justify-content-center" id="theme-btn" style="width: 36px; height: 36px; border: 1px solid var(--border-color); padding: 0;">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
+                <a href="index.html" class="btn btn-outline-success btn-sm rounded-pill fw-bold" id="btn-back">Kembali</a>
+            </div>
         </div>
     </nav>
 
@@ -32,24 +53,24 @@
         <div class="row justify-content-center">
             <div class="col-lg-9">
                 <div class="content-card">
-                    <h1>Kebijakan Privasi</h1>
-                    <p class="text-muted">Pembaruan Terakhir: 08 Mei 2026</p>
-                    <hr>
+                    <h1 id="title">Kebijakan Privasi</h1>
+                    <p class="text-muted" id="last-update">Pembaruan Terakhir: 08 Mei 2026</p>
+                    <hr style="border-color: var(--border-color);">
 
-                    <h4>Informasi yang Dikumpulkan</h4>
-                    <p>Kami mengumpulkan data pribadi Anda (Nama, Email, No. WA, NIK) saat Anda melakukan pembelian untuk kepentingan validasi tiket di lokasi event.</p>
+                    <h4 id="h1">Informasi yang Dikumpulkan</h4>
+                    <p id="p1">Kami mengumpulkan data pribadi Anda (Nama, Email, No. WA, NIK) saat Anda melakukan pembelian untuk kepentingan validasi tiket di lokasi event.</p>
 
-                    <h4>Keamanan Data</h4>
-                    <p>Semua data sensitif seperti password dienkripsi dengan standar industri. Kami tidak menyimpan data kartu kredit/debit Anda karena proses pembayaran ditangani sepenuhnya oleh Midtrans.</p>
+                    <h4 id="h2">Keamanan Data</h4>
+                    <p id="p2">Semua data sensitif seperti password dienkripsi dengan standar industri. Kami tidak menyimpan data kartu kredit/debit Anda karena proses pembayaran ditangani sepenuhnya oleh Midtrans.</p>
 
-                    <h4>Berbagi Data</h4>
-                    <p>Kami hanya membagikan informasi Anda kepada Penyelenggara Event (Promotor) untuk kebutuhan Check-in. Kami tidak akan pernah menjual data Anda ke pihak iklan manapun.</p>
+                    <h4 id="h3">Berbagi Data</h4>
+                    <p id="p3">Kami hanya membagikan informasi Anda kepada Penyelenggara Event (Promotor) untuk kebutuhan Check-in. Kami tidak akan pernah menjual data Anda ke pihak iklan manapun.</p>
 
-                    <h4>Cookie</h4>
-                    <p>Kami menggunakan cookie untuk mengingat sesi login Anda dan menyimpan preferensi tema (Mode Gelap/Terang) agar pengalaman browsing lebih nyaman.</p>
+                    <h4 id="h4">Cookie</h4>
+                    <p id="p4">Kami menggunakan cookie untuk mengingat sesi login Anda dan menyimpan preferensi tema (Mode Gelap/Terang) agar pengalaman browsing lebih nyaman.</p>
 
-                    <h4>Hak Pengguna</h4>
-                    <p>Anda berhak meminta penghapusan akun dan data pribadi Anda dengan menghubungi admin melalui fitur Support AI atau WhatsApp resmi kami.</p>
+                    <h4 id="h5">Hak Pengguna</h4>
+                    <p id="p5">Anda berhak meminta penghapusan akun dan data pribadi Anda dengan menghubungi admin melalui fitur Support AI atau WhatsApp resmi kami.</p>
                 </div>
             </div>
         </div>
@@ -60,5 +81,71 @@
             <small class="opacity-50">&copy; 2026 RCELLFEST ID. Secure Platform.</small>
         </div>
     </footer>
+
+    <script>
+        // --- THEME LOGIC ---
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            const btn = document.getElementById('theme-btn');
+            if (theme === 'dark') {
+                icon.className = 'bi bi-sun-fill';
+                icon.style.color = '#FFD700';
+                btn.className = 'btn btn-dark rounded-circle d-flex align-items-center justify-content-center';
+            } else {
+                icon.className = 'bi bi-moon-stars-fill';
+                icon.style.color = '';
+                btn.className = 'btn btn-light rounded-circle d-flex align-items-center justify-content-center';
+            }
+        }
+
+        // --- LANGUAGE LOGIC ---
+        const translations = {
+            id: { btn_back: "Kembali", title: "Kebijakan Privasi", last_update: "Pembaruan Terakhir: 08 Mei 2026", h1: "Informasi yang Dikumpulkan", p1: "Kami mengumpulkan data pribadi Anda (Nama, Email, No. WA, NIK) saat Anda melakukan pembelian untuk kepentingan validasi tiket di lokasi event.", h2: "Keamanan Data", p2: "Semua data sensitif seperti password dienkripsi dengan standar industri. Kami tidak menyimpan data kartu kredit/debit Anda karena proses pembayaran ditangani sepenuhnya oleh Midtrans.", h3: "Berbagi Data", p3: "Kami hanya membagikan informasi Anda kepada Penyelenggara Event (Promotor) untuk kebutuhan Check-in. Kami tidak akan pernah menjual data Anda ke pihak iklan manapun.", h4: "Cookie", p4: "Kami menggunakan cookie untuk mengingat sesi login Anda dan menyimpan preferensi tema (Mode Gelap/Terang) agar pengalaman browsing lebih nyaman.", h5: "Hak Pengguna", p5: "Anda berhak meminta penghapusan akun dan data pribadi Anda dengan menghubungi admin melalui fitur Support AI atau WhatsApp resmi kami." },
+            en: { btn_back: "Back", title: "Privacy Policy", last_update: "Last Updated: May 08, 2026", h1: "Information Collected", p1: "We collect your personal data (Name, Email, WA No., NIK) when you make a purchase for ticket validation purposes at the event location.", h2: "Data Security", p2: "All sensitive data such as passwords are encrypted with industry standards. We do not store your credit/debit card data as the payment process is handled entirely by Midtrans.", h3: "Data Sharing", p3: "We only share your information with Event Organizers (Promoters) for Check-in needs. We will never sell your data to any advertising parties.", h4: "Cookies", p4: "We use cookies to remember your login session and store theme preferences (Dark/Light Mode) for a more comfortable browsing experience.", h5: "User Rights", p5: "You have the right to request the deletion of your account and personal data by contacting the admin via our Support AI feature or official WhatsApp." }
+        };
+
+        const savedLang = localStorage.getItem('lang') || 'id';
+        updateLangUI(savedLang);
+
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('lang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', newLang);
+            updateLangUI(newLang);
+        }
+
+        function updateLangUI(lang) {
+            const langBtn = document.getElementById('lang-btn');
+            langBtn.innerText = lang.toUpperCase();
+            if(lang === 'en') {
+                langBtn.classList.add('btn-primary'); langBtn.classList.remove('btn-outline-secondary');
+            } else {
+                langBtn.classList.add('btn-outline-secondary'); langBtn.classList.remove('btn-primary');
+            }
+            
+            const t = translations[lang];
+            document.getElementById('btn-back').innerText = t.btn_back;
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('last-update').innerText = t.last_update;
+            document.getElementById('h1').innerText = t.h1; document.getElementById('p1').innerText = t.p1;
+            document.getElementById('h2').innerText = t.h2; document.getElementById('p2').innerText = t.p2;
+            document.getElementById('h3').innerText = t.h3; document.getElementById('p3').innerText = t.p3;
+            document.getElementById('h4').innerText = t.h4; document.getElementById('p4').innerText = t.p4;
+            document.getElementById('h5').innerText = t.h5; document.getElementById('p5').innerText = t.p5;
+        }
+    </script>
 </body>
 </html>
