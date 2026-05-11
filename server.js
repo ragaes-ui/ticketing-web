@@ -127,7 +127,7 @@ if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
 async function connectDB() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
-    const opts = { bufferCommands: false, serverSelectionTimeoutMS: 5000 };
+    const opts = { bufferCommands: false, serverSelectionTimeoutMS: 15000 };
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       console.log('✅ DATABASE TERHUBUNG!');
