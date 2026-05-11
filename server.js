@@ -545,7 +545,8 @@ app.post('/api/buy-ticket', async (req, res) => {
         }
         await event.save();
         // Kirim email tiket ke pembeli
-        sendTicketEmail(buyerData ? buyerData.email : user.email, {
+// 📧 KIRIM TIKET KE EMAIL (SALDO)
+        await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             eventName: event.name,
             tierName: tierName || 'General',
@@ -627,8 +628,8 @@ app.post('/api/midtrans-success', async (req, res) => {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
-        // Kirim email tiket ke pembeli
-        sendTicketEmail(customerEmail, {
+// 📧 KIRIM TIKET KE EMAIL (MIDTRANS)
+        await sendTicketEmail(customerEmail, {
             customerName: customerName,
             eventName: event.name,
             tierName: tierName || 'General',
