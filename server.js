@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const midtransClient = require('midtrans-client');
+const nodemailer = require('nodemailer'); // Pastikan ini ada
 
 // --- MODEL DATABASE ---
 const User = require('./models/users'); 
@@ -150,6 +151,43 @@ let snap = new midtransClient.Snap({
     isProduction : false, 
     serverKey : 'SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg' 
 });
+// ==========================================
+// KONFIGURASI EMAIL & FUNGSI KIRIM TIKET
+// ==========================================
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
+
+const sendTicketEmail = async (customerEmail, ticketData) => {
+    const mailOptions = {
+        from: '"RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
+        to: customerEmail,
+        subject: `E-Tiket RCELLFEST: ${ticketData.eventName}`,
+        html: `
+            <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 15px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #0049CC, #007bff); padding: 20px; text-align: center; color: white;">
+                    <h2 style="margin: 0;">RCELLFEST E-TICKET</h2>
+                </div>
+                <div style="padding: 30px; background: #fff;">
+                    <p>Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
+                    <p>Berikut adalah detail tiket resmi kamu:</p>
+                    <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
+                        <p style="margin: 5px 0;"><b>Tipe Tiket:</b> ${ticketData.tierName}</p>
+                        <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
+                        <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
+                    </div>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">KODE UNIK TIKET:</p>
+                        <h1 style="background: #000; color: #fff; padding: 15px; display: inline-block; border-radius: 10px; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h1>
+                    </div>
+                </div>
+            </div>`
+    };
+    try { await transporter.sendMail(mailOptions); console.log("Email tiket terkirim ke:", customerEmail); } 
+    catch (err) { console.error("Gagal kirim tiket:", err); }
+};
 
 // ==========================================
 // --- ROUTES API ---
@@ -506,6 +544,15 @@ app.post('/api/buy-ticket', async (req, res) => {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
+        // Kirim email tiket ke pembeli
+        sendTicketEmail(buyerData ? buyerData.email : user.email, {
+            customerName: buyerData ? buyerData.name : (user.fullName || user.username),
+            eventName: event.name,
+            tierName: tierName || 'General',
+            location: event.location || 'TBA',
+            eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            ticketCode: ticketCode
+        });
 
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
@@ -580,6 +627,15 @@ app.post('/api/midtrans-success', async (req, res) => {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
+        // Kirim email tiket ke pembeli
+        sendTicketEmail(customerEmail, {
+            customerName: customerName,
+            eventName: event.name,
+            tierName: tierName || 'General',
+            location: event.location || 'TBA',
+            eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            ticketCode: ticketCode
+        });
 
         res.json({ success: true, ticketCode });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
