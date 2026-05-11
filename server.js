@@ -160,33 +160,48 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (customerEmail, ticketData) => {
+    // Generate URL QR Code otomatis berdasarkan Kode Tiket
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticketData.ticketCode}`;
+
     const mailOptions = {
         from: '"RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
         to: customerEmail,
         subject: `E-Tiket RCELLFEST: ${ticketData.eventName}`,
         html: `
-            <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 15px; overflow: hidden;">
+            <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <div style="background: linear-gradient(135deg, #0049CC, #007bff); padding: 20px; text-align: center; color: white;">
-                    <h2 style="margin: 0;">RCELLFEST E-TICKET</h2>
+                    <h2 style="margin: 0; letter-spacing: 2px;">RCELLFEST E-TICKET</h2>
                 </div>
-                <div style="padding: 30px; background: #fff;">
-                    <p>Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
-                    <p>Berikut adalah detail tiket resmi kamu:</p>
-                    <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0;">
+                <div style="padding: 30px; background: #fff; text-align: center;">
+                    <p style="text-align: left;">Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
+                    <p style="text-align: left;">Berikut adalah tiket resmi kamu untuk masuk ke area event:</p>
+                    
+                    <div style="margin: 25px 0; padding: 20px; border: 2px dashed #0049CC; display: inline-block; border-radius: 10px;">
+                        <img src="${qrCodeUrl}" alt="QR Code Tiket" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
+                        <h3 style="margin-top: 15px; color: #333; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h3>
+                    </div>
+
+                    <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
                         <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
-                        <p style="margin: 5px 0;"><b>Tipe Tiket:</b> ${ticketData.tierName}</p>
+                        <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
                         <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
                     </div>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">KODE UNIK TIKET:</p>
-                        <h1 style="background: #000; color: #fff; padding: 15px; display: inline-block; border-radius: 10px; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h1>
-                    </div>
+
+                    <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan.</p>
+                </div>
+                <div style="background: #eee; padding: 15px; text-align: center; font-size: 11px; color: #777;">
+                    &copy; 2026 RCELLTECH ID. Digital Payment & Ticketing Solution.
                 </div>
             </div>`
     };
-    try { await transporter.sendMail(mailOptions); console.log("Email tiket terkirim ke:", customerEmail); } 
-    catch (err) { console.error("Gagal kirim tiket:", err); }
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log("Email tiket + QR Code terkirim ke:", customerEmail);
+    } catch (err) {
+        console.error("Gagal kirim tiket:", err);
+    }
 };
 
 // ==========================================
