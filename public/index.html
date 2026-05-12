@@ -394,8 +394,8 @@
             <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav_explore">Jelajah</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html" data-i18n="nav_about">Tentang Kami</a></li>
-                    <li class="nav-item"><a class="nav-link" href="guide.html" data-i18n="nav_guide">Panduan & Bantuan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about" data-i18n="nav_about">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/guide" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
             <div class="d-flex align-items-center gap-1 gap-md-2 flex-nowrap">
@@ -404,7 +404,7 @@
                     <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
                 </button>                
                 <div id="navUserArea">
-                    <a href="user-login.html" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
+                    <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
                 </div>
             </div>
         </div>
@@ -474,16 +474,16 @@
             <div class="row g-4">
                 <div class="col-6 col-lg-3">
                     <div class="footer-head" data-i18n="footer_about">Tentang</div>
-                    <a href="about.html" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
-                    <a href="blog.html" class="footer-link">Blog</a>
-                    <a href="career.html" class="footer-link" data-i18n="footer_career">Karir</a>
-                    <a href="terms.html" class="footer-link">Syarat & Ketentuan</a>
-                    <a href="privacy.html" class="footer-link">Kebijakan Privasi</a>
+                    <a href="/about" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
+                    <a href="/blog" class="footer-link">Blog</a>
+                    <a href="/career" class="footer-link" data-i18n="footer_career">Karir</a>
+                    <a href="/terms" class="footer-link">Syarat & Ketentuan</a>
+                    <a href="/privacy" class="footer-link">Kebijakan Privasi</a>
                 </div>
                 <div class="col-6 col-lg-3">
                     <div class="footer-head" data-i18n="footer_organizer">Penyelenggara</div>
                     <a href="https://s.id/createeventrcellfest" class="footer-link" data-i18n="footer_create">Buat Event</a>
-                    <a href="guide.html" class="footer-link" data-i18n="footer_guide">Panduan</a>
+                    <a href="/guide" class="footer-link" data-i18n="footer_guide">Panduan</a>
                     <a href="/admin.html" class="footer-link text-warning">Login Admin</a>
                 </div>
                 <div class="col-lg-3">
@@ -785,14 +785,14 @@
                             <span class="small fw-bold text-truncate" style="max-width: 60px;">${user.username}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
-                            <li><a class="dropdown-item rounded-2 small" href="dashboard.html">${t.nav_my_ticket}</a></li>
+                            <li><a class="dropdown-item rounded-2 small" href="/dashboard">${t.nav_my_ticket}</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
                         </ul>
                     </div>
                 `;
             } else {
-                navArea.innerHTML = `<a href="user-login.html" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
+                navArea.innerHTML = `<a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
             }
         }
 
@@ -903,7 +903,7 @@ function renderEvents(data) {
                 const isDisabled = isSoldOut || isFinished || isComingSoon;
                 const namaAman = event.name ? event.name : "event";
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                const linkDetail = `detail.html?event=${eventSlug}&id=${event._id}`;
+                const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
 
                 return `
                 <div class="col-6 col-md-4 col-lg-3">
@@ -1125,7 +1125,7 @@ function renderEvents(data) {
                     confirmButtonText: 'Login', 
                     confirmButtonColor: '#0049CC' 
                 }).then((r) => { 
-                    if(r.isConfirmed) window.location.href = 'user-login.html'; 
+                    if(r.isConfirmed) window.location.href = '/user-login'; 
                 }); 
                 return; 
             }
@@ -1306,7 +1306,7 @@ function renderEvents(data) {
                             icon: 'success', 
                             title: 'Berhasil!', 
                             html: `Tiket: <b>${data.ticketCode}</b><br>Sisa Saldo: Rp ${data.sisaSaldo.toLocaleString('id-ID')}` 
-                        }).then(() => window.location.href = 'dashboard.html');
+                        }).then(() => window.location.href = '/dashboard');
                     } else { 
                         Swal.fire('Gagal', data.message || 'Pembayaran gagal', 'error'); 
                     }
