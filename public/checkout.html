@@ -209,7 +209,7 @@
             
             // Tendang ke halaman utama jika data tidak ada
             if (!userRaw || !checkoutRaw) {
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
 
@@ -228,7 +228,7 @@
             hitungTotal();
             
             // Ilusi URL
-            window.history.replaceState(null, '', `detail.html?checkout=true&id=${checkoutData.eventId}`);
+            window.history.replaceState(null, '', `/detail?checkout=true&id=${checkoutData.eventId}`);
         });
 
         function manualUpdateQty(val) { 
@@ -375,7 +375,7 @@
                         userData.saldo = data.sisaSaldo; 
                         localStorage.setItem('userData', JSON.stringify(userData)); 
                         localStorage.removeItem('checkoutData'); 
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = 'dashboard.html'); 
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = '/dashboard'); 
                     } else { 
                         Swal.fire('Gagal', data.message, 'error'); 
                         grecaptcha.reset(); // Reset captcha kalo error
@@ -440,7 +440,7 @@
                                 const saveData = await saveRes.json();
                                 if(saveData.success) { 
                                     localStorage.removeItem('checkoutData'); 
-                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = 'dashboard.html'); 
+                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
                                 }
                             },
                             onPending: function(result){ 
