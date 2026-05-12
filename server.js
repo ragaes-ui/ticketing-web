@@ -116,7 +116,9 @@ app.get('/logout', (req, res) => {
     }
 });
 // 👇 FOLDER PUBLIC (Di bawah pelindung admin)
-app.use(express.static(path.join(process.cwd(), 'public')));
+app.use(express.static(path.join(process.cwd(), 'public'), {
+    extensions: ['html'] // Otomatis ngebaca file .html tanpa perlu ditulis di URL
+}));
 
 // ==========================================
 // 🛠️ KONEKSI DATABASE
