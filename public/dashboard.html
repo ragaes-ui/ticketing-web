@@ -337,7 +337,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
                 <i class="bi bi-ticket-perforated-fill text-primary"></i> RCELLFEST
             </a>
             <div class="d-flex align-items-center gap-2">
@@ -348,7 +348,7 @@
                     <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
                 </button>
 
-                <a href="index.html" class="btn btn-glass btn-sm d-none d-md-block" data-i18n="nav_home">
+                <a href="/" class="btn btn-glass btn-sm d-none d-md-block" data-i18n="nav_home">
                     <i class="bi bi-house-door me-1"></i> Home
                 </a>
                 <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-4" data-i18n="nav_logout">
@@ -394,7 +394,7 @@
                     <button onclick="openPassModal()" class="btn btn-glass btn-sm" title="Ganti Password">
                         <i class="bi bi-key"></i>
                     </button>
-                    <a href="history.html" class="btn btn-glass btn-sm" title="Riwayat Login">
+                    <a href="/history" class="btn btn-glass btn-sm" title="Riwayat Login">
                         <i class="bi bi-clock-history"></i>
                     </a>
                 </div>
@@ -420,7 +420,7 @@
                 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold mb-0" style="color: var(--text-main);"><span data-i18n="section_assets">Aset Digital Saya</span></h4>
-                    <a href="index.html" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
+                    <a href="/" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
                 </div> 
                 
                 <style>
@@ -620,7 +620,7 @@
     <script>
         // --- CEK LOGIN ---
         let user = JSON.parse(localStorage.getItem('userData'));
-        if (!user) window.location.href = 'user-login.html';
+        if (!user) window.location.href = '/user-login';
 
         // --- SETUP AWAL ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1083,7 +1083,7 @@
                 const tickets = await res.json();
 
                 if(tickets.length === 0) {
-                    list.innerHTML = `<div class="col-12 text-center py-5"><i class="bi bi-ticket-perforated display-1 text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">${t.empty_tickets}</p><a href="index.html" class="btn btn-outline-primary btn-sm">${t.btn_buy_new}</a></div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5"><i class="bi bi-ticket-perforated display-1 text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">${t.empty_tickets}</p><a href="/" class="btn btn-outline-primary btn-sm">${t.btn_buy_new}</a></div>`;
                     return;
                 }
 
