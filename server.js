@@ -98,7 +98,7 @@ app.use(keycloak.middleware());
 // 🔒 RUTE TERKUNCI OLEH KEYCLOAK
 // ==========================================
 // Jika ada yang buka admin.html, harus lewat Keycloak dulu!
-app.get(['/admin', '/admin.html'] keycloak.protect(), (req, res) => {
+app.get(['/admin', '/admin.html'], keycloak.protect(), (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
 });
 app.get('/logout', (req, res) => {
