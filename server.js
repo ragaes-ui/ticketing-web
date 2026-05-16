@@ -205,6 +205,39 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
         console.error("Gagal kirim tiket:", err);
     }
 };
+// 📧 FUNGSI KIRIM NOTIFIKASI LOGIN
+const sendLoginEmail = async (userEmail, userName) => {
+    // Ambil waktu saat ini (WIB)
+    const loginTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+
+    const mailOptions = {
+        from: '"RCELLFEST Security" <' + process.env.EMAIL_USER + '>',
+        to: userEmail,
+        subject: 'Peringatan Keamanan: Login Baru Terdeteksi',
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                <div style="background-color: #dc3545; padding: 15px; text-align: center; color: white;">
+                    <h2 style="margin: 0;">Notifikasi Login</h2>
+                </div>
+                <div style="padding: 20px; color: #333;">
+                    <p>Halo <b>${userName}</b>,</p>
+                    <p>Kami mendeteksi adanya aktivitas login ke akun RCELLFEST Anda pada:</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; margin: 15px 0;">
+                        <p style="margin: 5px 0;"><b>Waktu:</b> ${loginTime} WIB</p>
+                    </div>
+                    <p>Jika ini adalah Anda, abaikan email ini. Namun jika Anda merasa tidak melakukan login, segera ganti password Anda.</p>
+                </div>
+            </div>`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log("Email notif login terkirim ke:", userEmail);
+    } catch (err) {
+        console.error("Gagal kirim notif login:", err);
+    }
+};
+
 
 // ==========================================
 // --- ROUTES API ---
@@ -318,7 +351,11 @@ app.post('/api/login', async (req, res) => {
             device: req.headers['user-agent'] || "Unknown Device",
             ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
         });
-
+                // 👇 2. TEMPATKAN FUNGSI EMAIL NOTIFIKASI DI SINI! 👇
+        // (Kita ambil nama lengkap user. Kalau kosong, pakai username-nya)
+        await sendLoginEmail(user.email, user.fullName || user.username);
+        // 👆 
+  
         res.json({ 
             success: true, 
             token: "token-rahasia-" + user._id, 
@@ -330,6 +367,7 @@ app.post('/api/login', async (req, res) => {
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
+
 
 app.post('/api/reset-password', async (req, res) => {
     try {
