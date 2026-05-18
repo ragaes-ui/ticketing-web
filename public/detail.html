@@ -226,7 +226,28 @@
                 document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
                 document.getElementById('elDesc').innerText = currentEvent.description || "Deskripsi belum tersedia.";
                 document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
-
+                // 👇 TARUH KODE BREADCRUMB DI SINI 👇
+        const breadcrumbContainer = document.getElementById('breadcrumb-container');
+        if (breadcrumbContainer && currentEvent) {
+            breadcrumbContainer.innerHTML = `
+                <div class="container">
+                    <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
+                        <ol class="breadcrumb mb-0" style="font-size: 16px; font-weight: 500;">
+                            <li class="breadcrumb-item">
+                                <a href="/" style="color: #2c3540; text-decoration: none;">Beranda</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <span style="color: #2c3540;">Event</span>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page" style="color: #1a1d21; font-weight: 800;">
+                                ${currentEvent.name}
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            `;
+        }
+        // 👆 ================================== 👆
                 let dateStr = "Tanggal TBA";
                 if (currentEvent.date) {
                     const d = new Date(currentEvent.date);
