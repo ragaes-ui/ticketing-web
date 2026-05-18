@@ -93,7 +93,7 @@
             </div>
         </div>
     </nav>
-<div id="breadcrumb-container" style="background-color: #bfa68f; padding: 15px 20px; margin-top: 70px;"></div>
+<div id="breadcrumb-container" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); margin-top: 70px;"></div>
     <div class="container pb-5" id="mainContainer" style="display: none;">
         <div class="event-hero" id="eventHero">
             <div class="event-hero-content">
@@ -228,18 +228,18 @@
                 document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
                 // 👇 TARUH KODE BREADCRUMB DI SINI 👇
         const breadcrumbContainer = document.getElementById('breadcrumb-container');
-        if (breadcrumbContainer && currentEvent) {
+if (breadcrumbContainer && currentEvent) {
             breadcrumbContainer.innerHTML = `
                 <div class="container">
                     <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
-                        <ol class="breadcrumb mb-0" style="font-size: 16px; font-weight: 500;">
+                        <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
                             <li class="breadcrumb-item">
-                                <a href="/" style="color: #2c3540; text-decoration: none;">Beranda</a>
+                                <a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a>
                             </li>
                             <li class="breadcrumb-item">
-                                <span style="color: #2c3540;">Event</span>
+                                <span style="color: var(--text-muted);">Event</span>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page" style="color: #1a1d21; font-weight: 800;">
+                            <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">
                                 ${currentEvent.name}
                             </li>
                         </ol>
