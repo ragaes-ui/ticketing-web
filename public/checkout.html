@@ -89,7 +89,7 @@
             <div class="fw-bold text-muted d-none d-md-block">Secure Checkout <i class="bi bi-lock-fill"></i></div>
         </div>
     </nav>
-<div id="breadcrumb-container" style="background-color: #bfa68f; padding: 15px 20px; margin-bottom: 25px;"></div>
+<div id="breadcrumb-container" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 25px;"></div>
     <div class="container pb-5">
         <h2 class="fw-bold mb-4">Selesaikan Pembayaran</h2>
         
@@ -231,25 +231,25 @@
             // Kita tambahkan console.log buat ngecek kalau ada error
         console.log("Wadah Breadcrumb:", breadcrumbContainer);
         console.log("Data Checkout:", checkoutData);
-            if (breadcrumbContainer && checkoutData) {
-                breadcrumbContainer.innerHTML = `
-                    <div class="container">
-                        <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
-                            <ol class="breadcrumb mb-0" style="font-size: 16px; font-weight: 500;">
-                                <li class="breadcrumb-item">
-                                    <a href="/" style="color: #3b4550; text-decoration: none;">Beranda</a>
-                                </li>
-                                <li class="breadcrumb-item">
-                                    <a href="/detail?id=${checkoutData.eventId}" style="color: #3b4550; text-decoration: none;">${checkoutData.eventName}</a>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page" style="color: #2c3540; font-weight: 700;">
-                                    Checkout
-                                </li>
-                            </ol>
-                        </nav>
-                    </div>
-                `;
-            }
+if (breadcrumbContainer && checkoutData) {
+            breadcrumbContainer.innerHTML = `
+                <div class="container">
+                    <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
+                        <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
+                            <li class="breadcrumb-item">
+                                <a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/detail?id=${checkoutData.eventId}" style="color: var(--text-muted); text-decoration: none;">${checkoutData.eventName}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">
+                                Checkout
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            `;
+        }
             // 👆 ======================= 👆
             
             // Ilusi URL
