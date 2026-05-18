@@ -228,6 +228,9 @@
             hitungTotal();
             // 👇 KODE BREADCRUMB CHECKOUT 👇
             const breadcrumbContainer = document.getElementById('breadcrumb-container');
+            // Kita tambahkan console.log buat ngecek kalau ada error
+        console.log("Wadah Breadcrumb:", breadcrumbContainer);
+        console.log("Data Checkout:", checkoutData);
             if (breadcrumbContainer && checkoutData) {
                 breadcrumbContainer.innerHTML = `
                     <div class="container">
