@@ -368,23 +368,21 @@
         .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
         .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
-/* --- GAYA SLIDE WIDE BANNER ALA GOERS --- */
-        .hero-slider-wide { border-radius: 20px; background: var(--bg-card); position: relative; margin-bottom: 40px; }
-        .hero-slider-wide img { aspect-ratio: 21/7; object-fit: cover; width: 100%; border-radius: 20px; }
+/* --- GAYA BACKGROUND SLIDER RAKSASA --- */
+        .hero-slider-bg { height: 500px; width: 100%; position: relative; margin-bottom: 40px; }
+        .hero-slider-bg .carousel, .hero-slider-bg .carousel-inner, .hero-slider-bg .carousel-item { height: 100%; }
+        .hero-slider-bg img { height: 100%; width: 100%; object-fit: cover; }
         
-        /* Tombol Navigasi Bulat Melayang */
-        .custom-nav-btn { width: 45px; height: 45px; background: white; border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 15; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #333; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .custom-nav-btn.prev-btn { left: -20px; }
-        .custom-nav-btn.next-btn { right: -20px; }
-        .custom-nav-btn:hover { background: var(--primary); color: white; transform: translateY(-50%) scale(1.1); }
-        [data-theme="dark"] .custom-nav-btn { background: #1e293b; color: white; }
+        /* Lapisan hitam transparan */
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2; pointer-events: none; }
         
-        /* Titik Indikator di Bawah */
-        .custom-indicators { position: absolute; bottom: -35px; margin: 0; padding: 0; display: flex; justify-content: center; gap: 8px; width: 100%; left: 0; }
-        .custom-indicators button { width: 10px !important; height: 10px !important; border-radius: 50% !important; background-color: #cbd5e1 !important; border: none !important; opacity: 1 !important; transition: 0.3s !important; margin: 0 !important; }
-        .custom-indicators button.active { background-color: var(--primary) !important; transform: scale(1.3) !important; }
+        /* Teks & Search di tengah layar */
+        .hero-overlay-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
         
-        @media (max-width: 768px) { .hero-slider-wide img { aspect-ratio: 16/9; } .custom-nav-btn { display: none; } }  
+        /* Biar search box & tombol tetep bisa diklik */
+        .hero-overlay-content .container { pointer-events: auto; }
+        
+        @media (max-width: 768px) { .hero-slider-bg { height: 450px; } } 
     </style>
 </head>
 <body>
@@ -425,19 +423,37 @@
         </div>
     </nav>
 
-<section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
-        <div class="hero-bg-circle"></div>
-        <div class="container position-relative z-1">
-            <h1 class="hero-title mb-3" data-i18n="hero_title">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
-            <p class="hero-lead opacity-75 mb-4" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
-            
-            <div class="search-box mx-auto position-relative z-3">
-                <i class="bi bi-search text-secondary ms-2"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
-                <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
+<div class="hero-slider-bg">
+        <div id="heroBgSlider" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner" id="heroSliderContent">
+                <div class="carousel-item active">
+                    <div class="w-100 h-100 bg-secondary d-flex justify-content-center align-items-center">
+                        <div class="spinner-border text-white" role="status"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-overlay-content text-center">
+            <div class="container px-3">
+                <h1 class="hero-title mb-3 text-white fw-bold" data-i18n="hero_title" style="text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                    Satu sentuhan,<br>Untuk semua solusi event anda.
+                </h1>
+                <p class="hero-lead text-light mb-4" data-i18n="hero_subtitle" style="text-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                    Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.
+                </p>
+                
+                <div class="search-box mx-auto shadow-lg">
+                    <i class="bi bi-search text-secondary ms-2"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
+                    <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
 
     <div class="container position-relative z-2" style="margin-top: -40px;">
         <div id="heroEventSlider" class="carousel slide hero-slider-wide shadow-lg" data-bs-ride="carousel">
@@ -980,38 +996,33 @@ function renderEvents(data) {
         }
 function updateHeroSlider(data) {
             const sliderContainer = document.getElementById('heroSliderContent');
-            const indicatorContainer = document.getElementById('heroSliderIndicators');
             if (!sliderContainer || data.length === 0) return;
 
-            // Ambil maksimal 5 event aktif
+            // Ambil 5 event aktif
             const slideEvents = data.filter(e => e.availableSeats !== -2).slice(0, 5);
             if (slideEvents.length === 0) return;
 
             let html = '';
-            let indicatorsHtml = '';
-
             slideEvents.forEach((event, index) => {
                 const imageUrl = getEventImage(event);
                 const namaAman = event.name ? event.name : "event";
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
-
-                // Bikin Titik Indikator
-                indicatorsHtml += `<button type="button" data-bs-target="#heroEventSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}"></button>`;
-
-                // Bikin Gambar Slide
+                
                 html += `
                     <div class="carousel-item ${index === 0 ? 'active' : ''}" data-bs-interval="4000" style="cursor: pointer;" onclick="window.location.href='${linkDetail}'">
-                        <img src="${imageUrl}" class="d-block w-100" alt="${event.name}">
-                        <div class="carousel-caption d-none d-md-block" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); left: 0; right: 0; bottom: 0; padding: 20px; border-radius: 0 0 20px 20px;">
-                            <h5 class="mb-0 fw-bold text-white text-start px-4">${event.name}</h5>
+                        <img src="${imageUrl}" alt="${event.name}">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-start d-none d-md-block" style="z-index: 3; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+                            <div class="container">
+                                <h5 class="text-white mb-0 fw-bold">${event.name}</h5>
+                                <small class="text-light"><i class="bi bi-geo-alt-fill text-danger"></i> ${event.location || 'Lokasi TBA'}</small>
+                            </div>
                         </div>
                     </div>
                 `;
             });
 
             sliderContainer.innerHTML = html;
-            if(indicatorContainer) indicatorContainer.innerHTML = indicatorsHtml;
         }
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
