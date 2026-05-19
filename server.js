@@ -165,6 +165,17 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
     // Generate URL QR Code otomatis berdasarkan Kode Tiket
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticketData.ticketCode}`;
 
+    // 🔥 LOGIKA BARU: Bikin kotak data rahasia jika produk mengandung secretData 🔥
+    let secretDataBlock = '';
+    if (ticketData.secretData) {
+        secretDataBlock = `
+            <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffe69c; border-left: 5px solid #ffc107; border-radius: 8px; text-align: left;">
+                <p style="margin: 0 0 5px 0; font-size: 11px; font-weight: bold; color: #664d03; letter-spacing: 0.5px;">🔒 DATA RAHASIA / CREDENTIALS:</p>
+                <p style="margin: 0; font-size: 14px; font-family: monospace; color: #000; white-space: pre-wrap; line-height: 1.4;"><b>${ticketData.secretData}</b></p>
+            </div>
+        `;
+    }
+
     const mailOptions = {
         from: '"RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
         to: customerEmail,
@@ -183,7 +194,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                         <h3 style="margin-top: 15px; color: #333; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h3>
                     </div>
 
-                    <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
+                    ${secretDataBlock} <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
                         <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
@@ -608,7 +619,8 @@ app.post('/api/buy-ticket', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: ticketCode
+            ticketCode: ticketCode,
+            secretData: event.secretData
         });
 
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
@@ -691,7 +703,8 @@ app.post('/api/midtrans-success', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: ticketCode
+            ticketCode: ticketCode,
+            secretData: event.secretData
         });
 
         res.json({ success: true, ticketCode });
