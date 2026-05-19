@@ -1112,7 +1112,10 @@
                         : `<span class="badge bg-success rounded-pill">${t.status_active}</span>`;
 
                     let descText = event.description || "";
-                    let descClean = descText.replace(/\n/g, " | "); 
+                    let descClean = descText.replace(/\n/g, " | ");
+                    // Tarik data rahasia
+                    let secretText = event.secretData || "Akun belum tersedia / Hubungi Admin.";
+                    let secretClean = secretText.replace(/\n/g, " | ");
                     
                     const pemesanName = ticket.customerName || user.fullName || user.username;
                     const pemesanPhone = ticket.phone || '-';
@@ -1123,7 +1126,8 @@
 
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
-                        code: ticket.ticketCode, isStreaming: isStreaming, desc: descText, 
+                        code: ticket.ticketCode, isStreaming: isStreaming, desc: descText,
+                        secretData: secretText, // <--- TAMBAHAN
                         buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
                         tierName: tierName, 
                         quantity: qty
@@ -1355,12 +1359,13 @@ async function prosesTransfer() {
             let contentMiddle = '';
             let labelType = data.isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
             
-            if (data.isStreaming) {
-                const desc = data.desc ? data.desc : "Detail akun tidak tersedia.";
+if (data.isStreaming) {
+                // Ubah data.desc menjadi data.secretData
+                const secretInfo = data.secretData ? data.secretData : "Detail akun tidak tersedia.";
                 contentMiddle = `
                     <div style="border: 2px solid #000; padding: 15px; margin: 20px 0; text-align: left; background-color: #f8f9fa;">
                         <p style="margin:0; font-size: 12px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
-                        <p style="margin:10px 0 0 0; font-size: 14px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${desc}</p>
+                        <p style="margin:10px 0 0 0; font-size: 14px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${secretInfo}</p>
                     </div>`;
             } else {
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
