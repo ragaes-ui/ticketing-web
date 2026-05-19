@@ -164,8 +164,7 @@
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
         .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
         
-        .search-wrapper { margin-top: -45px; position: relative; z-index: 10; padding: 0 15px; }
-        .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 8px 25px var(--shadow-color); display: flex; align-items: center; width: 100%; max-width: 700px; margin: 0 auto; }
+       .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; width: 100%; max-width: 700px; }
         .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
         [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
         .btn-search { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
@@ -410,21 +409,39 @@
         </div>
     </nav>
 
-    <section class="hero-section text-center">
+<section class="hero-section position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); overflow: hidden; margin-bottom: 30px;">
         <div class="hero-bg-circle"></div>
         <div class="container position-relative z-1">
-            <h1 class="hero-title mb-2" data-i18n="hero_title">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
-            <p class="hero-lead opacity-75 mb-0" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
+            <div class="row align-items-center">
+                <div class="col-lg-7 text-center text-lg-start mb-5 mb-lg-0 pe-lg-5">
+                    <h1 class="hero-title mb-3" data-i18n="hero_title">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
+                    <p class="hero-lead opacity-75 mb-4" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
+                    <div class="search-box mx-auto mx-lg-0">
+                        <i class="bi bi-search text-secondary ms-2"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
+                        <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div id="heroEventSlider" class="carousel slide carousel-fade shadow-lg rounded-4 overflow-hidden" data-bs-ride="carousel" style="border: 4px solid rgba(255,255,255,0.2);">
+                        <div class="carousel-inner" id="heroSliderContent">
+                            <div class="carousel-item active">
+                                <div class="d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3; background: rgba(255,255,255,0.1);">
+                                    <div class="spinner-border text-white" role="status"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroEventSlider" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroEventSlider" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
-
-    <div class="search-wrapper mb-4">
-        <div class="search-box">
-            <i class="bi bi-search text-secondary ms-2"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
-            <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
-        </div>
-    </div>
 
     <div class="container">
         <div class="row justify-content-center mb-5 g-2 px-2">
@@ -812,6 +829,7 @@ async function loadEvents() {
                 
                 allEvents = dataEventCetak;
                 renderEvents(allEvents);
+                updateHeroSlider(allEvents); // <-- INI TAMBAHANNYA
             } catch (err) { 
                 console.error("Gagal memuat event:", err);
                 const lang = localStorage.getItem('lang') || 'id';
@@ -941,7 +959,38 @@ function renderEvents(data) {
                 soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event); });
             }
         }
+function updateHeroSlider(data) {
+            const sliderContainer = document.getElementById('heroSliderContent');
+            if (!sliderContainer || data.length === 0) return;
 
+            // Ambil 5 event aktif (bukan coming soon) untuk ditaruh di slider
+            const slideEvents = data.filter(e => e.availableSeats !== -2).slice(0, 5);
+            
+            if (slideEvents.length === 0) return;
+
+            let html = '';
+            slideEvents.forEach((event, index) => {
+                const imageUrl = getEventImage(event);
+                const locationName = event.location || 'Lokasi TBA';
+                
+                // Link supaya gambar kalau diklik langsung masuk ke detail
+                const namaAman = event.name ? event.name : "event";
+                const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
+
+                html += `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}" data-bs-interval="4000" style="cursor: pointer;" onclick="window.location.href='${linkDetail}'">
+                        <img src="${imageUrl}" class="d-block w-100" alt="${event.name}" style="aspect-ratio: 4/3; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block" style="background: rgba(0,0,0,0.6); border-radius: 10px; padding: 10px; bottom: 20px; left: 10%; right: 10%; backdrop-filter: blur(5px);">
+                            <h6 class="mb-0 fw-bold text-white">${event.name}</h6>
+                            <small class="text-light">${locationName}</small>
+                        </div>
+                    </div>
+                `;
+            });
+
+            sliderContainer.innerHTML = html;
+        }
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
