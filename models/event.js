@@ -38,7 +38,12 @@ const eventSchema = new mongoose.Schema({
         type: String, 
         default: "" 
     },
-    
+    // 🔥 TAMBAHAN BARU: DATA RAHASIA (STREAMING) 🔥
+    // Berisi Email & Password yang HANYA muncul setelah user bayar
+    secretData: {
+        type: String,
+        default: ""
+    },
     // Kategori: 'Konser', 'Olahraga', 'Workshop', 'Streaming'
     category: { 
         type: String, 
