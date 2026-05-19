@@ -327,6 +327,10 @@
                 <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_desc">Deskripsi</label>
                 <div class="mb-3"><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
+
+                <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Streaming)</label>
+                <div class="mb-3"><textarea id="editSecretData" class="form-control border-danger" rows="2"></textarea></div>
+                
                 <div id="editTiers" class="mb-4 mt-3 pt-3 border-top border-secondary"></div>
                 <button onclick="saveEdit()" class="btn btn-primary w-100 rounded-pill py-2" data-i18n="btn_save">Simpan Perubahan</button>
             </div>
@@ -682,6 +686,7 @@ function previewImage(u, i) {
             if(ev) {
                 document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
+                document.getElementById('editSecretData').value = ev.secretData || '';
                 if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
                 document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
@@ -695,6 +700,7 @@ function previewImage(u, i) {
             const data = {
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value,
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
+                secretData: document.getElementById('editSecretData').value,
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
             };
