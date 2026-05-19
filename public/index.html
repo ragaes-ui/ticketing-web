@@ -368,7 +368,19 @@
         .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
         .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
-        
+  /* Gaya khusus untuk slider di Hero Section */
+        .hero-slider-card {
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 4px solid rgba(255,255,255,0.15);
+            background-color: var(--bg-card);
+        }
+        .hero-slider-card img {
+            aspect-ratio: 16/9; /* Bikin gambarnya melebar pas (landscape) */
+            object-fit: cover; /* Biar gambar nggak gepeng */
+            width: 100%;
+        }      
     </style>
 </head>
 <body>
