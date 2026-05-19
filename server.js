@@ -284,10 +284,11 @@ app.get('/api/events/:id', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, date, price, capacity, description, category, location, tickets } = req.body;
+        const { name, date, price, capacity, description, category, location, tickets, secretData } = req.body;
         const newEvent = new Event({
             name, date, price, totalCapacity: capacity, availableSeats: capacity,
             description: description || "", category: category || "General", location: location || "TBA",
+            secretData: secretData || "", // 🔥 Pastikan ikut tersimpan!
             tickets: tickets || []
         });
         await newEvent.save();
