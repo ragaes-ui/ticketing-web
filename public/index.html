@@ -374,8 +374,7 @@
         .hero-slider-bg img { height: 100%; width: 100%; object-fit: cover; }
         
         /* Lapisan hitam transparan */
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2; pointer-events: none; }
-        
+.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 100%); z-index: 2; pointer-events: none; }        
         /* Teks & Search di tengah layar */
         .hero-overlay-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
         
@@ -438,21 +437,20 @@
 
         <div class="hero-overlay-content text-center">
             <div class="container px-3">
-                <h1 class="hero-title mb-3 text-white fw-bold" data-i18n="hero_title" style="text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                <h1 class="hero-title mb-3 text-white fw-bold" data-i18n="hero_title" style="text-shadow: 0 4px 10px rgba(0,0,0,0.8); line-height: 1.5 !important;">
                     Satu sentuhan,<br>Untuk semua solusi event anda.
                 </h1>
-                <p class="hero-lead text-light mb-4" data-i18n="hero_subtitle" style="text-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                <p class="hero-lead text-light mb-4" data-i18n="hero_subtitle" style="text-shadow: 0 2px 5px rgba(0,0,0,0.8); font-size: 1.1rem;">
                     Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.
                 </p>
                 
-                <div class="search-box mx-auto shadow-lg">
+                <div class="search-box mx-auto shadow-lg mt-4">
                     <i class="bi bi-search text-secondary ms-2"></i>
                     <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
                     <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
                 </div>
             </div>
         </div>
-    </div>
     <div class="container">
 
     <div class="container position-relative z-2" style="margin-top: -40px;">
