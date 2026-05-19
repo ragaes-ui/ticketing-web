@@ -1003,10 +1003,24 @@ function renderEvents(data) {
 function updateHeroSlider(data) {
             const sliderContainer = document.getElementById('heroSliderContent');
             const indicatorContainer = document.getElementById('heroSliderIndicators');
-            if (!sliderContainer || data.length === 0) return;
+            const sliderWrapper = document.getElementById('heroEventSlider'); // Ambil bungkus utamanya
+            
+            if (!sliderContainer || !sliderWrapper || data.length === 0) {
+                if(sliderWrapper) sliderWrapper.style.display = 'none'; // Sembunyikan kalau kosong
+                return;
+            }
 
+            // Ambil maksimal 5 event aktif
             const slideEvents = data.filter(e => e.availableSeats !== -2).slice(0, 5);
-            if (slideEvents.length === 0) return;
+            
+            // Kalau ternyata nggak ada event aktif sama sekali, hilangkan slidernya
+            if (slideEvents.length === 0) {
+                sliderWrapper.style.display = 'none'; 
+                return;
+            }
+
+            // Kalau ada isinya, pastikan slidernya tampil
+            sliderWrapper.style.display = 'block';
 
             let html = '';
             let indicatorsHtml = '';
