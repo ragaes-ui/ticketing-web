@@ -158,7 +158,7 @@
         [data-theme="dark"] .nav-link { color: #e2e8f0; }
         [data-theme="dark"] .nav-link:hover { color: var(--primary); }
 
-        .hero-section { background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 60px 0 100px 0; color: white; position: relative; width: 100%; margin: 0; }
+        .hero-section { background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 60px 0 50px 0; color: white; position: relative; width: 100%; margin: 0; }
         .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
         @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
@@ -377,7 +377,7 @@
             background-color: var(--bg-card);
         }
         .hero-slider-card img {
-            aspect-ratio: 16/9; /* Bikin gambarnya melebar pas (landscape) */
+            aspect-ratio: 4/3; /* Bikin gambarnya melebar pas (landscape) */
             object-fit: cover; /* Biar gambar nggak gepeng */
             width: 100%;
         }      
@@ -443,10 +443,10 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#heroEventSlider" data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroEventSlider" data-bs-slide="prev" style="background: linear-gradient(to right, rgba(0,0,0,0.5), transparent); width: 10%;">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#heroEventSlider" data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroEventSlider" data-bs-slide="next" style="background: linear-gradient(to left, rgba(0,0,0,0.5), transparent); width: 10%;">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         </button>
                     </div>
