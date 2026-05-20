@@ -177,7 +177,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
     }
 
     const mailOptions = {
-        from: '"RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
+        from: '"No-Reply - RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
         to: customerEmail,
         subject: `E-Tiket RCELLFEST: ${ticketData.eventName}`,
         html: `
@@ -222,7 +222,7 @@ const sendLoginEmail = async (userEmail, userName) => {
     const loginTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
     const mailOptions = {
-        from: '"RCELLFEST Security" <' + process.env.EMAIL_USER + '>',
+        from: '"No-Reply - RCELLFEST Security" <' + process.env.EMAIL_USER + '>',
         to: userEmail,
         subject: 'Peringatan Keamanan: Login Baru Terdeteksi',
         html: `
