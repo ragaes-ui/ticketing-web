@@ -233,7 +233,12 @@ async function loadEventDetail(id) {
                 document.getElementById('elTitle').innerText = currentEvent.name;
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
                 document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
-                document.getElementById('elDesc').innerText = currentEvent.description || "Deskripsi belum tersedia.";
+                // --- UBAH TEKS JADI LINK BISA DIKLIK ---
+                const rawDesc = currentEvent.description || "Deskripsi belum tersedia.";
+                const urlRegex = /(https?:\/\/[^\s]+)/g; // Rumus pendeteksi tulisan "http://" atau "https://"
+                const linkedDesc = rawDesc.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${url}</a>`);
+                
+                document.getElementById('elDesc').innerHTML = linkedDesc;
                 document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
                 
                 const breadcrumbContainer = document.getElementById('breadcrumb-container');
