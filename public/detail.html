@@ -94,6 +94,11 @@
         </div>
     </nav>
 <div id="breadcrumb-container" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);"></div>
+    <div class="container mt-5 pt-5 text-center" id="loadingDataContainer">
+        <div class="spinner-border text-primary mt-5" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h4 class="mt-3 fw-bold" style="color: var(--text-muted);">Sedang Memuat Data Event...</h4>
+        <p class="text-white-50 small">Mohon tunggu sebentar ya.</p>
+    </div>
     <div class="container pb-5" id="mainContainer" style="display: none;">
         <div class="event-hero" id="eventHero">
             <div class="event-hero-content">
@@ -212,42 +217,40 @@
             return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop";
         }
 
-        async function loadEventDetail(id) {
+async function loadEventDetail(id) {
+            // 1. Tampilkan Loading Data, Sembunyikan Konten
+            document.getElementById('loadingDataContainer').style.display = 'block';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('errorContainer').style.display = 'none';
+
             try {
                 const res = await fetch(`/api/events/${id}`);
                 if (!res.ok) throw new Error("Event tidak ditemukan");
                 
                 currentEvent = await res.json();
-                document.getElementById('mainContainer').style.display = 'block';
                 
-                // Render Info Event
+                // 2. Isi Semua Data ke HTML
                 document.getElementById('elTitle').innerText = currentEvent.name;
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
                 document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
                 document.getElementById('elDesc').innerText = currentEvent.description || "Deskripsi belum tersedia.";
                 document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
-                // 👇 TARUH KODE BREADCRUMB DI SINI 👇
-        const breadcrumbContainer = document.getElementById('breadcrumb-container');
-if (breadcrumbContainer && currentEvent) {
-            breadcrumbContainer.innerHTML = `
-                <div class="container">
-                    <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
-                        <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
-                            <li class="breadcrumb-item">
-                                <a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <span style="color: var(--text-muted);">Event</span>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">
-                                ${currentEvent.name}
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            `;
-        }
-        // 👆 ================================== 👆
+                
+                const breadcrumbContainer = document.getElementById('breadcrumb-container');
+                if (breadcrumbContainer && currentEvent) {
+                    breadcrumbContainer.innerHTML = `
+                        <div class="container">
+                            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
+                                <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
+                                    <li class="breadcrumb-item"><a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a></li>
+                                    <li class="breadcrumb-item"><span style="color: var(--text-muted);">Event</span></li>
+                                    <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">${currentEvent.name}</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    `;
+                }
+                
                 let dateStr = "Tanggal TBA";
                 if (currentEvent.date) {
                     const d = new Date(currentEvent.date);
@@ -256,8 +259,31 @@ if (breadcrumbContainer && currentEvent) {
                 document.getElementById('elDate').innerText = dateStr;
 
                 renderTickets();
+
+                // 3. Sembunyikan Loading, Tampilkan Konten Asli
+                document.getElementById('loadingDataContainer').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                
+                const loader = document.getElementById('preloader');
+                if (loader) {
+                    loader.classList.add('hide-loader');
+                    setTimeout(() => loader.style.display = 'none', 800);
+                }
+
             } catch (error) {
                 showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loadingDataContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('errorContainer').style.display = 'block';
+            
+            const loader = document.getElementById('preloader');
+            if (loader) {
+                loader.classList.add('hide-loader');
+                setTimeout(() => loader.style.display = 'none', 800);
             }
         }
 
