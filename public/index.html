@@ -1050,7 +1050,11 @@ function updateHeroSlider(data) {
             if (event.category === 'Streaming') { 
                 safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; 
             }
-            document.getElementById('modalDesc').innerText = safeDescription;
+            // --- UBAH TEKS JADI LINK BISA DIKLIK ---
+            const urlRegex = /(https?:\/\/[^\s]+)/g; // Rumus pendeteksi tulisan "http://" atau "https://"
+            const linkedDesc = safeDescription.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${url}</a>`);
+            
+            document.getElementById('modalDesc').innerHTML = linkedDesc;
 
             const btnBuy = document.getElementById('btnModalBuy');
             const priceTag = document.getElementById('modalPrice');
