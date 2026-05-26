@@ -232,7 +232,7 @@ async function loadEventDetail(id) {
                 console.log("DATA EVENT DARI SERVER:", currentEvent);
                 // 2. Isi Semua Data ke HTML
                 document.getElementById('elTitle').innerText = currentEvent.name;
-                document.getElementById('elOrganizer').innerText = "By: " + (currentEvent.organizer || "RCELLFEST");
+                document.getElementById('elOrganizer').innerText = "Creator: " + (currentEvent.organizer || "RCELLFEST");
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
                 // --- LOGIKA MENGUBAH LOKASI MENJADI LINK MAPS ---
                 const venueElement = document.getElementById('elVenue');
