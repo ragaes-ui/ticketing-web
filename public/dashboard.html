@@ -1117,6 +1117,7 @@
                     let secretText = event.secretData || "Akun belum tersedia / Hubungi Admin.";
                     let secretClean = secretText.replace(/\n/g, " | ");
                     
+// --- HAPUS DAN GANTI MULAI DARI SINI ---
                     const pemesanName = ticket.customerName || user.fullName || user.username;
                     const pemesanPhone = ticket.phone || '-';
                     const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
@@ -1127,33 +1128,51 @@
                     const ticketData = encodeURIComponent(JSON.stringify({
                         eventName: event.name, date: dateStr, location: event.location || 'TBA',
                         code: ticket.ticketCode, isStreaming: isStreaming, desc: descText,
-                        secretData: secretText, // <--- TAMBAHAN
+                        secretData: secretText,
                         buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
                         tierName: tierName, 
                         quantity: qty
                     }));
 
-                    let mainContent = '';
-                    // 1. CUKUP SATU KALI DEKLARASI LOCATION DI SINI
-                    let locationHTML = `<span class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'}</span>`;
+                    // Konfigurasi Lokasi & Maps
+                    let locationText = event.location || 'TBA';
+                    let mapsQuery = encodeURIComponent(locationText);
+                    
+                    // Link lokasi (untuk bagian atas tiket)
+                    let locationLinkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
                     if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
-                        locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline;">
-                                            <i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'} 
-                                            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
-                                        </a>`;
+                        locationLinkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
+                                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
+                                                <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
+                                            </a>`;
                     }
-                    mainContent += `
+
+                    // Peta Maps (untuk dimasukkan ke dalam Grid)
+                    let mapsHTML = '';
+                    if (!isStreaming && locationText !== 'TBA') {
+                        mapsHTML = `
+                            <div style="grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 15px; margin-top: 5px;">
+                                <div class="info-label mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Peta Lokasi</div>
+                                <div style="border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 45%; height: 0;">
+                                    <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                                        allowfullscreen="" loading="lazy">
+                                    </iframe>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Susunan Isi Grid yang sudah diperbaiki
+                    let mainContent = `
                         <div class="ticket-info-grid">
                             <div>
                                 <div class="info-label">Nama Pemesan</div>
                                 <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
                             </div>
+                            <div>
                                 <div class="info-label">Tipe Tiket</div>
-                                <div class="info-value text-primary fw-bold">${tierName}</div>
-                            </div>
-                            <div style="grid-column: span 2;">
-                            <div class="info-label">Lokasi</div>
-                            <div class="info-value">${locationHTML}</div>
+                                <div class="info-value text-primary fw-bold" style="word-break: break-word; font-size: 0.85rem;">${tierName}</div>
                             </div>
                             <div>
                                 <div class="info-label">Jumlah</div>
@@ -1167,10 +1186,11 @@
                                 <div class="info-label">Total Harga</div>
                                 <div class="info-value">Rp ${hargaTiket.toLocaleString('id-ID')}</div>
                             </div>
+                            ${mapsHTML}
                         </div>
                     `;
 
-if (isStreaming) {
+                    if (isStreaming) {
                         mainContent += `
                             <div class="account-box mt-3">
                                 <small class="d-block mb-1 opacity-75">${t.lbl_credentials}</small>
@@ -1208,7 +1228,6 @@ if (isStreaming) {
                         `;
                     }
 
-
                     htmlContent += `
                     <div class="col-md-6 col-lg-4 ticket-card-wrapper">
                             <div class="ticket-card h-100">
@@ -1221,15 +1240,17 @@ if (isStreaming) {
                                 </div>
                                 <div class="ticket-body">
                                     <span class="ticket-date mb-1" style="display: block;"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
-                                    <span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationHTML}</span>
+                                    <span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationLinkHTML}</span>
                                     
                                     ${mainContent}
+                                    
                                     <div class="mt-3">${statusBadge}</div>
                                     <div class="ticket-code mt-2">${ticket.ticketCode}</div>
                                 </div>
                             </div>
                         </div>
                     `;
+                    // --- SAMPAI SINI SAJA GANTINYA ---
                 });
                 list.innerHTML = htmlContent;
             } catch (err) { 
