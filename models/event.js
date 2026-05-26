@@ -49,6 +49,10 @@ const eventSchema = new mongoose.Schema({
         type: String, 
         default: 'General' 
     },
+    organizer: {
+        type: String,
+        default: ""
+    },
     
     // Lokasi: Nama Gedung (Event) atau Platform (Streaming)
     location: { 
