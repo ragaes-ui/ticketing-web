@@ -1198,6 +1198,12 @@ if (isStreaming) {
                         `;
                     }
 
+                    // --- LOGIKA LOKASI & LINK MAPS ---
+                    let locationHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${event.location || 'Lokasi TBA'}</span>`;
+                    if (event.mapsUrl) {
+                        locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${event.location || 'Lokasi TBA'} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i></a>`;
+                    }
+
                     htmlContent += `
                     <div class="col-md-6 col-lg-4 ticket-card-wrapper">
                             <div class="ticket-card h-100">
@@ -1209,7 +1215,9 @@ if (isStreaming) {
                                     <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
                                 </div>
                                 <div class="ticket-body">
-                                    <span class="ticket-date"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
+                                    <span class="ticket-date mb-1" style="display: block;"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
+                                    <span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationHTML}</span>
+                                    
                                     ${mainContent}
                                     <div class="mt-3">${statusBadge}</div>
                                     <div class="ticket-code mt-2">${ticket.ticketCode}</div>
