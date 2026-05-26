@@ -104,11 +104,12 @@
             <div class="event-hero-content">
                 <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill" id="elCategory">General</span>
                 <h1 class="fw-bold mb-2 text-white" id="elTitle" style="font-size: 2.5rem; line-height: 1.2;">Memuat Event...</h1>
-                <div class="d-flex flex-wrap gap-3 mt-3 text-light opacity-75 fw-500">
-                    <div><i class="bi bi-calendar-event me-1"></i> <span id="elDate">TBA</span></div>
-                    <div><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="elVenue">TBA</span></div>
-                    <div><i class="bi bi-building-fill text-warning me-1"></i> <span id="elOrganizer">Penyelenggara TBA</span></div>
-                </div>
+<div class="d-flex flex-wrap gap-3 mt-3 text-light opacity-75 fw-500">
+    <div><i class="bi bi-calendar-event me-1"></i> <span id="elDate">TBA</span></div>
+    <div><i class="bi bi-clock-fill text-info me-1"></i> <span id="elTime">TBA</span></div>
+    <div><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="elVenue">TBA</span></div>
+    <div><i class="bi bi-building-fill text-warning me-1"></i> <span id="elOrganizer">Penyelenggara TBA</span></div>
+</div>
             </div>
         </div>
 
@@ -266,12 +267,25 @@ async function loadEventDetail(id) {
                     `;
                 }
                 
-                let dateStr = "Tanggal TBA";
-                if (currentEvent.date) {
-                    const d = new Date(currentEvent.date);
-                    dateStr = d.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
-                }
-                document.getElementById('elDate').innerText = dateStr;
+let dateStr = "Tanggal TBA";
+let timeStr = "Jam TBA";
+
+if (currentEvent.date) {
+    const d = new Date(currentEvent.date);
+    // Format tanggal
+    dateStr = d.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+    
+    // Format jam menjadi 24-hour (contoh: 19:30) dan tambahkan WIB
+    timeStr = d.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) + ' WIB';
+    
+    // Jika di databasemu ada field khusus untuk jam (contoh: currentEvent.time), pakai baris di bawah ini:
+    if (currentEvent.time) {
+        timeStr = currentEvent.time + ' WIB';
+    }
+}
+
+document.getElementById('elDate').innerText = dateStr;
+document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTML
 
                 renderTickets();
 
