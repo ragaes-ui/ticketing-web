@@ -1136,27 +1136,28 @@
 
 // Konfigurasi Lokasi & Maps
                     let locationText = event.location || 'TBA';
-                    // Bersihkan spasi dan ubah ke huruf kecil untuk pengecekan (bisa deteksi "Coming soon", "comingsoon", atau "TBA")
                     let locCheck = locationText.toLowerCase().replace(/\s/g, ''); 
                     let mapsQuery = encodeURIComponent(locationText);
                     
-                    // Link lokasi (untuk bagian atas tiket)
-                    let locationLinkHTML = '';
-                    
-                    // Hanya dirender JIKA bukan TBA dan bukan Comingsoon
+                    // Siapkan Baris Tabel untuk Lokasi (Disembunyikan jika TBA/Comingsoon)
+                    let gridLokasiHTML = '';
                     if (locCheck !== 'tba' && locCheck !== 'comingsoon') {
-                        locationLinkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
+                        let linkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
                         if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
-                            locationLinkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
-                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
-                                                    <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-                                                </a>`;
+                            linkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
+                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
+                                            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
+                                        </a>`;
                         }
-                        // Tambahkan tag span pembungkus di sini agar margin mb-3 ikut hilang jika lokasi tidak ada
-                        locationLinkHTML = `<span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationLinkHTML}</span>`;
+                        gridLokasiHTML = `
+                            <div style="grid-column: span 2;">
+                                <div class="info-label">Lokasi Event</div>
+                                <div class="info-value" style="font-size: 0.85rem;">${linkHTML}</div>
+                            </div>
+                        `;
                     }
 
-                    // Peta Maps (untuk dimasukkan ke dalam Grid)
+                    // Peta Maps (Tetap di bawah Grid)
                     let mapsHTML = '';
                     if (!isStreaming && locCheck !== 'tba' && locCheck !== 'comingsoon') {
                         mapsHTML = `
@@ -1172,7 +1173,7 @@
                         `;
                     }
 
-                    // Susunan Isi Grid
+                    // Susunan Isi Grid (Tabel)
                     let mainContent = `
                         <div class="ticket-info-grid">
                             <div>
@@ -1183,6 +1184,9 @@
                                 <div class="info-label">Tipe Tiket</div>
                                 <div class="info-value text-primary fw-bold" style="word-break: break-word; font-size: 0.85rem;">${tierName}</div>
                             </div>
+                            
+                            ${gridLokasiHTML}
+
                             <div>
                                 <div class="info-label">Jumlah</div>
                                 <div class="info-value fw-bold text-danger">${qty} Tiket</div>
@@ -1237,7 +1241,7 @@
                         `;
                     }
 
-                htmlContent += `
+                    htmlContent += `
                         <div class="col-md-6 col-lg-4 ticket-card-wrapper">
                             <div class="ticket-card h-100">
                                 <div class="ticket-header ${headerClass}">
@@ -1248,11 +1252,9 @@
                                     <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
                                 </div>
                                 <div class="ticket-body justify-content-start">
-                                    <span class="ticket-date mb-1" style="display: block;">
+                                    <span class="ticket-date mb-3" style="display: block;">
                                         <i class="bi bi-calendar-event me-1"></i> ${dateStr}
                                     </span>
-                                    
-                                    ${locationLinkHTML}
                                     
                                     ${mainContent}
                                     
