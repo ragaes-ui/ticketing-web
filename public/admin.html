@@ -245,7 +245,20 @@
                         <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
                         <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" data-i18n-ph="ph_loc" required></div>
                         <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
-                        <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
+                        <div class="mb-3">
+    <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal & Waktu Event</label>
+    <input type="datetime-local" id="date" class="form-control" required>
+</div>
+<div class="row g-2 mb-3">
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
+        <input type="time" id="startTime" class="form-control" required>
+    </div>
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Jam Selesai</label>
+        <input type="time" id="endTime" class="form-control" required>
+    </div>
+</div>
                         <div class="mb-3">
                             <textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea>
                         </div>
@@ -329,8 +342,18 @@
                 <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
                 <div class="mb-3"><input type="text" id="editMapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/..."></div>
-                <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal</label>
-                <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
+<label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Event</label>
+<div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
+<div class="row g-2 mb-3">
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
+        <input type="time" id="editStartTime" class="form-control">
+    </div>
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Jam Selesai</label>
+        <input type="time" id="editEndTime" class="form-control">
+    </div>
+</div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_desc">Deskripsi</label>
                 <div class="mb-3"><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
 
@@ -667,6 +690,8 @@ function previewImage(u, i) {
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, // <-- TAMBAHKAN INI
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
+                startTime: document.getElementById('startTime').value, // <-- BARIS BARU
+                endTime: document.getElementById('endTime').value, // <-- BARIS BARU
                 mapsUrl: document.getElementById('mapsUrl').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
@@ -697,6 +722,8 @@ function previewImage(u, i) {
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
                 if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
+                document.getElementById('editStartTime').value = ev.startTime || ''; // <-- BARIS BARU
+document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BARU
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
                 document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
                 eModal.show();
@@ -708,6 +735,8 @@ function previewImage(u, i) {
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers');
             const data = {
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
+                startTime: document.getElementById('editStartTime').value, // <-- BARIS BARU
+    endTime: document.getElementById('editEndTime').value, // <-- BARIS BARU
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
                 mapsUrl: document.getElementById('editMapsUrl').value,
                 secretData: document.getElementById('editSecretData').value,
