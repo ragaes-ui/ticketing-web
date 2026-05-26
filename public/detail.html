@@ -272,18 +272,19 @@ let timeStr = "Jam TBA";
 
 if (currentEvent.date) {
     const d = new Date(currentEvent.date);
-    // Format tanggal
     dateStr = d.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
-    
-    // Format jam menjadi 24-hour (contoh: 19:30) dan tambahkan WIB
-    timeStr = d.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) + ' WIB';
-    
-    // Jika di databasemu ada field khusus untuk jam (contoh: currentEvent.time), pakai baris di bawah ini:
-    if (currentEvent.time) {
-        timeStr = currentEvent.time + ' WIB';
-    }
 }
 
+// 👇 LOGIKA BARU: MENGAMBIL JAM DARI DATABASE BARU 👇
+if (currentEvent.startTime && currentEvent.endTime) {
+    timeStr = `${currentEvent.startTime} - ${currentEvent.endTime} WIB`;
+} else if (currentEvent.startTime) {
+    timeStr = `${currentEvent.startTime} WIB`;
+} else if (currentEvent.date) {
+    // Fallback jika admin lupa isi jam, ambil dari bawaan kalender
+    const d = new Date(currentEvent.date);
+    timeStr = d.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) + ' WIB';
+}
 document.getElementById('elDate').innerText = dateStr;
 document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTML
 
