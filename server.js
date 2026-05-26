@@ -295,13 +295,19 @@ app.get('/api/events/:id', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, organizer, date, price, capacity, description, category, location, mapsUrl, tickets, secretData } = req.body;
+        // 👇 1. Tangkap startTime dan endTime dari request frontend
+        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData } = req.body;
+        
         const newEvent = new Event({
-            name, organizer, date, price, totalCapacity: capacity, availableSeats: capacity,
-            description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", // 👈 TAMBAHKAN INI JUGA BIAR MASUK DB
-            secretData: secretData || "", // 🔥 Pastikan ikut tersimpan!
+            name, organizer, date, 
+            startTime: startTime || "", // 👈 2. Masukkan ke dalam database
+            endTime: endTime || "",     // 👈 2. Masukkan ke dalam database
+            price, totalCapacity: capacity, availableSeats: capacity,
+            description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", 
+            secretData: secretData || "", 
             tickets: tickets || []
         });
+        
         await newEvent.save();
         res.json(newEvent);
     } catch (err) { res.status(500).json({ error: err.message }); }
