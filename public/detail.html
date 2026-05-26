@@ -107,6 +107,7 @@
                 <div class="d-flex flex-wrap gap-3 mt-3 text-light opacity-75 fw-500">
                     <div><i class="bi bi-calendar-event me-1"></i> <span id="elDate">TBA</span></div>
                     <div><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="elVenue">TBA</span></div>
+                    <div><i class="bi bi-building-fill text-warning me-1"></i> <span id="elOrganizer">Penyelenggara TBA</span></div>
                 </div>
             </div>
         </div>
@@ -231,6 +232,7 @@ async function loadEventDetail(id) {
                 
                 // 2. Isi Semua Data ke HTML
                 document.getElementById('elTitle').innerText = currentEvent.name;
+                document.getElementById('elOrganizer').innerText = "By: " + (currentEvent.organizer || "RCELLFEST");
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
                 document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
                 // --- UBAH TEKS JADI LINK BISA DIKLIK ---
