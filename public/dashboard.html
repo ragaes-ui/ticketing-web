@@ -1134,16 +1134,26 @@
                     }));
 
                     let mainContent = '';
-                    
+                    // 1. Siapkan variabel lokasi
+let locationHTML = `<span class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'}</span>`;
+if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
+    locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline;">
+                        <i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'} 
+                        <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
+                    </a>`;
+}
                     mainContent += `
                         <div class="ticket-info-grid">
                             <div>
                                 <div class="info-label">Nama Pemesan</div>
                                 <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
                             </div>
-                            <div>
                                 <div class="info-label">Tipe Tiket</div>
                                 <div class="info-value text-primary fw-bold">${tierName}</div>
+                            </div>
+                            <div style="grid-column: span 2;">
+                            <div class="info-label">Lokasi</div>
+                            <div class="info-value">${locationHTML}</div>
                             </div>
                             <div>
                                 <div class="info-label">Jumlah</div>
