@@ -12,6 +12,16 @@ const eventSchema = new mongoose.Schema({
         type: Date, 
         required: true 
     },
+    // 🔥 TAMBAHAN BARU: JAM EVENT 🔥
+    startTime: {
+        type: String, // Tipe String untuk menyimpan format "HH:mm" (cth: "19:00")
+        default: ""
+    },
+    endTime: {
+        type: String, 
+        default: ""
+    },
+    // -----------------------------
     
     // Harga (Rupiah)
     price: { 
