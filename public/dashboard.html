@@ -1134,22 +1134,31 @@
                         quantity: qty
                     }));
 
-                    // Konfigurasi Lokasi & Maps
+// Konfigurasi Lokasi & Maps
                     let locationText = event.location || 'TBA';
+                    // Bersihkan spasi dan ubah ke huruf kecil untuk pengecekan (bisa deteksi "Coming soon", "comingsoon", atau "TBA")
+                    let locCheck = locationText.toLowerCase().replace(/\s/g, ''); 
                     let mapsQuery = encodeURIComponent(locationText);
                     
                     // Link lokasi (untuk bagian atas tiket)
-                    let locationLinkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
-                    if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
-                        locationLinkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
-                                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
-                                                <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-                                            </a>`;
+                    let locationLinkHTML = '';
+                    
+                    // Hanya dirender JIKA bukan TBA dan bukan Comingsoon
+                    if (locCheck !== 'tba' && locCheck !== 'comingsoon') {
+                        locationLinkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
+                        if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
+                            locationLinkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
+                                                    <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
+                                                </a>`;
+                        }
+                        // Tambahkan tag span pembungkus di sini agar margin mb-3 ikut hilang jika lokasi tidak ada
+                        locationLinkHTML = `<span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationLinkHTML}</span>`;
                     }
 
                     // Peta Maps (untuk dimasukkan ke dalam Grid)
                     let mapsHTML = '';
-                    if (!isStreaming && locationText !== 'TBA') {
+                    if (!isStreaming && locCheck !== 'tba' && locCheck !== 'comingsoon') {
                         mapsHTML = `
                             <div style="grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 15px; margin-top: 5px;">
                                 <div class="info-label mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Peta Lokasi</div>
@@ -1163,7 +1172,7 @@
                         `;
                     }
 
-                    // Susunan Isi Grid yang sudah diperbaiki
+                    // Susunan Isi Grid
                     let mainContent = `
                         <div class="ticket-info-grid">
                             <div>
@@ -1240,7 +1249,8 @@
                                 </div>
                                 <div class="ticket-body">
                                     <span class="ticket-date mb-1" style="display: block;"><i class="bi bi-calendar-event me-1"></i> ${dateStr}</span>
-                                    <span class="d-block mb-3" style="font-size: 0.85rem; text-align: left;">${locationLinkHTML}</span>
+                                    
+                                    ${locationLinkHTML}
                                     
                                     ${mainContent}
                                     
@@ -1250,7 +1260,6 @@
                             </div>
                         </div>
                     `;
-                    // --- SAMPAI SINI SAJA GANTINYA ---
                 });
                 list.innerHTML = htmlContent;
             } catch (err) { 
