@@ -550,6 +550,12 @@
                         <div>
                             <span class="badge bg-primary mb-2" id="modalCategory">General</span>
                             <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark border border-secondary">
+                                    <i class="bi bi-building-fill text-warning me-1"></i> 
+                                    <span id="modalOrganizer">Penyelenggara TBA</span>
+                                </span>
+                            </div>
                             <div class="text-secondary small mt-2">
                                 <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
                                 &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
@@ -1039,11 +1045,12 @@ function updateHeroSlider(data) {
                     dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); 
                 } catch (e) { dateStr = event.date; } 
             }
-            
+            document.getElementById('modalOrganizer').innerText = "By: " + (event.organizer || "RCELLFEST");
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalDate').innerText = dateStr;
             document.getElementById('modalCategory').innerText = event.category || "General";
             document.getElementById('modalVenue').innerText = event.location || t.txt_tba;
+            document.getElementById('modalOrganizer').innerText = event.organizer ? "By: " + event.organizer : "By: RCELLFEST";
             document.getElementById('modalHeaderImg').style.backgroundImage = `url('${getEventImage(event)}')`;
             
             let safeDescription = event.description || (lang === 'id' ? "Deskripsi lengkap belum tersedia." : "Full description not available yet.");
