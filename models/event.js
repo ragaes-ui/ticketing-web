@@ -59,6 +59,10 @@ const eventSchema = new mongoose.Schema({
         type: String, 
         default: 'TBA' 
     }, 
+    mapsUrl: {
+        type: String,
+        default: ""
+    },// 👈 TAMBAHKAN BARIS INI
       // --- TAMBAHKAN BARIS INI ---
     image: { 
         type: String, 
