@@ -244,6 +244,7 @@
                         <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" data-i18n-ph="ph_name" required></div>
                         <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
                         <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" data-i18n-ph="ph_loc" required></div>
+                        <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
                         <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
                         <div class="mb-3">
                             <textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea>
@@ -326,6 +327,8 @@
 <div            class="mb-3"><input type="text" id="editOrganizer" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_loc">Lokasi</label>
                 <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
+                <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
+                <div class="mb-3"><input type="text" id="editMapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/..."></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal</label>
                 <div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_desc">Deskripsi</label>
@@ -664,6 +667,7 @@ function previewImage(u, i) {
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, // <-- TAMBAHKAN INI
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
+                mapsUrl: document.getElementById('mapsUrl').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
                 capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
@@ -687,6 +691,7 @@ function previewImage(u, i) {
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if(ev) {
+                document.getElementById('editMapsUrl').value = ev.mapsUrl || '';
                 document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
                 document.getElementById('editOrganizer').value = ev.organizer || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
@@ -704,6 +709,7 @@ function previewImage(u, i) {
             const data = {
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
+                mapsUrl: document.getElementById('editMapsUrl').value,
                 secretData: document.getElementById('editSecretData').value,
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
