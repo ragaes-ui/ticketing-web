@@ -234,7 +234,15 @@ async function loadEventDetail(id) {
                 document.getElementById('elTitle').innerText = currentEvent.name;
                 document.getElementById('elOrganizer').innerText = "By: " + (currentEvent.organizer || "RCELLFEST");
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
-                document.getElementById('elVenue').innerText = currentEvent.location || "Lokasi TBA";
+                // --- LOGIKA MENGUBAH LOKASI MENJADI LINK MAPS ---
+                const venueElement = document.getElementById('elVenue');
+                if (currentEvent.mapsUrl) {
+                    // Kalau admin masukin link maps, bungkus pakai tag <a> agar teksnya berwarna biru/bisa diklik
+                    venueElement.innerHTML = `<a href="${currentEvent.mapsUrl}" target="_blank" style="color: inherit; text-decoration: underline;">${currentEvent.location || "Lokasi TBA"} <i class="bi bi-box-arrow-up-right small"></i></a>`;
+                } else {
+                    // Kalau tidak ada link maps, tampilkan teks biasa
+                    venueElement.innerText = currentEvent.location || "Lokasi TBA";
+                }
                 // --- UBAH TEKS JADI LINK BISA DIKLIK ---
                 const rawDesc = currentEvent.description || "Deskripsi belum tersedia.";
                 const urlRegex = /(https?:\/\/[^\s]+)/g; // Rumus pendeteksi tulisan "http://" atau "https://"
