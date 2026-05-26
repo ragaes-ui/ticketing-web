@@ -242,6 +242,7 @@
                             </select>
                         </div>
                         <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" data-i18n-ph="ph_name" required></div>
+                        <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
                         <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" data-i18n-ph="ph_loc" required></div>
                         <div class="mb-3"><input type="datetime-local" id="date" class="form-control" required></div>
                         <div class="mb-3">
@@ -321,6 +322,8 @@
                 <div class="img-preview-box mb-3"><img id="editPreview"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_name">Nama Event</label>
                 <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
+                <label class="small text-white-50 fw-bold mb-1">Nama Penyelenggara</label>
+<div            class="mb-3"><input type="text" id="editOrganizer" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_loc">Lokasi</label>
                 <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal</label>
@@ -659,7 +662,7 @@ function previewImage(u, i) {
             const secretEl = document.getElementById('secretData');
             
             const data = {
-                name: document.getElementById('name').value, category: document.getElementById('category').value,
+                name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, // <-- TAMBAHKAN INI
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
@@ -685,6 +688,7 @@ function previewImage(u, i) {
             const ev = eventsData.find(e => e._id === id);
             if(ev) {
                 document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
+                document.getElementById('editOrganizer').value = ev.organizer || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
                 if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
@@ -698,7 +702,7 @@ function previewImage(u, i) {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers');
             const data = {
-                name: document.getElementById('editName').value, date: document.getElementById('editDate').value,
+                name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
                 secretData: document.getElementById('editSecretData').value,
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
