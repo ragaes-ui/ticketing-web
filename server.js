@@ -295,10 +295,10 @@ app.get('/api/events/:id', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        const { name, organizer, date, price, capacity, description, category, location, tickets, secretData } = req.body;
+        const { name, organizer, date, price, capacity, description, category, location, mapsUrl, tickets, secretData } = req.body;
         const newEvent = new Event({
             name, organizer, date, price, totalCapacity: capacity, availableSeats: capacity,
-            description: description || "", category: category || "General", location: location || "TBA",
+            description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", // 👈 TAMBAHKAN INI JUGA BIAR MASUK DB
             secretData: secretData || "", // 🔥 Pastikan ikut tersimpan!
             tickets: tickets || []
         });
