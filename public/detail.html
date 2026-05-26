@@ -229,7 +229,7 @@ async function loadEventDetail(id) {
                 if (!res.ok) throw new Error("Event tidak ditemukan");
                 
                 currentEvent = await res.json();
-                
+                console.log("DATA EVENT DARI SERVER:", currentEvent);
                 // 2. Isi Semua Data ke HTML
                 document.getElementById('elTitle').innerText = currentEvent.name;
                 document.getElementById('elOrganizer').innerText = "By: " + (currentEvent.organizer || "RCELLFEST");
