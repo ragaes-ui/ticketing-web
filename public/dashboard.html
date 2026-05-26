@@ -1134,14 +1134,14 @@
                     }));
 
                     let mainContent = '';
-                    // 1. Siapkan variabel lokasi
-let locationHTML = `<span class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'}</span>`;
-if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
-    locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline;">
-                        <i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'} 
-                        <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
-                    </a>`;
-}
+                    // 1. CUKUP SATU KALI DEKLARASI LOCATION DI SINI
+                    let locationHTML = `<span class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'}</span>`;
+                    if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
+                        locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline;">
+                                            <i class="bi bi-geo-alt-fill me-1"></i>${event.location || 'Lokasi TBA'} 
+                                            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
+                                        </a>`;
+                    }
                     mainContent += `
                         <div class="ticket-info-grid">
                             <div>
@@ -1207,13 +1207,7 @@ if (isStreaming) {
                             </div>
                         `;
                     }
-let locationHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${event.location || 'Lokasi TBA'}</span>`;
-if (event.mapsUrl) {
-    locationHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
-                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>${event.location || 'Lokasi TBA'} 
-                        <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-                    </a>`;
-}
+
 
                     htmlContent += `
                     <div class="col-md-6 col-lg-4 ticket-card-wrapper">
