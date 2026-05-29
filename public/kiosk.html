@@ -97,8 +97,8 @@
         
         <div id="reader"></div>
         
-        <h3 class="fw-bold" style="letter-spacing: 1px;">SCAN E-TIKET ANDA</h3>
-        <p style="color: #8fa0c1; font-size: 1rem;">Arahkan kode QR ke arah kamera perangkat</p>
+<h3 class="fw-bold" id="scanTitle" style="letter-spacing: 1px;">SCAN E-TIKET ANDA</h3>
+<p style="color: #8fa0c1; font-size: 1rem;" id="scanDesc">Arahkan kode QR ke arah kamera perangkat</p>
     </div>
 
     <div class="sponsor-bar">
@@ -110,126 +110,161 @@
         </div>
     </div>
 
-    <script>
-let isProcessing = false;
-        let html5QrCode;
-        let currentEventId = null;
+<script>
+    let isProcessing = false;
+    let html5QrCode;
+    let currentEventId = null;
 
-        // Tangkap parameter ID dari URL (contoh: ?id=65c4b...)
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlEventId = urlParams.get('id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEventId = urlParams.get('id');
 
-        async function loadEventName() {
-            const titleElement = document.getElementById('eventTitle');
-            try {
-                let apiUrl = '/api/events';
-                if (urlEventId) apiUrl = `/api/events/${urlEventId}`;
+    async function loadEventName() {
+        const titleElement = document.getElementById('eventTitle');
+        const readerDiv = document.getElementById('reader');
+        const scanTitle = document.getElementById('scanTitle');
+        const scanDesc = document.getElementById('scanDesc');
 
-                const res = await fetch(apiUrl);
+        try {
+            if (urlEventId) {
+                // Jika URL punya ID (aman dari Keycloak), langsung pakai
+                const res = await fetch(`/api/events/${urlEventId}`);
                 if (!res.ok) throw new Error("Gagal memuat data dari database");
-                
                 const data = await res.json();
                 
-                if (Array.isArray(data)) {
-                    if (data.length > 0) {
-                        currentEventId = data[0]._id;
-                        titleElement.innerHTML = `${data[0].name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data[0].organizer || 'RCELLFEST'}</span>`;
-                    } else {
-                        titleElement.innerText = "BELUM ADA EVENT AKTIF";
-                    }
-                } else {
-                    currentEventId = data._id;
-                    titleElement.innerHTML = `${data.name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data.organizer || 'RCELLFEST'}</span>`;
-                }
-            } catch (error) {
-                console.error("Error database title:", error);
-                titleElement.innerText = "EVENT TIDAK DITEMUKAN";
-            }
-        }
-
-        window.onload = () => {
-            loadEventName();
-
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-            .catch(err => {
-                Swal.fire('Error Kamera', 'Gagal mengakses kamera perangkat.', 'error');
-            });
-        };
-
-        function onScanSuccess(decodedText, decodedResult) {
-            if (isProcessing) return;
-            html5QrCode.pause(); 
-            processTicket(decodedText);
-        }
-
-        async function processTicket(code) {
-            isProcessing = true;
-            
-            Swal.fire({
-                title: 'MEMVERIFIKASI...',
-                html: 'Menyinkronkan data dengan server pusat',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() },
-                background: 'rgba(13, 17, 33, 0.9)',
-                color: '#fff',
-                customClass: { popup: 'border border-secondary rounded-4' }
-            });
-
-            try {
-                const response = await fetch('/api/validate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    // 👇 Kirim ticketCode DAN currentEventId ke server.js 👇
-                    body: JSON.stringify({ ticketCode: code, eventId: currentEventId }) 
-                });
+                currentEventId = data._id;
+                titleElement.innerHTML = `${data.name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data.organizer || 'RCELLFEST'}</span>`;
+                startScanner();
+            } else {
+                // 👇 JIKA ID HILANG/KOSONG, TAMPILKAN TOMBOL PILIHAN! 👇
+                const res = await fetch('/api/events');
+                const data = await res.json();
                 
-                const result = await response.json();
-
-                if (result.valid) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'AKSES DITERIMA',
-                        html: `<h2 class="fw-bold" style="color: #00f0ff;">${result.data.name}</h2>
-                               <p style="color: #8fa0c1;">${result.data.event}</p>`,
-                        showConfirmButton: false,
-                        timer: 3500,
-                        background: 'rgba(13, 17, 33, 0.95)',
-                        color: '#fff',
-                        iconColor: '#00f0ff'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'AKSES DITOLAK',
-                        html: `<h4 class="text-danger fw-bold mt-2">${result.message}</h4>
-                               <p class="text-white-50">${result.detail}</p>`,
-                        showConfirmButton: false,
-                        timer: 4000,
-                        background: 'rgba(30, 5, 10, 0.95)',
-                        color: '#fff',
-                        iconColor: '#ff2a2a'
-                    });
+                if (data.length === 0) {
+                    titleElement.innerText = "BELUM ADA EVENT AKTIF";
+                    return;
                 }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'KONEKSI TERPUTUS',
-                    text: 'Gagal terhubung ke server utama.',
-                    timer: 2500,
-                    showConfirmButton: false,
-                    background: 'rgba(13, 17, 33, 0.95)',
-                    color: '#fff'
+
+                // Sembunyikan kamera dulu
+                readerDiv.style.display = 'none';
+                scanTitle.style.display = 'none';
+                scanDesc.style.display = 'none';
+
+                // Tampilkan daftar tombol
+                let htmlButtons = `<div class="mt-3"><h5 style="color: #8fa0c1; margin-bottom: 20px;">PILIH EVENT UNTUK MESIN INI:</h5>`;
+                data.forEach(ev => {
+                    htmlButtons += `<button onclick="pilihEvent('${ev._id}', '${ev.name}', '${ev.organizer || 'RCELLFEST'}')" 
+                                    style="display: block; width: 100%; margin-bottom: 15px; padding: 15px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-blue); color: #fff; border-radius: 15px; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.3s;">
+                                    ${ev.name}
+                                    </button>`;
                 });
-            } finally {
-                setTimeout(() => { 
-                    isProcessing = false; 
-                    html5QrCode.resume(); 
-                }, 4000);
+                htmlButtons += `</div>`;
+                titleElement.innerHTML = htmlButtons;
             }
+        } catch (error) {
+            console.error("Error:", error);
+            titleElement.innerText = "EVENT TIDAK DITEMUKAN";
         }
-    </script>
+    }
+
+    // Fungsi saat staf mengklik tombol event di layar
+    window.pilihEvent = function(id, name, organizer) {
+        currentEventId = id;
+        
+        // Ubah URL di atas secara diam-diam (Biar kalau di-refresh ga hilang)
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
+        window.history.pushState({path:newUrl}, '', newUrl);
+
+        // Kembalikan tampilan kamera
+        document.getElementById('eventTitle').innerHTML = `${name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${organizer}</span>`;
+        document.getElementById('reader').style.display = 'block';
+        document.getElementById('scanTitle').style.display = 'block';
+        document.getElementById('scanDesc').style.display = 'block';
+
+        startScanner(); // Nyalakan kamera
+    }
+
+    function startScanner() {
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(err => {
+            Swal.fire('Error Kamera', 'Gagal mengakses kamera perangkat.', 'error');
+        });
+    }
+
+    window.onload = () => { loadEventName(); };
+
+    function onScanSuccess(decodedText, decodedResult) {
+        if (isProcessing) return;
+        html5QrCode.pause(); 
+        processTicket(decodedText);
+    }
+
+    async function processTicket(code) {
+        isProcessing = true;
+        
+        Swal.fire({
+            title: 'MEMVERIFIKASI...',
+            html: 'Menyinkronkan data dengan server pusat',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading() },
+            background: 'rgba(13, 17, 33, 0.9)',
+            color: '#fff',
+            customClass: { popup: 'border border-secondary rounded-4' }
+        });
+
+        try {
+            const response = await fetch('/api/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticketCode: code, eventId: currentEventId }) 
+            });
+            
+            const result = await response.json();
+
+            if (result.valid) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'AKSES DITERIMA',
+                    html: `<h2 class="fw-bold" style="color: #00f0ff;">${result.data.name}</h2>
+                           <p style="color: #8fa0c1;">${result.data.event}</p>`,
+                    showConfirmButton: false,
+                    timer: 3500,
+                    background: 'rgba(13, 17, 33, 0.95)',
+                    color: '#fff',
+                    iconColor: '#00f0ff'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'AKSES DITOLAK',
+                    html: `<h4 class="text-danger fw-bold mt-2">${result.message}</h4>
+                           <p class="text-white-50">${result.detail}</p>`,
+                    showConfirmButton: false,
+                    timer: 4000,
+                    background: 'rgba(30, 5, 10, 0.95)',
+                    color: '#fff',
+                    iconColor: '#ff2a2a'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'KONEKSI TERPUTUS',
+                text: 'Gagal terhubung ke server utama.',
+                timer: 2500,
+                showConfirmButton: false,
+                background: 'rgba(13, 17, 33, 0.95)',
+                color: '#fff'
+            });
+        } finally {
+            setTimeout(() => { 
+                isProcessing = false; 
+                html5QrCode.resume(); 
+            }, 4000);
+        }
+    }
+</script>
 </body>
 </html>
