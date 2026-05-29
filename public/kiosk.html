@@ -113,39 +113,37 @@
     <script>
 let isProcessing = false;
         let html5QrCode;
-        let currentEventName = null;
+        let currentEventId = null;
 
-        // 👇 Tangkap parameter NAMA EVENT dari URL (contoh: ?event=RCELLFEST 17)
+        // Tangkap parameter ID dari URL (contoh: ?id=65c4b...)
         const urlParams = new URLSearchParams(window.location.search);
-        const urlEventName = urlParams.get('event');
+        const urlEventId = urlParams.get('id');
 
         async function loadEventName() {
             const titleElement = document.getElementById('eventTitle');
             try {
-                // Tarik SEMUA event dari database
-                const res = await fetch('/api/events');
+                let apiUrl = '/api/events';
+                if (urlEventId) apiUrl = `/api/events/${urlEventId}`;
+
+                const res = await fetch(apiUrl);
                 if (!res.ok) throw new Error("Gagal memuat data dari database");
+                
                 const data = await res.json();
                 
-                let selectedEvent = null;
-
-                if (urlEventName && data.length > 0) {
-                    // Cari event yang namanya cocok dengan yang diketik di URL
-                    selectedEvent = data.find(e => e.name.toLowerCase() === urlEventName.toLowerCase());
-                } else if (data.length > 0) {
-                    // Kalau gak pakai awalan ?event= di URL, otomatis ambil event paling atas
-                    selectedEvent = data[0];
-                }
-
-                if (selectedEvent) {
-                    currentEventName = selectedEvent.name; 
-                    titleElement.innerHTML = `${selectedEvent.name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${selectedEvent.organizer || 'RCELLFEST'}</span>`;
+                if (Array.isArray(data)) {
+                    if (data.length > 0) {
+                        currentEventId = data[0]._id;
+                        titleElement.innerHTML = `${data[0].name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data[0].organizer || 'RCELLFEST'}</span>`;
+                    } else {
+                        titleElement.innerText = "BELUM ADA EVENT AKTIF";
+                    }
                 } else {
-                    titleElement.innerHTML = `<span class="text-danger">EVENT TIDAK DITEMUKAN</span><br><span style="font-size: 1rem; color:#8fa0c1;">Cek penulisan nama di URL</span>`;
+                    currentEventId = data._id;
+                    titleElement.innerHTML = `${data.name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data.organizer || 'RCELLFEST'}</span>`;
                 }
             } catch (error) {
                 console.error("Error database title:", error);
-                titleElement.innerText = "RCELLFEST KIOSK";
+                titleElement.innerText = "EVENT TIDAK DITEMUKAN";
             }
         }
 
@@ -184,8 +182,8 @@ let isProcessing = false;
                 const response = await fetch('/api/validate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // Kirim kode tiket dan nama event ke server untuk dicocokkan
-                    body: JSON.stringify({ ticketCode: code, eventName: currentEventName }) 
+                    // 👇 Kirim ticketCode DAN currentEventId ke server.js 👇
+                    body: JSON.stringify({ ticketCode: code, eventId: currentEventId }) 
                 });
                 
                 const result = await response.json();
