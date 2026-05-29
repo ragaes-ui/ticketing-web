@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gate Check-In | RCELLFEST </title>
+    <title>Gate Check-In | RCELLFEST</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -62,9 +62,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        /* Styling Kotak Kamera */
         #reader {
             width: 100%;
             max-width: 350px;
@@ -92,7 +92,8 @@
 
     <div class="kiosk-panel">
         <h3 class="subtitle">GATE CHECK-IN MANDIRI</h3>
-        <h1 class="title">RCELLFEST 17 FEST X INTERAKSI</h1>
+        
+        <h1 class="title" id="eventTitle">MEMUAT EVENT...</h1>
         
         <div id="reader"></div>
         
@@ -105,100 +106,133 @@
         <div>
             <span class="s-name">TELKOMSEL</span> &bull; 
             <span class="s-name">INFOKONSER</span> &bull; 
-            <span class="s-name">ATLANTIC SPACE</span>
+            <span class="s-name">DAN MASIH BANYAK LAGI</span>
         </div>
     </div>
 
     <script>
-        let isProcessing = false;
-        let html5QrCode;
+let isProcessing = false;
+let html5QrCode;
+let currentEventId = null; // 👈 Variabel baru untuk mengingat ID event yang sedang buka
 
-        // Inisialisasi Kamera saat halaman dimuat
-        window.onload = () => {
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-            // Otomatis minta izin dan nyalakan kamera belakang (environment)
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-            .catch(err => {
-                Swal.fire('Error Kamera', 'Gagal mengakses kamera. Pastikan izin kamera sudah diberikan di browser Anda.', 'error');
-            });
-        };
+// Tangkap parameter ID dari URL (contoh: kiosk.html?id=65c4b...)
+const urlParams = new URLSearchParams(window.location.search);
+const urlEventId = urlParams.get('id');
 
-        // Fungsi yang berjalan saat QR berhasil terbaca oleh kamera
-        function onScanSuccess(decodedText, decodedResult) {
-            if (isProcessing) return; // Cegah scan dobel
-            
-            // Jeda sementara kamera biar nggak nge-scan terus-terusan
-            html5QrCode.pause(); 
-            processTicket(decodedText);
-        }
+// Fungsi mengambil nama event dari database
+async function loadEventName() {
+    const titleElement = document.getElementById('eventTitle');
+    try {
+        let apiUrl = '/api/events';
+        if (urlEventId) apiUrl = `/api/events/${urlEventId}`;
 
-        async function processTicket(code) {
-            isProcessing = true;
-            
-            Swal.fire({
-                title: 'MEMVERIFIKASI...',
-                html: 'Menyinkronkan data dengan server pusat',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() },
-                background: 'rgba(13, 17, 33, 0.9)',
-                color: '#fff',
-                customClass: { popup: 'border border-secondary rounded-4' }
-            });
-
-            try {
-                const response = await fetch('/api/validate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticketCode: code })
-                });
-                
-                const result = await response.json();
-
-                if (result.valid) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'AKSES DITERIMA',
-                        html: `<h2 class="fw-bold" style="color: #00f0ff;">${result.data.name}</h2>
-                               <p style="color: #8fa0c1;">${result.data.event}</p>`,
-                        showConfirmButton: false,
-                        timer: 3500,
-                        background: 'rgba(13, 17, 33, 0.95)',
-                        color: '#fff',
-                        iconColor: '#00f0ff'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'AKSES DITOLAK',
-                        html: `<h4 class="text-danger fw-bold mt-2">${result.message}</h4>
-                               <p class="text-white-50">${result.detail}</p>`,
-                        showConfirmButton: false,
-                        timer: 4000,
-                        background: 'rgba(30, 5, 10, 0.95)',
-                        color: '#fff',
-                        iconColor: '#ff2a2a'
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'KONEKSI TERPUTUS',
-                    text: 'Gagal terhubung ke server utama.',
-                    timer: 2500,
-                    showConfirmButton: false,
-                    background: 'rgba(13, 17, 33, 0.95)',
-                    color: '#fff'
-                });
-            } finally {
-                // Lanjutkan kembali kamera setelah pop-up hilang
-                setTimeout(() => { 
-                    isProcessing = false; 
-                    html5QrCode.resume(); 
-                }, 4000);
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("Gagal memuat data dari database");
+        
+        const data = await res.json();
+        
+        if (Array.isArray(data)) {
+            if (data.length > 0) {
+                // Simpan ID event pertama
+                currentEventId = data[0]._id;
+                titleElement.innerHTML = `${data[0].name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data[0].organizer || 'RCELLFEST'}</span>`;
+            } else {
+                titleElement.innerText = "BELUM ADA EVENT AKTIF";
             }
+        } else {
+            // Simpan ID event spesifik dari URL
+            currentEventId = data._id;
+            titleElement.innerHTML = `${data.name}<br><span style="font-size: 1.3rem; font-weight: 500; color:#fff;">BY: ${data.organizer || 'RCELLFEST'}</span>`;
         }
+    } catch (error) {
+        console.error("Error database title:", error);
+        titleElement.innerText = "RCELLFEST AKTIF";
+    }
+}
+
+window.onload = () => {
+    loadEventName();
+
+    html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+    .catch(err => {
+        Swal.fire('Error Kamera', 'Gagal mengakses kamera perangkat.', 'error');
+    });
+};
+
+function onScanSuccess(decodedText, decodedResult) {
+    if (isProcessing) return;
+    html5QrCode.pause(); 
+    processTicket(decodedText);
+}
+
+async function processTicket(code) {
+    isProcessing = true;
+    
+    Swal.fire({
+        title: 'MEMVERIFIKASI...',
+        html: 'Menyinkronkan data dengan server pusat',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading() },
+        background: 'rgba(13, 17, 33, 0.9)',
+        color: '#fff',
+        customClass: { popup: 'border border-secondary rounded-4' }
+    });
+
+    try {
+        const response = await fetch('/api/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // 👇 Kirim ticketCode DAN currentEventId ke server.js 👇
+            body: JSON.stringify({ ticketCode: code, eventId: currentEventId }) 
+        });
+        
+        const result = await response.json();
+
+        if (result.valid) {
+            Swal.fire({
+                icon: 'success',
+                title: 'AKSES DITERIMA',
+                html: `<h2 class="fw-bold" style="color: #00f0ff;">${result.data.name}</h2>
+                       <p style="color: #8fa0c1;">${result.data.event}</p>`,
+                showConfirmButton: false,
+                timer: 3500,
+                background: 'rgba(13, 17, 33, 0.95)',
+                color: '#fff',
+                iconColor: '#00f0ff'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'AKSES DITOLAK',
+                html: `<h4 class="text-danger fw-bold mt-2">${result.message}</h4>
+                       <p class="text-white-50">${result.detail}</p>`,
+                showConfirmButton: false,
+                timer: 4000,
+                background: 'rgba(30, 5, 10, 0.95)',
+                color: '#fff',
+                iconColor: '#ff2a2a'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'KONEKSI TERPUTUS',
+            text: 'Gagal terhubung ke server utama.',
+            timer: 2500,
+            showConfirmButton: false,
+            background: 'rgba(13, 17, 33, 0.95)',
+            color: '#fff'
+        });
+    } finally {
+        setTimeout(() => { 
+            isProcessing = false; 
+            html5QrCode.resume(); 
+        }, 4000);
+    }
+}
     </script>
 </body>
 </html>
