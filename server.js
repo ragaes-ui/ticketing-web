@@ -763,19 +763,33 @@ app.post('/api/payment-notification', async (req, res) => {
 
 app.post('/api/validate', async (req, res) => {
     try {
-        const { ticketCode } = req.body;
+        // 1. Tangkap ticketCode DAN eventId dari Kiosk
+        const { ticketCode, eventId } = req.body;
         if (!ticketCode) return res.status(400).json({ valid: false, message: "KODE KOSONG", detail: "Harap masukkan kode tiket." });
 
         const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
 
         if (!ticket) return res.json({ valid: false, message: "TIKET TIDAK DITEMUKAN", detail: "Kode tiket tidak terdaftar di sistem kami." });
+        
         if (ticket.status === 'used') return res.json({ valid: false, message: "TIKET SUDAH DIPAKAI", detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!" });
+
+        // 👇 2. LOGIKA CEK ID EVENT 👇
+        if (eventId && ticket.eventId && ticket.eventId._id.toString() !== eventId) {
+            return res.json({ 
+                valid: false, 
+                message: "SALAH EVENT / GATE", 
+                detail: `Tiket ini untuk event: ${ticket.eventId.name}, bukan untuk event di gate ini!` 
+            });
+        }
+        // 👆 ---------------------------------- 👆
 
         ticket.status = 'used';
         await ticket.save();
 
         res.json({ valid: true, data: { event: ticket.eventId ? ticket.eventId.name : "RCELLFEST Event", name: ticket.customerName } });
-    } catch (error) { res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." }); }
+    } catch (error) { 
+        res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." }); 
+    }
 });
 
 app.post('/api/verify-ticket', async (req, res) => {
