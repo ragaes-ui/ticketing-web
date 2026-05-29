@@ -19,7 +19,10 @@
         body {
             background: radial-gradient(circle at 50% 0%, #1a153a 0%, var(--bg-dark) 70%);
             color: #fff;
-            height: 100vh;
+            /* 👇 UBAH 2 BARIS INI 👇 */
+            min-height: 100vh; 
+            overflow-y: auto; 
+            /* 👆 ---------------- 👆 */
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -52,6 +55,7 @@
             position: relative;
             z-index: 10;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            margin: 50px 0 100px 0;
         }
 
         h3.subtitle { color: #8fa0c1; font-weight: 500; letter-spacing: 4px; font-size: 1rem; margin-bottom: 10px; }
