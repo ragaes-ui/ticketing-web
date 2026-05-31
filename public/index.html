@@ -900,18 +900,15 @@ function renderEvents(data) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
-            // PISAHKAN DATA: Yang aktif vs Yang "Coming Soon" (Stok -2)
             const activeEvents = data.filter(e => e.availableSeats !== -2);
             const soonEvents = data.filter(e => e.availableSeats === -2);
 
-            // Tampilkan atau Sembunyikan bagian "Akan Datang"
             if (soonEvents.length > 0 && sectionSoon) {
                 sectionSoon.style.display = 'block';
             } else if (sectionSoon) {
                 sectionSoon.style.display = 'none';
             }
 
-            // FUNGSI BANTUAN BIKIN KARTU TIKET
             const buildCard = (event) => {
                 const harga = new Intl.NumberFormat('id-ID').format(event.price);
                 const isFinished = event.availableSeats === -1;
@@ -930,20 +927,48 @@ function renderEvents(data) {
                 const imageUrl = getEventImage(event);
                 const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
                 
+                // 👇 --- LOGIKA 3 SKENARIO WAKTU (START) --- 👇
                 let btnText = 'BELI';
-                if (isComingSoon) {
-                    btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
-                } else if (isFinished) {
+                let btnClass = 'btn-outline-book';
+                let btnAction = `onclick="event.stopPropagation(); window.location.href='${'/detail?event=' + (event.name || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '&id=' + event._id}'"`;
+                let timerHtml = '';
+                const now = new Date();
+
+                // 🗓️ RUMUS WAKTU SELESAI
+                const waktuSelesaiEvent = new Date(`${event.date}T${event.endTime || '23:59'}`);
+
+                // Skenario 1: EVENT SELESAI
+                if (now > waktuSelesaiEvent) {
                     btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                    btnClass = 'btn-outline-book disabled text-danger border-danger';
+                    btnAction = 'disabled';
+                } 
+                // Skenario 2: BELUM BUKA TIKET (COUNTDOWN)
+                else if (event.salesOpenDate && new Date(event.salesOpenDate) > now) {
+                    btnText = '<i class="bi bi-clock-history"></i> AKAN HADIR';
+                    btnClass = 'btn-outline-book disabled border-secondary text-secondary';
+                    btnAction = 'disabled';
+                    timerHtml = `<div id="timer-${event._id}" style="font-size: 0.75rem; font-weight: bold; margin-top: 5px; color: var(--primary);">Menghitung...</div>`;
+                    
+                    // Panggil fungsi timer
+                    setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate); }, 100);
+                }
+                // Skenario 3: NORMAL (Sudah buka, belum selesai)
+                else if (isComingSoon) {
+                    btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
+                    btnClass += ' disabled'; btnAction = 'disabled';
+                } else if (isFinished) { // Ini fallback manual dari panel admin
+                    btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                    btnClass += ' disabled'; btnAction = 'disabled';
                 } else if (isSoldOut) {
                     btnText = t.btn_sold_out;
+                    btnClass += ' disabled'; btnAction = 'disabled';
                 } else if (catName === 'Streaming') {
                     btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
                 }
+                // 👆 --- LOGIKA 3 SKENARIO WAKTU (END) --- 👆
 
-                // Munculkan badge pin jika event di-pin
                 const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
-                const isDisabled = isSoldOut || isFinished || isComingSoon;
                 const namaAman = event.name ? event.name : "event";
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
@@ -956,15 +981,20 @@ function renderEvents(data) {
                             <span class="category-badge-img">${catName}</span>
                             <div class="date-float">${dateStr}</div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body text-center">
                             <h5 class="event-title text-truncate">${event.name}</h5>
-                            <div class="event-venue text-truncate">
+                            <div class="event-venue text-truncate justify-content-center">
                                 <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
                             </div>
                             <div class="price-val">${hargaLabel}</div>
-                            <button onclick="event.stopPropagation(); window.location.href='${linkDetail}'" class="btn btn-outline-book ${isDisabled ? 'disabled' : ''}">
-                                ${btnText}
-                            </button>
+                            
+                            <div id="btn-container-${event._id}">
+                                <button ${btnAction} class="${btnClass}">
+                                    ${btnText}
+                                </button>
+                                ${timerHtml}
+                            </div>
+                            
                         </div>
                     </div>
                 </div>`;
@@ -984,6 +1014,53 @@ function renderEvents(data) {
                 soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event); });
             }
         }
+
+        // 👇 --- MESIN HITUNG MUNDUR --- 👇
+        function mulaiHitungMundur(eventId, targetDateStr) {
+            const targetWaktu = new Date(targetDateStr).getTime();
+
+            const intervalTimer = setInterval(function() {
+                const waktuSekarang = new Date().getTime();
+                const selisih = targetWaktu - waktuSekarang;
+
+                const tempatNampilin = document.getElementById(`timer-${eventId}`);
+                const wadahTombol = document.getElementById(`btn-container-${eventId}`);
+
+                // KALAU WAKTUNYA SUDAH HABIS (Tiket Dibuka)
+                if (selisih < 0) {
+                    clearInterval(intervalTimer); 
+                    
+                    if (wadahTombol) {
+                        // Ambil nama link yang aman
+                        const lang = localStorage.getItem('lang') || 'id';
+                        const btnText = lang === 'id' ? 'BELI TIKET' : 'BUY TICKET';
+                        wadahTombol.innerHTML = `
+                            <button onclick="event.stopPropagation(); window.location.href='/detail?id=${eventId}'" class="btn-outline-book" style="animation: fadeIn 0.5s; background-color: var(--primary); color: white;">
+                                ${btnText}
+                            </button>
+                        `;
+                    }
+                    return;
+                }
+
+                // PERHITUNGAN MUNDUR (Bulan, Hari, Jam, Menit, Detik)
+                const bulan = Math.floor(selisih / (1000 * 60 * 60 * 24 * 30));
+                const hari = Math.floor((selisih % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+                const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+                const detik = Math.floor((selisih % (1000 * 60)) / 1000);
+
+                if (tempatNampilin) {
+                    let teksTimer = '';
+                    if (bulan > 0) teksTimer += `${bulan} Bln `;
+                    if (hari > 0 || bulan > 0) teksTimer += `${hari} Hr `;
+                    teksTimer += `${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+                    
+                    tempatNampilin.innerHTML = teksTimer;
+                }
+            }, 1000);
+        }
+        // 👆 --- MESIN HITUNG MUNDUR (END) --- 👆
 function updateHeroSlider(data) {
             const sliderContainer = document.getElementById('heroSliderContent');
             const indicatorContainer = document.getElementById('heroSliderIndicators');
