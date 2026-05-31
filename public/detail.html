@@ -317,34 +317,69 @@ document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTM
             }
         }
 
-        function renderTickets() {
+function renderTickets() {
             const container = document.getElementById('ticketTierSelection');
             const btnBuy = document.getElementById('btnBuy');
             container.innerHTML = '';
+
+            const now = new Date();
+            // 🗓️ RUMUS WAKTU SELESAI: Gabungan Tanggal & Jam Selesai
+            const waktuSelesaiEvent = new Date(`${currentEvent.date}T${currentEvent.endTime || '23:59'}`);
 
             const isFinished = currentEvent.availableSeats === -1;
             const isComingSoon = currentEvent.availableSeats === -2;
             const isEventSoldOut = currentEvent.availableSeats === 0;
 
-            if (isComingSoon) {
-                btnBuy.innerText = 'BELUM DIMULAI'; btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark";
-                container.innerHTML = `<div class="alert alert-info text-center"><i class="bi bi-clock-fill"></i> Tiket belum dijual.</div>`;
-                return;
-            }
-            if (isFinished) {
-                btnBuy.innerText = 'EVENT SELESAI'; btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
-                container.innerHTML = `<div class="alert alert-secondary text-center">Event telah selesai.</div>`;
-                return;
-            }
-            if (isEventSoldOut) {
-                btnBuy.innerText = 'HABIS TERJUAL'; btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
-                container.innerHTML = `<div class="alert alert-danger text-center">Seluruh Tiket Habis Terjual.</div>`;
+            // 👇 --- SKENARIO 1: EVENT SELESAI (Waktu Lewat / Diset Manual Admin) --- 👇
+            if (now > waktuSelesaiEvent || isFinished) {
+                btnBuy.innerText = 'EVENT SELESAI'; 
+                btnBuy.className = "btn btn-danger btn-lg px-4 rounded-pill fw-bold w-100 disabled";
+                btnBuy.disabled = true;
+                container.innerHTML = `<div class="alert alert-danger text-center fw-bold border-danger"><i class="bi bi-x-octagon-fill fs-4 d-block mb-2"></i> Event ini telah selesai.</div>`;
                 return;
             }
 
+            // 👇 --- SKENARIO 2: BELUM BUKA TIKET (COUNTDOWN) --- 👇
+            if (currentEvent.salesOpenDate && new Date(currentEvent.salesOpenDate) > now) {
+                btnBuy.innerHTML = '<i class="bi bi-clock-history"></i> AKAN HADIR'; 
+                btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled text-white";
+                btnBuy.disabled = true;
+                
+                // Bikin tampilan box timer yang keren nutupin area tiket
+                container.innerHTML = `
+                    <div class="alert alert-info text-center border-info shadow-sm" style="background: var(--primary-light);">
+                        <div class="small text-muted fw-bold mb-2"><i class="bi bi-ticket-detailed-fill"></i> PENJUALAN TIKET DIBUKA DALAM:</div>
+                        <div id="timerDetail" class="fw-900 text-primary" style="font-size: 1.8rem; letter-spacing: 2px;">Menghitung...</div>
+                    </div>`;
+                    
+                // Jalankan mesin hitung mundur
+                setTimeout(() => { mulaiHitungMundurDetail(currentEvent.salesOpenDate); }, 100);
+                return;
+            }
+
+            // 👇 --- SKENARIO 3: HABIS TERJUAL ATAU COMING SOON MANUAL --- 👇
+            if (isComingSoon) {
+                btnBuy.innerText = 'BELUM DIMULAI'; 
+                btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark w-100 disabled";
+                btnBuy.disabled = true;
+                container.innerHTML = `<div class="alert alert-info text-center"><i class="bi bi-clock-fill"></i> Tiket belum dijual.</div>`;
+                return;
+            }
+            if (isEventSoldOut) {
+                btnBuy.innerText = 'HABIS TERJUAL'; 
+                btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled";
+                btnBuy.disabled = true;
+                container.innerHTML = `<div class="alert alert-danger text-center fw-bold">Seluruh Tiket Habis Terjual.</div>`;
+                return;
+            }
+
+            // 👇 --- SKENARIO 4: NORMAL (SEDANG DIJUAL) --- 👇
+            btnBuy.innerText = 'Pilih Tiket';
+            btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled"; // Disabled dulu sampai diklik
+            btnBuy.disabled = true;
+
             let tickets = currentEvent.tickets;
             if (!tickets || tickets.length === 0) {
-                // Fallback jika tidak ada array tiket
                 tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             }
 
@@ -355,7 +390,7 @@ document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTM
                         <div class="d-flex align-items-center gap-3">
                             <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier(${index})" ${isSoldOut ? 'disabled' : ''}>
                             <div>
-                                <h6 class="mb-0">${tier.tierName}</h6>
+                                <h6 class="mb-0 fw-bold">${tier.tierName}</h6>
                                 <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
                             </div>
                         </div>
@@ -363,6 +398,41 @@ document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTM
                     </label>
                 `;
             });
+        }
+
+        // --- MESIN HITUNG MUNDUR KHUSUS HALAMAN DETAIL ---
+        function mulaiHitungMundurDetail(targetDateStr) {
+            const targetWaktu = new Date(targetDateStr).getTime();
+
+            const intervalTimer = setInterval(function() {
+                const waktuSekarang = new Date().getTime();
+                const selisih = targetWaktu - waktuSekarang;
+                const tempatNampilin = document.getElementById('timerDetail');
+
+                // KALAU WAKTUNYA SUDAH HABIS (WAKTUNYA BUKA TIKET!)
+                if (selisih < 0) {
+                    clearInterval(intervalTimer); 
+                    // Refresh tampilan otomatis biar langsung munculin radio button list tiket!
+                    renderTickets(); 
+                    return;
+                }
+
+                // PERHITUNGAN BULAN, HARI, JAM, MENIT, DETIK
+                const bulan = Math.floor(selisih / (1000 * 60 * 60 * 24 * 30));
+                const hari = Math.floor((selisih % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+                const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+                const detik = Math.floor((selisih % (1000 * 60)) / 1000);
+
+                if (tempatNampilin) {
+                    let teksTimer = '';
+                    if (bulan > 0) teksTimer += `${bulan} Bln `;
+                    if (hari > 0 || bulan > 0) teksTimer += `${hari} Hr `;
+                    teksTimer += `${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+                    
+                    tempatNampilin.innerHTML = teksTimer;
+                }
+            }, 1000);
         }
 
         function selectTier(index) {
