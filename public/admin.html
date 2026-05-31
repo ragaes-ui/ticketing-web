@@ -260,6 +260,11 @@
     </div>
 </div>
                         <div class="mb-3">
+    <label class="small text-white-50 fw-bold mb-1">Waktu Buka Tiket (Opsional)</label>
+    <input type="datetime-local" id="salesOpenDate" class="form-control">
+    <small class="text-info" style="font-size: 0.75rem;">*Kosongkan jika tiket ingin langsung dijual sekarang.</small>
+</div>
+                        <div class="mb-3">
                             <textarea id="description" class="form-control" rows="2" placeholder="Deskripsi" data-i18n-ph="ph_desc"></textarea>
                         </div>
                         <div class="mb-3" id="streamingAccountBox" style="display: none;">
@@ -692,6 +697,7 @@ function previewImage(u, i) {
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
                 startTime: document.getElementById('startTime').value, // <-- BARIS BARU
                 endTime: document.getElementById('endTime').value, // <-- BARIS BARU
+                salesOpenDate: document.getElementById('salesOpenDate').value,
                 mapsUrl: document.getElementById('mapsUrl').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
