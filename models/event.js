@@ -21,6 +21,10 @@ const eventSchema = new mongoose.Schema({
         type: String, 
         default: ""
     },
+    salesOpenDate: { 
+        type: Date, 
+        default: "" 
+    },
     // -----------------------------
     
     // Harga (Rupiah)
