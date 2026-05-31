@@ -301,7 +301,7 @@ app.get('/api/events/:id', async (req, res) => {
 app.post('/api/events', async (req, res) => {
     try {
         // 👇 1. Tangkap startTime dan endTime dari request frontend
-        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData } = req.body;
+        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate } = req.body;
         
         const newEvent = new Event({
             name, organizer, date, 
@@ -310,6 +310,7 @@ app.post('/api/events', async (req, res) => {
             price, totalCapacity: capacity, availableSeats: capacity,
             description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", 
             secretData: secretData || "", 
+            salesOpenDate: salesOpenDate || null,
             tickets: tickets || []
         });
         
