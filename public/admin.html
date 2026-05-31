@@ -247,7 +247,7 @@
                         <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
                         <div class="mb-3">
     <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal & Waktu Event</label>
-    <input type="datetime-local" id="date" class="form-control" required>
+    <input type="date" id="date" class="form-control" required>
 </div>
 <div class="row g-2 mb-3">
     <div class="col-6">
@@ -348,7 +348,7 @@
                 <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
                 <div class="mb-3"><input type="text" id="editMapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/..."></div>
 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Event</label>
-<div class="mb-3"><input type="datetime-local" id="editDate" class="form-control"></div>
+<div class="mb-3"><input type="date" id="editDate" class="form-control"></div>
 <div class="row g-2 mb-3">
     <div class="col-6">
         <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
@@ -729,17 +729,24 @@ function previewImage(u, i) {
                 document.getElementById('editOrganizer').value = ev.organizer || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
-                if(ev.date) document.getElementById('editDate').value = new Date(ev.date).toISOString().slice(0,16);
+if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
                 document.getElementById('editStartTime').value = ev.startTime || ''; // <-- BARIS BARU
 document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BARU
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
                 document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
-                // 👇 TAMBAHKAN KODINGAN INI 👇
-                if(ev.salesOpenDate) {
-                    document.getElementById('editSalesOpenDate').value = new Date(ev.salesOpenDate).toISOString().slice(0,16);
-                } else {
-                    document.getElementById('editSalesOpenDate').value = '';
-                }
+// 👇 REVISI LOGIKA TANGGAL BUKA TIKET 👇
+            if(ev.salesOpenDate) {
+                const d = new Date(ev.salesOpenDate);
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const hh = String(d.getHours()).padStart(2, '0');
+                const min = String(d.getMinutes()).padStart(2, '0');
+                document.getElementById('editSalesOpenDate').value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+            } else {
+                document.getElementById('editSalesOpenDate').value = '';
+            }
+            // 👆 -------------------------------- 👆
                 // 👆 ---------------------- 👆
                 eModal.show();
             }
