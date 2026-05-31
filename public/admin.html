@@ -699,7 +699,7 @@ function previewImage(u, i) {
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
                 startTime: document.getElementById('startTime').value, // <-- BARIS BARU
                 endTime: document.getElementById('endTime').value, // <-- BARIS BARU
-                salesOpenDate: document.getElementById('salesOpenDate').value,
+                salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '',
                 mapsUrl: document.getElementById('mapsUrl').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
@@ -760,7 +760,7 @@ document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BA
                 startTime: document.getElementById('editStartTime').value, // <-- BARIS BARU
     endTime: document.getElementById('editEndTime').value, // <-- BARIS BARU
                 // 👇 TAMBAHKAN 1 BARIS INI 👇
-                salesOpenDate: document.getElementById('editSalesOpenDate').value,
+                salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '',
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
                 mapsUrl: document.getElementById('editMapsUrl').value,
                 secretData: document.getElementById('editSecretData').value,
