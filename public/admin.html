@@ -359,6 +359,8 @@
         <input type="time" id="editEndTime" class="form-control">
     </div>
 </div>
+                <label class="small text-white-50 fw-bold mb-1">Waktu Buka Tiket (Opsional)</label>
+<div class="mb-3"><input type="datetime-local" id="editSalesOpenDate" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_desc">Deskripsi</label>
                 <div class="mb-3"><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
 
@@ -732,6 +734,13 @@ function previewImage(u, i) {
 document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BARU
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
                 document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
+                // 👇 TAMBAHKAN KODINGAN INI 👇
+                if(ev.salesOpenDate) {
+                    document.getElementById('editSalesOpenDate').value = new Date(ev.salesOpenDate).toISOString().slice(0,16);
+                } else {
+                    document.getElementById('editSalesOpenDate').value = '';
+                }
+                // 👆 ---------------------- 👆
                 eModal.show();
             }
         }
@@ -743,6 +752,8 @@ document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BA
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
                 startTime: document.getElementById('editStartTime').value, // <-- BARIS BARU
     endTime: document.getElementById('editEndTime').value, // <-- BARIS BARU
+                // 👇 TAMBAHKAN 1 BARIS INI 👇
+                salesOpenDate: document.getElementById('editSalesOpenDate').value,
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
                 mapsUrl: document.getElementById('editMapsUrl').value,
                 secretData: document.getElementById('editSecretData').value,
