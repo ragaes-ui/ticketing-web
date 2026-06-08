@@ -258,7 +258,47 @@ const sendLoginEmail = async (userEmail, userName) => {
 // ==========================================
 // --- ROUTES API ---
 // ==========================================
+// ==========================================
+// 🚀 PUBLIC API UNTUK PIHAK KETIGA (WEB LAIN)
+// ==========================================
+const cekApiKeyPublic = (req, res, next) => {
+    // Ambil kunci dari header request
+    const apiKeyClient = req.headers['x-api-key'];
+    const apiKeyServer = process.env.API_KEY_RCELLFEST; // Ngambil dari .env / Vercel
 
+    // Kalau kuncinya kosong atau nggak cocok, tolak!
+    if (!apiKeyClient || apiKeyClient !== apiKeyServer) {
+        return res.status(401).json({ 
+            success: false, 
+            message: "Akses Ditolak! API Key tidak valid atau tidak disertakan." 
+        });
+    }
+    next(); // Kalau cocok, silakan masuk
+};
+
+app.get('/api/v1/public/events', cekApiKeyPublic, async (req, res) => {
+    try {
+        // Cuma ngirim event yang tiketnya masih ada (> 0)
+        const events = await Event.find({ availableSeats: { $gt: 0 } });
+        
+        // Bikin data yang aman untuk pihak luar (Jangan kirim secretData!)
+        const safeData = events.map(ev => ({
+            id: ev._id,
+            eventName: ev.name,
+            category: ev.category,
+            date: ev.date,
+            time: `${ev.startTime} - ${ev.endTime}`,
+            location: ev.location,
+            price: ev.price,
+            availableTickets: ev.availableSeats
+        }));
+
+        res.json({ success: true, total: safeData.length, data: safeData });
+    } catch (err) { 
+        res.status(500).json({ success: false, message: "Server Error", error: err.message }); 
+    }
+});
+// ==========================================
 // API KHUSUS CEK PING SERVER
 app.get('/api/ping', (req, res) => {
     res.status(200).send('pong');
