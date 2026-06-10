@@ -366,7 +366,12 @@
 
                 <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Streaming)</label>
                 <div class="mb-3"><textarea id="editSecretData" class="form-control border-danger" rows="2"></textarea></div>
-                
+                <label class="small text-white-50 fw-bold mb-1">Tipe Tiket & Harga</label>
+<div id="editTiers"></div>
+<button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addTierRow('editTiers')">
+    <i class="bi bi-plus-circle me-1"></i> Tambah Tipe Tiket
+</button>
+
                 <div id="editTiers" class="mb-4 mt-3 pt-3 border-top border-secondary"></div>
                 <button onclick="saveEdit()" class="btn btn-primary w-100 rounded-pill py-2" data-i18n="btn_save">Simpan Perubahan</button>
             </div>
