@@ -697,19 +697,42 @@ app.post('/api/payment-token', async (req, res) => {
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        const gross_amount = price * quantity;
+        // 👇 PERBAIKAN: Paksa price dan quantity jadi angka (Integer) mutlak
+        const numPrice = parseInt(price) || 0;
+        const numQuantity = parseInt(quantity) || 1;
+        const gross_amount = numPrice * numQuantity;
+
+        if (gross_amount <= 0) return res.status(400).json({ message: 'Total harga tidak valid' });
+
         const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         let parameter = {
-            transaction_details: { order_id: orderId, gross_amount: gross_amount },
-            customer_details: { first_name: customerName, email: customerEmail, phone: customerPhone || "0800000000" },
-            item_details: [{ id: eventId, price: price, quantity: quantity, name: `${event.name.substring(0, 30)} - ${tierName || 'General'}` }]
+            transaction_details: { 
+                order_id: orderId, 
+                gross_amount: gross_amount // Sudah pasti angka sekarang
+            },
+            customer_details: { 
+                first_name: customerName, 
+                email: customerEmail, 
+                phone: customerPhone || "0800000000" 
+            },
+            item_details: [{ 
+                id: eventId.toString().substring(0, 50), // Pastikan ID nggak kepanjangan
+                price: numPrice, // Sudah pasti angka
+                quantity: numQuantity, // Sudah pasti angka
+                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}`.substring(0, 50) // Max 50 Karakter
+            }]
         };
 
         const token = await snap.createTransactionToken(parameter);
         res.json({ token, orderId });
-    } catch (error) { res.status(500).json({ message: 'Gagal membuat token pembayaran' }); }
+    } catch (error) { 
+        // Munculkan pesan error aslinya di terminal/Vercel Logs biar gampang dilacak
+        console.error("🚨 ERROR MIDTRANS:", error.message); 
+        res.status(500).json({ message: 'Gagal membuat token pembayaran', detail: error.message }); 
+    }
 });
+
 
 // 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
 app.post('/api/midtrans-success', async (req, res) => {
