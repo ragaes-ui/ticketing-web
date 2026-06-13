@@ -690,6 +690,18 @@ function previewImage(u, i) {
                     </div>
                 </div>`);
         }
+        // 👇 PASTE DI SINI MAS 👇
+        function addLineupRow(containerId, url = '') {
+            const html = `
+                <div class="input-group mb-2 lineup-row">
+                    <span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span>
+                    <input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}">
+                    <button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
+        }
+        // 👆 ------------------ 👆
         function getTiers(id) {
             return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
                 tierName: r.querySelector('.tier-name').value, price: parseInt(r.querySelector('.tier-price').value),
@@ -726,16 +738,7 @@ function previewImage(u, i) {
                 loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers');
                 previewImage('', 'addPreview'); Swal.fire(t.alert_success, t.alert_success_add, 'success');
                 // FUNGSI PENCETAK KOTAK INPUT LINE UP
-function addLineupRow(containerId, url = '') {
-    const html = `
-        <div class="input-group mb-2 lineup-row">
-            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span>
-            <input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}">
-            <button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
-        </div>
-    `;
-    document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
-}
+
             } catch (err) { Swal.fire(t.alert_err, t.alert_err_save, 'error'); }
         });
 
