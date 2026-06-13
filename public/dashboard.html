@@ -1246,7 +1246,9 @@
                             <div class="ticket-card h-100">
                                 <div class="ticket-header ${headerClass}">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <h5 class="fw-bold mb-0 text-truncate" style="max-width: 65%;">${event.name}</h5>
+                                        <h5 class="fw-bold mb-0" style="max-width: 65%;">
+    <marquee scrollamount="4" style="white-space: nowrap;">${event.name}</marquee>
+</h5>
                                         <span class="badge bg-white text-dark bg-opacity-75" style="font-size: 0.7rem;">${labelHeader}</span>
                                     </div>
                                     <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
