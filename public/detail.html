@@ -119,6 +119,11 @@
                     <h5 class="fw-bold mb-3 border-bottom pb-2">Deskripsi & Info Event</h5>
                     <p id="elDesc" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-muted);"></p>
                 </div>
+                <div class="glass-panel mt-4" id="lineupSection" style="display: none;">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-stars text-warning me-2"></i>EXTRAORDINARY LINE UP</h5>
+                    <div class="row g-3" id="lineupGrid">
+                        </div>
+                </div>
             </div>
 
             <div class="col-lg-5">
@@ -289,7 +294,29 @@ document.getElementById('elDate').innerText = dateStr;
 document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTML
 
                 renderTickets();
+// 👇 RUMUS MENCETAK LINE UP DARI DATABASE 👇
+                const lineupSection = document.getElementById('lineupSection');
+                const lineupGrid = document.getElementById('lineupGrid');
 
+                if (currentEvent.lineupImages && currentEvent.lineupImages.length > 0) {
+                    lineupSection.style.display = 'block'; 
+                    let htmlLineUp = '';
+                    
+                    currentEvent.lineupImages.forEach(imgUrl => {
+                        htmlLineUp += `
+                        <div class="col-6 col-md-4">
+                            <div style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-color); cursor: pointer; aspect-ratio: 4/5;">
+                                <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%); transition: 0.4s;" onmouseover="this.style.filter='grayscale(0%)'; this.style.transform='scale(1.05)';" onmouseout="this.style.filter='grayscale(30%)'; this.style.transform='scale(1)';">
+                            </div>
+                        </div>
+                        `;
+                    });
+                    
+                    lineupGrid.innerHTML = htmlLineUp;
+                } else {
+                    lineupSection.style.display = 'none'; 
+                }
+                // 👆 SELESAI RUMUS LINE UP 👆
                 // 3. Sembunyikan Loading, Tampilkan Konten Asli
                 document.getElementById('loadingDataContainer').style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
