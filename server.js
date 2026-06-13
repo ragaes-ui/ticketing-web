@@ -290,7 +290,9 @@ app.get('/api/v1/public/events', cekApiKeyPublic, async (req, res) => {
             time: `${ev.startTime} - ${ev.endTime}`,
             location: ev.location,
             price: ev.price,
-            availableTickets: ev.availableSeats
+            availableTickets: ev.availableSeats,
+            image: ev.image || "", // 👈 INI TAMBAHANNYA
+    lineupImages: ev.lineupImages || [] // 👈 INI TAMBAHANNYA
         }));
 
         res.json({ success: true, total: safeData.length, data: safeData });
@@ -341,7 +343,7 @@ app.get('/api/events/:id', async (req, res) => {
 app.post('/api/events', async (req, res) => {
     try {
         // 👇 1. Tangkap startTime dan endTime dari request frontend
-        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate } = req.body;
+        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages } = req.body;
         
         const newEvent = new Event({
             name, organizer, date, 
@@ -351,7 +353,8 @@ app.post('/api/events', async (req, res) => {
             description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", 
             secretData: secretData || "", 
             salesOpenDate: salesOpenDate || null,
-            tickets: tickets || []
+            tickets: tickets || [],
+            lineupImages: lineupImages || [] // 👈 INI TAMBAHANNYA
         });
         
         await newEvent.save();
