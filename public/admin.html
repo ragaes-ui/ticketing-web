@@ -720,7 +720,7 @@ function previewImage(u, i) {
             const tiers = getTiers('addTiers');
             if(tiers.length === 0) return Swal.fire(t.alert_err, t.alert_err_tier, 'error');
             const secretEl = document.getElementById('secretData');
-            
+            const lineupImagesAdd = Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, // <-- TAMBAHKAN INI
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
@@ -788,6 +788,7 @@ document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BA
         async function saveEdit() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers');
+            const lineupImagesEdit = Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
             const data = {
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
                 startTime: document.getElementById('editStartTime').value, // <-- BARIS BARU
