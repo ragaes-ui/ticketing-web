@@ -82,6 +82,12 @@ const eventSchema = new mongoose.Schema({
         type: String, 
         default: "" 
     },
+    // 👇 --- TAMBAHAN BARU UNTUK POSTER LINE UP ARTIS --- 👇
+    lineupImages: {
+        type: [String], // Array karena posternya bisa lebih dari satu
+        default: []
+    },
+    // 👆 ------------------------------------------------ 👆
     // 👇 --- TAMBAHAN BARU UNTUK TIPE TIKET (TIERING) --- 👇
     // Array ini akan menyimpan macam-macam jenis tiket di dalam 1 event
     tickets: [{
