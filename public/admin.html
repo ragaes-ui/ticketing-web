@@ -232,6 +232,11 @@
                             <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview')">
                             <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-white-50 small"><i class="bi bi-image fs-4"></i></span></div>
                         </div>
+                        <div class="mb-3 p-3 mt-3" style="background: rgba(0,255,255,0.05); border: 1px dashed rgba(0,255,255,0.3); border-radius: 12px;">
+    <label class="small text-info fw-bold mb-2"><i class="bi bi-people-fill me-1"></i> Poster Line Up Artis (Opsional)</label>
+    <div id="addLineups"></div>
+    <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster Line Up</button>
+</div>
                         <div class="mb-3">
                             <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_cat">Kategori</label>
                             <select id="category" class="form-select">
@@ -339,6 +344,11 @@
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_img">Link Gambar</label>
                 <div class="mb-3"><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"></div>
                 <div class="img-preview-box mb-3"><img id="editPreview"></div>
+                <div class="mb-3 p-3" style="background: rgba(0,255,255,0.05); border: 1px dashed rgba(0,255,255,0.3); border-radius: 12px;">
+    <label class="small text-info fw-bold mb-2"><i class="bi bi-people-fill me-1"></i> Poster Line Up Artis (Opsional)</label>
+    <div id="editLineups"></div>
+    <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster Line Up</button>
+</div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_name">Nama Event</label>
                 <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1">Nama Penyelenggara</label>
@@ -708,12 +718,24 @@ function previewImage(u, i) {
                 mapsUrl: document.getElementById('mapsUrl').value,
                 description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
-                capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
+                capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
+                lineupImages: lineupImagesAdd // 👈 INI TAMBAHANNYA
             };
             try {
                 await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
                 loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers');
                 previewImage('', 'addPreview'); Swal.fire(t.alert_success, t.alert_success_add, 'success');
+                // FUNGSI PENCETAK KOTAK INPUT LINE UP
+function addLineupRow(containerId, url = '') {
+    const html = `
+        <div class="input-group mb-2 lineup-row">
+            <span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span>
+            <input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}">
+            <button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
+        </div>
+    `;
+    document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
+}
             } catch (err) { Swal.fire(t.alert_err, t.alert_err_save, 'error'); }
         });
 
@@ -751,6 +773,9 @@ document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BA
             } else {
                 document.getElementById('editSalesOpenDate').value = '';
             }
+                // Panggil poster Lineup
+                document.getElementById('editLineups').innerHTML = ''; 
+                if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url));
             // 👆 -------------------------------- 👆
                 // 👆 ---------------------- 👆
                 eModal.show();
@@ -770,7 +795,8 @@ document.getElementById('editEndTime').value = ev.endTime || ''; // <-- BARIS BA
                 mapsUrl: document.getElementById('editMapsUrl').value,
                 secretData: document.getElementById('editSecretData').value,
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
-                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
+                lineupImages: lineupImagesEdit // 👈 INI TAMBAHANNYA
             };
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
             eModal.hide(); loadTable(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_edit, background: '#1c1c2d', color: '#fff' });
