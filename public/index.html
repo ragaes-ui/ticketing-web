@@ -385,6 +385,31 @@
         .custom-indicators button.active { background-color: var(--primary) !important; transform: scale(1.3) !important; }
         
         @media (max-width: 768px) { .hero-slider-wide img { aspect-ratio: 16/9; } .custom-nav-btn { display: none; } } 
+                /* 🔥 OPTIMASI PERFORMA & BATERAI KHUSUS HP 🔥 */
+        @media (max-width: 768px) {
+            /* Matikan bayangan bulat yang bikin berat render */
+            .blob { 
+                display: none !important; 
+            }
+            
+            /* Matikan animasi latar belakang bergerak, bikin statis saja */
+            body { 
+                animation: none !important; 
+                background-size: cover !important;
+            }
+            
+            /* Matikan efek kaca transparan yang terlalu tebal di kotak panel */
+            .glass-panel, .glass-card {
+                backdrop-filter: blur(5px) !important;
+                -webkit-backdrop-filter: blur(5px) !important;
+            }
+            
+            /* Ringankan kerja sistem untuk foto lineup */
+            #lineupGrid img {
+                filter: none !important; /* Hapus efek abu-abu agar CPU tidak kerja keras */
+            }
+        }
+
     </style>
 </head>
 <body>
