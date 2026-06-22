@@ -807,19 +807,30 @@ app.post('/api/payment-notification', async (req, res) => {
                 const ticket = await Order.findById(ticketId);
                 if(ticket) {
                     const event = await Event.findById(ticket.eventId);
-                    const qty = ticket.quantity || 1; // Tarik jumlah tiket
+                    const qty = ticket.quantity || 1; 
                     
                     const tierLama = event.tickets.find(t => t.tierName === ticket.tierName);
-                    if (tierLama) tierLama.availableSeats += qty; // Kembalikan stok lama
+                    if (tierLama) tierLama.availableSeats += qty; 
 
                     const tierBaru = event.tickets.find(t => t.tierName === newTierName);
-                    if (tierBaru) tierBaru.availableSeats -= qty; // Potong stok baru
+                    if (tierBaru) tierBaru.availableSeats -= qty; 
 
                     await event.save();
 
                     ticket.tierName = newTierName;
-                    ticket.price = tierBaru.price * qty; // Ubah harga total tiketnya
+                    ticket.price = tierBaru.price * qty; 
                     await ticket.save();
+
+                    // 📧 TAMBAHAN: KIRIM EMAIL TIKET BARU HASIL UPGRADE 📧
+                    await sendTicketEmail(ticket.email, {
+                        customerName: ticket.customerName,
+                        eventName: event.name + " (UPGRADED)",
+                        tierName: newTierName,
+                        location: event.location || 'TBA',
+                        eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+                        ticketCode: ticket.ticketCode,
+                        secretData: event.secretData
+                    });
                 }
             }
             return res.status(200).send('OK');
