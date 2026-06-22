@@ -1267,8 +1267,7 @@
                                 <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 text-warning border-warning mb-2">
                                     <i class="bi bi-send me-2"></i> <span data-i18n="btn_transfer">${t.btn_transfer}</span>
                                 </button>
-                                <button onclick="bukaModalUpgrade('${ticket._id}', '${event._id}', ${hargaTiket})" class="btn btn-outline-success btn-sm w-100 rounded-pill">
-                                    <i class="bi bi-arrow-up-circle me-1"></i> Upgrade Tiket
+<button onclick="bukaModalUpgrade('${ticket._id}', '${event._id}', ${hargaTiket}, ${qty})" class="btn btn-outline-success btn-sm w-100 rounded-pill mt-2">                                    <i class="bi bi-arrow-up-circle me-1"></i> Upgrade Tiket
                                 </button>` : ''}
                             </div>
                         `;
@@ -1426,12 +1425,15 @@ async function prosesTransfer() {
                 Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1e293b', color: '#fff'});
             }
         }
+// ==========================================
+        // 🔄 FUNGSI UPGRADE TIKET (UPDATE QTY & HARGA SATUAN)
         // ==========================================
-        // 🔄 FUNGSI UPGRADE TIKET
-        // ==========================================
-        async function bukaModalUpgrade(ticketId, eventId, currentPrice) {
+        async function bukaModalUpgrade(ticketId, eventId, totalPaid, qty) {
             document.getElementById('upgTicketId').value = ticketId;
-            document.getElementById('upgCurrentPrice').value = currentPrice;
+            
+            // CARI HARGA SATUAN (Total Bayar dibagi Jumlah Tiket)
+            const unitPrice = Math.round(totalPaid / qty); 
+            document.getElementById('upgCurrentPrice').value = unitPrice;
             document.getElementById('upgPriceBox').classList.add('d-none'); 
             
             const upgModal = new bootstrap.Modal(document.getElementById('upgradeModal'));
@@ -1445,13 +1447,15 @@ async function prosesTransfer() {
                 const event = await res.json();
                 
                 let optionsHtml = '<option value="">-- Pilih Tiket Tujuan --</option>';
-                const tiketTersedia = event.tickets.filter(t => t.price > currentPrice && t.availableSeats > 0);
+                
+                // FILTER: Harga satuan tujuan harus lebih mahal, & Sisa kursi harus cukup untuk jumlah (qty) yang dibeli
+                const tiketTersedia = event.tickets.filter(t => parseInt(t.price) > unitPrice && parseInt(t.availableSeats) >= qty);
                 
                 if(tiketTersedia.length === 0) {
-                    optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out)</option>';
+                    optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out / Stok Kurang)</option>';
                 } else {
                     tiketTersedia.forEach(t => {
-                        optionsHtml += `<option value="${t.tierName}" data-price="${t.price}">${t.tierName} - Sisa ${t.availableSeats} kursi</option>`;
+                        optionsHtml += `<option value="${t.tierName}" data-price="${t.price}" data-qty="${qty}">${t.tierName} - Sisa ${t.availableSeats} kursi</option>`;
                     });
                 }
                 selectEl.innerHTML = optionsHtml;
@@ -1462,7 +1466,7 @@ async function prosesTransfer() {
 
         function hitungSelisih() {
             const selectEl = document.getElementById('upgTierSelect');
-            const currentPrice = parseInt(document.getElementById('upgCurrentPrice').value);
+            const currentUnitPrice = parseInt(document.getElementById('upgCurrentPrice').value);
             const priceBox = document.getElementById('upgPriceBox');
             const priceText = document.getElementById('upgPriceText');
             
@@ -1470,10 +1474,14 @@ async function prosesTransfer() {
                 priceBox.classList.add('d-none'); return;
             }
 
-            const newPrice = parseInt(selectEl.options[selectEl.selectedIndex].getAttribute('data-price'));
-            const selisih = newPrice - currentPrice;
+            // Hitung selisih harga dikali dengan jumlah tiket (qty) yang dimiliki user
+            const optionDipilih = selectEl.options[selectEl.selectedIndex];
+            const newUnitPrice = parseInt(optionDipilih.getAttribute('data-price'));
+            const qty = parseInt(optionDipilih.getAttribute('data-qty'));
             
-            priceText.innerText = 'Rp ' + selisih.toLocaleString('id-ID');
+            const selisihTotal = (newUnitPrice - currentUnitPrice) * qty;
+            
+            priceText.innerText = 'Rp ' + selisihTotal.toLocaleString('id-ID');
             priceBox.classList.remove('d-none');
         }
 
