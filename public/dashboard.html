@@ -332,6 +332,15 @@
             background-color: #1e293b !important; 
             color: #ffffff !important;
         }
+        /* 🔥 OPTIMASI PERFORMA & BATERAI KHUSUS HP 🔥 */
+        @media (max-width: 768px) {
+            .blob { display: none !important; }
+            body { animation: none !important; background-size: cover !important; }
+            .glass-card, .navbar, .custom-search-box, .modal-content {
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+            }
+        }
     </style>
 </head>
 <body>
