@@ -807,17 +807,18 @@ app.post('/api/payment-notification', async (req, res) => {
                 const ticket = await Order.findById(ticketId);
                 if(ticket) {
                     const event = await Event.findById(ticket.eventId);
+                    const qty = ticket.quantity || 1; // Tarik jumlah tiket
                     
                     const tierLama = event.tickets.find(t => t.tierName === ticket.tierName);
-                    if (tierLama) tierLama.availableSeats += 1;
+                    if (tierLama) tierLama.availableSeats += qty; // Kembalikan stok lama
 
                     const tierBaru = event.tickets.find(t => t.tierName === newTierName);
-                    if (tierBaru) tierBaru.availableSeats -= 1;
+                    if (tierBaru) tierBaru.availableSeats -= qty; // Potong stok baru
 
                     await event.save();
 
                     ticket.tierName = newTierName;
-                    ticket.price = tierBaru.price;
+                    ticket.price = tierBaru.price * qty; // Ubah harga total tiketnya
                     await ticket.save();
                 }
             }
@@ -926,7 +927,7 @@ app.post('/api/use-ticket', async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: 'Terjadi kesalahan.' }); }
 });
 // ==========================================
-// 🔄 API KHUSUS UPGRADE TIKET
+// 🔄 API KHUSUS UPGRADE TIKET (UPDATE QTY)
 // ==========================================
 app.post('/api/upgrade-ticket', async (req, res) => {
     try {
@@ -938,14 +939,18 @@ app.post('/api/upgrade-ticket', async (req, res) => {
         const event = await Event.findById(ticketLama.eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        const tierLama = event.tickets.find(t => t.tierName === ticketLama.tierName);
         const tierBaru = event.tickets.find(t => t.tierName === newTierName);
-
         if (!tierBaru) return res.status(400).json({ message: 'Tier tujuan tidak valid' });
-        if (tierBaru.availableSeats <= 0) return res.status(400).json({ message: 'Stok tiket tujuan sudah habis' });
-        if (tierBaru.price <= ticketLama.price) return res.status(400).json({ message: 'Upgrade hanya ke tiket yang harganya lebih tinggi' });
 
-        const selisihHarga = tierBaru.price - ticketLama.price;
+        // Hitung Qty dan Harga Satuan
+        const qty = ticketLama.quantity || 1;
+        const unitPriceLama = Math.round(ticketLama.price / qty);
+
+        if (tierBaru.availableSeats < qty) return res.status(400).json({ message: 'Stok tiket tujuan tidak cukup' });
+        if (tierBaru.price <= unitPriceLama) return res.status(400).json({ message: 'Upgrade hanya ke tiket yang harganya lebih tinggi' });
+
+        // Tagihan akhir Midtrans = Selisih x Qty
+        const selisihHarga = (tierBaru.price - unitPriceLama) * qty;
         const orderId = `UPG-${ticketId.substring(ticketId.length - 6)}-${Date.now()}`;
 
         const parameter = {
