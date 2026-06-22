@@ -798,7 +798,32 @@ app.post('/api/payment-notification', async (req, res) => {
         let orderId = statusResponse.order_id;
         let transactionStatus = statusResponse.transaction_status;
         let fraudStatus = statusResponse.fraud_status;
+// 👇 PENCEGAT TRANSAKSI UPGRADE 👇
+        if (statusResponse.custom_field1 === "UPGRADE") {
+            if (transactionStatus == 'capture' || transactionStatus == 'settlement'){
+                const ticketId = statusResponse.custom_field2;
+                const newTierName = statusResponse.custom_field3;
 
+                const ticket = await Order.findById(ticketId);
+                if(ticket) {
+                    const event = await Event.findById(ticket.eventId);
+                    
+                    const tierLama = event.tickets.find(t => t.tierName === ticket.tierName);
+                    if (tierLama) tierLama.availableSeats += 1;
+
+                    const tierBaru = event.tickets.find(t => t.tierName === newTierName);
+                    if (tierBaru) tierBaru.availableSeats -= 1;
+
+                    await event.save();
+
+                    ticket.tierName = newTierName;
+                    ticket.price = tierBaru.price;
+                    await ticket.save();
+                }
+            }
+            return res.status(200).send('OK');
+        }
+        // 👆 ---------------------------- 👆
         if (orderId.startsWith('TOPUP-')) {
             const topup = await Topup.findOne({ orderId: orderId });
             if (!topup) return res.status(404).json({ message: "Data Top Up tidak ditemukan" });
@@ -899,6 +924,41 @@ app.post('/api/use-ticket', async (req, res) => {
         await ticket.save();
         res.json({ success: true, message: 'Berhasil Check-In! Tiket hangus.' });
     } catch (error) { res.status(500).json({ success: false, message: 'Terjadi kesalahan.' }); }
+});
+// ==========================================
+// 🔄 API KHUSUS UPGRADE TIKET
+// ==========================================
+app.post('/api/upgrade-ticket', async (req, res) => {
+    try {
+        const { ticketId, newTierName, userId } = req.body;
+
+        const ticketLama = await Order.findById(ticketId);
+        if (!ticketLama) return res.status(404).json({ message: 'Tiket tidak ditemukan' });
+
+        const event = await Event.findById(ticketLama.eventId);
+        if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
+
+        const tierLama = event.tickets.find(t => t.tierName === ticketLama.tierName);
+        const tierBaru = event.tickets.find(t => t.tierName === newTierName);
+
+        if (!tierBaru) return res.status(400).json({ message: 'Tier tujuan tidak valid' });
+        if (tierBaru.availableSeats <= 0) return res.status(400).json({ message: 'Stok tiket tujuan sudah habis' });
+        if (tierBaru.price <= ticketLama.price) return res.status(400).json({ message: 'Upgrade hanya ke tiket yang harganya lebih tinggi' });
+
+        const selisihHarga = tierBaru.price - ticketLama.price;
+        const orderId = `UPG-${ticketId.substring(ticketId.length - 6)}-${Date.now()}`;
+
+        const parameter = {
+            transaction_details: { order_id: orderId, gross_amount: selisihHarga },
+            customer_details: { first_name: ticketLama.customerName, email: ticketLama.email },
+            custom_field1: "UPGRADE",
+            custom_field2: ticketId,       
+            custom_field3: newTierName     
+        };
+
+        const snapToken = await snap.createTransactionToken(parameter);
+        res.json({ token: snapToken, orderId: orderId, selisihHarga });
+    } catch (error) { res.status(500).json({ message: 'Kesalahan server saat upgrade' }); }
 });
 
 app.put('/api/user/update-name', async (req, res) => {
