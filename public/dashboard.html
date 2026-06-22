@@ -610,6 +610,36 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="upgradeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border);">
+                <div class="modal-header border-bottom" style="border-color: var(--glass-border);">
+                    <h5 class="modal-title fw-bold text-white"><i class="bi bi-arrow-up-circle-fill text-warning me-2"></i>Upgrade Tiket</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="upgTicketId">
+                    <input type="hidden" id="upgCurrentPrice">
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Pilih Tipe Tiket Baru (Hanya yang lebih mahal & tersedia):</label>
+                        <select id="upgTierSelect" class="form-select text-white" style="background: rgba(128,128,128,0.1); border: 1px solid var(--text-muted);" onchange="hitungSelisih()">
+                            <option value="">-- Sedang memuat tiket... --</option>
+                        </select>
+                    </div>
+                    
+                    <div id="upgPriceBox" class="alert alert-warning bg-opacity-10 border-warning text-warning text-center d-none">
+                        <small>Selisih Harga yang Harus Dibayar:</small><br>
+                        <h3 class="fw-bold mb-0 mt-1" id="upgPriceText">Rp 0</h3>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-color: var(--glass-border);">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-warning fw-bold text-dark rounded-pill px-4" id="btnProsesUpgrade" onclick="prosesUpgrade()">Bayar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="signal-badge" id="floatingPing" title="Ping ke Server Rcellfest">
         <span id="networkDot" class="signal-dot dot-kuat"></span> 
         <span id="networkSpeed">Menghitung...</span>
@@ -1234,8 +1264,11 @@
                                     <i class="bi bi-download me-2"></i> ${t.btn_pdf}
                                 </button>
                                 ${ticket.status !== 'used' ? `
-                                <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 text-warning border-warning">
+                                <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 text-warning border-warning mb-2">
                                     <i class="bi bi-send me-2"></i> <span data-i18n="btn_transfer">${t.btn_transfer}</span>
+                                </button>
+                                <button onclick="bukaModalUpgrade('${ticket._id}', '${event._id}', ${hargaTiket})" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                                    <i class="bi bi-arrow-up-circle me-1"></i> Upgrade Tiket
                                 </button>` : ''}
                             </div>
                         `;
@@ -1393,6 +1426,101 @@ async function prosesTransfer() {
                 Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1e293b', color: '#fff'});
             }
         }
+        // ==========================================
+        // 🔄 FUNGSI UPGRADE TIKET
+        // ==========================================
+        async function bukaModalUpgrade(ticketId, eventId, currentPrice) {
+            document.getElementById('upgTicketId').value = ticketId;
+            document.getElementById('upgCurrentPrice').value = currentPrice;
+            document.getElementById('upgPriceBox').classList.add('d-none'); 
+            
+            const upgModal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+            upgModal.show();
+
+            const selectEl = document.getElementById('upgTierSelect');
+            selectEl.innerHTML = '<option value="">-- Sedang memuat data... --</option>';
+
+            try {
+                const res = await fetch(`/api/events/${eventId}`);
+                const event = await res.json();
+                
+                let optionsHtml = '<option value="">-- Pilih Tiket Tujuan --</option>';
+                const tiketTersedia = event.tickets.filter(t => t.price > currentPrice && t.availableSeats > 0);
+                
+                if(tiketTersedia.length === 0) {
+                    optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out)</option>';
+                } else {
+                    tiketTersedia.forEach(t => {
+                        optionsHtml += `<option value="${t.tierName}" data-price="${t.price}">${t.tierName} - Sisa ${t.availableSeats} kursi</option>`;
+                    });
+                }
+                selectEl.innerHTML = optionsHtml;
+            } catch (err) {
+                selectEl.innerHTML = '<option value="">Gagal memuat tiket</option>';
+            }
+        }
+
+        function hitungSelisih() {
+            const selectEl = document.getElementById('upgTierSelect');
+            const currentPrice = parseInt(document.getElementById('upgCurrentPrice').value);
+            const priceBox = document.getElementById('upgPriceBox');
+            const priceText = document.getElementById('upgPriceText');
+            
+            if(!selectEl.value) {
+                priceBox.classList.add('d-none'); return;
+            }
+
+            const newPrice = parseInt(selectEl.options[selectEl.selectedIndex].getAttribute('data-price'));
+            const selisih = newPrice - currentPrice;
+            
+            priceText.innerText = 'Rp ' + selisih.toLocaleString('id-ID');
+            priceBox.classList.remove('d-none');
+        }
+
+        async function prosesUpgrade() {
+            const ticketId = document.getElementById('upgTicketId').value;
+            const newTierName = document.getElementById('upgTierSelect').value;
+            
+            if(!newTierName) return Swal.fire({icon: 'warning', title: 'Tunggu', text: 'Pilih tiket tujuan dulu!', background: '#1c1c2d', color: '#fff'});
+
+            const btn = document.getElementById('btnProsesUpgrade');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/upgrade-ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticketId, newTierName, userId: user.id }) 
+                });
+                const data = await res.json();
+
+                if(!res.ok) throw new Error(data.message);
+
+                bootstrap.Modal.getInstance(document.getElementById('upgradeModal')).hide();
+
+                window.snap.pay(data.token, {
+                    onSuccess: function() {
+                        Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Tiket di-upgrade ke ' + newTierName, background: '#1c1c2d', color: '#fff'})
+                        .then(() => location.reload());
+                    },
+                    onPending: function() {
+                        Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di Midtrans.', background: '#1c1c2d', color: '#fff'});
+                    },
+                    onError: function() {
+                        Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.', background: '#1c1c2d', color: '#fff'});
+                    },
+                    onClose: function () {
+                        Swal.fire({icon: 'warning', title: 'Batal', text: 'Menutup jendela pembayaran.', background: '#1c1c2d', color: '#fff'});
+                    }
+                });
+            } catch (error) {
+                Swal.fire({icon: 'error', title: 'Gagal', text: error.message, background: '#1c1c2d', color: '#fff'});
+            } finally {
+                btn.innerHTML = 'Bayar'; btn.disabled = false;
+            }
+        }
+        // ==========================================
         async function downloadTicket(dataString) {
             const data = JSON.parse(decodeURIComponent(dataString));
             const lang = localStorage.getItem('lang') || 'id';
