@@ -392,25 +392,32 @@
             <div class="tab-pane fade" id="promo-pane" role="tabpanel">
                 <div class="glass-card">
                     <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i>Kelola Kode Promo</h5>
-                    <form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(0, 255, 100, 0.05); border: 1px dashed rgba(0, 255, 100, 0.3);">
-                        <div class="col-md-3">
+<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(0, 255, 100, 0.05); border: 1px dashed rgba(0, 255, 100, 0.3);">
+                        <div class="col-md-6">
+                            <label class="small text-white-50 fw-bold mb-1">Target Event Promo</label>
+                            <select id="promoEventId" class="form-select text-white" required>
+                                <option value="ALL">-- Berlaku Untuk Semua Event --</option>
+                                <!-- Nanti diisi otomatis oleh Javascript -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="small text-white-50 fw-bold mb-1">Kode Promo</label>
                             <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Potongan Harga (Rp)</label>
                             <input type="number" id="promoDisc" class="form-control" placeholder="20000" required>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Batas Kuota</label>
                             <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Masa Aktif (Hari)</label>
                             <input type="number" id="promoDays" class="form-control" placeholder="7" required>
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-success w-100 rounded-pill py-2"><i class="bi bi-plus-lg"></i> Simpan</button>
+                        <div class="col-12 mt-2">
+                            <button type="submit" class="btn btn-success w-100 rounded-pill py-2"><i class="bi bi-plus-lg"></i> Buat Kode Promo</button>
                         </div>
                     </form>
                     
@@ -781,25 +788,57 @@
             eModal.hide(); loadTable(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_edit, background: '#1c1c2d', color: '#fff' });
         }
 
-        // --- MANAJEMEN PROMO ---
+// --- MANAJEMEN PROMO ---
         async function loadPromos() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
+            
+            // 1. ISI DROPDOWN EVENT OTOMATIS DARI DATABASE
+            const promoSelect = document.getElementById('promoEventId');
+            if (promoSelect && eventsData.length > 0) {
+                let opts = '<option value="ALL">-- Berlaku Untuk Semua Event --</option>';
+                eventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
+                promoSelect.innerHTML = opts;
+            }
+
+            // 2. RENDER KARTU PROMO
             try { 
                 const res = await fetch('/api/promos'); const data = await res.json(); 
                 document.getElementById('promoList').innerHTML = data.length === 0 ? `<div class="text-white-50 col-12">${t.empty_table}</div>` : data.map(p => `
                     <div class="col-md-4">
                         <div class="promo-ticket m-0 h-100">
-                            <div><b class="text-warning fs-5">${p.code}</b><br><small class="text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small></div>
+                            <div>
+                                <b class="text-warning fs-5">${p.code}</b><br>
+                                <span class="badge bg-info text-dark mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT'}</span><br>
+                                <small class="text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small>
+                            </div>
                             <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>`).join(''); 
             } catch(e) {}
         }
+
         document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault(); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
-            const data = { code: document.getElementById('promoCode').value, discount: document.getElementById('promoDisc').value, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value };
-            await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); e.target.reset(); loadPromos(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_promo, background: '#1c1c2d', color: '#fff' });
+            
+            // Tangkap Event ID dan Nama Event dari Dropdown
+            const promoSelect = document.getElementById('promoEventId');
+            const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
+
+            const data = { 
+                code: document.getElementById('promoCode').value, 
+                discount: document.getElementById('promoDisc').value, 
+                quota: document.getElementById('promoQuota').value, 
+                daysActive: document.getElementById('promoDays').value,
+                eventId: promoSelect.value, // Simpan ID Event-nya
+                eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT' : selectedEventName // Simpan Nama Event-nya
+            };
+
+            await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+            e.target.reset(); 
+            loadPromos(); 
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_promo, background: '#1c1c2d', color: '#fff' });
         });
+        
         async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
 
         // --- MANAJEMEN ANGGOTA ---
