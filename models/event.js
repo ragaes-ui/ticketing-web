@@ -94,7 +94,8 @@ const eventSchema = new mongoose.Schema({
         tierName: { type: String, required: true },      // Contoh: "Presale 1", "VIP", atau "Sharing 1 Bulan"
         price: { type: Number, required: true },         // Harga spesifik untuk kategori ini
         totalSeats: { type: Number, required: true },    // Kuota khusus kategori ini
-        availableSeats: { type: Number, required: true } // Sisa tiket kategori ini
+        availableSeats: { type: Number, required: true }, // Sisa tiket kategori ini
+        minQty: { type: Number, default: 1 }
     }],
     // ----------------------------------------------------
     isPinned: { type: Boolean, default: false }
