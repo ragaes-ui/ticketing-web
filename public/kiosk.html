@@ -91,6 +91,15 @@ position: relative; /* 👈 Ubah dari absolute jadi relative */
         }
         .sponsor-text { font-size: 0.75rem; color: #6b7280; letter-spacing: 2px; margin-bottom: 8px; }
         .s-name { font-weight: 700; font-size: 0.9rem; color: #cbd5e1; margin: 0 10px; }
+        /* 🔥 OPTIMASI PERFORMA & BATERAI KHUSUS HP 🔥 */
+        @media (max-width: 768px) {
+            .blob { display: none !important; }
+            body { animation: none !important; background-size: cover !important; }
+            .glass-card, .navbar, .modal-content {
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+            }
+        }
     </style>
 </head>
 <body>
