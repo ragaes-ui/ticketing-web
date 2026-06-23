@@ -101,11 +101,10 @@ app.use(keycloak.middleware());
 app.get(['/admin', '/admin.html'], keycloak.protect(), (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
 });
-// 👇 TAMBAHKAN 3 BARIS INI DI SINI 👇
-app.get(['/kiosk', '/kiosk.html'], keycloak.protect(), (req, res) => {
+// Kiosk sekarang bebas dari Lemur-7, tapi akan kita jaga pakai Javascript MongoDB
+app.get(['/kiosk', '/kiosk.html'], (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'kiosk.html'));
 });
-// 👆 ------------------------------- 👆
 app.get('/logout', (req, res) => {
     if (req.session) {
         // 1. Hapus sesi di MongoDB dengan callback agar aman
