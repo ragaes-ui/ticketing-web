@@ -465,6 +465,7 @@ function renderTickets() {
                             <div>
                                 <h6 class="mb-0 fw-bold">${tier.tierName}</h6>
                                 <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
+                                ${tier.minQty > 1 ? `<br><span class="badge bg-warning text-dark mt-1" style="font-size: 0.65rem;">Min. Beli: ${tier.minQty} Tiket</span>` : ''}
                             </div>
                         </div>
                         <div class="fw-bold text-primary fs-5">Rp ${tier.price.toLocaleString('id-ID')}</div>
@@ -553,7 +554,8 @@ function renderTickets() {
                 eventLocation: currentEvent.location,
                 tierName: selectedTierObj.tierName,
                 price: selectedTierObj.price,
-                availableSeats: selectedTierObj.availableSeats
+                availableSeats: selectedTierObj.availableSeats,
+                minQty: selectedTierObj.minQty || 1 // 👈 KUNCI RAHASIANYA DI SINI
             };
 
             // 3. Simpan ke dalam memori HP/Browser (Local Storage)
