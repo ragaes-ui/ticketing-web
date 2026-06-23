@@ -1019,6 +1019,11 @@ app.post('/api/check-promo', async (req, res) => {
 
         if (!promo) return res.json({ valid: false, message: "Kode promo tidak ditemukan." });
         if (promo.quota <= 0) return res.json({ valid: false, message: "Kuota promo habis." });
+        // 👇 PENGECEKAN KETAT PROMO SPESIFIK EVENT 👇
+        if (promo.eventId && promo.eventId !== 'ALL' && promo.eventId !== req.body.eventId) {
+            return res.status(400).json({ message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
+        }
+        // 👆 -------------------------------------- 👆
         if (new Date() > promo.expiresAt) return res.json({ valid: false, message: "Kode promo sudah kadaluarsa." });
 
         res.json({ valid: true, discount: promo.discount, message: `Diskon Rp ${promo.discount.toLocaleString('id-ID')}!` });
