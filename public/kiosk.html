@@ -117,6 +117,15 @@ position: relative; /* 👈 Ubah dari absolute jadi relative */
     </div>
 
 <script>
+    // 👇 SATPAM PENJAGA KIOSK (PENGGANTI KEYCLOAK) 👇
+    const userKiosk = JSON.parse(localStorage.getItem('userData'));
+
+    // JIKA BELUM LOGIN, ATAU JABATANNYA CUMA "USER" BIASA -> TENDANG!
+    if (!userKiosk || (userKiosk.role !== 'panitia' && userKiosk.role !== 'admin')) {
+        alert('⛔ AKSES DITOLAK! Akun Anda tidak memiliki izin sebagai Panitia Scanner.');
+        window.location.href = '/'; // Usir ke halaman depan
+    }
+    // 👆 --------------------------------------- 👆
     let isProcessing = false;
     let html5QrCode;
     let currentEventId = null;
