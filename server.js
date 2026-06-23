@@ -1039,14 +1039,31 @@ app.get('/api/promos', async (req, res) => {
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// --- JALUR API BUAT SIMPAN PROMO BARU ---
 app.post('/api/promos', async (req, res) => {
     try {
-        const { code, discount, quota, daysActive } = req.body;
-        const expiresAt = new Date(); expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
-        const newPromo = new Promo({ code, discount, quota, expiresAt });
+        // 👇 TAMBAHKAN eventId DAN eventName DI SINI 👇
+        const { code, discount, quota, daysActive, eventId, eventName } = req.body;
+        
+        // Atur tanggal kedaluwarsa
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
+
+        // 👇 PASTIKAN KEDUANYA IKUT DIMASUKKAN KE DALAM DATABASE 👇
+        const newPromo = new Promo({ 
+            code: code, 
+            discount: discount, 
+            quota: quota, 
+            expiresAt: expiresAt,
+            eventId: eventId,      // Kunci rahasianya!
+            eventName: eventName   // Kunci rahasianya!
+        });
+
         await newPromo.save();
-        res.json({ success: true, message: "Promo berhasil dibuat!" });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        res.json({ success: true, message: 'Promo berhasil dibuat' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 
 app.delete('/api/promos/:id', async (req, res) => {
