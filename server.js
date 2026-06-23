@@ -1161,6 +1161,18 @@ app.get('/api/admin/users', async (req, res) => {
         res.json({ success: true, data: users });
     } catch (error) { res.status(500).json({ success: false, message: "Gagal mengambil data user." }); }
 });
+// 👇 TAMBAHAN API UNTUK UPDATE ROLE ANGGOTA 👇
+app.put('/api/admin/users/:id/role', async (req, res) => {
+    try {
+        const { role } = req.body;
+        // Cari user dan update field 'role'-nya
+        await User.findByIdAndUpdate(req.params.id, { role: role });
+        res.json({ success: true, message: 'Jabatan berhasil diupdate' });
+    } catch (error) { 
+        res.status(500).json({ success: false, message: error.message }); 
+    }
+});
+// 👆 ---------------------------------------- 👆
 
 // ROUTE HANDLER TERAKHIR
 app.get('*', (req, res) => {
