@@ -196,6 +196,7 @@
         let userData = {}; 
         let checkoutData = {}; 
         let selectedPayment = null; 
+        let minQty = 1; // 👈 Variabel baru
         let qty = 1; 
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
@@ -215,7 +216,11 @@
 
             userData = JSON.parse(userRaw); 
             checkoutData = JSON.parse(checkoutRaw);
-            
+            minQty = checkoutData.minQty || 1;
+            qty = minQty; // Paksa jumlah keranjang awal sama dengan minQty
+            const qtyInput = document.getElementById('chkQty');
+            if (qtyInput) qtyInput.value = qty;
+            // 👆 ------------------------------------------- 👆
             document.getElementById('chkName').value = userData.fullName || userData.username;
             document.getElementById('chkEmail').value = userData.email;
             document.getElementById('chkPhone').value = userData.phone || '';
@@ -256,10 +261,11 @@ if (breadcrumbContainer && checkoutData) {
             window.history.replaceState(null, '', `/detail?checkout=true&id=${checkoutData.eventId}`);
         });
 
-        function manualUpdateQty(val) { 
+function manualUpdateQty(val) { 
             const max = checkoutData.availableSeats || 1; 
             let newQty = parseInt(val); 
-            if (isNaN(newQty) || newQty < 1) newQty = 1; 
+            // Kalau diketik manual di bawah angka minimal, paksa balik ke minQty
+            if (isNaN(newQty) || newQty < minQty) newQty = minQty; 
             if (newQty > max) newQty = max; 
             qty = newQty; 
             document.getElementById('chkQty').value = qty; 
@@ -269,11 +275,14 @@ if (breadcrumbContainer && checkoutData) {
         function updateQty(change) { 
             const max = checkoutData.availableSeats || 1; 
             let newQty = qty + change; 
-            if (newQty >= 1 && newQty <= max) { 
+            if (newQty >= minQty && newQty <= max) { 
                 qty = newQty; 
                 document.getElementById('chkQty').value = qty; 
                 hitungTotal(); 
-            } 
+            } else if (newQty < minQty) {
+                // Munculkan notifikasi kalau maksa ngeklik tombol minus
+                Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500, icon: 'warning', title: `Minimal pembelian ${minQty} tiket!`, background: 'var(--bg-card)', color: 'var(--text-main)' });
+            }
         }
 
         function hitungTotal() { 
