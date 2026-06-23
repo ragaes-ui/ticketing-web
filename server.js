@@ -645,31 +645,38 @@ app.post('/api/buy-ticket', async (req, res) => {
         );
         if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
-        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
-        
-        const newOrder = new Order({
-            ticketCode: ticketCode,
-            eventId: eventId,
-            price: finalPrice,
-            tierName: tierName || 'General',
-            quantity: quantity,
-            customerName: buyerData ? buyerData.name : (user.fullName || user.username),
-            email: buyerData ? buyerData.email : user.email,
-            phone: buyerData ? buyerData.phone : user.phone,
-            nik: buyerData ? buyerData.nik : undefined,
-            status: 'valid',
-            paymentMethod: 'SALDO', 
-            orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
-        });
-        await newOrder.save();
+// 👇 PABRIK TIKET SALDO (LOOPING PER BARCODE) 👇
+        const hargaSatuan = finalPrice / quantity;
+        let tiketPertama = "";
+
+        for (let i = 0; i < quantity; i++) {
+            const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+            const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
+            if (i === 0) tiketPertama = kodeUnik; // Simpan 1 kode buat dikirim ke email
+
+            const newOrder = new Order({
+                ticketCode: kodeUnik,
+                eventId: eventId,
+                price: hargaSatuan,
+                tierName: tierName || 'General',
+                quantity: 1, // 👈 Paksa jadi 1 per barcode!
+                customerName: buyerData ? buyerData.name : (user.fullName || user.username),
+                email: buyerData ? buyerData.email : user.email,
+                phone: buyerData ? buyerData.phone : user.phone,
+                nik: buyerData ? buyerData.nik : undefined,
+                status: 'valid',
+                paymentMethod: 'SALDO', 
+                orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
+            });
+            await newOrder.save();
+        }
+        // 👆 ----------------------------------------- 👆
         
         event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
-        // Kirim email tiket ke pembeli
 // 📧 KIRIM TIKET KE EMAIL (SALDO)
         await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
@@ -677,11 +684,12 @@ app.post('/api/buy-ticket', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: ticketCode,
+            ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
             secretData: event.secretData
         });
 
-        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: ticketCode, sisaSaldo: user.saldo });
+        // 👇 UBAH JUGA BARIS INI JADI tiketPertama 👇
+        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: tiketPertama, sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
@@ -753,24 +761,32 @@ app.post('/api/midtrans-success', async (req, res) => {
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
         }
 
-        const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-        const ticketCode = `TIKET-${randomStr.toUpperCase()}`; 
-        
-        const newOrder = new Order({
-            ticketCode: ticketCode,
-            eventId: eventId,
-            price: price, 
-            tierName: tierName || 'General',
-            quantity: quantity,
-            customerName: customerName,
-            email: customerEmail,
-            phone: buyerData ? buyerData.phone : undefined,
-            nik: buyerData ? buyerData.nik : undefined,
-            status: 'valid',
-            paymentMethod: 'MIDTRANS', 
-            orderIdMidtrans: orderId
-        });
-        await newOrder.save();
+  // 👇 PABRIK TIKET MIDTRANS (LOOPING PER BARCODE) 👇
+        const hargaSatuan = price / quantity;
+        let tiketPertama = "";
+
+        for (let i = 0; i < quantity; i++) {
+            const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+            const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
+            if (i === 0) tiketPertama = kodeUnik;
+
+            const newOrder = new Order({
+                ticketCode: kodeUnik,
+                eventId: eventId,
+                price: hargaSatuan, 
+                tierName: tierName || 'General',
+                quantity: 1, // 👈 Paksa jadi 1 per barcode!
+                customerName: customerName,
+                email: customerEmail,
+                phone: buyerData ? buyerData.phone : undefined,
+                nik: buyerData ? buyerData.nik : undefined,
+                status: 'valid',
+                paymentMethod: 'MIDTRANS', 
+                orderIdMidtrans: orderId
+            });
+            await newOrder.save();
+        }
+        // 👆 ------------------------------------------- 👆
 
         event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
@@ -784,11 +800,12 @@ app.post('/api/midtrans-success', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: ticketCode,
+            ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
             secretData: event.secretData
         });
 
-        res.json({ success: true, ticketCode });
+        // 👇 UBAH JUGA BARIS INI 👇
+        res.json({ success: true, ticketCode: tiketPertama });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
