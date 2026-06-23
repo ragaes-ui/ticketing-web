@@ -282,7 +282,7 @@ if (breadcrumbContainer && checkoutData) {
             document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`; 
         }
 
-        async function cekPromoLuar() {
+async function cekPromoLuar() {
             const inputEl = document.getElementById('inputPromo'); 
             const statusEl = document.getElementById('promoStatus'); 
             const rowDiskon = document.getElementById('rowDiskon'); 
@@ -295,7 +295,12 @@ if (breadcrumbContainer && checkoutData) {
                 const res = await fetch('/api/check-promo', { 
                     method: 'POST', 
                     headers: {'Content-Type':'application/json'}, 
-                    body: JSON.stringify({ code: code }) 
+                    // 👇 TAMBAHKAN EVENT ID DI SINI 👇
+                    body: JSON.stringify({ 
+                        code: code,
+                        eventId: checkoutData.eventId // Kunci rahasianya!
+                    }) 
+                    // 👆 -------------------------- 👆
                 });
                 const data = await res.json();
                 
