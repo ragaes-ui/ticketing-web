@@ -37,7 +37,11 @@ const promoSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true, uppercase: true }, 
     discount: { type: Number, required: true }, 
     quota: { type: Number, default: 100 }, 
-    expiresAt: { type: Date, required: true } 
+    expiresAt: { type: Date, required: true },
+    // 👇 TAMBAHKAN 2 BARIS INI BIAR DATANYA NGGAK DIBUANG 👇
+    eventId: { type: String, default: 'ALL' },
+    eventName: { type: String, default: 'SEMUA EVENT' },
+    // 👆 ---------------------------------------------- 👆
 });
 const Promo = mongoose.model('Promo', promoSchema);
 
