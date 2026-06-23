@@ -92,6 +92,15 @@
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
             @page { size: 250mm 25mm; margin: 0; }
         }
+        /* 🔥 OPTIMASI PERFORMA & BATERAI KHUSUS HP 🔥 */
+        @media (max-width: 768px) {
+            .blob { display: none !important; }
+            body { animation: none !important; background-size: cover !important; }
+            .glass-card, .navbar, .modal-content {
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+            }
+        }
     </style>
 </head>
 <body>
