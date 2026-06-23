@@ -680,18 +680,18 @@
             if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
         }
 
-        function addTierRow(id, n='', p='', s='') {
+function addTierRow(id, n='', p='', s='', m='1') {
             document.getElementById(id).insertAdjacentHTML('beforeend', `
                 <div class="tier-row">
                     <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
                     <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required>
                     <div class="row g-2">
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div>
-                        <div class="col-6"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div>
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
                     </div>
                 </div>`);
         }
-
         function addLineupRow(containerId, url = '') {
             const html = `
                 <div class="input-group mb-2 lineup-row">
@@ -703,10 +703,14 @@
             document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
         }
 
-        function getTiers(id) {
+function getTiers(id) {
             return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
-                tierName: r.querySelector('.tier-name').value, price: parseInt(r.querySelector('.tier-price').value),
-                availableSeats: parseInt(r.querySelector('.tier-stock').value), totalSeats: parseInt(r.querySelector('.tier-stock').value)
+                tierName: r.querySelector('.tier-name').value, 
+                price: parseInt(r.querySelector('.tier-price').value),
+                availableSeats: parseInt(r.querySelector('.tier-stock').value), 
+                totalSeats: parseInt(r.querySelector('.tier-stock').value),
+                // 👇 TAMBAHAN RUMUS MENGAMBIL ANGKA MIN. BELI 👇
+                minQty: parseInt(r.querySelector('.tier-min').value) || 1
             }));
         }
 
@@ -757,7 +761,7 @@
                 if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
                 document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || '';
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
-                document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats));
+                document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) ev.tickets.forEach(t => addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1));
                 if(ev.salesOpenDate) {
                     const d = new Date(ev.salesOpenDate);
                     const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0');
