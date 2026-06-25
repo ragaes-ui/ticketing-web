@@ -708,33 +708,25 @@ app.post('/api/payment-token', async (req, res) => {
         const googleData = await googleRes.json();
         
         if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
-        // 👇 JIKA ADA PAJAK, TAMBAHKAN SEBAGAI ITEM BARU KE MIDTRANS 👇
-        const numPajak = parseInt(pajak) || 0;
-        if (numPajak > 0) {
-            parameter.item_details.push({
-                id: "TAX-CUSTOM",
-                price: numPajak,
-                quantity: 1,
-                name: "Pajak Event" // Namanya dibikin general aja biar gampang
-            });
-        }
+        
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        // 👇 PERBAIKAN: Paksa price dan quantity jadi angka (Integer) mutlak
+        // 👇 1. HITUNG ANGKA DULU 👇
         const numPrice = parseInt(price) || 0;
         const numQuantity = parseInt(quantity) || 1;
         const numPajak = parseInt(pajak) || 0;
-        const gross_amount = (numPrice * numQuantity) + numPajak;
+        const gross_amount = (numPrice * numQuantity) + numPajak; // (Sudah tanpa titik koma ganda)
 
         if (gross_amount <= 0) return res.status(400).json({ message: 'Total harga tidak valid' });
 
         const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
+        // 👇 2. BIKIN PARAMETER MIDTRANS 👇
         let parameter = {
             transaction_details: { 
                 order_id: orderId, 
-                gross_amount: gross_amount // Sudah pasti angka sekarang
+                gross_amount: gross_amount 
             },
             customer_details: { 
                 first_name: customerName, 
@@ -742,17 +734,26 @@ app.post('/api/payment-token', async (req, res) => {
                 phone: customerPhone || "0800000000" 
             },
             item_details: [{ 
-                id: eventId.toString().substring(0, 50), // Pastikan ID nggak kepanjangan
-                price: numPrice, // Sudah pasti angka
-                quantity: numQuantity, // Sudah pasti angka
-                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}`.substring(0, 50) // Max 50 Karakter
+                id: eventId.toString().substring(0, 50), 
+                price: numPrice, 
+                quantity: numQuantity, 
+                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}`.substring(0, 50) 
             }]
         };
+
+        // 👇 3. MASUKKAN PAJAK KE DALAM PARAMETER JIKA ADA 👇
+        if (numPajak > 0) {
+            parameter.item_details.push({
+                id: "TAX-CUSTOM",
+                price: numPajak,
+                quantity: 1,
+                name: "Pajak Event"
+            });
+        }
 
         const token = await snap.createTransactionToken(parameter);
         res.json({ token, orderId });
     } catch (error) { 
-        // Munculkan pesan error aslinya di terminal/Vercel Logs biar gampang dilacak
         console.error("🚨 ERROR MIDTRANS:", error.message); 
         res.status(500).json({ message: 'Gagal membuat token pembayaran', detail: error.message }); 
     }
