@@ -600,7 +600,7 @@ app.post('/api/user/set-pin', async (req, res) => {
 // 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName } = req.body; 
+        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName, pajak = 0 } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
@@ -638,7 +638,7 @@ app.post('/api/buy-ticket', async (req, res) => {
 
         let finalPrice = price - discountAmount;
         if (finalPrice < 0) finalPrice = 0;
-
+finalPrice = finalPrice + parseInt(pajak);
         const user = await User.findOneAndUpdate(
             { _id: userId, saldo: { $gte: finalPrice } }, 
             { $inc: { saldo: -finalPrice } },
@@ -697,7 +697,7 @@ app.post('/api/buy-ticket', async (req, res) => {
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName } = req.body; 
+        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName, pajak = 0 } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
@@ -708,14 +708,24 @@ app.post('/api/payment-token', async (req, res) => {
         const googleData = await googleRes.json();
         
         if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
-        
+        // 👇 JIKA ADA PAJAK, TAMBAHKAN SEBAGAI ITEM BARU KE MIDTRANS 👇
+        const numPajak = parseInt(pajak) || 0;
+        if (numPajak > 0) {
+            parameter.item_details.push({
+                id: "TAX-CUSTOM",
+                price: numPajak,
+                quantity: 1,
+                name: "Pajak Event" // Namanya dibikin general aja biar gampang
+            });
+        }
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
         // 👇 PERBAIKAN: Paksa price dan quantity jadi angka (Integer) mutlak
         const numPrice = parseInt(price) || 0;
         const numQuantity = parseInt(quantity) || 1;
-        const gross_amount = numPrice * numQuantity;
+        const numPajak = parseInt(pajak) || 0;
+        const gross_amount = (numPrice * numQuantity) + numPajak;
 
         if (gross_amount <= 0) return res.status(400).json({ message: 'Total harga tidak valid' });
 
