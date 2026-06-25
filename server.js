@@ -346,7 +346,7 @@ app.get('/api/events/:id', async (req, res) => {
 app.post('/api/events', async (req, res) => {
     try {
         // 👇 1. Tangkap startTime dan endTime dari request frontend
-        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages } = req.body;
+        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate } = req.body;
         
         const newEvent = new Event({
             name, organizer, date, 
@@ -357,7 +357,8 @@ app.post('/api/events', async (req, res) => {
             secretData: secretData || "", 
             salesOpenDate: salesOpenDate || null,
             tickets: tickets || [],
-            lineupImages: lineupImages || [] // 👈 INI TAMBAHANNYA
+            lineupImages: lineupImages || [],
+            taxRate: taxRate || 0 // 👈 2. Masukkan ke database// 👈 INI TAMBAHANNYA
         });
         
         await newEvent.save();
