@@ -32,6 +32,11 @@ const eventSchema = new mongoose.Schema({
         type: Number, 
         required: true 
     },
+    // 👇 TAMBAHAN UNTUK PAJAK CUSTOM 👇
+    taxRate: { 
+        type: Number, 
+        default: 0 
+    },
     
     // Total Stok Awal
     totalCapacity: { 
