@@ -175,6 +175,24 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
 
     // 🔥 LOGIKA BARU: Bikin kotak data rahasia jika produk mengandung secretData 🔥
     let secretDataBlock = '';
+    // 👇 TAMBAHAN BLOK RINCIAN PEMBAYARAN 👇
+    let receiptBlock = '';
+    if (ticketData.totalPaid !== undefined) {
+        let taxRow = ticketData.tax > 0 ? `<p style="margin: 5px 0; color: #dc3545;">Pajak Event: Rp ${ticketData.tax.toLocaleString('id-ID')}</p>` : '';
+        let discountRow = ticketData.discount > 0 ? `<p style="margin: 5px 0; color: #28a745;">Diskon Promo: - Rp ${ticketData.discount.toLocaleString('id-ID')}</p>` : '';
+        
+        receiptBlock = `
+            <div style="background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; margin: 20px 0; text-align: left; border-radius: 8px;">
+                <h4 style="margin-top: 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Rincian Pembayaran</h4>
+                <p style="margin: 5px 0;">Harga Tiket (${ticketData.qty}x): Rp ${ticketData.subTotal.toLocaleString('id-ID')}</p>
+                ${discountRow}
+                ${taxRow}
+                <hr style="border: 0; border-top: 1px dashed #ddd; margin: 10px 0;">
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold; color: #0049CC;">Total Bayar: Rp ${ticketData.totalPaid.toLocaleString('id-ID')}</p>
+            </div>
+        `;
+    }
+    // 👆 -------------------------------- 👆
     if (ticketData.secretData) {
         secretDataBlock = `
             <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffe69c; border-left: 5px solid #ffc107; border-radius: 8px; text-align: left;">
@@ -202,7 +220,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                         <h3 style="margin-top: 15px; color: #333; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h3>
                     </div>
 
-                    ${secretDataBlock} <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
+                    ${secretDataBlock} ${receiptBlock} <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
                         <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
@@ -686,7 +704,13 @@ finalPrice = finalPrice + parseInt(pajak);
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
             ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
-            secretData: event.secretData
+            secretData: event.secretData,
+            // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
+            qty: quantity,
+            subTotal: price, 
+            discount: discountAmount,
+            tax: parseInt(pajak) || 0,
+            totalPaid: finalPrice
         });
 
         // 👇 UBAH JUGA BARIS INI JADI tiketPertama 👇
@@ -763,7 +787,7 @@ app.post('/api/payment-token', async (req, res) => {
 // 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
 app.post('/api/midtrans-success', async (req, res) => {
     try {
-        const { eventId, customerName, customerEmail, tierName, price, quantity = 1, orderId, buyerData } = req.body;
+        const { eventId, customerName, customerEmail, tierName, price, quantity = 1, orderId, buyerData, subTotal = 0, diskon = 0, pajak = 0 } = req.body;
         
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
@@ -813,7 +837,13 @@ app.post('/api/midtrans-success', async (req, res) => {
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
             ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
-            secretData: event.secretData
+            secretData: event.secretData,
+            // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
+            qty: quantity,
+            subTotal: price, 
+            discount: discountAmount,
+            tax: parseInt(pajak) || 0,
+            totalPaid: finalPrice
         });
 
         // 👇 UBAH JUGA BARIS INI 👇
