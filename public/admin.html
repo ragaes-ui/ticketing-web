@@ -731,8 +731,9 @@ function getTiers(id) {
             if(tiers.length === 0) return Swal.fire(t.alert_err, t.alert_err_tier, 'error');
             const secretEl = document.getElementById('secretData');
             const lineupImagesAdd = Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
+            const taxInput = document.getElementById('taxRate');
+            const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
-                taxRate: parseInt(document.getElementById('taxRate').value) || 0,
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, 
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
                 startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value,
@@ -740,7 +741,8 @@ function getTiers(id) {
                 mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
                 capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
-                lineupImages: lineupImagesAdd 
+                lineupImages: lineupImagesAdd,
+                taxRate: taxRateValue  // 👈 PASTIKAN ADA INI JUGA YA
             };
             try {
                 await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
@@ -760,12 +762,14 @@ function getTiers(id) {
         function bukaModalEdit(id) {
             const ev = eventsData.find(e => e._id === id);
             if(ev) {
-                document.getElementById('editTaxRate').value = ev.taxRate || 0;
                 document.getElementById('editMapsUrl').value = ev.mapsUrl || '';
                 document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
                 document.getElementById('editOrganizer').value = ev.organizer || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
+                // 👇 PASTIKAN PAJAK KEBACA DI MODAL 👇
+                const taxInput = document.getElementById('editTaxRate');
+                if (taxInput) taxInput.value = ev.taxRate || 0;
                 if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
                 document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || '';
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
@@ -786,8 +790,10 @@ function getTiers(id) {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers');
             const lineupImagesEdit = Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
+            // 👇 TANGKAP PAJAK SEBELUM DISIMPAN 👇
+            const taxInput = document.getElementById('editTaxRate');
+            const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
-                taxRate: parseInt(document.getElementById('editTaxRate').value) || 0,
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
                 startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, 
                 salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '',
@@ -795,7 +801,8 @@ function getTiers(id) {
                 mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value,
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
-                lineupImages: lineupImagesEdit 
+                lineupImages: lineupImagesEdit,
+                taxRate: taxRateValue // 👈 KIRIM PAJAK KE DATABASE
             };
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
             eModal.hide(); loadTable(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_edit, background: '#1c1c2d', color: '#fff' });
