@@ -787,6 +787,7 @@ app.post('/api/payment-token', async (req, res) => {
 // 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
 app.post('/api/midtrans-success', async (req, res) => {
     try {
+        // 👇 PENANGKAP DATA HARUS SESUAI DENGAN FRONTEND (Ada subTotal, diskon, pajak) 👇
         const { eventId, customerName, customerEmail, tierName, price, quantity = 1, orderId, buyerData, subTotal = 0, diskon = 0, pajak = 0 } = req.body;
         
         const event = await Event.findById(eventId);
@@ -797,10 +798,10 @@ app.post('/api/midtrans-success', async (req, res) => {
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
         }
 
-  // 👇 PABRIK TIKET MIDTRANS (LOOPING PER BARCODE) 👇
         const hargaSatuan = price / quantity;
         let tiketPertama = "";
 
+        // PABRIK TIKET LOOPING
         for (let i = 0; i < quantity; i++) {
             const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
             const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
@@ -811,7 +812,7 @@ app.post('/api/midtrans-success', async (req, res) => {
                 eventId: eventId,
                 price: hargaSatuan, 
                 tierName: tierName || 'General',
-                quantity: 1, // 👈 Paksa jadi 1 per barcode!
+                quantity: 1, 
                 customerName: customerName,
                 email: customerEmail,
                 phone: buyerData ? buyerData.phone : undefined,
@@ -822,33 +823,35 @@ app.post('/api/midtrans-success', async (req, res) => {
             });
             await newOrder.save();
         }
-        // 👆 ------------------------------------------- 👆
 
         event.availableSeats -= quantity; 
         if (selectedTierIndex !== -1) {
             event.tickets[selectedTierIndex].availableSeats -= quantity; 
         }
         await event.save();
-// 📧 KIRIM TIKET KE EMAIL (MIDTRANS)
+
+        // 📧 KIRIM TIKET KE EMAIL (MIDTRANS)
         await sendTicketEmail(customerEmail, {
             customerName: customerName,
             eventName: event.name,
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
+            ticketCode: tiketPertama, 
             secretData: event.secretData,
-            // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
+            
+            // 👇 INI YANG TADI SALAH (DISCOUNT AMOUNT), SEKARANG SUDAH BENAR 👇
             qty: quantity,
-            subTotal: price, 
-            discount: discountAmount,
+            subTotal: parseInt(subTotal) || 0, 
+            discount: parseInt(diskon) || 0, // Menggunakan variabel 'diskon'
             tax: parseInt(pajak) || 0,
-            totalPaid: finalPrice
+            totalPaid: price 
         });
 
-        // 👇 UBAH JUGA BARIS INI 👇
         res.json({ success: true, ticketCode: tiketPertama });
-    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+    } catch (error) { 
+        res.status(500).json({ success: false, message: error.message }); 
+    }
 });
 
 // ==========================================
