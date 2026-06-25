@@ -453,9 +453,12 @@ async function cekPromoLuar() {
                 Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
                 try {
+                // 👇 PERBAIKAN RUMUS HARGA (Biar pajak nggak kehitung dobel kalau ada diskon) 👇
                     let hargaMidtrans = checkoutData.price; 
                     if (diskonPromo > 0) { 
-                        hargaMidtrans = totalTagihan / qty; 
+                        let hargaSetelahDiskon = (checkoutData.price * qty) - diskonPromo;
+                        if (hargaSetelahDiskon < 0) hargaSetelahDiskon = 0;
+                        hargaMidtrans = hargaSetelahDiskon / qty; 
                     }
                     
                     const res = await fetch('/api/payment-token', { 
@@ -466,6 +469,7 @@ async function cekPromoLuar() {
                             tierName: checkoutData.tierName, 
                             price: hargaMidtrans, 
                             quantity: qty, 
+                            pajak: window.pajakAktif || 0,
                             customerName: name, 
                             customerEmail: userData.email, 
                             customerPhone: phone, 
