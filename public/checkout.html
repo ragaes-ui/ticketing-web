@@ -425,7 +425,8 @@ async function cekPromoLuar() {
                             pin: pin, 
                             promoCode: kodePromoAktif, 
                             buyerData: buyerPayload,
-                            recaptchaToken: recaptchaToken // Kirim token ke backend!
+                            recaptchaToken: recaptchaToken, // Kirim token ke backend!
+                            pajak: window.pajakAktif || 0 // 👈 TAMBAHAN WAJIB
                         })
                     });
                     
@@ -493,7 +494,12 @@ async function cekPromoLuar() {
                                         price: totalTagihan, 
                                         quantity: qty, 
                                         orderId: data.orderId, 
-                                        buyerData: buyerPayload 
+                                        buyerData: buyerPayload,
+                                        // 👇 TAMBAHAN RINCIAN UNTUK EMAIL 👇
+                                        subTotal: (checkoutData.price * qty),
+                                        diskon: diskonPromo,
+                                        pajak: window.pajakAktif || 0
+                                        // 👆 --------------------------- 👆
                                     }) 
                                 });
                                 
