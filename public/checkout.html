@@ -483,34 +483,39 @@ async function cekPromoLuar() {
                     
                     if (res.ok && data.token) { 
                         window.snap.pay(data.token, { 
-                            onSuccess: async function(result){ 
-                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
+onSuccess: async function(result){ 
+                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)', allowOutsideClick: false });
                                 
-                                const saveRes = await fetch('/api/midtrans-success', { 
-                                    method: 'POST', 
-                                    headers: { 'Content-Type': 'application/json' }, 
-                                    body: JSON.stringify({ 
-                                        eventId: checkoutData.eventId, 
-                                        userId: userData.id, 
-                                        customerName: name, 
-                                        customerEmail: userData.email, 
-                                        tierName: checkoutData.tierName, 
-                                        price: totalTagihan, 
-                                        quantity: qty, 
-                                        orderId: data.orderId, 
-                                        buyerData: buyerPayload,
-                                        // 👇 TAMBAHAN RINCIAN UNTUK EMAIL 👇
-                                        subTotal: (checkoutData.price * qty),
-                                        diskon: diskonPromo,
-                                        pajak: window.pajakAktif || 0
-                                        // 👆 --------------------------- 👆
-                                    }) 
-                                });
-                                
-                                const saveData = await saveRes.json();
-                                if(saveData.success) { 
-                                    localStorage.removeItem('checkoutData'); 
-                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
+                                try {
+                                    const saveRes = await fetch('/api/midtrans-success', { 
+                                        method: 'POST', 
+                                        headers: { 'Content-Type': 'application/json' }, 
+                                        body: JSON.stringify({ 
+                                            eventId: checkoutData.eventId, 
+                                            userId: userData.id, 
+                                            customerName: name, 
+                                            customerEmail: userData.email, 
+                                            tierName: checkoutData.tierName, 
+                                            price: totalTagihan, 
+                                            quantity: qty, 
+                                            orderId: data.orderId, 
+                                            buyerData: buyerPayload,
+                                            subTotal: (checkoutData.price * qty),
+                                            diskon: diskonPromo,
+                                            pajak: window.pajakAktif || 0
+                                        }) 
+                                    });
+                                    
+                                    const saveData = await saveRes.json();
+                                    
+                                    if(saveData.success) { 
+                                        localStorage.removeItem('checkoutData'); 
+                                        Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
+                                    } else {
+                                        Swal.fire({icon: 'error', title: 'Gagal Menerbitkan', text: saveData.message, background: 'var(--bg-card)', color: 'var(--text-main)'});
+                                    }
+                                } catch(err) {
+                                    Swal.fire({icon: 'error', title: 'Koneksi Terputus', text: 'Gagal menghubungi server database.', background: 'var(--bg-card)', color: 'var(--text-main)'});
                                 }
                             },
                             onPending: function(result){ 
