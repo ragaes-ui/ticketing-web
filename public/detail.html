@@ -555,7 +555,8 @@ function renderTickets() {
                 tierName: selectedTierObj.tierName,
                 price: selectedTierObj.price,
                 availableSeats: selectedTierObj.availableSeats,
-                minQty: selectedTierObj.minQty || 1 // 👈 KUNCI RAHASIANYA DI SINI
+                minQty: selectedTierObj.minQty || 1, // 👈 KUNCI RAHASIANYA DI SINI
+                taxRate: currentEvent.taxRate || 0 // 👈 KUNCI PAJAK DINAMIS
             };
 
             // 3. Simpan ke dalam memori HP/Browser (Local Storage)
