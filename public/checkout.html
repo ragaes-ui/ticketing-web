@@ -172,6 +172,9 @@
                     <div class="d-flex justify-content-between mb-2 d-none" id="rowDiskon">
                         <span class="text-success small"><i class="bi bi-tags-fill me-1"></i> Diskon Promo</span>
                         <span class="fw-bold text-success small" id="sumDiskon">- Rp 0</span>
+                        <div class="d-flex justify-content-between mb-2 text-danger d-none" id="rowPajak">
+    <span class="small"><i class="bi bi-bank me-1"></i> <span id="lblPajak">Pajak</span></span>
+    <span class="fw-bold small" id="sumPajak">+ Rp 0</span>
                     </div>
 
                     <hr>
@@ -285,10 +288,28 @@ function manualUpdateQty(val) {
             }
         }
 
-        function hitungTotal() { 
-            let total = (checkoutData.price * qty) - diskonPromo; 
-            if(total < 0) total = 0; 
-            document.getElementById('sumTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`; 
+function hitungTotal() { 
+            let subTotal = (checkoutData.price * qty) - diskonPromo; 
+            if(subTotal < 0) subTotal = 0; 
+            
+            // 👇 HITUNG PAJAK DINAMIS DARI ADMIN 👇
+            let persenPajak = checkoutData.taxRate || 0;
+            let pajak = 0;
+
+            if (persenPajak > 0) {
+                pajak = Math.round(subTotal * (persenPajak / 100));
+                document.getElementById('rowPajak').classList.remove('d-none');
+                document.getElementById('lblPajak').innerText = `Pajak (${persenPajak}%)`;
+                document.getElementById('sumPajak').innerText = `+ Rp ${pajak.toLocaleString('id-ID')}`;
+            } else {
+                document.getElementById('rowPajak').classList.add('d-none');
+            }
+
+            let totalAkhir = subTotal + pajak;
+            document.getElementById('sumTotal').innerText = `Rp ${totalAkhir.toLocaleString('id-ID')}`; 
+            
+            window.pajakAktif = pajak; 
+            window.persenPajakAktif = persenPajak;
         }
 
 async function cekPromoLuar() {
