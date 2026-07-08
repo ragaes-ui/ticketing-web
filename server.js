@@ -170,17 +170,26 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (customerEmail, ticketData) => {
-    // Generate URL QR Code otomatis berdasarkan Kode Tiket
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticketData.ticketCode}`;
+    // 🔥 LOGIKA BARU: Looping pembuatan banyak QR Code 🔥
+    let qrCodesHTML = '';
+    if (ticketData.ticketCodes && ticketData.ticketCodes.length > 0) {
+        ticketData.ticketCodes.forEach((kode, index) => {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${kode}`;
+            qrCodesHTML += `
+                <div style="margin: 15px 10px; padding: 20px; border: 2px dashed #0049CC; display: inline-block; border-radius: 10px; text-align: center; background: #f8f9fa;">
+                    <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: bold; color: #0049CC;">TIKET ${index + 1} DARI ${ticketData.qty}</p>
+                    <img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
+                    <h3 style="margin-top: 15px; color: #333; letter-spacing: 2px; font-family: monospace;">${kode}</h3>
+                </div>
+            `;
+        });
+    }
 
-    // 🔥 LOGIKA BARU: Bikin kotak data rahasia jika produk mengandung secretData 🔥
     let secretDataBlock = '';
-    // 👇 TAMBAHAN BLOK RINCIAN PEMBAYARAN 👇
     let receiptBlock = '';
     if (ticketData.totalPaid !== undefined) {
         let taxRow = ticketData.tax > 0 ? `<p style="margin: 5px 0; color: #dc3545;">Pajak Event: Rp ${ticketData.tax.toLocaleString('id-ID')}</p>` : '';
         let discountRow = ticketData.discount > 0 ? `<p style="margin: 5px 0; color: #28a745;">Diskon Promo: - Rp ${ticketData.discount.toLocaleString('id-ID')}</p>` : '';
-        
         receiptBlock = `
             <div style="background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; margin: 20px 0; text-align: left; border-radius: 8px;">
                 <h4 style="margin-top: 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Rincian Pembayaran</h4>
@@ -192,7 +201,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
             </div>
         `;
     }
-    // 👆 -------------------------------- 👆
+
     if (ticketData.secretData) {
         secretDataBlock = `
             <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffe69c; border-left: 5px solid #ffc107; border-radius: 8px; text-align: left;">
@@ -205,7 +214,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
     const mailOptions = {
         from: '"No-Reply - RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
         to: customerEmail,
-        subject: `E-Tiket RCELLFEST: ${ticketData.eventName}`,
+        subject: `E-Tiket RCELLFEST: ${ticketData.eventName} (${ticketData.qty} Tiket)`,
         html: `
             <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <div style="background: linear-gradient(135deg, #0049CC, #007bff); padding: 20px; text-align: center; color: white;">
@@ -213,31 +222,31 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                 </div>
                 <div style="padding: 30px; background: #fff; text-align: center;">
                     <p style="text-align: left;">Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
-                    <p style="text-align: left;">Berikut adalah tiket resmi kamu untuk masuk ke area event:</p>
+                    <p style="text-align: left;">Berikut adalah <b>${ticketData.qty} tiket</b> resmi kamu untuk masuk ke area event:</p>
                     
-                    <div style="margin: 25px 0; padding: 20px; border: 2px dashed #0049CC; display: inline-block; border-radius: 10px;">
-                        <img src="${qrCodeUrl}" alt="QR Code Tiket" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
-                        <h3 style="margin-top: 15px; color: #333; letter-spacing: 3px; font-family: monospace;">${ticketData.ticketCode}</h3>
+                    <!-- 👇 DI SINI TEMPAT BARCODE BERJEJER 👇 -->
+                    <div style="text-align: center;">
+                        ${qrCodesHTML}
                     </div>
 
-                    ${secretDataBlock} ${receiptBlock} <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
+                    ${secretDataBlock} ${receiptBlock} 
+                    
+                    <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
                         <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
                         <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
                     </div>
-
-                    <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan.</p>
+                    <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan semua QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan satu per satu.</p>
                 </div>
                 <div style="background: #eee; padding: 15px; text-align: center; font-size: 11px; color: #777;">
-                    &copy; 2026 RCELLTECH ID. Digital Payment & Ticketing Solution.
+                    &copy; ${new Date().getFullYear()} RCELLTECH ID. Digital Payment & Ticketing Solution.
                 </div>
             </div>`
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("Email tiket + QR Code terkirim ke:", customerEmail);
     } catch (err) {
         console.error("Gagal kirim tiket:", err);
     }
@@ -666,12 +675,12 @@ finalPrice = finalPrice + parseInt(pajak);
 
 // 👇 PABRIK TIKET SALDO (LOOPING PER BARCODE) 👇
         const hargaSatuan = finalPrice / quantity;
-        let tiketPertama = "";
+        let kumpulanKodeTiket = []; // 👈 BIKIN ARRAY
 
         for (let i = 0; i < quantity; i++) {
             const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
             const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
-            if (i === 0) tiketPertama = kodeUnik; // Simpan 1 kode buat dikirim ke email
+            kumpulanKodeTiket.push(kodeUnik); // 👈 KUMPULKAN KODE
 
             const newOrder = new Order({
                 ticketCode: kodeUnik,
@@ -703,7 +712,7 @@ finalPrice = finalPrice + parseInt(pajak);
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: tiketPertama, // 👈 UBAH JADI tiketPertama
+            ticketCodes: kumpulanKodeTiket, // 👈 PAKE ARRAY ticketCodes
             secretData: event.secretData,
             // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
             qty: quantity,
@@ -714,7 +723,7 @@ finalPrice = finalPrice + parseInt(pajak);
         });
 
         // 👇 UBAH JUGA BARIS INI JADI tiketPertama 👇
-        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: tiketPertama, sisaSaldo: user.saldo });
+        res.json({ success: true, message: "Pembelian berhasil!", ticketCode: kumpulanKodeTiket[0], sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
@@ -799,13 +808,13 @@ app.post('/api/midtrans-success', async (req, res) => {
         }
 
         const hargaSatuan = price / quantity;
-        let tiketPertama = "";
+        let kumpulanKodeTiket = []; // 👈 UBAH JADI ARRAY
 
         // PABRIK TIKET LOOPING
         for (let i = 0; i < quantity; i++) {
             const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
             const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
-            if (i === 0) tiketPertama = kodeUnik;
+            kumpulanKodeTiket.push(kodeUnik); // 👈 MASUKKAN SEMUA KODE KE DALAM KARUNG ARRAY
 
             const newOrder = new Order({
                 ticketCode: kodeUnik,
@@ -837,7 +846,7 @@ app.post('/api/midtrans-success', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            ticketCode: tiketPertama, 
+            ticketCodes: kumpulanKodeTiket, // 👈 GANTI ticketCode JADI ticketCodes 
             secretData: event.secretData,
             
             // 👇 INI YANG TADI SALAH (DISCOUNT AMOUNT), SEKARANG SUDAH BENAR 👇
@@ -848,7 +857,7 @@ app.post('/api/midtrans-success', async (req, res) => {
             totalPaid: price 
         });
 
-        res.json({ success: true, ticketCode: tiketPertama });
+        res.json({ success: true, ticketCode: kumpulanKodeTiket[0] });
     } catch (error) { 
         res.status(500).json({ success: false, message: error.message }); 
     }
