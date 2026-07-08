@@ -233,6 +233,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                     
                     <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
                         <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
+                        <p style="margin: 5px 0;"><b>Penyelenggara:</b> ${ticketData.organizer || 'RCELLFEST'}</p>
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
                         <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
@@ -709,6 +710,7 @@ finalPrice = finalPrice + parseInt(pajak);
         await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             eventName: event.name,
+            organizer: event.organizer, // 👈 SELIPKAN INI
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
@@ -843,6 +845,7 @@ app.post('/api/midtrans-success', async (req, res) => {
         await sendTicketEmail(customerEmail, {
             customerName: customerName,
             eventName: event.name,
+            organizer: event.organizer, // 👈 SELIPKAN INI
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
