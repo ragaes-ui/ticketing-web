@@ -237,6 +237,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
                         <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
+                        <p style="margin: 5px 0;"><b>Waktu:</b> ${ticketData.eventTime}</p>
                     </div>
                     <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan semua QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan satu per satu.</p>
                 </div>
@@ -714,6 +715,7 @@ finalPrice = finalPrice + parseInt(pajak);
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 SELIPKAN INI
             ticketCodes: kumpulanKodeTiket, // 👈 PAKE ARRAY ticketCodes
             secretData: event.secretData,
             // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
@@ -849,6 +851,7 @@ app.post('/api/midtrans-success', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 SELIPKAN INI
             ticketCodes: kumpulanKodeTiket, // 👈 GANTI ticketCode JADI ticketCodes 
             secretData: event.secretData,
             
