@@ -711,14 +711,13 @@ finalPrice = finalPrice + parseInt(pajak);
         await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             eventName: event.name,
-            organizer: event.organizer, // 👈 SELIPKAN INI
+            organizer: event.organizer, // 👈 TAMBAHAN PENYELENGGARA
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 SELIPKAN INI
-            ticketCodes: kumpulanKodeTiket, // 👈 PAKE ARRAY ticketCodes
+            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 TAMBAHAN JAM
+            ticketCodes: kumpulanKodeTiket,
             secretData: event.secretData,
-            // 👇 TAMBAHAN DATA UNTUK STRUK EMAIL 👇
             qty: quantity,
             subTotal: price, 
             discount: discountAmount,
