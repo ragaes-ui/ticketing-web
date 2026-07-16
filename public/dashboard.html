@@ -472,11 +472,19 @@
                     }
                 </style>
 
-                <div class="mb-4">
+            <div class="mb-3">
                     <div class="custom-search-box">
                         <i class="bi bi-search"></i>
                         <input type="text" id="searchTicketInput" placeholder="Cari nama event atau kode tiket..." onkeyup="searchTickets()">
                     </div>
+                </div>
+                
+                <!-- 👇 TOMBOL FILTER TIKET DI DASHBOARD 👇 -->
+                <div class="d-flex gap-2 mb-4 overflow-auto pb-1" style="white-space: nowrap; scrollbar-width: none;">
+                    <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" id="btn-filter-all" onclick="filterMyTickets('All')">Semua Tiket</button>
+                    <button class="btn btn-glass btn-sm rounded-pill px-3 fw-bold" id="btn-filter-closest" onclick="filterMyTickets('Terdekat')">
+                        <i class="bi bi-calendar2-check-fill me-1"></i> Event Terdekat
+                    </button>
                 </div>
 
                 <div id="ticketList" class="row g-4">
@@ -663,6 +671,7 @@
     <script>
         // --- CEK LOGIN ---
         let user = JSON.parse(localStorage.getItem('userData'));
+        let myAllTickets = []; // 👈 VARIABEL BARU UNTUK SIMPAN SEMUA TIKET
         if (!user) window.location.href = '/user-login';
 
         // --- SETUP AWAL ---
@@ -1111,21 +1120,58 @@
             });
         }
 
-        // --- LOAD TIKET (ASET DIGITAL) ---
+// --- LOAD TIKET (ASET DIGITAL) ---
         async function loadTickets() {
             const list = document.getElementById('ticketList');
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
-
             try {
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
                 });
                 if (!res.ok) throw new Error("API Gagal");
-                const tickets = await res.json();
+                
+                myAllTickets = await res.json(); // Simpan ke global
+                
+                // Ubah jadi 'Terdekat' biar langsung tampil event yang paling dekat waktunya
+filterMyTickets('Terdekat');
+            } catch (err) { 
+                list.innerHTML = `<div class="col-12 text-center text-danger py-5"><i class="bi bi-exclamation-triangle display-4"></i><p class="mt-2">Gagal load data tiket.</p></div>`;
+            }
+        }
 
-                if(tickets.length === 0) {
+function filterMyTickets(type) {
+            const btnAll = document.getElementById('btn-filter-all');
+            const btnClosest = document.getElementById('btn-filter-closest');
+            
+            // Logika untuk kasih warna biru ke tombol yang aktif
+            if (type === 'All') {
+                btnAll.className = "btn btn-primary btn-sm rounded-pill px-3 fw-bold";
+                btnClosest.className = "btn btn-glass btn-sm rounded-pill px-3 fw-bold";
+                renderMyTickets(myAllTickets); 
+            } else if (type === 'Terdekat') {
+                btnAll.className = "btn btn-glass btn-sm rounded-pill px-3 fw-bold"; // Tombol All jadi abu
+                btnClosest.className = "btn btn-primary btn-sm rounded-pill px-3 fw-bold"; // Tombol Terdekat jadi biru
+                
+                const now = new Date();
+                now.setHours(0,0,0,0);
+                
+                let filtered = myAllTickets.filter(ticket => {
+                    if (!ticket.eventId || !ticket.eventId.date) return false;
+                    return new Date(ticket.eventId.date) >= now;
+                });
+                
+                filtered.sort((a, b) => new Date(a.eventId.date) - new Date(b.eventId.date));
+                renderMyTickets(filtered);
+            }
+        }
+
+        // 👇 MESIN PENCETAK KARTU (Ganti nama fungsi dari yang lama) 👇
+        function renderMyTickets(tickets) {
+            const list = document.getElementById('ticketList');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            if(tickets.length === 0) {
                     list.innerHTML = `<div class="col-12 text-center py-5"><i class="bi bi-ticket-perforated display-1 text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">${t.empty_tickets}</p><a href="/" class="btn btn-outline-primary btn-sm">${t.btn_buy_new}</a></div>`;
                     return;
                 }
