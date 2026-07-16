@@ -456,24 +456,38 @@ function renderTickets() {
                 tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             }
 
-            tickets.forEach((tier, index) => {
+tickets.forEach((tier, index) => {
                 const isSoldOut = tier.availableSeats <= 0;
+                
+                // 👇 LOGIKA WAKTU BUKA TIER 👇
+                let isTierNotOpenYet = false;
+                let tierTimerHtml = '';
+                const now = new Date();
+
+                if (tier.salesOpenDate && new Date(tier.salesOpenDate) > now) {
+                    isTierNotOpenYet = true;
+                    tierTimerHtml = `<div id="tier-timer-${index}" class="text-primary fw-bold mt-1" style="font-size: 0.75rem;"><i class="bi bi-clock"></i> Menghitung...</div>`;
+                    setTimeout(() => { mulaiHitungMundurTier(index, tier.salesOpenDate); }, 100);
+                }
+
+                const isDisabled = isSoldOut || isTierNotOpenYet;
+                const statusClass = isDisabled ? 'tier-sold-out' : '';
+
                 container.innerHTML += `
-                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'tier-sold-out' : ''}" id="lblTier${index}">
+                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${statusClass}" id="lblTier${index}">
                         <div class="d-flex align-items-center gap-3">
-                            <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier(${index})" ${isSoldOut ? 'disabled' : ''}>
+                            <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier(${index})" ${isDisabled ? 'disabled' : ''}>
                             <div>
                                 <h6 class="mb-0 fw-bold">${tier.tierName}</h6>
                                 <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
                                 ${tier.minQty > 1 ? `<br><span class="badge bg-warning text-dark mt-1" style="font-size: 0.65rem;">Min. Beli: ${tier.minQty} Tiket</span>` : ''}
+                                ${tierTimerHtml}
                             </div>
                         </div>
                         <div class="fw-bold text-primary fs-5">Rp ${tier.price.toLocaleString('id-ID')}</div>
                     </label>
                 `;
             });
-        }
-
         // --- MESIN HITUNG MUNDUR KHUSUS HALAMAN DETAIL ---
         function mulaiHitungMundurDetail(targetDateStr) {
             const targetWaktu = new Date(targetDateStr).getTime();
@@ -508,7 +522,43 @@ function renderTickets() {
                 }
             }, 1000);
         }
+// 👇 --- MESIN HITUNG MUNDUR KHUSUS TIER TIKET --- 👇
+        function mulaiHitungMundurTier(tierIndex, targetDateStr) {
+            const targetWaktu = new Date(targetDateStr).getTime();
+            const timerId = `tier-timer-${tierIndex}`;
 
+            const intervalTimer = setInterval(function() {
+                const waktuSekarang = new Date().getTime();
+                const selisih = targetWaktu - waktuSekarang;
+                const tempatNampilin = document.getElementById(timerId);
+
+                // KALAU WAKTUNYA SUDAH HABIS (Tiket Tier Dibuka)
+                if (selisih < 0) {
+                    clearInterval(intervalTimer); 
+                    
+                    if (tempatNampilin) {
+                        // Refresh halaman otomatis biar radio button-nya kebuka dan bisa diklik
+                        window.location.reload(); 
+                    }
+                    return;
+                }
+
+                // PERHITUNGAN MUNDUR WAKTU
+                const hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
+                const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+                const detik = Math.floor((selisih % (1000 * 60)) / 1000);
+
+                if (tempatNampilin) {
+                    let teksTimer = '<i class="bi bi-clock me-1"></i> Buka dlm: ';
+                    if (hari > 0) teksTimer += `${hari}h `;
+                    teksTimer += `${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+                    
+                    tempatNampilin.innerHTML = teksTimer;
+                }
+            }, 1000);
+        }
+        // 👆 --- MESIN HITUNG MUNDUR KHUSUS TIER TIKET (END) --- 👆
         function selectTier(index) {
             // Hapus class selected dari semua label
             document.querySelectorAll('.tier-label').forEach(el => el.classList.remove('selected'));
