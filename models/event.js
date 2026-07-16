@@ -23,7 +23,7 @@ const eventSchema = new mongoose.Schema({
     },
     salesOpenDate: { 
         type: Date, 
-        default: "" 
+        default: null 
     },
     // -----------------------------
     
@@ -100,7 +100,8 @@ const eventSchema = new mongoose.Schema({
         price: { type: Number, required: true },         // Harga spesifik untuk kategori ini
         totalSeats: { type: Number, required: true },    // Kuota khusus kategori ini
         availableSeats: { type: Number, required: true }, // Sisa tiket kategori ini
-        minQty: { type: Number, default: 1 }
+        minQty: { type: Number, default: 1 },
+        salesOpenDate: { type: Date, default: null }
     }],
     // ----------------------------------------------------
     isPinned: { type: Boolean, default: false }
