@@ -1182,7 +1182,7 @@
                     let locCheck = locationText.toLowerCase().replace(/\s/g, ''); 
                     let mapsQuery = encodeURIComponent(locationText);
                     
-                    // Siapkan Baris Tabel untuk Lokasi (Disembunyikan jika TBA/Comingsoon)
+// 👇 TOMBOL COLLAPSE UNTUK LOKASI & PETA 👇
                     let gridLokasiHTML = '';
                     if (locCheck !== 'tba' && locCheck !== 'comingsoon') {
                         let linkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
@@ -1192,31 +1192,33 @@
                                             <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
                                         </a>`;
                         }
-                        gridLokasiHTML = `
-                            <div style="grid-column: span 2;">
-                                <div class="info-label">Lokasi Event</div>
-                                <div class="info-value" style="font-size: 0.85rem;">${linkHTML}</div>
+                        
+                        let iframePeta = isStreaming ? '' : `
+                            <div class="mt-2" style="border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 45%; height: 0;">
+                                <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                                    allowfullscreen="" loading="lazy">
+                                </iframe>
                             </div>
                         `;
-                    }
 
-                    // Peta Maps (Tetap di bawah Grid)
-                    let mapsHTML = '';
-                    if (!isStreaming && locCheck !== 'tba' && locCheck !== 'comingsoon') {
-                        mapsHTML = `
-                            <div style="grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 15px; margin-top: 5px;">
-                                <div class="info-label mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Peta Lokasi</div>
-                                <div style="border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 45%; height: 0;">
-                                    <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
-                                        allowfullscreen="" loading="lazy">
-                                    </iframe>
+                        gridLokasiHTML = `
+                            <div style="grid-column: span 2;">
+                                <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#lokasi-${ticket.ticketCode}" style="font-size: 0.8rem;">
+                                    <i class="bi bi-geo-alt me-1"></i> Lihat Lokasi
+                                </button>
+                                <div class="collapse mt-2" id="lokasi-${ticket.ticketCode}">
+                                    <div class="p-2 border rounded text-start" style="background: rgba(0,0,0,0.2); border-color: var(--glass-border) !important;">
+                                        <div class="info-value" style="font-size: 0.85rem;">${linkHTML}</div>
+                                        ${iframePeta}
+                                    </div>
                                 </div>
                             </div>
                         `;
                     }
+                    // 👆 SAMPAI SINI 👆
 
-                    // Susunan Isi Grid (Tabel)
+// Susunan Isi Grid (Tabel)
                     let mainContent = `
                         <div class="ticket-info-grid">
                             <div>
@@ -1242,7 +1244,6 @@
                                 <div class="info-label">Total Harga</div>
                                 <div class="info-value">Rp ${hargaTiket.toLocaleString('id-ID')}</div>
                             </div>
-                            ${mapsHTML}
                         </div>
                     `;
 
@@ -1266,31 +1267,43 @@
                             </div>
                         `;
 } else {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
-    mainContent += `
-        <!-- 👇 TOMBOL BUKA-TUTUP BARCODE 👇 -->
-        <button class="btn btn-sm btn-outline-info mt-3 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}" aria-expanded="false">
-            <i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode
-        </button>
-        
-        <!-- 👇 WADAH BARCODE (AWALNYA TERSEMBUNYI) 👇 -->
-        <div class="collapse mt-2" id="barcode-${ticket.ticketCode}">
-            <div class="qr-container w-100" style="background: rgba(255,255,255,0.05); border: 1px dashed #00c6ff;">
-                <small class="text-info fw-bold mb-2 d-block">${t.lbl_scan}</small>
-                <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">
-            </div>
-        </div>
+                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
+                        mainContent += `
+                            <!-- TOMBOL BUKA-TUTUP BARCODE -->
+                            <button class="btn btn-sm btn-outline-info mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}">
+                                <i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode
+                            </button>
+                            
+                            <div class="collapse mt-2" id="barcode-${ticket.ticketCode}">
+                                <div class="qr-container w-100 text-center" style="background: rgba(255,255,255,0.05); border: 1px dashed #00c6ff;">
+                                    <small class="text-info fw-bold mb-2 d-block">${t.lbl_scan}</small>
+                                    <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">
+                                </div>
+                            </div>
 
-        <div class="mt-3 d-flex flex-column gap-2">
-                                <button onclick="downloadTicket('${ticketData}')" class="btn btn-primary-neon btn-sm w-100">
-                                    <i class="bi bi-download me-2"></i> ${t.btn_pdf}
-                                </button>
+                            <!-- 👇 TOMBOL ACTION MENYAMPING (HORIZONTAL) 👇 -->
+                            <div class="mt-3 row g-2">
+                                <div class="col-6">
+                                    <button onclick="downloadTicket('${ticketData}')" class="btn btn-primary-neon btn-sm w-100 h-100 rounded-pill">
+                                        <i class="bi bi-download"></i> PDF
+                                    </button>
+                                </div>
                                 ${ticket.status !== 'used' ? `
-                                <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 text-warning border-warning mb-2">
-                                    <i class="bi bi-send me-2"></i> <span data-i18n="btn_transfer">${t.btn_transfer}</span>
-                                </button>
-<button onclick="bukaModalUpgrade('${ticket._id}', '${event._id}', ${hargaTiket}, ${qty})" class="btn btn-outline-success btn-sm w-100 rounded-pill mt-2">                                    <i class="bi bi-arrow-up-circle me-1"></i> Upgrade Tiket
-                                </button>` : ''}
+                                <div class="col-6">
+                                    <button onclick="openTransferModal('${ticket.ticketCode}')" class="btn btn-glass btn-sm w-100 h-100 text-warning border-warning rounded-pill px-0">
+                                        <i class="bi bi-send"></i> Transfer
+                                    </button>
+                                </div>
+                                <div class="col-12 mt-1">
+                                    <button onclick="bukaModalUpgrade('${ticket._id}', '${event._id}', ${hargaTiket}, ${qty})" class="btn btn-outline-success btn-sm w-100 rounded-pill">
+                                        <i class="bi bi-arrow-up-circle"></i> Upgrade Tiket
+                                    </button>
+                                </div>` : `
+                                <div class="col-6">
+                                    <button class="btn btn-secondary btn-sm w-100 h-100 rounded-pill disabled">
+                                        Dipakai
+                                    </button>
+                                </div>`}
                             </div>
                         `;
                     }
@@ -1298,14 +1311,15 @@
                     htmlContent += `
                         <div class="col-md-6 col-lg-4 ticket-card-wrapper">
                             <div class="ticket-card h-100">
-                                <div class="ticket-header ${headerClass}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h5 class="fw-bold mb-0" style="max-width: 65%;">
-    <marquee scrollamount="4" style="white-space: nowrap;">${event.name}</marquee>
-</h5>
-                                        <span class="badge bg-white text-dark bg-opacity-75" style="font-size: 0.7rem;">${labelHeader}</span>
+<div class="ticket-header ${headerClass}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <!-- 👇 JUDUL DIAM & BISA TURUN 2 BARIS 👇 -->
+                                        <h5 class="fw-bold mb-0 text-start" style="max-width: 65%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">
+                                            ${event.name}
+                                        </h5>
+                                        <span class="badge bg-white text-dark bg-opacity-75 mt-1" style="font-size: 0.7rem;">${labelHeader}</span>
                                     </div>
-                                    <div class="small mt-1 opacity-75">${iconHeader} ${category}</div>
+                                    <div class="small mt-2 opacity-75 text-start">${iconHeader} ${category}</div>
                                 </div>
                                 <div class="ticket-body justify-content-start">
                                     <span class="ticket-date mb-3" style="display: block;">
