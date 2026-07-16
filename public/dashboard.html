@@ -1312,14 +1312,14 @@
                         <div class="col-md-6 col-lg-4 ticket-card-wrapper">
                             <div class="ticket-card h-100">
 <div class="ticket-header ${headerClass}">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <!-- 👇 JUDUL DIAM & BISA TURUN 2 BARIS 👇 -->
-                                        <h5 class="fw-bold mb-0 text-start" style="max-width: 65%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">
-                                            ${event.name}
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <!-- 👇 JUDUL KEMBALI BERGERAK BIAR NGGAK KEPOTONG 👇 -->
+                                        <h5 class="fw-bold mb-0 text-start" style="max-width: 65%; overflow: hidden;">
+                                            <marquee scrollamount="4" style="white-space: nowrap;">${event.name}</marquee>
                                         </h5>
-                                        <span class="badge bg-white text-dark bg-opacity-75 mt-1" style="font-size: 0.7rem;">${labelHeader}</span>
+                                        <span class="badge bg-white text-dark bg-opacity-75" style="font-size: 0.7rem;">${labelHeader}</span>
                                     </div>
-                                    <div class="small mt-2 opacity-75 text-start">${iconHeader} ${category}</div>
+                                    <div class="small mt-1 opacity-75 text-start">${iconHeader} ${category}</div>
                                 </div>
                                 <div class="ticket-body justify-content-start">
                                     <span class="ticket-date mb-3" style="display: block;">
