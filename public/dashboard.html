@@ -1265,14 +1265,23 @@
                                 </button>` : ''}
                             </div>
                         `;
-                    } else {
-                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
-                        mainContent += `
-                            <small class="text-muted fw-bold mb-2 d-block mt-3">${t.lbl_scan}</small>
-                            <div class="qr-container">
-                                <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous">
-                            </div>
-                            <div class="mt-3 d-flex flex-column gap-2">
+} else {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
+    mainContent += `
+        <!-- 👇 TOMBOL BUKA-TUTUP BARCODE 👇 -->
+        <button class="btn btn-sm btn-outline-info mt-3 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}" aria-expanded="false">
+            <i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode
+        </button>
+        
+        <!-- 👇 WADAH BARCODE (AWALNYA TERSEMBUNYI) 👇 -->
+        <div class="collapse mt-2" id="barcode-${ticket.ticketCode}">
+            <div class="qr-container w-100" style="background: rgba(255,255,255,0.05); border: 1px dashed #00c6ff;">
+                <small class="text-info fw-bold mb-2 d-block">${t.lbl_scan}</small>
+                <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex flex-column gap-2">
                                 <button onclick="downloadTicket('${ticketData}')" class="btn btn-primary-neon btn-sm w-100">
                                     <i class="bi bi-download me-2"></i> ${t.btn_pdf}
                                 </button>
