@@ -374,20 +374,22 @@ app.get('/api/events/:id', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        // 👇 1. Tangkap startTime dan endTime dari request frontend
+        // 👇 1. Tangkap semua data dari request frontend, termasuk salesOpenDate dan pajak
         const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate } = req.body;
         
         const newEvent = new Event({
             name, organizer, date, 
-            startTime: startTime || "", // 👈 2. Masukkan ke dalam database
-            endTime: endTime || "",     // 👈 2. Masukkan ke dalam database
+            startTime: startTime || "", 
+            endTime: endTime || "",     
             price, totalCapacity: capacity, availableSeats: capacity,
             description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", 
             secretData: secretData || "", 
+            // 👇 2. Masukkan salesOpenDate ke dalam database (event utama) 👇
             salesOpenDate: salesOpenDate || null,
+            // 👇 3. Pastikan tickets (array) yang sudah mengandung salesOpenDate per-tier ikut tersimpan 👇
             tickets: tickets || [],
             lineupImages: lineupImages || [],
-            taxRate: taxRate || 0 // 👈 2. Masukkan ke database// 👈 INI TAMBAHANNYA
+            taxRate: taxRate || 0 
         });
         
         await newEvent.save();
