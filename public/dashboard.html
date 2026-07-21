@@ -1494,7 +1494,18 @@
                 
                 let optionsHtml = '<option value="">-- Pilih Tiket Tujuan --</option>';
                 
-                const tiketTersedia = event.tickets.filter(t => parseInt(t.price) > unitPrice && parseInt(t.availableSeats) >= qty);
+                const now = new Date(); // Ambil waktu sekarang
+
+                // FILTER: Harga lebih mahal, stok cukup, DAN WAKTU SUDAH BUKA!
+                const tiketTersedia = event.tickets.filter(t => {
+                    const hargaMasuk = parseInt(t.price) > unitPrice;
+                    const stokAman = parseInt(t.availableSeats) >= qty;
+                    
+                    // Cek apakah tiket sudah buka (kalau null berarti langsung buka, kalau ada tanggalnya pastikan sudah lewat)
+                    const tiketSudahBuka = !t.salesOpenDate || new Date(t.salesOpenDate) <= now;
+                    
+                    return hargaMasuk && stokAman && tiketSudahBuka;
+                });
                 
                 if(tiketTersedia.length === 0) {
                     optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out / Stok Kurang)</option>';
