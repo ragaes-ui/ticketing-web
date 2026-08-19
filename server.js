@@ -375,10 +375,11 @@ app.get('/api/events/:id', async (req, res) => {
 app.post('/api/events', async (req, res) => {
     try {
         // 👇 1. Tangkap semua data dari request frontend, termasuk salesOpenDate dan pajak
-        const { name, organizer, date, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate } = req.body;
+        const { name, organizer, date, endDate, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate } = req.body;
         
         const newEvent = new Event({
             name, organizer, date, 
+            endDate: endDate || null, // 👈 2. TAMBAHKAN DI SINI AGAR TERSIMPAN KE DATABASE
             startTime: startTime || "", 
             endTime: endTime || "",     
             price, totalCapacity: capacity, availableSeats: capacity,
