@@ -1207,6 +1207,10 @@ let dateStr = t.txt_date_tba;
                                 dateStr = dSpecific.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                             }
                         }
+                        } catch (e) { 
+                        dateStr = event.date; 
+                    }
+                } // 👈 TUTUP KURUNG UNTUK if (event.date)
                         // CATATAN: Bagian 'else if (event.endDate)' kita HAPUS.
                         // Jadi kalau cuma "Reguler Festival", otomatis cuma nampil 1 hari (Tanggal Mulai).
                         // 👆 ---------------------------------- 👆
