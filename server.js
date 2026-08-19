@@ -1036,7 +1036,37 @@ app.post('/api/validate', async (req, res) => {
                 });
             }
         }
+// 👇 TAMBAHAN: PENCEGAT KHUSUS TIKET "DAY X" (Misal: Day 2, Day 3) 👇
+        const tierNameLower = (ticket.tierName || '').toLowerCase();
+        const specificDayMatch = tierNameLower.match(/day\s*([0-9]+)/);
+        
+        if (specificDayMatch && ticket.eventId && ticket.eventId.date) {
+            const dayNumber = parseInt(specificDayMatch[1]);
+            if (dayNumber > 1) {
+                // Hitung tanggal spesifik untuk Day X
+                const dSpecific = new Date(ticket.eventId.date);
+                dSpecific.setDate(dSpecific.getDate() + (dayNumber - 1));
+                const specificDateStr = dSpecific.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
+                // Kalau di-scan SEBELUM harinya
+                if (todayStr < specificDateStr) {
+                    return res.json({ 
+                        valid: false, 
+                        message: "SALAH HARI", 
+                        detail: `Tiket ini khusus untuk Day ${dayNumber} (${dSpecific.toLocaleDateString('id-ID')}). Tidak bisa dipakai masuk hari ini!` 
+                    });
+                }
+                // Kalau di-scan SETELAH harinya lewat (Opsional, biar makin ketat)
+                else if (todayStr > specificDateStr) {
+                    return res.json({ 
+                        valid: false, 
+                        message: "KADALUARSA", 
+                        detail: `Jadwal tiket Day ${dayNumber} ini sudah lewat.` 
+                    });
+                }
+            }
+        }
+        // 👆 -------------------------------------------------------- 👆
         // 3. DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
         const tierNameLower = (ticket.tierName || '').toLowerCase();
         const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
