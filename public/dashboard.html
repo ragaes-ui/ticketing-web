@@ -1273,7 +1273,12 @@ let dateStr = t.txt_date_tba;
                         </div>
                         
                         ${gridLokasiHTML}
-
+<!-- 👇 TAMBAHAN KOTAK MASA BERLAKU 👇 -->
+                        <div style="grid-column: span 2; background: rgba(0, 255, 127, 0.1); border: 1px dashed rgba(0, 255, 127, 0.4); padding: 10px; border-radius: 8px;">
+                            <div class="info-label text-success"><i class="bi bi-calendar-check me-1"></i> Masa Berlaku Tiket</div>
+                            <div class="info-value fw-bold text-success" style="font-size: 0.9rem;">${dateStr}</div>
+                        </div>
+                        <!-- 👆 -------------------------- 👆 -->
                         <div>
                             <div class="info-label">Jumlah</div>
                             <div class="info-value fw-bold text-danger">${qty} Tiket</div>
