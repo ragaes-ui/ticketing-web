@@ -200,6 +200,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                 eventDateStr = dSpecific.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             }
         }
+    }
         // 👆 ---------------------------------- 👆
 
     // 🔥 LOGIKA BARU: Looping pembuatan banyak QR Code 🔥
