@@ -317,7 +317,20 @@ let timeStr = "Jam TBA";
 
 if (currentEvent.date) {
     const d = new Date(currentEvent.date);
-    dateStr = d.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+    // Format tanggal mulai
+    const startStr = d.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+    dateStr = startStr;
+
+    // 👇 TAMBAHAN LOGIKA UNTUK TANGGAL SELESAI 👇
+    if (currentEvent.endDate) {
+        const dEnd = new Date(currentEvent.endDate);
+        const endStr = dEnd.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+        
+        // Kalau tanggal selesai beda dengan tanggal mulai, gabungkan jadi rentang waktu
+        if (startStr !== endStr) {
+            dateStr = `${startStr} s/d ${endStr}`;
+        }
+    }
 }
 
 // 👇 LOGIKA BARU: MENGAMBIL JAM DARI DATABASE BARU 👇
