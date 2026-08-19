@@ -1180,13 +1180,27 @@ let dateStr = t.txt_date_tba;
                         const startStr = dStart.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                         dateStr = startStr;
 
-                        // 👇 TAMBAHAN LOGIKA TANGGAL SELESAI 👇
-                        if (event.endDate) {
+                        // 👇 DETEKSI MASA BERLAKU DARI NAMA TIKET 👇
+                        const tierLower = (tierName || '').toLowerCase();
+                        const dayMatch = tierLower.match(/([0-9]+)\s*day/); // Cari angka sebelum kata "day"
+                        
+                        if (dayMatch) {
+                            const totalDays = parseInt(dayMatch[1]);
+                            if (totalDays > 1) {
+                                // Tambahkan jatah hari ke Tanggal Mulai Event
+                                const dEnd = new Date(dStart);
+                                dEnd.setDate(dEnd.getDate() + (totalDays - 1));
+                                
+                                const endStr = dEnd.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
+                                const separator = lang === 'id' ? 's/d' : 'to';
+                                dateStr = `${startStr} ${separator} ${endStr}`;
+                            }
+                        } 
+                        // Jika bukan tiket terusan, tapi event punya End Date (Opsional)
+                        else if (event.endDate) {
                             const dEnd = new Date(event.endDate);
                             const endStr = dEnd.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
-                            
                             if (startStr !== endStr) {
-                                // Jika beda, gabungkan jadi rentang. Jika bahasa Inggris pakai 'to', Indonesia 's/d'
                                 const separator = lang === 'id' ? 's/d' : 'to';
                                 dateStr = `${startStr} ${separator} ${endStr}`;
                             }
