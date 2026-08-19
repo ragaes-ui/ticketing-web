@@ -12,6 +12,12 @@ const eventSchema = new mongoose.Schema({
         type: Date, 
         required: true 
     },
+    // 👇 TAMBAHKAN BARIS INI (Tanggal Selesai) 👇
+    endDate: { 
+        type: Date, 
+        default: null 
+    },
+    // 👆 -------------------------------------- 👆
     // 🔥 TAMBAHAN BARU: JAM EVENT 🔥
     startTime: {
         type: String, // Tipe String untuk menyimpan format "HH:mm" (cth: "19:00")
