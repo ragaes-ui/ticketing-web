@@ -953,17 +953,13 @@ app.post('/api/payment-notification', async (req, res) => {
 
 app.post('/api/validate', async (req, res) => {
     try {
-        // 1. Tangkap ticketCode DAN eventId dari Kiosk
         const { ticketCode, eventId } = req.body;
         if (!ticketCode) return res.status(400).json({ valid: false, message: "KODE KOSONG", detail: "Harap masukkan kode tiket." });
 
         const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
-
         if (!ticket) return res.json({ valid: false, message: "TIKET TIDAK DITEMUKAN", detail: "Kode tiket tidak terdaftar di sistem kami." });
         
-        if (ticket.status === 'used') return res.json({ valid: false, message: "TIKET SUDAH DIPAKAI", detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!" });
-
-        // 👇 2. LOGIKA CEK ID EVENT 👇
+        // LOGIKA CEK ID EVENT / GATE
         if (eventId && ticket.eventId && ticket.eventId._id.toString() !== eventId) {
             return res.json({ 
                 valid: false, 
@@ -971,17 +967,74 @@ app.post('/api/validate', async (req, res) => {
                 detail: `Tiket ini untuk event: ${ticket.eventId.name}, bukan untuk event di gate ini!` 
             });
         }
-        // 👆 ---------------------------------- 👆
 
-        ticket.status = 'used';
-        await ticket.save();
+        // AMBIL WAKTU HARI INI (WIB) - Format YYYY-MM-DD
+        const now = new Date();
+        const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
 
-        res.json({ valid: true, data: { event: ticket.eventId ? ticket.eventId.name : "RCELLFEST Event", name: ticket.customerName } });
+        // DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
+        // Kita cari angka sebelum kata "day" atau "days" (Contoh: "3 Days Pass", "2 day ticket")
+        const tierNameLower = (ticket.tierName || '').toLowerCase();
+        const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
+
+        // JIKA TIKET TERUSAN (MULTI-DAY)
+        if (multiDayMatch) {
+            const maxDays = parseInt(multiDayMatch[1]); // Menangkap angkanya (misal: 3)
+            
+            // Pastikan array scanHistory ada
+            if (!ticket.scanHistory) ticket.scanHistory = [];
+
+            // 1. Cek apakah HARI INI sudah pernah masuk?
+            if (ticket.scanHistory.includes(todayStr)) {
+                return res.json({ valid: false, message: "SUDAH CHECK-IN", detail: `Tiket ${ticket.tierName} ini sudah kamu pakai untuk hari ini. Silakan kembali besok!` });
+            }
+
+            // 2. Cek apakah JATAH HARINYA sudah habis? (misal 3 Days, tapi ini mau masuk hari ke-4)
+            if (ticket.status === 'used' || ticket.scanHistory.length >= maxDays) {
+                return res.json({ valid: false, message: "TIKET HANGUS", detail: `Jatah ${maxDays} Hari untuk tiket ini sudah terpakai habis.` });
+            }
+
+            // 3. LOLOS! Catat kehadiran hari ini
+            ticket.scanHistory.push(todayStr);
+
+            // Kalau hari ini adalah hari terakhir jatahnya, langsung hanguskan statusnya
+            if (ticket.scanHistory.length >= maxDays) {
+                ticket.status = 'used';
+            }
+            await ticket.save();
+
+            return res.json({ 
+                valid: true, 
+                data: { 
+                    event: ticket.eventId ? ticket.eventId.name : "RCELLFEST", 
+                    name: ticket.customerName,
+                    info: `Berhasil Masuk! (Sisa Jatah: ${maxDays - ticket.scanHistory.length} Hari)`
+                } 
+            });
+        } 
+        
+        // JIKA TIKET NORMAL (1 HARI / GENERAL)
+        else {
+            if (ticket.status === 'used') {
+                return res.json({ valid: false, message: "TIKET SUDAH DIPAKAI", detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!" });
+            }
+            
+            // Hanguskan langsung
+            ticket.status = 'used';
+            if (!ticket.scanHistory) ticket.scanHistory = [];
+            ticket.scanHistory.push(todayStr);
+            await ticket.save();
+
+            return res.json({ 
+                valid: true, 
+                data: { event: ticket.eventId ? ticket.eventId.name : "RCELLFEST", name: ticket.customerName } 
+            });
+        }
+
     } catch (error) { 
         res.status(500).json({ valid: false, message: "Sistem Error", detail: "Gagal memproses data." }); 
     }
 });
-
 app.post('/api/verify-ticket', async (req, res) => {
     try {
         const { ticketCode } = req.body;
