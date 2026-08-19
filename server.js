@@ -1006,7 +1006,7 @@ app.post('/api/validate', async (req, res) => {
         const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
         if (!ticket) return res.json({ valid: false, message: "TIKET TIDAK DITEMUKAN", detail: "Kode tiket tidak terdaftar di sistem kami." });
         
-        // 1. LOGIKA CEK ID EVENT / GATE (Biar nggak salah masuk event)
+// 1. LOGIKA CEK ID EVENT / GATE (Biar nggak salah masuk event)
         if (eventId && ticket.eventId && ticket.eventId._id.toString() !== eventId) {
             return res.json({ 
                 valid: false, 
@@ -1015,13 +1015,13 @@ app.post('/api/validate', async (req, res) => {
             });
         }
 
-        // AMBIL WAKTU HARI INI (WIB) - Format YYYY-MM-DD
         // AMBIL WAKTU HARI INI (WIB) DENGAN BATAS RESET JAM 05.00 PAGI
         const now = new Date();
         // Kurangi 5 jam (5 * 60 * 60 * 1000 millisecond)
         const resetTime = new Date(now.getTime() - (5 * 60 * 60 * 1000));
-        const todayStr = resetTime.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
-        const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
+        const todayStr = resetTime.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
+
+        // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
 
         // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
         if (ticket.eventId && ticket.eventId.date) {
