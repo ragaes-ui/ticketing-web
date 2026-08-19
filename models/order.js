@@ -20,7 +20,9 @@ const orderSchema = new mongoose.Schema({
     default: 'pending', // Default 'pending' dulu sebelum dibayar
     enum: ['pending', 'valid', 'used', 'failed'] // Pilihan status yang diizinkan
   },
-  
+  // 👇🔥 TARUH DI SINI MAS RAGA (RIWAYAT SCAN TIKET MULTI-DAY) 🔥👇
+  scanHistory: { type: [String], default: [] }, 
+  // 👆 -------------------------------------------------------- 👆
   // PENTING: Field baru untuk menyimpan ID unik transaksi Midtrans
   // Nanti dipakai buat mencocokkan pembayaran yang masuk
   orderIdMidtrans: { type: String },
