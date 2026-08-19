@@ -256,10 +256,16 @@
                                 <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
                                 <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" required></div>
                                 <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
-                                <div class="mb-3">
-                                    <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal & Waktu Event</label>
-                                    <input type="date" id="date" class="form-control" required>
-                                </div>
+<div class="row g-2 mb-3">
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
+        <input type="date" id="date" class="form-control" required>
+    </div>
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai (Opsional)</label>
+        <input type="date" id="endDate" class="form-control">
+    </div>
+</div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
@@ -460,8 +466,16 @@
                 <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
                 <div class="mb-3"><input type="text" id="editMapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/..."></div>
-                <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Event</label>
-                <div class="mb-3"><input type="date" id="editDate" class="form-control"></div>
+<div class="row g-2 mb-3">
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
+        <input type="date" id="editDate" class="form-control">
+    </div>
+    <div class="col-6">
+        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai</label>
+        <input type="date" id="editEndDate" class="form-control">
+    </div>
+</div>
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
@@ -745,6 +759,8 @@ function getTiers(id) {
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, 
                 location: document.getElementById('location').value, date: document.getElementById('date').value,
+                date: document.getElementById('date').value,
+                endDate: document.getElementById('endDate').value || null, // 👈 TAMBAHKAN BARIS INI
                 startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value,
                 salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '',
                 mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value,
@@ -780,6 +796,12 @@ function getTiers(id) {
                 const taxInput = document.getElementById('editTaxRate');
                 if (taxInput) taxInput.value = ev.taxRate || 0;
                 if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
+                // 👇 TAMBAHAN UNTUK MUNCULIN TANGGAL SELESAI DI MODAL 👇
+                if(ev.endDate) { 
+                    document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; 
+                } else { 
+                    document.getElementById('editEndDate').value = ''; 
+                }
                 document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || '';
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
 document.getElementById('editTiers').innerHTML = ''; 
@@ -814,7 +836,7 @@ document.getElementById('editTiers').innerHTML = '';
             const taxInput = document.getElementById('editTaxRate');
             const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
-                name: document.getElementById('editName').value, date: document.getElementById('editDate').value, organizer: document.getElementById('editOrganizer').value,
+                name: document.getElementById('editName').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, organizer: document.getElementById('editOrganizer').value,
                 startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, 
                 salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '',
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
