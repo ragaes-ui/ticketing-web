@@ -1180,33 +1180,36 @@ let dateStr = t.txt_date_tba;
                         const startStr = dStart.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                         dateStr = startStr;
 
-                        // 👇 DETEKSI MASA BERLAKU DARI NAMA TIKET 👇
+// 👇 DETEKSI MASA BERLAKU SUPER CERDAS 👇
                         const tierLower = (ticket.tierName || '').toLowerCase();
-                        const dayMatch = tierLower.match(/([0-9]+)\s*day/); // Cari angka sebelum kata "day"
                         
-                        if (dayMatch) {
-                            const totalDays = parseInt(dayMatch[1]);
+                        // Cek apakah tiket terusan (Contoh: "3 Days Pass")
+                        const multiDayMatch = tierLower.match(/([0-9]+)\s*day/);
+                        // Cek apakah tiket hari spesifik (Contoh: "Day 2" atau "Day 3")
+                        const specificDayMatch = tierLower.match(/day\s*([0-9]+)/);
+                        
+                        if (multiDayMatch) {
+                            const totalDays = parseInt(multiDayMatch[1]);
                             if (totalDays > 1) {
-                                // Tambahkan jatah hari ke Tanggal Mulai Event
                                 const dEnd = new Date(dStart);
                                 dEnd.setDate(dEnd.getDate() + (totalDays - 1));
-                                
                                 const endStr = dEnd.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                                 const separator = lang === 'id' ? 's/d' : 'to';
                                 dateStr = `${startStr} ${separator} ${endStr}`;
                             }
                         } 
-                        // Jika bukan tiket terusan, tapi event punya End Date (Opsional)
-                        else if (event.endDate) {
-                            const dEnd = new Date(event.endDate);
-                            const endStr = dEnd.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
-                            if (startStr !== endStr) {
-                                const separator = lang === 'id' ? 's/d' : 'to';
-                                dateStr = `${startStr} ${separator} ${endStr}`;
+                        else if (specificDayMatch) {
+                            const dayNumber = parseInt(specificDayMatch[1]);
+                            if (dayNumber > 1) {
+                                // Otomatis hitung maju tanggalnya sesuai angka Day
+                                const dSpecific = new Date(dStart);
+                                dSpecific.setDate(dSpecific.getDate() + (dayNumber - 1));
+                                dateStr = dSpecific.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                             }
                         }
-                    } catch (e) { dateStr = event.date; }
-                }
+                        // CATATAN: Bagian 'else if (event.endDate)' kita HAPUS.
+                        // Jadi kalau cuma "Reguler Festival", otomatis cuma nampil 1 hari (Tanggal Mulai).
+                        // 👆 ---------------------------------- 👆
 
                 const headerClass = isStreaming ? 'streaming' : '';
                 const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
