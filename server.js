@@ -1068,7 +1068,6 @@ app.post('/api/validate', async (req, res) => {
         }
         // 👆 -------------------------------------------------------- 👆
         // 3. DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
-        const tierNameLower = (ticket.tierName || '').toLowerCase();
         const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
 
         // JIKA TIKET TERUSAN (MULTI-DAY)
