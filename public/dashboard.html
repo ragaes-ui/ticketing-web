@@ -1181,7 +1181,7 @@ let dateStr = t.txt_date_tba;
                         dateStr = startStr;
 
                         // 👇 DETEKSI MASA BERLAKU DARI NAMA TIKET 👇
-                        const tierLower = (tierName || '').toLowerCase();
+                        const tierLower = (ticket.tierName || '').toLowerCase();
                         const dayMatch = tierLower.match(/([0-9]+)\s*day/); // Cari angka sebelum kata "day"
                         
                         if (dayMatch) {
