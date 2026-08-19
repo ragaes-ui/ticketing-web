@@ -177,26 +177,30 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
         const startStr = dStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         eventDateStr = startStr;
 
+// 👇 DETEKSI MASA BERLAKU UNTUK EMAIL 👇
         const tierLower = (ticketData.tierName || '').toLowerCase();
-        const dayMatch = tierLower.match(/([0-9]+)\s*day/);
         
-        if (dayMatch) {
-            const totalDays = parseInt(dayMatch[1]);
+        const multiDayMatch = tierLower.match(/([0-9]+)\s*day/);
+        const specificDayMatch = tierLower.match(/day\s*([0-9]+)/);
+        
+        if (multiDayMatch) {
+            const totalDays = parseInt(multiDayMatch[1]);
             if (totalDays > 1) {
                 const dEnd = new Date(dStart);
                 dEnd.setDate(dEnd.getDate() + (totalDays - 1));
                 const endStr = dEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
                 eventDateStr = `${startStr} s/d ${endStr}`;
             }
-        } else if (ticketData.eventEndDateRaw) {
-            const dEnd = new Date(ticketData.eventEndDateRaw);
-            const endStr = dEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            if (startStr !== endStr) {
-                eventDateStr = `${startStr} s/d ${endStr}`;
+        } 
+        else if (specificDayMatch) {
+            const dayNumber = parseInt(specificDayMatch[1]);
+            if (dayNumber > 1) {
+                const dSpecific = new Date(dStart);
+                dSpecific.setDate(dSpecific.getDate() + (dayNumber - 1));
+                eventDateStr = dSpecific.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             }
         }
-    }
-    // 👆 ---------------------------- 👆
+        // 👆 ---------------------------------- 👆
 
     // 🔥 LOGIKA BARU: Looping pembuatan banyak QR Code 🔥
     let qrCodesHTML = '';
@@ -890,6 +894,8 @@ app.post('/api/midtrans-success', async (req, res) => {
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            eventDateRaw: event.date,          // 👈 TAMBAHKAN INI
+            eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
             eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 SELIPKAN INI
             ticketCodes: kumpulanKodeTiket, // 👈 GANTI ticketCode JADI ticketCodes 
             secretData: event.secretData,
@@ -947,6 +953,8 @@ app.post('/api/payment-notification', async (req, res) => {
                         tierName: newTierName,
                         location: event.location || 'TBA',
                         eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+                        eventDateRaw: event.date,          // 👈 TAMBAHKAN INI
+                        eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
                         ticketCode: ticket.ticketCode,
                         secretData: event.secretData
                     });
