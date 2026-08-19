@@ -1363,16 +1363,38 @@ const headerClass = isStreaming ? 'streaming' : '';
                         `;
                     }
 
+// 👇 LOGIKA SENSOR BARCODE JIKA SUDAH CHECK-IN 👇
+                    let btnTampil = `<button class="btn btn-sm btn-outline-info mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}"><i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode</button>`;
+                    let qrBox = `<img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">`;
+                    let boxBorderColor = "#00c6ff";
+                    let scanLabel = t.lbl_scan;
+                    let scanLabelColor = "text-info";
+
+                    if (isScannedToday || ticket.status === 'used') {
+                        // Kalau sudah di-scan, ubah tombol dan sensor gambarnya
+                        btnTampil = `<button class="btn btn-sm btn-outline-warning mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}"><i class="bi bi-lock-fill me-1"></i> Barcode Terkunci</button>`;
+                        boxBorderColor = "#ffc107";
+                        scanLabel = "KODE SEMENTARA DIKUNCI";
+                        scanLabelColor = "text-warning";
+                        qrBox = `
+                            <div style="position: relative; display: inline-block;">
+                                <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px; filter: blur(8px); opacity: 0.5; pointer-events: none;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-shadow: 0px 2px 4px rgba(0,0,0,0.8);">
+                                    <i class="bi bi-shield-lock-fill display-4 d-block mb-1 text-warning"></i>
+                                    <span class="text-white fw-bold" style="font-size: 0.9rem; letter-spacing: 2px;">DI SENSOR</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     mainContent += `
                         ${notifReset}
-                        <button class="btn btn-sm btn-outline-info mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}">
-                            <i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode
-                        </button>
+                        ${btnTampil}
                         
                         <div class="collapse mt-2" id="barcode-${ticket.ticketCode}">
-                            <div class="qr-container w-100 text-center" style="background: rgba(255,255,255,0.05); border: 1px dashed #00c6ff;">
-                                <small class="text-info fw-bold mb-2 d-block">${t.lbl_scan}</small>
-                                <img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">
+                            <div class="qr-container w-100 text-center" style="background: rgba(255,255,255,0.05); border: 1px dashed ${boxBorderColor};">
+                                <small class="${scanLabelColor} fw-bold mb-2 d-block">${scanLabel}</small>
+                                ${qrBox}
                             </div>
                         </div>
 
