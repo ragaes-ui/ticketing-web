@@ -170,6 +170,34 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (customerEmail, ticketData) => {
+    // 👇 1. LOGIKA TANGGAL MASA BERLAKU 👇
+    let eventDateStr = ticketData.eventDate || "Tanggal TBA";
+    if (ticketData.eventDateRaw) {
+        const dStart = new Date(ticketData.eventDateRaw);
+        const startStr = dStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        eventDateStr = startStr;
+
+        const tierLower = (ticketData.tierName || '').toLowerCase();
+        const dayMatch = tierLower.match(/([0-9]+)\s*day/);
+        
+        if (dayMatch) {
+            const totalDays = parseInt(dayMatch[1]);
+            if (totalDays > 1) {
+                const dEnd = new Date(dStart);
+                dEnd.setDate(dEnd.getDate() + (totalDays - 1));
+                const endStr = dEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                eventDateStr = `${startStr} s/d ${endStr}`;
+            }
+        } else if (ticketData.eventEndDateRaw) {
+            const dEnd = new Date(ticketData.eventEndDateRaw);
+            const endStr = dEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            if (startStr !== endStr) {
+                eventDateStr = `${startStr} s/d ${endStr}`;
+            }
+        }
+    }
+    // 👆 ---------------------------- 👆
+
     // 🔥 LOGIKA BARU: Looping pembuatan banyak QR Code 🔥
     let qrCodesHTML = '';
     if (ticketData.ticketCodes && ticketData.ticketCodes.length > 0) {
@@ -236,9 +264,16 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                         <p style="margin: 5px 0;"><b>Penyelenggara:</b> ${ticketData.organizer || 'RCELLFEST'}</p>
                         <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
-                        <p style="margin: 5px 0;"><b>Tanggal:</b> ${ticketData.eventDate}</p>
                         <p style="margin: 5px 0;"><b>Waktu:</b> ${ticketData.eventTime}</p>
                     </div>
+                    
+                    <!-- 👇 KOTAK MASA BERLAKU DI EMAIL 👇 -->
+                    <div style="background-color: #e8f5e9; border: 1px dashed #28a745; padding: 15px; border-radius: 8px; margin: 0 0 20px 0; text-align: center;">
+                        <p style="margin: 0; font-size: 12px; color: #155724; font-weight: bold; text-transform: uppercase;">🗓️ MASA BERLAKU TIKET</p>
+                        <p style="margin: 5px 0 0 0; font-size: 16px; color: #155724; font-weight: bold;">${eventDateStr}</p>
+                    </div>
+                    <!-- 👆 -------------------------- 👆 -->
+                    
                     <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan semua QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan satu per satu.</p>
                 </div>
                 <div style="background: #eee; padding: 15px; text-align: center; font-size: 11px; color: #777;">
@@ -718,6 +753,8 @@ finalPrice = finalPrice + parseInt(pajak);
             tierName: tierName || 'General',
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
+            eventDateRaw: event.date,          // 👈 TAMBAHKAN INI
+eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
             eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 TAMBAHAN JAM
             ticketCodes: kumpulanKodeTiket,
             secretData: event.secretData,
