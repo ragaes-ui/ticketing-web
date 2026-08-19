@@ -1648,6 +1648,12 @@ let dateStr = t.txt_date_tba;
                         <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
                             ${data.tierName} </span>
                         <p style="margin: 8px 0 0 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
+                        <!-- 👇 KOTAK MASA BERLAKU DI PDF 👇 -->
+                        <div style="margin-top: 12px; background: #e8f5e9; border: 1px dashed #28a745; padding: 8px 15px; border-radius: 6px; display: inline-block;">
+                            <p style="margin:0; font-size: 10px; color:#155724; font-weight:bold;">MASA BERLAKU TIKET:</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#155724; font-weight:bold;">${data.date}</p>
+                        </div>
+                        <!-- 👆 ------------------------ 👆 -->
                     </div>
 
                     <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
