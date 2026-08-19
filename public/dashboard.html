@@ -1219,9 +1219,11 @@ const headerClass = isStreaming ? 'streaming' : '';
                 const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
                 const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
                 
-                // 👇 CEK APAKAH TIKET SUDAH DI-SCAN HARI INI 👇
+// 👇 CEK APAKAH TIKET SUDAH DI-SCAN HARI INI 👇
                 const now = new Date();
-                const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+                // Kurangi 5 jam agar gembok baru terbuka tepat jam 05.00 pagi
+                const resetTime = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+                const todayStr = resetTime.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 
                 let isScannedToday = false;
                 // Kalau tiket masih valid (masih ada sisa hari) DAN tanggal hari ini ada di riwayat scan
