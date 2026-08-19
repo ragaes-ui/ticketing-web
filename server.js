@@ -1024,51 +1024,45 @@ app.post('/api/validate', async (req, res) => {
         // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
 
         // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
-        if (ticket.eventId && ticket.eventId.date) {
-            const eventDateObj = new Date(ticket.eventId.date);
-            const eventDateStr = eventDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+// 2. PENCEGAT TANGGAL SUPER CERDAS (General, Multi-Day & Day X)
+        const tierNameLower = (ticket.tierName || '').toLowerCase();
+        const specificDayMatch = tierNameLower.match(/day\s*([0-9]+)/);
+        const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
 
-            if (todayStr < eventDateStr) {
+        if (ticket.eventId && ticket.eventId.date) {
+            let allowedDateObj = new Date(ticket.eventId.date);
+            let isDayX = false;
+            let dayNum = 1;
+
+            // Jika tiket "Day 2", "Day 3", dst.. majukan tanggal izinkannya
+            if (specificDayMatch) {
+                dayNum = parseInt(specificDayMatch[1]);
+                if (dayNum > 1) {
+                    allowedDateObj.setDate(allowedDateObj.getDate() + (dayNum - 1));
+                    isDayX = true;
+                }
+            }
+
+            const allowedDateStr = allowedDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+
+            // Tolak jika di-scan SEBELUM tanggal tiket diizinkan
+            if (todayStr < allowedDateStr) {
                 return res.json({ 
                     valid: false, 
                     message: "BELUM WAKTUNYA", 
-                    detail: `Sabar ya! Event ini baru dimulai pada ${eventDateObj.toLocaleDateString('id-ID')}. Tiket belum bisa di-scan hari ini.` 
+                    detail: `Sabar ya! Tiket kamu ini khusus untuk tanggal ${allowedDateObj.toLocaleDateString('id-ID')}. Belum bisa dipakai masuk hari ini.` 
+                });
+            }
+
+            // Tolak jika tiket spesifik "DAY X" di-scan SETELAH harinya lewat
+            if (isDayX && todayStr > allowedDateStr) {
+                return res.json({ 
+                    valid: false, 
+                    message: "KADALUARSA", 
+                    detail: `Jadwal tiket Day ${dayNum} (${allowedDateObj.toLocaleDateString('id-ID')}) sudah terlewat.` 
                 });
             }
         }
-// 👇 TAMBAHAN: PENCEGAT KHUSUS TIKET "DAY X" (Misal: Day 2, Day 3) 👇
-        const tierNameLower = (ticket.tierName || '').toLowerCase();
-        const specificDayMatch = tierNameLower.match(/day\s*([0-9]+)/);
-        
-        if (specificDayMatch && ticket.eventId && ticket.eventId.date) {
-            const dayNumber = parseInt(specificDayMatch[1]);
-            if (dayNumber > 1) {
-                // Hitung tanggal spesifik untuk Day X
-                const dSpecific = new Date(ticket.eventId.date);
-                dSpecific.setDate(dSpecific.getDate() + (dayNumber - 1));
-                const specificDateStr = dSpecific.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
-
-                // Kalau di-scan SEBELUM harinya
-                if (todayStr < specificDateStr) {
-                    return res.json({ 
-                        valid: false, 
-                        message: "SALAH HARI", 
-                        detail: `Tiket ini khusus untuk Day ${dayNumber} (${dSpecific.toLocaleDateString('id-ID')}). Tidak bisa dipakai masuk hari ini!` 
-                    });
-                }
-                // Kalau di-scan SETELAH harinya lewat (Opsional, biar makin ketat)
-                else if (todayStr > specificDateStr) {
-                    return res.json({ 
-                        valid: false, 
-                        message: "KADALUARSA", 
-                        detail: `Jadwal tiket Day ${dayNumber} ini sudah lewat.` 
-                    });
-                }
-            }
-        }
-        // 👆 -------------------------------------------------------- 👆
-        // 3. DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
-        const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
 
         // JIKA TIKET TERUSAN (MULTI-DAY)
         if (multiDayMatch) {
