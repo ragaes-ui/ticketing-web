@@ -1016,7 +1016,11 @@ app.post('/api/validate', async (req, res) => {
         }
 
         // AMBIL WAKTU HARI INI (WIB) - Format YYYY-MM-DD
+        // AMBIL WAKTU HARI INI (WIB) DENGAN BATAS RESET JAM 05.00 PAGI
         const now = new Date();
+        // Kurangi 5 jam (5 * 60 * 60 * 1000 millisecond)
+        const resetTime = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+        const todayStr = resetTime.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
         const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
 
         // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
