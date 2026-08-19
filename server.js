@@ -972,6 +972,22 @@ app.post('/api/validate', async (req, res) => {
         const now = new Date();
         const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
 
+        // 👇 TAMBAHKAN BLOK PENCEGAT TANGGAL INI 👇
+        if (ticket.eventId && ticket.eventId.date) {
+            const eventDateObj = new Date(ticket.eventId.date);
+            // Ubah tanggal event ke format YYYY-MM-DD WIB biar setara
+            const eventDateStr = eventDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+
+            // Kalau hari ini masih SEBELUM tanggal event dimulai, tolak mentah-mentah!
+            if (todayStr < eventDateStr) {
+                return res.json({ 
+                    valid: false, 
+                    message: "BELUM WAKTUNYA", 
+                    detail: `Sabar ya! Event ini baru dimulai pada ${eventDateObj.toLocaleDateString('id-ID')}. Tiket belum bisa di-scan hari ini.` 
+                });
+            }
+        }
+        // 👆 -------------------------------------- 👆
         // DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
         // Kita cari angka sebelum kata "day" atau "days" (Contoh: "3 Days Pass", "2 day ticket")
         const tierNameLower = (ticket.tierName || '').toLowerCase();
