@@ -1215,13 +1215,29 @@ let dateStr = t.txt_date_tba;
                         // Jadi kalau cuma "Reguler Festival", otomatis cuma nampil 1 hari (Tanggal Mulai).
                         // 👆 ---------------------------------- 👆
 
-                const headerClass = isStreaming ? 'streaming' : '';
+const headerClass = isStreaming ? 'streaming' : '';
                 const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
                 const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
                 
-                const statusBadge = ticket.status === 'used' 
-                    ? `<span class="badge bg-secondary rounded-pill">${t.status_used}</span>` 
-                    : `<span class="badge bg-success rounded-pill">${t.status_active}</span>`;
+                // 👇 CEK APAKAH TIKET SUDAH DI-SCAN HARI INI 👇
+                const now = new Date();
+                const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+                
+                let isScannedToday = false;
+                // Kalau tiket masih valid (masih ada sisa hari) DAN tanggal hari ini ada di riwayat scan
+                if (ticket.status === 'valid' && ticket.scanHistory && ticket.scanHistory.includes(todayStr)) {
+                    isScannedToday = true;
+                }
+
+                let statusBadge = '';
+                if (ticket.status === 'used') {
+                    statusBadge = `<span class="badge bg-secondary rounded-pill">${t.status_used}</span>`;
+                } else if (isScannedToday) {
+                    statusBadge = `<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-check2-all"></i> CHECK-IN HARI INI</span>`;
+                } else {
+                    statusBadge = `<span class="badge bg-success rounded-pill">${t.status_active}</span>`;
+                }
+                // 👆 -------------------------------------- 👆
 
                 let descText = event.description || "";
                 let descClean = descText.replace(/\n/g, " | ");
@@ -1334,9 +1350,21 @@ let dateStr = t.txt_date_tba;
                             </button>` : ''}
                         </div>
                     `;
-                } else {
+} else {
                     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
+                    
+                    // 👇 NOTIFIKASI RESET BESOK KALAU SUDAH DI-SCAN 👇
+                    let notifReset = '';
+                    if (isScannedToday) {
+                        notifReset = `
+                            <div class="alert alert-warning mt-3 mb-2 p-2 text-center" style="font-size: 0.8rem; border-radius: 8px; border: 1px dashed #ffc107; background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                                <i class="bi bi-info-circle-fill me-1"></i> Tiket sudah dipakai hari ini. <br><b>Kode akan direset besok pukul 05.00 WIB</b>.
+                            </div>
+                        `;
+                    }
+
                     mainContent += `
+                        ${notifReset}
                         <button class="btn btn-sm btn-outline-info mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}">
                             <i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode
                         </button>
