@@ -959,7 +959,7 @@ app.post('/api/validate', async (req, res) => {
         const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
         if (!ticket) return res.json({ valid: false, message: "TIKET TIDAK DITEMUKAN", detail: "Kode tiket tidak terdaftar di sistem kami." });
         
-        // LOGIKA CEK ID EVENT / GATE
+        // 1. LOGIKA CEK ID EVENT / GATE (Biar nggak salah masuk event)
         if (eventId && ticket.eventId && ticket.eventId._id.toString() !== eventId) {
             return res.json({ 
                 valid: false, 
@@ -972,13 +972,11 @@ app.post('/api/validate', async (req, res) => {
         const now = new Date();
         const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); 
 
-        // 👇 TAMBAHKAN BLOK PENCEGAT TANGGAL INI 👇
+        // 2. PENCEGAT TANGGAL: Tolak kalau di-scan sebelum hari H!
         if (ticket.eventId && ticket.eventId.date) {
             const eventDateObj = new Date(ticket.eventId.date);
-            // Ubah tanggal event ke format YYYY-MM-DD WIB biar setara
             const eventDateStr = eventDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
-            // Kalau hari ini masih SEBELUM tanggal event dimulai, tolak mentah-mentah!
             if (todayStr < eventDateStr) {
                 return res.json({ 
                     valid: false, 
@@ -987,30 +985,28 @@ app.post('/api/validate', async (req, res) => {
                 });
             }
         }
-        // 👆 -------------------------------------- 👆
-        // DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
-        // Kita cari angka sebelum kata "day" atau "days" (Contoh: "3 Days Pass", "2 day ticket")
+
+        // 3. DETEKSI APAKAH INI TIKET TERUSAN (Multi-Day Pass)
         const tierNameLower = (ticket.tierName || '').toLowerCase();
         const multiDayMatch = tierNameLower.match(/([0-9]+)\s*day/); 
 
         // JIKA TIKET TERUSAN (MULTI-DAY)
         if (multiDayMatch) {
-            const maxDays = parseInt(multiDayMatch[1]); // Menangkap angkanya (misal: 3)
+            const maxDays = parseInt(multiDayMatch[1]);
             
-            // Pastikan array scanHistory ada
             if (!ticket.scanHistory) ticket.scanHistory = [];
 
-            // 1. Cek apakah HARI INI sudah pernah masuk?
+            // A. Cek apakah HARI INI sudah pernah masuk?
             if (ticket.scanHistory.includes(todayStr)) {
                 return res.json({ valid: false, message: "SUDAH CHECK-IN", detail: `Tiket ${ticket.tierName} ini sudah kamu pakai untuk hari ini. Silakan kembali besok!` });
             }
 
-            // 2. Cek apakah JATAH HARINYA sudah habis? (misal 3 Days, tapi ini mau masuk hari ke-4)
+            // B. Cek apakah JATAH HARINYA sudah habis?
             if (ticket.status === 'used' || ticket.scanHistory.length >= maxDays) {
                 return res.json({ valid: false, message: "TIKET HANGUS", detail: `Jatah ${maxDays} Hari untuk tiket ini sudah terpakai habis.` });
             }
 
-            // 3. LOLOS! Catat kehadiran hari ini
+            // C. LOLOS! Catat kehadiran hari ini
             ticket.scanHistory.push(todayStr);
 
             // Kalau hari ini adalah hari terakhir jatahnya, langsung hanguskan statusnya
@@ -1029,7 +1025,7 @@ app.post('/api/validate', async (req, res) => {
             });
         } 
         
-        // JIKA TIKET NORMAL (1 HARI / GENERAL)
+        // 4. JIKA TIKET NORMAL (1 HARI / GENERAL)
         else {
             if (ticket.status === 'used') {
                 return res.json({ valid: false, message: "TIKET SUDAH DIPAKAI", detail: "Tiket ini sudah pernah di-scan sebelumnya. Akses ditolak!" });
