@@ -1172,11 +1172,25 @@
                 const category = event.category || 'General';
                 const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
                 
-                let dateStr = t.txt_date_tba;
+let dateStr = t.txt_date_tba;
                 if (event.date) {
                     try {
-                        const d = new Date(event.date);
-                        dateStr = d.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+                        const localeConfig = lang === 'id' ? 'id-ID' : 'en-US';
+                        const dStart = new Date(event.date);
+                        const startStr = dStart.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
+                        dateStr = startStr;
+
+                        // 👇 TAMBAHAN LOGIKA TANGGAL SELESAI 👇
+                        if (event.endDate) {
+                            const dEnd = new Date(event.endDate);
+                            const endStr = dEnd.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
+                            
+                            if (startStr !== endStr) {
+                                // Jika beda, gabungkan jadi rentang. Jika bahasa Inggris pakai 'to', Indonesia 's/d'
+                                const separator = lang === 'id' ? 's/d' : 'to';
+                                dateStr = `${startStr} ${separator} ${endStr}`;
+                            }
+                        }
                     } catch (e) { dateStr = event.date; }
                 }
 
