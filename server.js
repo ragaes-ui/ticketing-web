@@ -676,7 +676,27 @@ app.post('/api/user/set-pin', async (req, res) => {
         res.json({ success: true, message: "PIN berhasil disimpan!" });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
+// ==========================================
+// 🔒 API CEK KODE TIKET RAHASIA DARI DEPAN
+// ==========================================
+app.post('/api/check-tier-code', async (req, res) => {
+    try {
+        const { eventId, tierName, accessCode } = req.body;
+        const event = await Event.findById(eventId);
+        if (!event) return res.json({ valid: false, message: 'Event tidak ditemukan' });
 
+        const tierData = event.tickets.find(t => t.tierName === tierName);
+        if (tierData && tierData.accessCode) {
+            // Cocokkan kode (Abaikan huruf besar/kecil)
+            if (tierData.accessCode.trim().toUpperCase() === (accessCode || '').trim().toUpperCase()) {
+                return res.json({ valid: true });
+            }
+        }
+        res.json({ valid: false, message: 'Kode rahasia salah!' });
+    } catch (error) {
+        res.status(500).json({ valid: false, message: 'Server error' });
+    }
+});
 // 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
