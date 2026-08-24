@@ -391,7 +391,7 @@ app.get('/api/events', async (req, res) => {
                 eventObj.tickets = eventObj.tickets.map(t => ({
                     ...t,
                     isLocked: !!t.accessCode, // Menjadi true jika ada kode rahasia
-                    accessCode: undefined     // Hapus kode aslinya biar ga bisa di-inspect elemen!
+                    accessCode: t.accessCode ? '***TERKUNCI***' : ''     // Hapus kode aslinya biar ga bisa di-inspect elemen!
                 }));
             }
             return eventObj;
@@ -414,6 +414,15 @@ app.get('/api/events/:id', async (req, res) => {
         if (eventObj.category === 'Streaming') {
             eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
         }
+        // 👇 TAMBAHKAN BLOK INI BIAR KODE GA BOCOR 👇
+        if (eventObj.tickets && eventObj.tickets.length > 0) {
+            eventObj.tickets = eventObj.tickets.map(t => ({
+                ...t,
+                isLocked: !!t.accessCode,
+                accessCode: t.accessCode ? '***TERKUNCI***' : ''
+            }));
+        }
+        // 👆 ------------------------------------ 👆
         res.json(eventObj);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -449,6 +458,23 @@ app.post('/api/events', async (req, res) => {
 app.put('/api/events/:id', async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(404).json({ error: "ID Konser gak valid" });
+        
+        // 👇 LOGIKA PENYELAMAT KODE RAHASIA 👇
+        const oldEvent = await Event.findById(req.params.id);
+        if (req.body.tickets && oldEvent && oldEvent.tickets) {
+            req.body.tickets = req.body.tickets.map((newTicket) => {
+                // Cari tiket lama yang namanya sama
+                const oldTicket = oldEvent.tickets.find(t => t.tierName === newTicket.tierName);
+                
+                // Kalau di frontend isinya "***TERKUNCI***", berarti admin gak ngubah kodenya. Ambil kode aslinya dari DB!
+                if (newTicket.accessCode === '***TERKUNCI***' && oldTicket) {
+                    newTicket.accessCode = oldTicket.accessCode;
+                }
+                return newTicket;
+            });
+        }
+        // 👆 -------------------------------- 👆
+
         const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true }); 
         res.json({ message: "Sukses update!", data: updatedEvent });
     } catch (error) { res.status(500).json({ error: error.message }); }
