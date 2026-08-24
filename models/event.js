@@ -107,7 +107,9 @@ const eventSchema = new mongoose.Schema({
         totalSeats: { type: Number, required: true },    // Kuota khusus kategori ini
         availableSeats: { type: Number, required: true }, // Sisa tiket kategori ini
         minQty: { type: Number, default: 1 },
-        salesOpenDate: { type: Date, default: null }
+        salesOpenDate: { type: Date, default: null },
+        isLocked: { type: Boolean, default: false }, // Penanda tiket digembok
+        accessCode: { type: String, default: "" }    // Kode rahasianya
     }],
     // ----------------------------------------------------
     isPinned: { type: Boolean, default: false }
