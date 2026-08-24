@@ -199,6 +199,8 @@
     <script>
         let currentEvent = null;
         let selectedTierObj = null;
+        let selectedTierIndex = -1; // Untuk mengingat tiket ke-berapa yang dipilih
+        let enteredCodes = {};      // Menyimpan kode rahasia yang diinput pembeli
 
         document.addEventListener('DOMContentLoaded', async () => {
             // 1. Ambil data URL satu kali saja (biar nggak tabrakan)
@@ -409,14 +411,12 @@ function renderTickets() {
             container.innerHTML = '';
 
             const now = new Date();
-            // 🗓️ RUMUS WAKTU SELESAI: Gabungan Tanggal & Jam Selesai
             const waktuSelesaiEvent = new Date(`${currentEvent.date}T${currentEvent.endTime || '23:59'}`);
 
             const isFinished = currentEvent.availableSeats === -1;
             const isComingSoon = currentEvent.availableSeats === -2;
             const isEventSoldOut = currentEvent.availableSeats === 0;
 
-            // 👇 --- SKENARIO 1: EVENT SELESAI (Waktu Lewat / Diset Manual Admin) --- 👇
             if (now > waktuSelesaiEvent || isFinished) {
                 btnBuy.innerText = 'EVENT SELESAI'; 
                 btnBuy.className = "btn btn-danger btn-lg px-4 rounded-pill fw-bold w-100 disabled";
@@ -425,25 +425,19 @@ function renderTickets() {
                 return;
             }
 
-            // 👇 --- SKENARIO 2: BELUM BUKA TIKET (COUNTDOWN) --- 👇
             if (currentEvent.salesOpenDate && new Date(currentEvent.salesOpenDate) > now) {
                 btnBuy.innerHTML = '<i class="bi bi-clock-history"></i> AKAN HADIR'; 
                 btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled text-white";
                 btnBuy.disabled = true;
-                
-                // Bikin tampilan box timer yang keren nutupin area tiket
                 container.innerHTML = `
                     <div class="alert alert-info text-center border-info shadow-sm" style="background: var(--primary-light);">
                         <div class="small text-muted fw-bold mb-2"><i class="bi bi-ticket-detailed-fill"></i> PENJUALAN TIKET DIBUKA DALAM:</div>
                         <div id="timerDetail" class="fw-900 text-primary" style="font-size: 1.8rem; letter-spacing: 2px;">Menghitung...</div>
                     </div>`;
-                    
-                // Jalankan mesin hitung mundur
                 setTimeout(() => { mulaiHitungMundurDetail(currentEvent.salesOpenDate); }, 100);
                 return;
             }
 
-            // 👇 --- SKENARIO 3: HABIS TERJUAL ATAU COMING SOON MANUAL --- 👇
             if (isComingSoon) {
                 btnBuy.innerText = 'BELUM DIMULAI'; 
                 btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark w-100 disabled";
@@ -459,9 +453,8 @@ function renderTickets() {
                 return;
             }
 
-            // 👇 --- SKENARIO 4: NORMAL (SEDANG DIJUAL) --- 👇
             btnBuy.innerText = 'Pilih Tiket';
-            btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled"; // Disabled dulu sampai diklik
+            btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold w-100 disabled"; 
             btnBuy.disabled = true;
 
             let tickets = currentEvent.tickets;
@@ -469,15 +462,12 @@ function renderTickets() {
                 tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             }
 
-tickets.forEach((tier, index) => {
+            tickets.forEach((tier, index) => {
                 const isSoldOut = tier.availableSeats <= 0;
-                
-                // 👇 LOGIKA WAKTU BUKA TIER 👇
                 let isTierNotOpenYet = false;
                 let tierTimerHtml = '';
-                const now = new Date();
 
-                if (tier.salesOpenDate && new Date(tier.salesOpenDate) > now) {
+                if (tier.salesOpenDate && new Date(tier.salesOpenDate) > new Date()) {
                     isTierNotOpenYet = true;
                     tierTimerHtml = `<div id="tier-timer-${index}" class="text-primary fw-bold mt-1" style="font-size: 0.75rem;"><i class="bi bi-clock"></i> Menghitung...</div>`;
                     setTimeout(() => { mulaiHitungMundurTier(index, tier.salesOpenDate); }, 100);
@@ -485,11 +475,17 @@ tickets.forEach((tier, index) => {
 
                 const isDisabled = isSoldOut || isTierNotOpenYet;
                 const statusClass = isDisabled ? 'tier-sold-out' : '';
+                
+                // 👇 TAMPILAN KHUSUS GEMBOK TIKET 👇
+                const isLocked = tier.isLocked;
+                const lockIcon = isLocked ? `<i class="bi bi-lock-fill text-danger fs-5" id="lockIcon${index}"></i>` : '';
+                const radioDisplay = isLocked ? 'display: none;' : '';
 
                 container.innerHTML += `
-                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${statusClass}" id="lblTier${index}">
+                    <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${statusClass}" id="lblTier${index}" onclick="handleTierClick(event, ${index}, ${isLocked}, ${isDisabled})">
                         <div class="d-flex align-items-center gap-3">
-                            <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier(${index})" ${isDisabled ? 'disabled' : ''}>
+                            <div id="iconContainer${index}">${lockIcon}</div>
+                            <input type="radio" name="ticketTier" id="radioTier${index}" class="form-check-input mt-0" style="${radioDisplay}" ${isDisabled ? 'disabled' : ''}>
                             <div>
                                 <h6 class="mb-0 fw-bold">${tier.tierName}</h6>
                                 <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
@@ -501,7 +497,7 @@ tickets.forEach((tier, index) => {
                     </label>
                 `;
             });
-}
+        }
         // --- MESIN HITUNG MUNDUR KHUSUS HALAMAN DETAIL ---
         function mulaiHitungMundurDetail(targetDateStr) {
             const targetWaktu = new Date(targetDateStr).getTime();
@@ -572,9 +568,48 @@ tickets.forEach((tier, index) => {
                 }
             }, 1000);
         }
-        // 👆 --- MESIN HITUNG MUNDUR KHUSUS TIER TIKET (END) --- 👆
+// Fungsi untuk menangani saat tiket diklik (Biar pop up gemboknya muncul)
+        function handleTierClick(e, index, isLocked, isDisabled) {
+            if (isDisabled) return;
+            if (e.target.tagName === 'INPUT') return; // Mencegah klik dobel
+
+            // Kalau digembok dan kodenya belum diisi pembeli
+            if (isLocked && !enteredCodes[index]) {
+                e.preventDefault(); 
+                
+                Swal.fire({
+                    title: 'Tiket Terkunci!',
+                    text: 'Masukkan kode akses rahasia untuk membeli tiket ini:',
+                    input: 'text',
+                    inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+                    showCancelButton: true,
+                    confirmButtonText: 'Buka Kunci <i class="bi bi-unlock-fill"></i>',
+                    cancelButtonText: 'Batal',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-main)',
+                    inputValidator: (value) => {
+                        if (!value) return 'Kode akses tidak boleh kosong!';
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        enteredCodes[index] = result.value.trim();
+                        // Ubah tampilan jadi Gembok Terbuka (Hijau)
+                        document.getElementById(`iconContainer${index}`).innerHTML = '<i class="bi bi-unlock-fill text-success fs-5"></i>';
+                        const radio = document.getElementById(`radioTier${index}`);
+                        radio.style.display = 'block';
+                        radio.checked = true;
+                        selectTier(index);
+                    }
+                });
+                return;
+            }
+
+            // Kalau ga digembok, langsung pilih aja
+            document.getElementById(`radioTier${index}`).checked = true;
+            selectTier(index);
+        }
+
         function selectTier(index) {
-            // Hapus class selected dari semua label
             document.querySelectorAll('.tier-label').forEach(el => el.classList.remove('selected'));
             document.getElementById(`lblTier${index}`).classList.add('selected');
 
@@ -582,6 +617,7 @@ tickets.forEach((tier, index) => {
             if (!tickets || tickets.length === 0) tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             
             selectedTierObj = tickets[index];
+            selectedTierIndex = index; // Simpan posisi index
             document.getElementById('totalPriceDisplay').innerText = `Rp ${selectedTierObj.price.toLocaleString('id-ID')}`;
             
             const btnBuy = document.getElementById('btnBuy');
@@ -620,7 +656,8 @@ tickets.forEach((tier, index) => {
                 price: selectedTierObj.price,
                 availableSeats: selectedTierObj.availableSeats,
                 minQty: selectedTierObj.minQty || 1, // 👈 KUNCI RAHASIANYA DI SINI
-                taxRate: currentEvent.taxRate || 0 // 👈 KUNCI PAJAK DINAMIS
+                taxRate: currentEvent.taxRate || 0, // 👈 KUNCI PAJAK DINAMIS
+                tierAccessCode: enteredCodes[selectedTierIndex] || ''
             };
 
             // 3. Simpan ke dalam memori HP/Browser (Local Storage)
