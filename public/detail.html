@@ -569,6 +569,7 @@ function renderTickets() {
             }, 1000);
         }
 // Fungsi untuk menangani saat tiket diklik (Biar pop up gemboknya muncul)
+// Fungsi untuk menangani saat tiket diklik
         function handleTierClick(e, index, isLocked, isDisabled) {
             if (isDisabled) return;
             if (e.target.tagName === 'INPUT') return; // Mencegah klik dobel
@@ -577,9 +578,11 @@ function renderTickets() {
             if (isLocked && !enteredCodes[index]) {
                 e.preventDefault(); 
                 
+                const tierInfo = currentEvent.tickets[index];
+
                 Swal.fire({
                     title: 'Tiket Terkunci!',
-                    text: 'Masukkan kode akses rahasia untuk membeli tiket ini:',
+                    text: 'Masukkan kode akses rahasia untuk tiket ini:',
                     input: 'text',
                     inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
                     showCancelButton: true,
@@ -587,10 +590,39 @@ function renderTickets() {
                     cancelButtonText: 'Batal',
                     background: 'var(--bg-card)',
                     color: 'var(--text-main)',
-                    inputValidator: (value) => {
-                        if (!value) return 'Kode akses tidak boleh kosong!';
-                    }
+                    showLoaderOnConfirm: true, // 👈 Bikin tombol loading muter-muter
+                    preConfirm: async (inputCode) => {
+                        if (!inputCode) {
+                            Swal.showValidationMessage('Kode akses tidak boleh kosong!');
+                            return false;
+                        }
+                        try {
+                            // 👇 Nanya ke server beneran nggak nih kodenya? 👇
+                            const response = await fetch('/api/check-tier-code', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    eventId: currentEvent._id,
+                                    tierName: tierInfo.tierName,
+                                    accessCode: inputCode
+                                })
+                            });
+                            const result = await response.json();
+                            
+                            // Kalau server bilang salah, langsung getar dan merah!
+                            if (!result.valid) {
+                                Swal.showValidationMessage(result.message || 'Kode rahasia salah!');
+                                return false;
+                            }
+                            return inputCode; // Kalau lolos, balikin kodenya!
+                        } catch (error) {
+                            Swal.showValidationMessage('Gagal ngecek kode ke server.');
+                            return false;
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
                 }).then((result) => {
+                    // Kalau server bilang BENAR (isConfirmed)
                     if (result.isConfirmed) {
                         enteredCodes[index] = result.value.trim();
                         // Ubah tampilan jadi Gembok Terbuka (Hijau)
@@ -599,6 +631,12 @@ function renderTickets() {
                         radio.style.display = 'block';
                         radio.checked = true;
                         selectTier(index);
+                        
+                        Swal.fire({
+                            toast: true, position: 'top-end', icon: 'success',
+                            title: 'Kunci Terbuka!', showConfirmButton: false, timer: 1500,
+                            background: 'var(--bg-card)', color: 'var(--text-main)'
+                        });
                     }
                 });
                 return;
