@@ -700,7 +700,7 @@
             if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
         }
 
-function addTierRow(id, n='', p='', s='', m='1', o='') {
+function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
             document.getElementById(id).insertAdjacentHTML('beforeend', `
                 <div class="tier-row">
                     <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
@@ -718,7 +718,32 @@ function addTierRow(id, n='', p='', s='', m='1', o='') {
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
                     </div>
+<!-- 👇 FITUR TIKET GEMBOK 👇 -->
+                    <div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50">
+                        <div class="col-12 col-md-5 d-flex align-items-center">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input tier-is-locked" type="checkbox" role="switch" ${isLocked ? 'checked' : ''} onchange="toggleAccessCode(this)">
+                                <label class="form-check-label small fw-bold text-warning ms-1"><i class="bi bi-lock-fill"></i> Gembok Tiket?</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia (Misal: CREW26)" style="${isLocked ? '' : 'display: none;'}">
+                        </div>
+                    </div>
+                    <!-- 👆 ------------------ 👆 -->
                 </div>`);
+        }
+        // Fungsi animasi untuk memunculkan kolom input kode
+        function toggleAccessCode(checkbox) {
+            const input = checkbox.closest('.tier-row').querySelector('.tier-access-code');
+            if (checkbox.checked) {
+                input.style.display = 'block';
+                input.setAttribute('required', 'true'); // Wajib diisi kalau digembok
+            } else {
+                input.style.display = 'none';
+                input.removeAttribute('required');
+                input.value = ''; // Kosongkan jika gembok dimatikan
+            }
         }
         function addLineupRow(containerId, url = '') {
             const html = `
@@ -739,7 +764,9 @@ function getTiers(id) {
                 totalSeats: parseInt(r.querySelector('.tier-stock').value),
                 minQty: parseInt(r.querySelector('.tier-min').value) || 1,
                 // 👇 TARIK DATA TANGGAL BUKA TIKET DARI FORM 👇
-                salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null
+                salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null,
+                isLocked: r.querySelector('.tier-is-locked').checked,
+                accessCode: r.querySelector('.tier-access-code').value
             }));
         }
 
@@ -814,7 +841,7 @@ document.getElementById('editTiers').innerHTML = '';
                             const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0');
                             openDateFormatted = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
                         }
-                        addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted);
+                        addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode);
                     });
                 }                if(ev.salesOpenDate) {
                     const d = new Date(ev.salesOpenDate);
