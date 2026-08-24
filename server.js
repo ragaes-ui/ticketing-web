@@ -712,11 +712,15 @@ app.post('/api/check-tier-code', async (req, res) => {
         if (!event) return res.json({ valid: false, message: 'Event tidak ditemukan' });
 
         const tierData = event.tickets.find(t => t.tierName === tierName);
-        if (tierData && tierData.accessCode) {
-            // Cocokkan kode (Abaikan huruf besar/kecil)
-            if (tierData.accessCode.trim().toUpperCase() === (accessCode || '').trim().toUpperCase()) {
+if (tierData && tierData.accessCode) {
+            // 👇 PECAH KODE BERDASARKAN KOMA LALU CEK 👇
+            const inputCode = (accessCode || '').trim().toUpperCase();
+            const validCodes = tierData.accessCode.split(',').map(c => c.trim().toUpperCase());
+            
+            if (validCodes.includes(inputCode)) {
                 return res.json({ valid: true });
             }
+            // 👆 ----------------------------------- 👆
         }
         res.json({ valid: false, message: 'Kode rahasia salah!' });
     } catch (error) {
@@ -752,12 +756,14 @@ let selectedTierIndex = -1;
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
             
             // 👇 VALIDASI KODE RAHASIA TIKET 👇
+// 👇 VALIDASI KODE RAHASIA TIKET 👇
             if (selectedTierIndex !== -1) {
                 const tierData = event.tickets[selectedTierIndex];
                 if (tierData.accessCode) { // Jika tiket ini digembok
                     const inputCode = (tierAccessCode || '').trim().toUpperCase();
-                    const secretCode = tierData.accessCode.trim().toUpperCase();
-                    if (inputCode !== secretCode) {
+                    const validCodes = tierData.accessCode.split(',').map(c => c.trim().toUpperCase());
+                    
+                    if (!validCodes.includes(inputCode)) {
                         return res.status(403).json({ success: false, message: "Akses Ditolak: Kode rahasia salah!" });
                     }
                 }
@@ -861,12 +867,14 @@ const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
         // 👇 VALIDASI KODE RAHASIA TIKET 👇
+// 👇 VALIDASI KODE RAHASIA TIKET 👇
         if (tierName && event.tickets && event.tickets.length > 0) {
             const tierData = event.tickets.find(t => t.tierName === tierName);
             if (tierData && tierData.accessCode) {
                 const inputCode = (tierAccessCode || '').trim().toUpperCase();
-                const secretCode = tierData.accessCode.trim().toUpperCase();
-                if (inputCode !== secretCode) {
+                const validCodes = tierData.accessCode.split(',').map(c => c.trim().toUpperCase());
+                
+                if (!validCodes.includes(inputCode)) {
                     return res.status(403).json({ message: "Akses Ditolak: Kode rahasia salah!" });
                 }
             }
