@@ -386,6 +386,14 @@ app.get('/api/events', async (req, res) => {
             if (eventObj.category === 'Streaming') {
                 eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
             }
+            // 👇 LOGIKA UNTUK MENYEMBUNYIKAN KODE RAHASIA TAPI MENGIRIM STATUS GEMBOK 👇
+            if (eventObj.tickets && eventObj.tickets.length > 0) {
+                eventObj.tickets = eventObj.tickets.map(t => ({
+                    ...t,
+                    isLocked: !!t.accessCode, // Menjadi true jika ada kode rahasia
+                    accessCode: undefined     // Hapus kode aslinya biar ga bisa di-inspect elemen!
+                }));
+            }
             return eventObj;
         });
         res.json(publicEvents); 
@@ -672,7 +680,7 @@ app.post('/api/user/set-pin', async (req, res) => {
 // 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName, pajak = 0 } = req.body; 
+        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName, pajak = 0, tierAccessCode } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
@@ -693,9 +701,22 @@ app.post('/api/buy-ticket', async (req, res) => {
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        let selectedTierIndex = -1;
+let selectedTierIndex = -1;
         if (tierName && event.tickets && event.tickets.length > 0) {
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
+            
+            // 👇 VALIDASI KODE RAHASIA TIKET 👇
+            if (selectedTierIndex !== -1) {
+                const tierData = event.tickets[selectedTierIndex];
+                if (tierData.accessCode) { // Jika tiket ini digembok
+                    const inputCode = (tierAccessCode || '').trim().toUpperCase();
+                    const secretCode = tierData.accessCode.trim().toUpperCase();
+                    if (inputCode !== secretCode) {
+                        return res.status(403).json({ success: false, message: "Akses Ditolak: Kode rahasia salah!" });
+                    }
+                }
+            }
+            // 👆 ---------------------------- 👆
         }
 
         let discountAmount = 0;
@@ -778,7 +799,7 @@ eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName, pajak = 0 } = req.body; 
+        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName, pajak = 0, tierAccessCode } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
@@ -790,8 +811,23 @@ app.post('/api/payment-token', async (req, res) => {
         
         if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
-        const event = await Event.findById(eventId);
+const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
+
+        // 👇 VALIDASI KODE RAHASIA TIKET 👇
+        if (tierName && event.tickets && event.tickets.length > 0) {
+            const tierData = event.tickets.find(t => t.tierName === tierName);
+            if (tierData && tierData.accessCode) {
+                const inputCode = (tierAccessCode || '').trim().toUpperCase();
+                const secretCode = tierData.accessCode.trim().toUpperCase();
+                if (inputCode !== secretCode) {
+                    return res.status(403).json({ message: "Akses Ditolak: Kode rahasia salah!" });
+                }
+            }
+        }
+        // 👆 ---------------------------- 👆
+
+        // 👇 1. HITUNG ANGKA DULU 👇
 
         // 👇 1. HITUNG ANGKA DULU 👇
         const numPrice = parseInt(price) || 0;
@@ -850,9 +886,10 @@ app.post('/api/midtrans-success', async (req, res) => {
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-        let selectedTierIndex = -1;
+let selectedTierIndex = -1;
         if (tierName && event.tickets && event.tickets.length > 0) {
             selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
+            
         }
 
         const hargaSatuan = price / quantity;
