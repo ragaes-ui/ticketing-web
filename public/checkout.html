@@ -426,7 +426,8 @@ async function cekPromoLuar() {
                             promoCode: kodePromoAktif, 
                             buyerData: buyerPayload,
                             recaptchaToken: recaptchaToken, // Kirim token ke backend!
-                            pajak: window.pajakAktif || 0 // 👈 TAMBAHAN WAJIB
+                            pajak: window.pajakAktif || 0, // 👈 TAMBAHAN WAJIB
+                            tierAccessCode: checkoutData.tierAccessCode || ''
                         })
                     });
                     
@@ -474,7 +475,8 @@ async function cekPromoLuar() {
                             customerEmail: userData.email, 
                             customerPhone: phone, 
                             userId: userData.id,
-                            recaptchaToken: recaptchaToken // Kirim token ke backend!
+                            recaptchaToken: recaptchaToken, // Kirim token ke backend!
+                            tierAccessCode: checkoutData.tierAccessCode || ''
                         }) 
                     });
                     
