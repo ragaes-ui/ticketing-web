@@ -18,329 +18,210 @@
 
     <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
-    <style>
-        /* --- THEME VARIABLES --- */
+<style>
+        /* --- TEMA TERANG & GELAP PROFESIONAL --- */
         :root {
-            --bg-body: #f0f2f5;
+            --bg-body: #f8fafc;
             --bg-nav: #ffffff;
             --bg-card: #ffffff;
-            --text-main: #333333;
-            --text-muted: #6c757d;
-            --glass-border: 1px solid rgba(0,0,0,0.1);
-            --glass-bg: #ffffff;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            --primary-gradient: linear-gradient(135deg, #0049CC, #0072ff);
+            --bg-input: #ffffff;
+            --bg-section: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
         }
 
         [data-theme="dark"] {
-            --bg-body: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
-            --bg-nav: rgba(15, 12, 41, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --bg-body: #121212;
+            --bg-nav: #1e1e1e;
+            --bg-card: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --bg-section: #181818;
+            --text-main: #f8f9fa;
+            --text-muted: #a1a1aa;
+            --border-color: #333333; 
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.15);
         }
 
         body {
-            background: var(--bg-body);
-            background-size: 400% 400%;
+            background-color: var(--bg-body);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             padding-top: 80px;
             overflow-x: hidden;
-            transition: color 0.3s;
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        /* Animasi Background hanya untuk Dark Mode */
-        [data-theme="dark"] body { 
-            animation: gradientBG 15s ease infinite; 
-        }
-        
-        @keyframes gradientBG { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
-        }
+        /* 1. Matikan Bola Blur (Blob) & Animasi Background */
+        .blob { display: none !important; }
 
-        /* Blob Effects (Dark Mode Only) */
-        .blob { 
-            position: fixed; 
-            border-radius: 50%; 
-            filter: blur(80px); 
-            z-index: -1; 
-            opacity: 0.5; 
-            display: none; 
-        }
-        
-        [data-theme="dark"] .blob { 
-            display: block; 
-        }
-        
-        .blob-1 { 
-            top: -10%; left: -10%; width: 500px; height: 500px; background: #7f00ff; 
-        }
-        
-        .blob-2 { 
-            bottom: -10%; right: -10%; width: 400px; height: 400px; background: #00c6ff; 
-        }
-
-        /* Navbar */
+        /* 2. Navbar & Card Solid Clean */
         .navbar {
-            background: var(--bg-nav);
-            backdrop-filter: blur(20px);
-            border-bottom: var(--glass-border);
+            background-color: var(--bg-nav) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            box-shadow: 0 2px 10px var(--shadow-color) !important;
             padding: 15px 0;
-            transition: background 0.3s;
         }
         
         .navbar-brand { 
-            font-weight: 800; color: #0049CC !important; font-size: 1.4rem; letter-spacing: -0.5px; 
+            font-weight: 800; 
+            color: var(--primary) !important; 
+            font-size: 1.4rem; 
+            letter-spacing: -0.5px; 
         }
 
-        /* Glass Card (Profile & Tickets) */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            border: var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
+        .glass-card, .modal-content, .ticket-card, .custom-search-box {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 15px var(--shadow-color) !important;
             padding: 25px;
             color: var(--text-main);
-            transition: 0.3s;
         }
 
         .profile-img { 
-            width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); 
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
-            color: white; box-shadow: 0 0 15px rgba(0, 198, 255, 0.5); 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: var(--primary); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; color: white;
         }
 
-        /* Ticket Card Styling */
+        /* 3. Ticket Card Styling */
         .ticket-card {
-            background: var(--bg-card);
-            border: var(--glass-border);
-            border-radius: 20px;
+            padding: 0 !important;
             overflow: hidden;
-            transition: transform 0.3s;
-            position: relative;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        
         .ticket-card:hover { 
-            transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,73,204,0.2); 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 25px var(--shadow-color) !important; 
         }
 
         .ticket-header {
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            background: var(--primary) !important;
             padding: 15px 20px;
             color: white;
         }
-        
-        .ticket-header.streaming { 
-            background: linear-gradient(90deg, #11998e, #38ef7d); 
-        }
+        .ticket-header.streaming { background: #059669 !important; }
 
         .ticket-body { 
-            padding: 25px; text-align: center; flex-grow: 1; display: flex; 
-            flex-direction: column; justify-content: center; color: var(--text-main); 
+            padding: 20px; 
+            text-align: center; 
+            color: var(--text-main); 
         }
 
         .ticket-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            background: rgba(128, 128, 128, 0.05);
-            border: var(--glass-border);
+            gap: 12px;
+            background: var(--bg-section) !important;
+            border: 1px solid var(--border-color) !important;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 8px !important;
             text-align: left;
             margin: 15px 0;
         }
         
         .info-label { 
-            font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; 
-            letter-spacing: 1px; font-weight: 700; margin-bottom: 3px; 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            font-weight: 700; 
+            margin-bottom: 2px; 
         }
-        
-        .info-value { 
-            font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin: 0; 
-        }
-
-        .qr-container {
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin: 15px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .qr-image { 
-            width: 140px; height: 140px; object-fit: contain; 
-        }
+        .info-value { font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin: 0; }
 
         .account-box {
-            background: rgba(0, 255, 127, 0.1);
-            border: 1px solid rgba(0, 255, 127, 0.3);
-            color: #00bf63;
-            padding: 15px;
-            border-radius: 12px;
+            background: rgba(5, 150, 105, 0.1) !important;
+            border: 1px dashed #059669 !important;
+            color: #059669 !important;
+            padding: 12px;
+            border-radius: 8px !important;
             text-align: left;
             margin-bottom: 15px;
             word-break: break-all;
             font-family: monospace;
         }
-        
-        [data-theme="dark"] .account-box { 
-            color: #00ff7f; 
-        }
 
         .ticket-code {
-            background: rgba(128, 128, 128, 0.1);
-            border: 1px dashed var(--text-muted);
-            padding: 8px 15px;
-            border-radius: 8px;
+            background: var(--bg-section) !important;
+            border: 1px dashed var(--border-color) !important;
+            padding: 6px 14px;
+            border-radius: 6px !important;
             font-family: monospace;
             letter-spacing: 2px;
             display: inline-block;
-            margin-top: 10px;
             color: var(--text-main);
         }
 
-        .ticket-date { 
-            display: block; margin-bottom: 10px; font-size: 0.9rem; 
-            color: var(--text-muted); font-weight: 500; 
-        }
-
+        /* 4. Button & Inputs */
+        .btn, .form-control, .saldo-box, .custom-search-box { border-radius: 8px !important; }
+        
         .btn-glass { 
-            background: rgba(128, 128, 128, 0.1); border: 1px solid var(--text-muted); 
-            color: var(--text-main); border-radius: 50px; padding: 8px 20px; transition: 0.3s; 
+            background: var(--bg-input) !important; 
+            border: 1px solid var(--border-color) !important; 
+            color: var(--text-main) !important; 
+            padding: 8px 16px;
         }
-        
-        .btn-glass:hover { 
-            background: rgba(128, 128, 128, 0.2); transform: scale(1.05); 
-        }
-        
-        .btn-primary-neon { 
-            background: var(--primary-gradient); border: none; color: white; 
-            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); border-radius: 50px; 
-            padding: 8px 20px; transition: 0.3s; 
-        }
-        
-        .btn-primary-neon:hover { 
-            transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5); color: white; 
+        .btn-glass:hover { background: var(--bg-section) !important; }
+
+        .nav-pills .btn-glass.active { 
+            background: var(--primary) !important; 
+            color: white !important; 
+            border-color: var(--primary) !important; 
         }
 
-        .modal-content { 
-            background: var(--bg-nav); backdrop-filter: blur(20px); 
-            border: 1px solid var(--glass-border); border-radius: 24px; color: var(--text-main); 
+        .btn-primary-neon { 
+            background: var(--primary) !important; 
+            border: none; 
+            color: white !important; 
+            padding: 8px 18px;
+            font-weight: 600;
         }
-        
-        .modal-header, .modal-footer { 
-            border-color: var(--glass-border); 
-        }
-        
-        .form-control { 
-            background: rgba(128, 128, 128, 0.05); border: 1px solid var(--text-muted); color: var(--text-main); 
-        }
-        
-        .form-control:focus { 
-            background: rgba(128, 128, 128, 0.1); color: var(--text-main); border-color: #00c6ff; box-shadow: none; 
-        }
-        
-        .form-control::placeholder {
-            color: var(--text-muted);
-            opacity: 0.6;
-        }
-        
-        [data-theme="dark"] .btn-close { 
-            filter: invert(1); 
-        }
-        
+        .btn-primary-neon:hover { background: #1d4ed8 !important; }
+
         .saldo-box {
-            background: rgba(0, 198, 255, 0.1);
-            border: 1px solid rgba(0, 198, 255, 0.3);
-            border-radius: 50px;
-            padding: 6px 15px;
+            background: var(--primary-light) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 6px 14px;
             font-weight: 700;
-            color: #00c6ff;
-            display: flex;
-            align-items: center;
+            color: var(--primary) !important;
         }
 
         .history-item { 
-            border-bottom: 1px solid var(--glass-border); 
-            padding: 15px 0; 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 12px 0; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
         }
-        
-        .history-item:last-child { 
-            border-bottom: none; 
-        }
+        .history-item:last-child { border-bottom: none; }
         
         .history-icon { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.2rem; 
+            width: 38px; height: 38px; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; 
         }
 
+        /* Ping Signal */
         .signal-badge {
-            position: fixed;         
-            bottom: 42px;            
-            right: 105px;            
-            z-index: 9998;           
-            background-color: #424242; 
-            color: #ffffff;
-            border-radius: 50px;
-            padding: 6px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
+            position: fixed; bottom: 42px; right: 105px; z-index: 9998;
+            background-color: #334155; color: #ffffff; border-radius: 50px;
+            padding: 6px 16px; display: flex; align-items: center; gap: 10px;
+            font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .signal-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+        .signal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
         .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
 
-        [data-theme="dark"] .text-muted {
-            color: var(--text-muted) !important;
-        }
-
-        #upgTierSelect option {
-            background-color: #1e293b !important; 
-            color: #ffffff !important;
-        }
-
-        @media (max-width: 768px) {
-            .blob { display: none !important; }
-            body { animation: none !important; background-size: cover !important; }
-            .glass-card, .navbar, .custom-search-box, .modal-content {
-                backdrop-filter: blur(4px) !important;
-                -webkit-backdrop-filter: blur(4px) !important;
-            }
-        }
+        [data-theme="dark"] .btn-close { filter: invert(1); }
     </style>
 </head>
 <body>
