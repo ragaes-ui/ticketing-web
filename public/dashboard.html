@@ -222,6 +222,33 @@
         .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
 
         [data-theme="dark"] .btn-close { filter: invert(1); }
+    /* ========================================= */
+        /* 🔥 FIX TULISAN HILANG DI MODE GELAP 🔥 */
+        /* ========================================= */
+        
+        /* Paksa tulisan "text-dark" jadi putih/terang di mode gelap */
+        [data-theme="dark"] .text-dark { color: var(--text-main) !important; }
+        
+        /* Paksa background "bg-light" & "bg-white" jadi gelap elegan */
+        [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
+        
+        /* Pastikan text-muted tidak terlalu gelap sehingga mudah dibaca */
+        [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+        
+        /* Pastikan inputan dan form di dalam popup/modal tidak gelap */
+        [data-theme="dark"] .modal-content, 
+        [data-theme="dark"] .modal-body { color: var(--text-main) !important; }
+        
+        [data-theme="dark"] .form-control, 
+        [data-theme="dark"] .form-select { 
+            color: var(--text-main) !important; 
+            background-color: var(--bg-input) !important; 
+            border-color: var(--border-color) !important; 
+        }
+        
+        /* Opsi pilihan dropdown (misal pas mau Upgrade Tiket) */
+        [data-theme="dark"] select option { background-color: var(--bg-input) !important; color: var(--text-main) !important; }
     </style>
 </head>
 <body>
