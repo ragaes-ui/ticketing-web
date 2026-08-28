@@ -118,6 +118,47 @@
                 transform: scale(1.05); 
             }
         }
+    /* ========================================= */
+        /* 🔥 REVISI TAMPILAN PROFESIONAL DETAIL HTML 🔥 */
+        /* ========================================= */
+        
+        /* 1. Navbar, Card, Modal Tanpa Kaca (Solid & Bersih) */
+        .navbar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 0 2px 10px var(--shadow-color) !important; background-color: var(--bg-nav) !important; }
+        .glass-panel { 
+            backdrop-filter: none !important; 
+            -webkit-backdrop-filter: none !important; 
+            background-color: var(--bg-card) !important; 
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important; 
+            box-shadow: 0 4px 15px var(--shadow-color) !important; 
+        }
+
+        /* 2. Tombol, Input & Pilihan Tiket Standar Industri (Tidak Lebay) */
+        .btn, .form-control, .tier-label { border-radius: 8px !important; }
+        
+        /* 3. Hero Section (Banner Atas) Dibuat Kotak Bersih */
+        .event-hero { border-radius: 12px !important; overflow: hidden; }
+        .event-hero::before { border-radius: 12px !important; }
+        
+        /* 4. Line Up Poster (Biar konsisten kotaknya) */
+        .lineup-card { border-radius: 8px !important; }
+
+        /* ========================================= */
+        /* 🔥 FIX TULISAN HILANG DI MODE GELAP 🔥 */
+        /* ========================================= */
+        
+        /* Paksa tulisan "text-dark" jadi putih/terang di mode gelap */
+        [data-theme="dark"] .text-dark { color: var(--text-main) !important; }
+        
+        /* Paksa background "bg-light" & "bg-white" jadi gelap elegan */
+        [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
+        
+        /* Pastikan text-muted tidak terlalu gelap sehingga mudah dibaca */
+        [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+        
+        /* Pastikan tulisan di bagian atas banner kebaca saat gelap */
+        [data-theme="dark"] .event-hero-content { color: #ffffff !important; }
     </style>
 </head>
 <body>
