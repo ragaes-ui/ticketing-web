@@ -15,68 +15,79 @@
 <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
 
-    <style>
+<style>
+        /* ========================================= */
+        /* 🔥 TEMA WARNA PROFESIONAL (TERANG & GELAP) 🔥 */
+        /* ========================================= */
         :root {
-            --bg-body: #f8f9fa;
+            --bg-body: #f8fafc;
             --bg-nav: #ffffff;
             --bg-card: #ffffff;
             --bg-input: #ffffff;
-            --text-main: #1a1d21;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-            --primary: #0049CC;
-            --primary-light: rgba(0, 73, 204, 0.05);
-            --shadow-color: rgba(0,0,0,0.05);
-            --bg-section: #f1f3f5;
+            --bg-section: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
         }
 
         [data-theme="dark"] {
-            --bg-body: #0b1120;
-            --bg-nav: rgba(17, 24, 39, 0.8);
-            --bg-card: #111827;
-            --bg-input: #1f2937;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: rgba(255,255,255,0.06); 
-            --primary: #38bdf8;
-            --primary-light: rgba(56, 189, 248, 0.1);
-            --shadow-color: rgba(0,0,0,0.3);
-            --bg-section: #080c14;
+            --bg-body: #121212;
+            --bg-nav: #1e1e1e;
+            --bg-card: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --bg-section: #181818;
+            --text-main: #f8f9fa;
+            --text-muted: #a1a1aa;
+            --border-color: #333333; 
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.15);
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 60px; }
-        .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color); }
+        /* ========================================= */
+        /* 🔥 GAYA KOTAK & TOMBOL (LEBIH ELEGAN) 🔥 */
+        /* ========================================= */
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 60px; transition: background-color 0.2s, color 0.2s; }
+        
+        .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color) !important; box-shadow: 0 2px 10px var(--shadow-color) !important; }
         .navbar-brand { font-weight: 800; color: var(--primary) !important; }
 
-        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px var(--shadow-color); margin-bottom: 20px; }
+        /* Panel dibikin kotak rapi (radius 12px) */
+        .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 20px; }
         
-        .form-control { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 12px 15px; }
+        /* Input dan Tombol dibikin standar aplikasi (radius 8px) */
+        .form-control { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
         .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
-        .form-control:read-only { background-color: var(--border-color); opacity: 0.7; color: var(--text-muted); }
+        .form-control:read-only { background-color: var(--bg-section); opacity: 0.7; color: var(--text-muted); }
 
-        .payment-card { border: 2px solid var(--border-color); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
+        .payment-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
         .payment-card:hover { border-color: var(--primary); background: var(--primary-light); }
         .payment-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 4px 15px var(--primary-light); }
-        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--bg-body); border-radius: 12px; }
+        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); border-radius: 8px; }
         
-        .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 600; color: white;}
-        
-        /* Swal Fix Dark Mode */
-        .swal2-popup { border-radius: 20px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
-        .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
+        .btn-primary { background-color: var(--primary); border: none; border-radius: 8px; padding: 12px; font-weight: 600; color: white;}
+        .btn-secondary { border-radius: 8px; }
+        .input-group .btn { border-radius: 8px; }
 
-        /* Jurus Dark Mode Pamungkas */
-        [data-theme="dark"] .text-muted { color: #9ca3af !important; }
-        [data-theme="dark"] .text-dark { color: #f3f4f6 !important; }
-        [data-theme="dark"] .fw-bold { color: #f3f4f6 !important; }
-        [data-theme="dark"] .form-control { color: #f3f4f6 !important; background-color: #1f2937 !important; border-color: #374151 !important; }
-        [data-theme="dark"] .form-control:read-only { background-color: #111827 !important; color: #6b7280 !important; }
-        [data-theme="dark"] .form-control::placeholder { color: #6b7280 !important; }
-        [data-theme="dark"] .btn-outline-secondary { color: #f3f4f6 !important; border-color: #4b5563 !important; }
-        [data-theme="dark"] .btn-outline-secondary:hover { background-color: #4b5563 !important; color: #fff !important; }
-        [data-theme="dark"] .btn-secondary { background-color: #4b5563 !important; border-color: #4b5563 !important; color: #fff !important; }
-        [data-theme="dark"] .text-primary { color: #38bdf8 !important; }
+        /* ========================================= */
+        /* 🔥 FIX TULISAN HILANG DI MODE GELAP 🔥 */
+        /* ========================================= */
+        [data-theme="dark"] .text-dark { color: var(--text-main) !important; }
+        [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
+        [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+        [data-theme="dark"] .form-control { color: var(--text-main) !important; background-color: var(--bg-input) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .fw-bold { color: var(--text-main) !important; }
+        [data-theme="dark"] .btn-outline-secondary { color: var(--text-main) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .btn-outline-secondary:hover { background-color: var(--bg-section) !important; }
         [data-theme="dark"] span { color: inherit; }
+
+        /* Swal Fix Dark Mode & Dibikin Kotak Rapi */
+        .swal2-popup { border-radius: 12px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
+        .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
     </style>
 </head>
 <body>
