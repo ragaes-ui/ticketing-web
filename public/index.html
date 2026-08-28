@@ -162,8 +162,21 @@
         [data-theme="dark"] .nav-link:hover { color: var(--primary); }
 
 /* 5. Warna Hero Section Elegan Corporate */
+/* 5. Warna Hero Section Elegan Corporate */
         .hero-section { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; }
-        .loader-icon-main { background: #2563eb !important; -webkit-text-fill-color: #2563eb !important; }        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
+        
+        /* 🔥 FIX LOGO LOADING HILANG 🔥 */
+        .loader-icon-main { 
+            background: transparent !important; 
+            color: var(--primary) !important; 
+            -webkit-text-fill-color: var(--primary) !important; 
+        }
+        .loader-text {
+            background: transparent !important;
+            color: var(--text-main) !important;
+            -webkit-text-fill-color: var(--text-main) !important;
+        }        
+        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
         @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
         .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
