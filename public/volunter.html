@@ -53,6 +53,16 @@
             box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); transition: 0.2s;
         }
         .kiosk-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.6); color: white;}
+        /* 👇 TARUH CSS TAMBAHAN DI SINI 👇 */
+    #selectEventGate:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+    }
+    #selectEventGate option {
+        background-color: #1e1e1e;
+        color: #fff;
+        padding: 10px;
+    }
     </style>
 </head>
 <body>
@@ -75,13 +85,19 @@
         <a href="/kiosk" target="_blank" class="kiosk-btn text-decoration-none w-100 mb-3">
             <i class="bi bi-display"></i> Buka Layar Kiosk / Antrean
         </a>
-
-        <!-- 👇 PILIH EVENT YANG MAU DI-SCAN 👇 -->
-        <div class="glass-card mb-3 p-3 bg-card border rounded-12" style="background: var(--bg-card); border: 1px solid #333; border-radius: 12px; padding: 15px;">
-            <label class="form-label text-muted small fw-bold mb-1"><i class="bi bi-calendar-event text-warning me-1"></i> PILIH EVENT / GATE TUJUAN:</label>
-            <select id="selectEventGate" class="form-select bg-dark text-white fw-bold border-secondary">
-                <option value="">-- Memuat daftar event... --</option>
-            </select>
+<!-- 👇 TARUH KODINGAN DROPDOWN BARU DI SINI 👇 -->
+        <div class="glass-card mb-3 p-3" style="background: var(--bg-card); border: 1px solid #333; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
+            <label class="form-label text-muted small fw-bold mb-2 d-flex align-items-center gap-1">
+                <i class="bi bi-shield-fill-check text-primary"></i> PILIH GATE / EVENT TUJUAN:
+            </label>
+            <div class="position-relative">
+                <select id="selectEventGate" class="form-select text-white fw-bold py-3 px-3 shadow-none" style="background-color: #121212; border: 2px solid #333; border-radius: 12px; cursor: pointer; font-size: 0.95rem; transition: 0.2s;">
+                    <option value="">-- Memuat daftar event... --</option>
+                </select>
+            </div>
+            <div class="form-text text-muted mt-2 small">
+                <i class="bi bi-info-circle me-1 text-warning"></i> Pastikan memilih event yang benar sebelum membuka kamera scan.
+            </div>
         </div>
         <!-- 👆 ----------------------------------- 👆 -->
 
