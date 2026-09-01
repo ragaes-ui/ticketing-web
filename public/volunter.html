@@ -132,12 +132,13 @@
         }
 
         // 🔄 Sinkronisasi data terbaru langsung dari Database (Biar gak perlu logout pas role diubah admin)
-        async function syncUserProfile() {
+async function syncUserProfile() {
             try {
                 const res = await fetch(`/api/user/profile/${user.id}`);
                 if (res.ok) {
-                    const latestData = res.json();
-                    // Update data di localStorage dengan data terbaru dari database
+                    const latestData = await res.json(); // 👈 TAMBAHKAN 'await' DI SINI!
+                    
+                    // Update data lokal dengan role terbaru dari database
                     user.role = latestData.role || user.role;
                     user.fullName = latestData.fullName || user.fullName;
                     localStorage.setItem('userData', JSON.stringify(user));
