@@ -84,16 +84,27 @@
         </div>
 
         <!-- AREA KAMERA -->
-        <div class="scanner-box">
+        <div class="scanner-box text-center">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0"><i class="bi bi-qr-code-scan text-primary me-2"></i> Area Scan Tiket</h6>
+                <h6 class="fw-bold mb-0 text-start"><i class="bi bi-qr-code-scan text-primary me-2"></i> Area Scan Tiket</h6>
                 <div class="spinner-grow spinner-grow-sm text-primary" role="status" id="scanIndicator" style="display: none;"></div>
             </div>
             
-            <div id="reader"></div>
+            <!-- TOMBOL Buka Kamera (Default Terlihat) -->
+            <div id="startScanWrapper" class="py-4">
+                <i class="bi bi-camera-fill display-3 text-muted mb-3 d-block"></i>
+                <p class="text-muted small mb-3">Kamera dalam keadaan mati untuk menghemat baterai.</p>
+                <button class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow" onclick="startScanner()">
+                    <i class="bi bi-play-fill me-1"></i> Buka Kamera & Scan
+                </button>
+            </div>
+
+            <!-- KOTAK KAMERA (Default Disembunyikan) -->
+            <div id="reader" style="display: none;"></div>
             
-            <button class="btn btn-primary w-100 fw-bold py-2 mt-3 rounded-pill shadow" id="btnRescan" onclick="startScanner()" style="display: none;">
-                Lanjut Scan Tiket Berikutnya <i class="bi bi-arrow-right-circle ms-1"></i>
+            <!-- Tombol Tutup / Selesai Scan -->
+            <button class="btn btn-outline-danger w-100 fw-bold py-2 mt-3 rounded-pill shadow" id="btnCloseScanner" onclick="stopScanner()" style="display: none;">
+                <i class="bi bi-stop-circle me-1"></i> Tutup Kamera
             </button>
         </div>
         
@@ -117,25 +128,28 @@
         // ==========================================
         // 📊 LOGIKA COUNTER SCAN (Tersimpan di Memori HP)
         // ==========================================
-        // Kita simpan berdasarkan ID Volunteer biar akurat
         const counterKey = `rcell_vol_scan_count_${user.id}`;
         let totalScanned = parseInt(localStorage.getItem(counterKey)) || 0;
         
         function updateCounterDisplay() {
             document.getElementById('scanCounter').innerText = totalScanned;
         }
-        updateCounterDisplay(); // Tampilkan saat load pertama
+        updateCounterDisplay();
 
         // ==========================================
-        // 📷 LOGIKA SCANNER QR CODE
+        // 📷 LOGIKA SCANNER QR CODE (MANUAL TOGGLE)
         // ==========================================
-        let html5QrcodeScanner;
-        const btnRescan = document.getElementById('btnRescan');
+        let html5QrcodeScanner = null;
+        const startScanWrapper = document.getElementById('startScanWrapper');
+        const readerElement = document.getElementById('reader');
+        const btnCloseScanner = document.getElementById('btnCloseScanner');
         const scanIndicator = document.getElementById('scanIndicator');
-        const beepSound = new Audio('https://www.soundjay.com/buttons/beep-07.wav'); // Efek suara
+        const beepSound = new Audio('https://www.soundjay.com/buttons/beep-07.wav');
 
         function startScanner() {
-            btnRescan.style.display = 'none';
+            startScanWrapper.style.display = 'none';
+            readerElement.style.display = 'block';
+            btnCloseScanner.style.display = 'block';
             scanIndicator.style.display = 'block';
 
             html5QrcodeScanner = new Html5Qrcode("reader");
@@ -143,20 +157,37 @@
             
             html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
             .catch(err => {
-                scanIndicator.style.display = 'none';
+                stopScanner();
                 Swal.fire('Kamera Gagal', 'Pastikan izin kamera diaktifkan di browser HP Anda!', 'error');
             });
         }
 
-        async function onScanSuccess(decodedText, decodedResult) {
-            html5QrcodeScanner.stop(); // Matikan kamera sementara
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                }).catch(err => console.log(err));
+            }
+            readerElement.style.display = 'none';
+            btnCloseScanner.style.display = 'none';
             scanIndicator.style.display = 'none';
+            startScanWrapper.style.display = 'block';
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            if (html5QrcodeScanner) {
+                await html5QrcodeScanner.stop();
+                html5QrcodeScanner.clear();
+            }
+            readerElement.style.display = 'none';
+            scanIndicator.style.display = 'none';
+            btnCloseScanner.style.display = 'none';
+            
             beepSound.play(); 
 
             Swal.fire({ title: 'Memvalidasi Tiket...', text: `Kode: ${decodedText}`, allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
 
             try {
-                // Tembak ke API backend Mas Raga
                 const res = await fetch('/api/validate', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ticketCode: decodedText })
@@ -164,7 +195,6 @@
                 const data = await res.json();
 
                 if (data.valid) {
-                    // 🎉 TIKET SUKSES: Tambah Counter!
                     totalScanned += 1;
                     localStorage.setItem(counterKey, totalScanned);
                     updateCounterDisplay();
@@ -176,20 +206,23 @@
                                    <p class="mb-1"><b>Nama:</b> ${data.data.name}</p>
                                    <p class="mb-0"><b>Event:</b> ${data.data.event}</p>
                                </div>`,
-                        confirmButtonText: 'OK', confirmButtonColor: '#10b981', background: '#1e1e1e', color: '#fff'
-                    }).then(() => { btnRescan.style.display = 'block'; });
+                        confirmButtonText: 'Scan Lagi', confirmButtonColor: '#10b981', background: '#1e1e1e', color: '#fff'
+                    }).then(() => { 
+                        startScanWrapper.style.display = 'block'; 
+                    });
 
                 } else {
-                    // ❌ TIKET GAGAL: Jangan tambah counter
                     Swal.fire({
                         icon: 'error', title: data.message || 'DITOLAK',
                         html: `<h4 class="text-danger fw-bold">${decodedText}</h4><p class="mt-2">${data.detail || 'Tiket tidak valid atau hangus.'}</p>`,
-                        confirmButtonText: 'Tutup', confirmButtonColor: '#ef4444', background: '#1e1e1e', color: '#fff'
-                    }).then(() => { btnRescan.style.display = 'block'; });
+                        confirmButtonText: 'Coba Lagi', confirmButtonColor: '#ef4444', background: '#1e1e1e', color: '#fff'
+                    }).then(() => { 
+                        startScanWrapper.style.display = 'block'; 
+                    });
                 }
             } catch (err) {
                 Swal.fire({icon: 'error', title: 'Sinyal Putus', text: 'Gagal terhubung ke server.'})
-                .then(() => { btnRescan.style.display = 'block'; });
+                .then(() => { startScanWrapper.style.display = 'block'; });
             }
         }
 
@@ -200,9 +233,8 @@
             window.location.href = '/user-login';
         }
 
-        // Auto start kamera saat halaman beres diload
         document.addEventListener('DOMContentLoaded', () => {
-            startScanner();
+            updateCounterDisplay();
         });
     </script>
 </body>
