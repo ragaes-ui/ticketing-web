@@ -207,13 +207,19 @@
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
                         <!-- 👇 FOTO PROFIL BISA DIKLIK 👇 -->
-                        <div class="profile-img shadow-sm position-relative" style="cursor: pointer; padding: 0; overflow: hidden;" onclick="document.getElementById('avatarUpload').click()" title="Ganti Foto Profil">
-                            <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" id="mainAvatarDisplay" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+<!-- 👇 FOTO PROFIL BISA DIKLIK (VERSI IKON KAMERA MENGAPUNG) 👇 -->
+                        <div class="position-relative d-inline-block" style="cursor: pointer; transition: 0.2s;" onclick="document.getElementById('avatarUpload').click()" title="Ganti Foto Profil">
                             
-                            <!-- Ikon Kamera Transparan di Bawah Foto -->
-                            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-50 text-center" style="height: 20px; padding-bottom: 2px;">
-                                <i class="bi bi-camera-fill text-white" style="font-size: 0.7rem;"></i>
+                            <!-- Lingkaran Foto -->
+                            <div class="profile-img shadow-sm border border-2" style="padding: 0; overflow: hidden; border-color: var(--primary) !important;">
+                                <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" id="mainAvatarDisplay" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
+                            
+                            <!-- Ikon Kamera Mengapung Ala WhatsApp/IG -->
+                            <div class="position-absolute shadow" style="bottom: 0px; right: -5px; width: 26px; height: 26px; background-color: var(--primary); border-radius: 50%; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 2;">
+                                <i class="bi bi-camera-fill text-white" style="font-size: 0.75rem;"></i>
+                            </div>
+
                         </div>
                         <div>
                             <h4 class="fw-bold mb-0" id="userNameDisplay">Loading...</h4>
