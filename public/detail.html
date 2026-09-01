@@ -594,7 +594,16 @@ function renderTickets() {
             if (!tickets || tickets.length === 0) {
                 tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats }];
             }
+        // 👇 TARUH KODINGAN PENGURUTANNYA DI SINI 👇
+            tickets.sort((a, b) => {
+                const aHabis = a.availableSeats <= 0; 
+                const bHabis = b.availableSeats <= 0;
 
+                if (aHabis && !bHabis) return 1;  // Kalau tiket A habis, lempar ke bawah
+                if (!aHabis && bHabis) return -1; // Kalau tiket A masih, taruh di atas
+                return 0;
+            });
+            // 👆 ------------------------------------ 👆
             tickets.forEach((tier, index) => {
                 const isSoldOut = tier.availableSeats <= 0;
                 let isTierNotOpenYet = false;
