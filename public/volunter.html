@@ -123,12 +123,33 @@
         // ==========================================
         // 🔒 AUTENTIKASI & SETUP AWAL
         // ==========================================
+// ==========================================
+        // 🔒 AUTENTIKASI & SINKRONISASI ROLE OTOMATIS
+        // ==========================================
         let user = JSON.parse(localStorage.getItem('userData'));
         if (!user) {
             window.location.href = '/user-login';
-        } else {
+        }
+
+        // 🔄 Sinkronisasi data terbaru langsung dari Database (Biar gak perlu logout pas role diubah admin)
+        async function syncUserProfile() {
+            try {
+                const res = await fetch(`/api/user/profile/${user.id}`);
+                if (res.ok) {
+                    const latestData = res.json();
+                    // Update data di localStorage dengan data terbaru dari database
+                    user.role = latestData.role || user.role;
+                    user.fullName = latestData.fullName || user.fullName;
+                    localStorage.setItem('userData', JSON.stringify(user));
+                }
+            } catch (e) {
+                console.log("Gagal sinkronisasi profil, menggunakan data lokal.");
+            }
+
+            // Validasi Role setelah disinkronkan
             const userRole = (user.role || '').toUpperCase();
             const isAllowed = userRole.includes('PANITIA') || userRole.includes('ADMIN') || userRole.includes('SUPER');
+            
             if (!isAllowed) {
                 Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'Halaman ini khusus Panitia / Scanner!'})
                 .then(() => { window.location.href = '/'; });
@@ -309,6 +330,7 @@ async function loadEventsForGate() {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            syncUserProfile(); // 👈 Sinkronkan data dulu sebelum yang lain
             loadEventsForGate();
             updateCounterDisplay();
         });
