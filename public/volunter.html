@@ -54,15 +54,16 @@
         }
         .kiosk-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.6); color: white;}
         /* 👇 TARUH CSS TAMBAHAN DI SINI 👇 */
-    #selectEventGate:focus {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
-    }
-    #selectEventGate option {
-        background-color: #1e1e1e;
-        color: #fff;
-        padding: 10px;
-    }
+/* Perjelas warna teks label di atas dropdown */
+        .form-label {
+            color: #ffffff !important;
+        }
+        /* Styling dropdown agar opsi di dalamnya punya latar belakang gelap yang kontras */
+        #selectEventGate option {
+            background-color: #1e1e1e !important;
+            color: #ffffff !important;
+            padding: 12px !important;
+        }
     </style>
 </head>
 <body>
