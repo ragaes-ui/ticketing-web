@@ -661,7 +661,7 @@ app.get('/api/user/profile/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin });
+        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin, role: user.role });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
