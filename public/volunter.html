@@ -64,6 +64,20 @@
             color: #ffffff !important;
             padding: 12px !important;
         }
+        /* Efek hover pada opsi dropdown custom */
+        #customEventList .dropdown-item {
+            color: #f8f9fa !important;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+            cursor: pointer;
+            white-space: normal; /* Biar teks panjang otomatis turun ke bawah (tidak terpotong) */
+        }
+        #customEventList .dropdown-item:hover {
+            background-color: var(--primary) !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body>
@@ -87,15 +101,28 @@
             <i class="bi bi-display"></i> Buka Layar Kiosk / Antrean
         </a>
 <!-- 👇 TARUH KODINGAN DROPDOWN BARU DI SINI 👇 -->
+<!-- 👇 CUSTOM DROPDOWN EVENT ELEGANT 👇 -->
         <div class="glass-card mb-3 p-3" style="background: var(--bg-card); border: 1px solid #333; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
-            <label class="form-label text-muted small fw-bold mb-2 d-flex align-items-center gap-1">
+            <label class="form-label text-white small fw-bold mb-2 d-flex align-items-center gap-1">
                 <i class="bi bi-shield-fill-check text-primary"></i> PILIH GATE / EVENT TUJUAN:
             </label>
-            <div class="position-relative">
-                <select id="selectEventGate" class="form-select text-white fw-bold py-3 px-3 shadow-none" style="background-color: #121212; border: 2px solid #333; border-radius: 12px; cursor: pointer; font-size: 0.95rem; transition: 0.2s;">
-                    <option value="">-- Memuat daftar event... --</option>
-                </select>
+            
+            <!-- Tombol Pemicu Dropdown Custom -->
+            <div class="dropdown">
+                <button class="btn w-100 text-start d-flex justify-content-between align-items-center text-white fw-bold py-3 px-3" type="button" id="dropdownEventButton" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #121212; border: 2px solid #333; border-radius: 12px; font-size: 0.95rem;">
+                    <span id="selectedEventText">-- Pilih Event yang Sedang Dijaga --</span>
+                    <i class="bi bi-chevron-down text-muted"></i>
+                </button>
+                
+                <!-- Daftar Menu Opsi Custom (Isinya diisi via Javascript) -->
+                <ul class="dropdown-menu w-100 p-2 shadow-lg" id="customEventList" style="background-color: #1a1a1a; border: 1px solid #333; border-radius: 12px; max-height: 250px; overflow-y: auto; z-index: 1050;">
+                    <li><span class="dropdown-item text-muted text-center py-2">Memuat daftar event...</span></li>
+                </ul>
             </div>
+            
+            <!-- Hidden input untuk menyimpan ID event yang dipilih (agar logika validasi kamera tetap berjalan normal) -->
+            <input type="hidden" id="selectEventGate" value="">
+
             <div class="form-text text-muted mt-2 small">
                 <i class="bi bi-info-circle me-1 text-warning"></i> Pastikan memilih event yang benar sebelum membuka kamera scan.
             </div>
@@ -180,26 +207,26 @@ async function syncUserProfile() {
         // 📥 AMBIL LIST EVENT UNTUK DROPDOWN
         // ==========================================
 async function loadEventsForGate() {
-            const selectEl = document.getElementById('selectEventGate');
+            const listEl = document.getElementById('customEventList');
             try {
                 const res = await fetch('/api/events');
                 const events = await res.json();
                 
-                // Ambil tanggal hari ini (Format YYYY-MM-DD waktu lokal)
                 const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
-                // Filter ketat:
-                // 1. Buang event kategori "Streaming"
-                // 2. Buang event yang tanggalnya sudah lewat dari hari ini
                 const activeEvents = events.filter(ev => {
                     const category = (ev.category || '').toLowerCase();
-                    const isStreaming = category.includes('stream');
-                    
-                    if (isStreaming) return false; // Sembunyikan streaming
+                    if (category.includes('stream')) return false; 
 
+                    // 1. Cek status event (Jika di database statusnya 'completed', 'selesai', atau sejenisnya, buang!)
+                    const status = (ev.status || '').toLowerCase();
+                    if (status === 'completed' || status === 'selesai' || status === 'closed') {
+                        return false; 
+                    }
+
+                    // 2. Cek tanggal event (Buang jika tanggalnya sudah lewat dari hari ini)
                     if (ev.date) {
                         const eventDateStr = new Date(ev.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
-                        // Jika tanggal event kurang dari hari ini (sudah lewat), sembunyikan!
                         if (eventDateStr < todayStr) return false;
                     }
 
@@ -207,18 +234,20 @@ async function loadEventsForGate() {
                 });
 
                 if (activeEvents.length === 0) {
-                    selectEl.innerHTML = '<option value="">Tidak ada event fisik aktif hari ini</option>';
+                    listEl.innerHTML = '<li><span class="dropdown-item text-muted text-center py-2">Tidak ada event fisik aktif</span></li>';
                     return;
                 }
 
-                let html = '<option value="">-- Pilih Event yang Sedang Dijaga --</option>';
+                let html = '';
                 activeEvents.forEach(ev => {
                     let tglFormat = ev.date ? new Date(ev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA';
-                    html += `<option value="${ev._id}">${ev.name} (${tglFormat} - ${ev.location || 'TBA'})</option>`;
+                    let eventNameDisplay = `${ev.name} (${tglFormat} - ${ev.location || 'TBA'})`;
+                    
+                    html += `<li><a class="dropdown-item" href="#" onclick="selectEvent('${ev._id}', '${escapeHtml(eventNameDisplay)}')">${eventNameDisplay}</a></li>`;
                 });
-                selectEl.innerHTML = html;
+                listEl.innerHTML = html;
             } catch (err) {
-                selectEl.innerHTML = '<option value="">Gagal memuat event</option>';
+                listEl.innerHTML = '<li><span class="dropdown-item text-danger text-center py-2">Gagal memuat event</span></li>';
             }
         }
 
