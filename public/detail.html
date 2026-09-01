@@ -179,6 +179,35 @@
                 min-height: 300px;
             }
         }
+    /* ========================================= */
+        /* 🔥 FIX BREADCRUMB NAVIGASI RAPI DI HP 🔥 */
+        /* ========================================= */
+        .breadcrumb {
+            flex-wrap: nowrap !important; /* Paksa kumpul di 1 baris */
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        .breadcrumb-item {
+            white-space: nowrap; /* Mencegah patah di tengah kata */
+            font-size: 0.85rem; /* Ukuran pas untuk navigasi */
+        }
+        
+        .breadcrumb-item.active {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px; /* Batas panjang di layar PC */
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Penyesuaian khusus untuk layar HP yang sempit */
+        @media (max-width: 576px) {
+            .breadcrumb-item.active {
+                max-width: 140px; /* Di HP, teks panjang akan otomatis dipotong jadi "RCELLFESTIVAL BEY..." */
+            }
+        }
     </style>
 </head>
 <body>
