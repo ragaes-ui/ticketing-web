@@ -89,6 +89,35 @@
         /* Swal Fix Dark Mode & Dibikin Kotak Rapi */
         .swal2-popup { border-radius: 12px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
+        /* ========================================= */
+        /* 🔥 FIX BREADCRUMB NAVIGASI RAPI DI HP 🔥 */
+        /* ========================================= */
+        .breadcrumb {
+            flex-wrap: nowrap !important; /* Paksa kumpul di 1 baris */
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        .breadcrumb-item {
+            white-space: nowrap; /* Mencegah patah di tengah kata */
+            font-size: 0.85rem; /* Ukuran pas untuk navigasi */
+        }
+        
+        .breadcrumb-item.active {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px; /* Batas panjang di layar PC */
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Penyesuaian khusus untuk layar HP yang sempit */
+        @media (max-width: 576px) {
+            .breadcrumb-item.active {
+                max-width: 140px; /* Di HP, teks panjang akan otomatis dipotong jadi "RCELLFESTIVAL BEY..." */
+            }
+        }
     </style>
 </head>
 <body>
