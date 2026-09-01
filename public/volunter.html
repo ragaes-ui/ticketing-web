@@ -12,7 +12,6 @@
     <!-- Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
     <style>
         :root {
@@ -64,7 +63,7 @@
             <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo" width="35" height="35" class="rounded-circle">
             <div>
                 <h6 class="mb-0 fw-bold" id="volName">Loading...</h6>
-                <span class="badge bg-primary rounded-pill" style="font-size: 0.65rem;">VOLUNTEER</span>
+                <span class="badge bg-primary rounded-pill" style="font-size: 0.65rem;">PANITIA GATE</span>
             </div>
         </div>
         <button class="btn btn-sm btn-outline-danger rounded-pill fw-bold" onclick="logout()">Keluar</button>
@@ -73,11 +72,20 @@
     <div class="container mt-4">
         
         <!-- INTEGRASI KIOSK -->
-        <a href="/kiosk" target="_blank" class="kiosk-btn text-decoration-none w-100 mb-4">
+        <a href="/kiosk" target="_blank" class="kiosk-btn text-decoration-none w-100 mb-3">
             <i class="bi bi-display"></i> Buka Layar Kiosk / Antrean
         </a>
 
-        <!-- STATISTIK SCAN VOLUNTEER -->
+        <!-- 👇 PILIH EVENT YANG MAU DI-SCAN 👇 -->
+        <div class="glass-card mb-3 p-3 bg-card border rounded-12" style="background: var(--bg-card); border: 1px solid #333; border-radius: 12px; padding: 15px;">
+            <label class="form-label text-muted small fw-bold mb-1"><i class="bi bi-calendar-event text-warning me-1"></i> PILIH EVENT / GATE TUJUAN:</label>
+            <select id="selectEventGate" class="form-select bg-dark text-white fw-bold border-secondary">
+                <option value="">-- Memuat daftar event... --</option>
+            </select>
+        </div>
+        <!-- 👆 ----------------------------------- 👆 -->
+
+        <!-- STATISTIK SCAN -->
         <div class="stats-card shadow-sm">
             <p class="text-success fw-bold mb-2"><i class="bi bi-check-circle-fill me-1"></i> TIKET BERHASIL DI-SCAN</p>
             <div class="stats-number" id="scanCounter">0</div>
@@ -91,19 +99,19 @@
                 <div class="spinner-grow spinner-grow-sm text-primary" role="status" id="scanIndicator" style="display: none;"></div>
             </div>
             
-            <!-- TOMBOL Buka Kamera (Default Terlihat) -->
+            <!-- TOMBOL Buka Kamera -->
             <div id="startScanWrapper" class="py-4">
                 <i class="bi bi-camera-fill display-3 text-muted mb-3 d-block"></i>
-                <p class="text-muted small mb-3">Kamera dalam keadaan mati untuk menghemat baterai.</p>
+                <p class="text-muted small mb-3">Pilih event di atas, lalu buka kamera untuk mulai.</p>
                 <button class="btn btn-success fw-bold px-4 py-2 rounded-pill shadow" onclick="startScanner()">
                     <i class="bi bi-play-fill me-1"></i> Buka Kamera & Scan
                 </button>
             </div>
 
-            <!-- KOTAK KAMERA (Default Disembunyikan) -->
+            <!-- KOTAK KAMERA -->
             <div id="reader" style="display: none;"></div>
             
-            <!-- Tombol Tutup / Selesai Scan -->
+            <!-- Tombol Tutup Kamera -->
             <button class="btn btn-outline-danger w-100 fw-bold py-2 mt-3 rounded-pill shadow" id="btnCloseScanner" onclick="stopScanner()" style="display: none;">
                 <i class="bi bi-stop-circle me-1"></i> Tutup Kamera
             </button>
@@ -115,27 +123,46 @@
         // ==========================================
         // 🔒 AUTENTIKASI & SETUP AWAL
         // ==========================================
-let user = JSON.parse(localStorage.getItem('userData'));
+        let user = JSON.parse(localStorage.getItem('userData'));
         if (!user) {
             window.location.href = '/user-login';
         } else {
-            // Ubah huruf jadi huruf besar semua biar gampang dicocokkan
             const userRole = (user.role || '').toUpperCase();
-            
-            // Izinkan jika rolenya adalah PENGURUS / ADMIN / PANITIA (Scan)
             const isAllowed = userRole.includes('PANITIA') || userRole.includes('ADMIN') || userRole.includes('SUPER');
-            
             if (!isAllowed) {
                 Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'Halaman ini khusus Panitia / Scanner!'})
                 .then(() => { window.location.href = '/'; });
             }
         }
 
-        // Tampilkan Nama Volunteer
         document.getElementById('volName').innerText = user.fullName || user.username;
 
         // ==========================================
-        // 📊 LOGIKA COUNTER SCAN (Tersimpan di Memori HP)
+        // 📥 AMBIL LIST EVENT UNTUK DROPDOWN
+        // ==========================================
+        async function loadEventsForGate() {
+            const selectEl = document.getElementById('selectEventGate');
+            try {
+                const res = await fetch('/api/events');
+                const events = await res.json();
+                
+                if (events.length === 0) {
+                    selectEl.innerHTML = '<option value="">Tidak ada event aktif</option>';
+                    return;
+                }
+
+                let html = '<option value="">-- Pilih Event yang Sedang Dijaga --</option>';
+                events.forEach(ev => {
+                    html += `<option value="${ev._id}">${ev.name} (${ev.location || 'TBA'})</option>`;
+                });
+                selectEl.innerHTML = html;
+            } catch (err) {
+                selectEl.innerHTML = '<option value="">Gagal memuat event</option>';
+            }
+        }
+
+        // ==========================================
+        // 📊 COUNTER SCAN (Tersimpan di Memori HP)
         // ==========================================
         const counterKey = `rcell_vol_scan_count_${user.id}`;
         let totalScanned = parseInt(localStorage.getItem(counterKey)) || 0;
@@ -146,7 +173,7 @@ let user = JSON.parse(localStorage.getItem('userData'));
         updateCounterDisplay();
 
         // ==========================================
-        // 📷 LOGIKA SCANNER QR CODE (MANUAL TOGGLE)
+        // 📷 LOGIKA SCANNER QR CODE
         // ==========================================
         let html5QrcodeScanner = null;
         const startScanWrapper = document.getElementById('startScanWrapper');
@@ -156,6 +183,17 @@ let user = JSON.parse(localStorage.getItem('userData'));
         const beepSound = new Audio('https://www.soundjay.com/buttons/beep-07.wav');
 
         function startScanner() {
+            // Validasi: Pastikan event sudah dipilih sebelum kamera dibuka!
+            const selectedEventId = document.getElementById('selectEventGate').value;
+            if (!selectedEventId) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Event Dulu!',
+                    text: 'Panitia wajib memilih event/gate yang sedang dijaga sebelum membuka kamera.',
+                    confirmButtonColor: '#f59e0b'
+                });
+            }
+
             startScanWrapper.style.display = 'none';
             readerElement.style.display = 'block';
             btnCloseScanner.style.display = 'block';
@@ -194,12 +232,16 @@ let user = JSON.parse(localStorage.getItem('userData'));
             
             beepSound.play(); 
 
+            // Ambil ID event yang dipilih di dropdown
+            const selectedEventId = document.getElementById('selectEventGate').value;
+
             Swal.fire({ title: 'Memvalidasi Tiket...', text: `Kode: ${decodedText}`, allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
 
             try {
+                // KIRIM ticketCode DAN eventId KE BACKEND!
                 const res = await fetch('/api/validate', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticketCode: decodedText })
+                    body: JSON.stringify({ ticketCode: decodedText, eventId: selectedEventId })
                 });
                 const data = await res.json();
 
@@ -221,9 +263,11 @@ let user = JSON.parse(localStorage.getItem('userData'));
                     });
 
                 } else {
+                    // Kalau salah event / belum waktunya / tiket palsu, backend otomatis nolak di sini!
                     Swal.fire({
                         icon: 'error', title: data.message || 'DITOLAK',
-                        html: `<h4 class="text-danger fw-bold">${decodedText}</h4><p class="mt-2">${data.detail || 'Tiket tidak valid atau hangus.'}</p>`,
+                        html: `<h4 class="text-danger fw-bold">${decodedText}</h4>
+                               <p class="mt-2 text-warning"><b>${data.detail || 'Tiket tidak valid.'}</b></p>`,
                         confirmButtonText: 'Coba Lagi', confirmButtonColor: '#ef4444', background: '#1e1e1e', color: '#fff'
                     }).then(() => { 
                         startScanWrapper.style.display = 'block'; 
@@ -243,6 +287,7 @@ let user = JSON.parse(localStorage.getItem('userData'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadEventsForGate();
             updateCounterDisplay();
         });
     </script>
