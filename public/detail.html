@@ -208,6 +208,49 @@
                 max-width: 140px; /* Di HP, teks panjang akan otomatis dipotong jadi "RCELLFESTIVAL BEY..." */
             }
         }
+    /* ========================================= */
+        /* 🔥 FIX TOMBOL ATAS NUMPUK DI HP 🔥 */
+        /* ========================================= */
+        
+        /* Paksa area Navbar dan isinya tetap 1 baris (nggak boleh turun) */
+        .navbar .container, 
+        .navbar .container .d-flex {
+            display: flex !important;
+            flex-wrap: nowrap !important; 
+            align-items: center !important;
+        }
+
+        /* Penyesuaian ukuran khusus untuk layar HP */
+        @media (max-width: 576px) {
+            /* 1. Kecilin dikit tulisan RCELLFEST-nya biar ngasih ruang */
+            .navbar-brand {
+                font-size: 1.1rem !important; 
+                white-space: nowrap;
+                margin-right: auto !important; /* Dorong tombol kanan mentok ke kanan */
+            }
+            
+            /* 2. Kalau nama usernya panjang banget, ujungnya jadi titik-titik (...) */
+            .navbar .d-flex a.btn, 
+            .navbar .d-flex button.btn-outline-primary {
+                max-width: 110px; /* Batas panjang tombol nama */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                font-size: 0.8rem !important; /* Dikecilin dikit fontnya */
+            }
+            
+            /* 3. Tombol Tema / Bulan Bintang */
+            .navbar .d-flex button.rounded-circle {
+                width: 32px !important;
+                height: 32px !important;
+                padding: 0 !important;
+            }
+            .navbar .d-flex button.rounded-circle i {
+                font-size: 0.8rem !important;
+            }
+        }
     </style>
 </head>
 <body>
