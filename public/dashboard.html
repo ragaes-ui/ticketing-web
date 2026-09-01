@@ -170,6 +170,7 @@
                             <button class="btn w-100 fw-bold btn-lihat-profil shadow-sm" onclick="openNameModal()" data-i18n="menu_profile">Lihat Profil</button>
                         </li>
     <!-- 👇 TAMBAHAN TOMBOL HAPUS FOTO 👇 -->
+                        <li id="btnDeleteAvatarMenu" style="display: none;">
                         <li><a class="dropdown-item d-flex align-items-center text-danger" href="#" onclick="deleteAvatar()">
                             <i class="bi bi-trash3-fill text-danger fs-5"></i> <span class="fw-medium">Hapus Foto Profil</span>
                         </a></li>
@@ -576,7 +577,7 @@
         // 🔥 UPDATE FUNGSI RENDER PROFILE LAMA 🔥
         // ==========================================
         // Cari fungsi renderProfile() yang lama dan TIMPA dengan yang ini:
-        function renderProfile() {
+function renderProfile() {
             if(user) {
                 document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
                 document.getElementById('userEmailDisplay').innerText = user.email;
@@ -584,14 +585,25 @@
                     document.getElementById('saldoDisplay').innerText = user.saldo.toLocaleString('id-ID');
                 }
                 
-                // Set gambar dari database jika ada, jika tidak pakai gambar default RCELL
-                const currentAvatar = user.avatar || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
+                const defaultAvatar = 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
+                const currentAvatar = user.avatar || defaultAvatar;
                 
                 const mainAvatar = document.getElementById('mainAvatarDisplay');
                 if(mainAvatar) mainAvatar.src = currentAvatar;
                 
                 const navAvatar = document.getElementById('navAvatarDisplay');
                 if(navAvatar) navAvatar.src = currentAvatar;
+
+                // 👇 LOGIKA SEMBUNYIKAN/MUNCULKAN TOMBOL HAPUS FOTO 👇
+                const btnDeleteMenu = document.getElementById('btnDeleteAvatarMenu');
+                if(btnDeleteMenu) {
+                    if (currentAvatar === defaultAvatar) {
+                        btnDeleteMenu.style.display = 'none'; // Sembunyikan kalau pakai foto bawaan
+                    } else {
+                        btnDeleteMenu.style.display = 'block'; // Munculkan kalau sudah upload foto sendiri
+                    }
+                }
+                // 👆 ------------------------------------------------ 👆
             }
         }
         // --- CEK LOGIN ---
