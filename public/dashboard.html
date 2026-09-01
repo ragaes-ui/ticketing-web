@@ -11,314 +11,101 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     
-    <!-- FIX: Gunakan Client Key di Frontend, bukan Server Key -->
-    <script type="text/javascript"
-            src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="SB-Mid-client-B0QVtPjOdqXMklFX"></script>
-
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-B0QVtPjOdqXMklFX"></script>
     <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
-<style>
-        /* --- TEMA TERANG & GELAP PROFESIONAL --- */
+    <style>
         :root {
-            --bg-body: #f8fafc;
-            --bg-nav: #ffffff;
-            --bg-card: #ffffff;
-            --bg-input: #ffffff;
-            --bg-section: #f1f5f9;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --shadow-color: rgba(15, 23, 42, 0.08);
-            --primary: #2563eb;
-            --primary-light: #eff6ff;
+            --bg-body: #f8fafc; --bg-nav: #ffffff; --bg-card: #ffffff; --bg-input: #ffffff;
+            --bg-section: #f1f5f9; --text-main: #0f172a; --text-muted: #64748b;
+            --border-color: #e2e8f0; --shadow-color: rgba(15, 23, 42, 0.08);
+            --primary: #2563eb; --primary-light: #eff6ff;
         }
 
         [data-theme="dark"] {
-            --bg-body: #121212;
-            --bg-nav: #1e1e1e;
-            --bg-card: #1e1e1e;
-            --bg-input: #2d2d2d;
-            --bg-section: #181818;
-            --text-main: #f8f9fa;
-            --text-muted: #a1a1aa;
-            --border-color: #333333; 
-            --shadow-color: rgba(0, 0, 0, 0.4);
-            --primary: #3b82f6;
-            --primary-light: rgba(59, 130, 246, 0.15);
+            --bg-body: #121212; --bg-nav: #1e1e1e; --bg-card: #1e1e1e; --bg-input: #2d2d2d;
+            --bg-section: #181818; --text-main: #f8f9fa; --text-muted: #a1a1aa;
+            --border-color: #333333; --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary: #3b82f6; --primary-light: rgba(59, 130, 246, 0.15);
         }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            padding-top: 80px;
-            overflow-x: hidden;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        /* 1. Matikan Bola Blur (Blob) & Animasi Background */
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; padding-top: 80px; transition: 0.2s; }
         .blob { display: none !important; }
 
-        /* 2. Navbar & Card Solid Clean */
-        .navbar {
-            background-color: var(--bg-nav) !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            box-shadow: 0 2px 10px var(--shadow-color) !important;
-            padding: 15px 0;
-        }
-        
-        .navbar-brand { 
-            font-weight: 800; 
-            color: var(--primary) !important; 
-            font-size: 1.4rem; 
-            letter-spacing: -0.5px; 
-        }
+        .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color) !important; box-shadow: 0 2px 10px var(--shadow-color) !important; padding: 15px 0; }
+        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.4rem; letter-spacing: -0.5px; }
 
         .glass-card, .modal-content, .ticket-card, .custom-search-box {
-            background-color: var(--bg-card) !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 4px 15px var(--shadow-color) !important;
-            padding: 25px;
-            color: var(--text-main);
+            background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; box-shadow: 0 4px 15px var(--shadow-color) !important; padding: 25px; color: var(--text-main);
         }
 
-        .profile-img { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: var(--primary); 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.5rem; color: white;
-        }
+        .profile-img { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
 
-        /* 3. Ticket Card Styling */
-        .ticket-card {
-            padding: 0 !important;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .ticket-card:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 10px 25px var(--shadow-color) !important; 
-        }
-
-        .ticket-header {
-            background: var(--primary) !important;
-            padding: 15px 20px;
-            color: white;
-        }
+        .ticket-card { padding: 0 !important; overflow: hidden; transition: 0.2s; }
+        .ticket-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px var(--shadow-color) !important; }
+        .ticket-header { background: var(--primary) !important; padding: 15px 20px; color: white; }
         .ticket-header.streaming { background: #059669 !important; }
+        .ticket-body { padding: 20px; text-align: center; color: var(--text-main); }
 
-        .ticket-body { 
-            padding: 20px; 
-            text-align: center; 
-            color: var(--text-main); 
-        }
-
-        .ticket-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            background: var(--bg-section) !important;
-            border: 1px solid var(--border-color) !important;
-            padding: 15px;
-            border-radius: 8px !important;
-            text-align: left;
-            margin: 15px 0;
-        }
-        
-        .info-label { 
-            font-size: 0.75rem; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            font-weight: 700; 
-            margin-bottom: 2px; 
-        }
+        .ticket-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-section) !important; border: 1px solid var(--border-color) !important; padding: 15px; border-radius: 8px !important; text-align: left; margin: 15px 0; }
+        .info-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
         .info-value { font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin: 0; }
 
-        .account-box {
-            background: rgba(5, 150, 105, 0.1) !important;
-            border: 1px dashed #059669 !important;
-            color: #059669 !important;
-            padding: 12px;
-            border-radius: 8px !important;
-            text-align: left;
-            margin-bottom: 15px;
-            word-break: break-all;
-            font-family: monospace;
-        }
+        .account-box { background: rgba(5, 150, 105, 0.1) !important; border: 1px dashed #059669 !important; color: #059669 !important; padding: 12px; border-radius: 8px !important; text-align: left; margin-bottom: 15px; word-break: break-all; font-family: monospace; }
+        .ticket-code { background: var(--bg-section) !important; border: 1px dashed var(--border-color) !important; padding: 6px 14px; border-radius: 6px !important; font-family: monospace; letter-spacing: 2px; display: inline-block; color: var(--text-main); }
 
-        .ticket-code {
-            background: var(--bg-section) !important;
-            border: 1px dashed var(--border-color) !important;
-            padding: 6px 14px;
-            border-radius: 6px !important;
-            font-family: monospace;
-            letter-spacing: 2px;
-            display: inline-block;
-            color: var(--text-main);
-        }
-
-        /* 4. Button & Inputs */
         .btn, .form-control, .saldo-box, .custom-search-box { border-radius: 8px !important; }
-        
-        .btn-glass { 
-            background: var(--bg-input) !important; 
-            border: 1px solid var(--border-color) !important; 
-            color: var(--text-main) !important; 
-            padding: 8px 16px;
-        }
+        .btn-glass { background: var(--bg-input) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; padding: 8px 16px; }
         .btn-glass:hover { background: var(--bg-section) !important; }
-
-        .nav-pills .btn-glass.active { 
-            background: var(--primary) !important; 
-            color: white !important; 
-            border-color: var(--primary) !important; 
-        }
-
-        .btn-primary-neon { 
-            background: var(--primary) !important; 
-            border: none; 
-            color: white !important; 
-            padding: 8px 18px;
-            font-weight: 600;
-        }
+        .nav-pills .btn-glass.active { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
+        .btn-primary-neon { background: var(--primary) !important; border: none; color: white !important; padding: 8px 18px; font-weight: 600; }
         .btn-primary-neon:hover { background: #1d4ed8 !important; }
-
-        .saldo-box {
-            background: var(--primary-light) !important;
-            border: 1px solid var(--border-color) !important;
-            padding: 6px 14px;
-            font-weight: 700;
-            color: var(--primary) !important;
-        }
-
-        .history-item { 
-            border-bottom: 1px solid var(--border-color); 
-            padding: 12px 0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .history-item:last-child { border-bottom: none; }
         
-        .history-icon { 
-            width: 38px; height: 38px; border-radius: 8px; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; 
-        }
+        .saldo-box { background: var(--primary-light) !important; border: 1px solid var(--border-color) !important; padding: 6px 14px; font-weight: 700; color: var(--primary) !important; }
+        .history-item { border-bottom: 1px solid var(--border-color); padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .history-item:last-child { border-bottom: none; }
+        .history-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 
-        /* Ping Signal */
-        .signal-badge {
-            position: fixed; bottom: 42px; right: 105px; z-index: 9998;
-            background-color: #334155; color: #ffffff; border-radius: 50px;
-            padding: 6px 16px; display: flex; align-items: center; gap: 10px;
-            font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+        .signal-badge { position: fixed; bottom: 42px; right: 105px; z-index: 9998; background-color: #334155; color: #ffffff; border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .signal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
         .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
 
         [data-theme="dark"] .btn-close { filter: invert(1); }
-    /* ========================================= */
-        /* 🔥 FIX TULISAN HILANG DI MODE GELAP 🔥 */
-        /* ========================================= */
-        
-        /* Paksa tulisan "text-dark" jadi putih/terang di mode gelap */
         [data-theme="dark"] .text-dark { color: var(--text-main) !important; }
-        
-        /* Paksa background "bg-light" & "bg-white" jadi gelap elegan */
         [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
-        
-        /* Pastikan text-muted tidak terlalu gelap sehingga mudah dibaca */
         [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
-        
-        /* Pastikan inputan dan form di dalam popup/modal tidak gelap */
-        [data-theme="dark"] .modal-content, 
-        [data-theme="dark"] .modal-body { color: var(--text-main) !important; }
-        
-        [data-theme="dark"] .form-control, 
-        [data-theme="dark"] .form-select { 
-            color: var(--text-main) !important; 
-            background-color: var(--bg-input) !important; 
-            border-color: var(--border-color) !important; 
-        }
-        
-        /* Opsi pilihan dropdown (misal pas mau Upgrade Tiket) */
+        [data-theme="dark"] .modal-content, [data-theme="dark"] .modal-body { color: var(--text-main) !important; }
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select { color: var(--text-main) !important; background-color: var(--bg-input) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] select option { background-color: var(--bg-input) !important; color: var(--text-main) !important; }
-    /* ========================================= */
-        /* 🔥 DROPDOWN MENU PROFIL MODERN 🔥 */
-        /* ========================================= */
-        .custom-profile-menu {
-            border-radius: 20px !important;
-            min-width: 270px;
-            padding: 15px 0 10px 0;
-            background-color: var(--bg-card) !important;
-            border: 1px solid var(--border-color) !important;
-        }
-        
-        .btn-lihat-profil {
-            background-color: #0d9488 !important; /* Warna Hijau/Teal persis di gambar */
-            color: #ffffff !important;
-            border: none;
-            border-radius: 50px !important;
-            padding: 10px;
-            font-size: 1rem;
-        }
-        
-        .custom-profile-menu .dropdown-item {
-            padding: 12px 20px;
-            color: var(--text-main);
-            transition: all 0.2s ease;
-            font-size: 0.95rem;
-        }
-        
-        .custom-profile-menu .dropdown-item:hover {
-            background-color: var(--bg-section);
-            color: var(--primary);
-            padding-left: 25px; /* Efek geser halus saat disentuh */
-        }
-        
+
+        .custom-profile-menu { border-radius: 20px !important; min-width: 270px; padding: 15px 0 10px 0; background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; }
+        .btn-lihat-profil { background-color: #0d9488 !important; color: #ffffff !important; border: none; border-radius: 50px !important; padding: 10px; font-size: 1rem; }
+        .custom-profile-menu .dropdown-item { padding: 12px 20px; color: var(--text-main); transition: all 0.2s ease; font-size: 0.95rem; }
+        .custom-profile-menu .dropdown-item:hover { background-color: var(--bg-section); color: var(--primary); padding-left: 25px; }
         .custom-profile-menu i { width: 30px; text-align: left; display: inline-block; }
 
-        /* Tombol Jelajahi dengan Badge NEW */
-        .btn-jelajahi {
-            background-color: var(--bg-section) !important;
-            color: var(--text-main) !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 50px;
-            padding: 6px 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            transition: 0.2s;
-        }
+        .btn-jelajahi { background-color: var(--bg-section) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; border-radius: 50px; padding: 6px 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; position: relative; transition: 0.2s; }
         .btn-jelajahi:hover { background-color: var(--border-color) !important; }
-        .badge-new {
-            position: absolute; top: -5px; right: -10px;
-            background-color: #d90429; color: white;
-            font-size: 0.6rem; padding: 3px 6px; border-radius: 10px;
-        }
+        .badge-new { position: absolute; top: -5px; right: -10px; background-color: #d90429; color: white; font-size: 0.6rem; padding: 3px 6px; border-radius: 10px; }
+        
+        .custom-search-box { background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 50px; padding: 4px 20px; display: flex; align-items: center; transition: 0.3s; }
+        .custom-search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; padding: 12px 10px; outline: none; }
+        .custom-search-box input::placeholder { color: var(--text-muted); }
+        .custom-search-box i { color: var(--text-muted); font-size: 1.2rem; margin-right: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#">
+            <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
             </a>
-<div class="d-flex align-items-center gap-2 gap-md-3">
-                
-                <!-- Ganti Bahasa / Tema (Mewakili Icon Bendera) -->
+            
+            <div class="d-flex align-items-center gap-2 gap-md-3">
                 <div class="dropdown">
                     <button class="btn btn-light rounded-pill fw-bold border d-flex align-items-center px-2 px-md-3" data-bs-toggle="dropdown" style="background: var(--bg-card); color: var(--text-main); border-color: var(--border-color) !important; height: 42px;">
                         <span id="lang-btn-text">ID</span> <i class="bi bi-chevron-down ms-1" style="font-size: 0.7rem;"></i>
@@ -329,13 +116,11 @@
                     </ul>
                 </div>
 
-                <!-- Tombol Jelajahi -->
                 <a href="/" class="btn-jelajahi text-decoration-none" style="height: 42px;">
                     <i class="bi bi-compass-fill fs-5"></i> <span class="d-none d-md-inline">Jelajahi</span>
                     <span class="badge-new">NEW</span>
                 </a>
 
-                <!-- Avatar Dropdown Menu -->
                 <div class="dropdown">
                     <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Profile" width="45" height="45" class="rounded-circle border border-2 shadow-sm" style="object-fit: cover; background: var(--bg-card); padding: 2px;">
@@ -362,52 +147,27 @@
                         </a></li>
                     </ul>
                 </div>
-
             </div>
         </div>
     </nav>
 
     <div class="container pb-5 mt-4">
         
-<div class="glass-card mb-4">
+        <div class="glass-card mb-4">
             <div class="row align-items-center">
-                
-                <!-- Kiri: Foto Profil & Nama -->
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="profile-img">
-                            <i class="bi bi-person-fill"></i>
-                        </div>
+                        <div class="profile-img shadow-sm"><i class="bi bi-person-fill"></i></div>
                         <div>
                             <h4 class="fw-bold mb-0" id="userNameDisplay">Loading...</h4>
                             <small class="text-muted" id="userEmailDisplay">...</small>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Kanan: Sisa Saldo Saja -->
                 <div class="col-md-6 d-flex justify-content-md-end justify-content-start">
                     <div class="saldo-box shadow-sm" title="Saldo Saya">
                         <i class="bi bi-wallet2 me-2"></i> Rp <span id="saldoDisplay" class="ms-1">0</span>
                     </div>
-                </div>
-
-            </div>
-        </div>
-                    
-                    <button onclick="openPinModal()" class="btn btn-glass btn-sm text-warning border-warning" title="Atur/Ubah PIN Saldo">
-                        <i class="bi bi-shield-lock-fill"></i>
-                    </button>
-
-                    <button onclick="openNameModal()" class="btn btn-glass btn-sm" title="Edit Profil">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button onclick="openPassModal()" class="btn btn-glass btn-sm" title="Ganti Password">
-                        <i class="bi bi-key"></i>
-                    </button>
-                    <a href="/history" class="btn btn-glass btn-sm" title="Riwayat Login">
-                        <i class="bi bi-clock-history"></i>
-                    </a>
                 </div>
             </div>
         </div>
@@ -426,49 +186,11 @@
         </ul>
 
         <div class="tab-content" id="dashboardTabsContent">
-            
             <div class="tab-pane fade show active" id="tickets-pane" role="tabpanel">
-                
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold mb-0" style="color: var(--text-main);"><span data-i18n="section_assets">Aset Digital Saya</span></h4>
                     <a href="/" class="btn btn-primary-neon btn-sm"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_buy_new">Beli Baru</span></a>
                 </div> 
-                
-                <style>
-                    .custom-search-box {
-                        background: var(--glass-bg); 
-                        border: var(--glass-border);
-                        border-radius: 50px; 
-                        padding: 4px 20px;
-                        display: flex;
-                        align-items: center;
-                        backdrop-filter: blur(15px);
-                        transition: all 0.3s ease;
-                        box-shadow: var(--card-shadow);
-                    }
-                    .custom-search-box:focus-within {
-                        border-color: #00c6ff; 
-                        box-shadow: 0 0 15px rgba(0, 198, 255, 0.2);
-                    }
-                    .custom-search-box input {
-                        background: transparent;
-                        border: none;
-                        color: var(--text-main); 
-                        width: 100%;
-                        padding: 12px 10px;
-                        outline: none;
-                        font-size: 0.95rem;
-                        letter-spacing: 0.5px;
-                    }
-                    .custom-search-box input::placeholder {
-                        color: var(--text-muted); 
-                    }
-                    .custom-search-box i {
-                        color: var(--text-muted);
-                        font-size: 1.2rem;
-                        margin-right: 5px;
-                    }
-                </style>
 
                 <div class="mb-3">
                     <div class="custom-search-box">
@@ -490,7 +212,6 @@
                         <p class="mt-3 text-muted" data-i18n="loading_tickets">Mengambil data tiket...</p>
                     </div>
                 </div>
-
             </div>
 
             <div class="tab-pane fade" id="topups-pane" role="tabpanel">
@@ -503,7 +224,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -582,12 +302,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    
                     <div class="mb-3" id="groupOldPin" style="display: none;">
                         <label class="text-muted mb-2 text-warning fw-bold" data-i18n="modal_pin_old">PIN Lama</label>
                         <input type="password" id="inputOldPin" class="form-control text-center fw-bold fs-3 mx-auto border-warning" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
                     </div>
-
                     <div class="mb-3">
                         <label class="text-muted mb-2" data-i18n="modal_pin_desc">PIN Baru (6 Digit)</label>
                         <input type="password" id="inputNewPin" class="form-control text-center fw-bold fs-3 mx-auto" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="letter-spacing: 15px; width: 70%;">
@@ -615,9 +333,7 @@
                 <div class="modal-body text-center">
                     <i class="bi bi-send-check display-4 text-primary mb-3"></i>
                     <p class="small" style="color: var(--text-muted);" data-i18n="modal_transfer_desc">Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!</p>
-                    
                     <input type="hidden" id="transferTicketCode" value="">
-                    
                     <div class="mb-3 text-start">
                         <label class="mb-2 fw-bold" style="color: var(--text-muted);" data-i18n="lbl_receiver_email">Email Penerima</label>
                         <input type="email" id="receiverEmail" class="form-control text-center fw-bold" placeholder="email.teman@gmail.com" required>
@@ -632,10 +348,10 @@
 
     <div class="modal fade" id="upgradeModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border);">
-                <div class="modal-header border-bottom" style="border-color: var(--glass-border);">
-                    <h5 class="modal-title fw-bold text-white"><i class="bi bi-arrow-up-circle-fill text-warning me-2"></i>Upgrade Tiket! Bisa dong</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-arrow-up-circle-fill text-warning me-2"></i>Upgrade Tiket! Bisa dong</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="upgTicketId">
@@ -643,18 +359,18 @@
                     
                     <div class="mb-3">
                         <label class="form-label text-muted small">Pilih Tipe Tiket Baru (Hanya yang lebih mahal & tersedia):</label>
-                        <select id="upgTierSelect" class="form-select text-white" style="background: rgba(128,128,128,0.1); border: 1px solid var(--text-muted);" onchange="hitungSelisih()">
+                        <select id="upgTierSelect" class="form-control fw-bold" onchange="hitungSelisih()">
                             <option value="">-- Sedang memuat tiket... --</option>
                         </select>
                     </div>
                     
-                    <div id="upgPriceBox" class="alert alert-warning bg-opacity-10 border-warning text-warning text-center d-none">
+                    <div id="upgPriceBox" class="alert alert-warning border-warning text-warning text-center d-none" style="background-color: rgba(255, 193, 7, 0.1);">
                         <small>Selisih Harga yang Harus Dibayar:</small><br>
                         <h3 class="fw-bold mb-0 mt-1" id="upgPriceText">Rp 0</h3>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-color: var(--glass-border);">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-warning fw-bold text-dark rounded-pill px-4" id="btnProsesUpgrade" onclick="prosesUpgrade()">Bayar</button>
                 </div>
             </div>
@@ -729,8 +445,7 @@
         // --- KAMUS BAHASA ---
         const translations = {
             id: {
-                nav_home: "Home", nav_logout: "Keluar",
-                section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
+                nav_home: "Home", nav_logout: "Keluar", section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
                 btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
                 modal_pin_title: "Atur PIN Keamanan", modal_pin_old: "Masukkan PIN Lama", modal_pin_desc: "PIN Baru (6 Digit)", modal_pin_confirm: "Konfirmasi PIN Baru", 
                 modal_pin_note: "Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.", btn_save_pin: "Simpan PIN", btn_change_pin: "Update PIN",
@@ -747,8 +462,7 @@
                 btn_transfer: "Transfer", modal_transfer_title: "Transfer Tiket", modal_transfer_desc: "Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!", lbl_receiver_email: "Email Penerima", btn_send_ticket: "Kirim Tiket Sekarang"
             },
             en: {
-                nav_home: "Home", nav_logout: "Logout",
-                section_assets: "My Digital Assets", btn_buy_new: "Buy New",
+                nav_home: "Home", nav_logout: "Logout", section_assets: "My Digital Assets", btn_buy_new: "Buy New",
                 btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
                 modal_pin_title: "Set Security PIN", modal_pin_old: "Enter Old PIN", modal_pin_desc: "New PIN (6 Digits)", modal_pin_confirm: "Confirm New PIN",
                 modal_pin_note: "Remember this PIN! Used when buying tickets with balance.", btn_save_pin: "Save PIN", btn_change_pin: "Update PIN",
@@ -811,34 +525,15 @@
 
                 let html = '';
                 history.forEach(item => {
-                    let badgeClass = '';
-                    let icon = '';
-                    let amountClass = '';
-                    let sign = '';
-
-                    if (item.type === 'in') {
-                        badgeClass = 'bg-success'; 
-                        icon = '<i class="bi bi-arrow-down-left"></i>'; 
-                        amountClass = 'text-success'; 
-                        sign = '+';
-                    } else {
-                        badgeClass = 'bg-danger'; 
-                        icon = '<i class="bi bi-arrow-up-right"></i>'; 
-                        amountClass = 'text-danger'; 
-                        sign = '-';
-                    }
+                    let badgeClass = item.type === 'in' ? 'bg-success' : 'bg-danger';
+                    let icon = item.type === 'in' ? '<i class="bi bi-arrow-down-left"></i>' : '<i class="bi bi-arrow-up-right"></i>';
+                    let amountClass = item.type === 'in' ? 'text-success' : 'text-danger';
+                    let sign = item.type === 'in' ? '+' : '-';
 
                     let dateStr = "TBA";
                     try {
                         const dateObj = new Date(item.date);
-                        dateStr = dateObj.toLocaleString('id-ID', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric', 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            hour12: false
-                        });
+                        dateStr = dateObj.toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
                         dateStr = dateStr.replace(/\./g, ':').replace(',', ' -');
                     } catch(e) {}
 
@@ -898,15 +593,13 @@
             const t = translations[lang];
             
             if (user.hasPin && (!oldPin || oldPin.length !== 6 || isNaN(oldPin))) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_old_pin, background: '#1c1c2d', color: '#fff'});
+                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_old_pin});
             }
-
             if(newPin.length !== 6 || isNaN(newPin)) {
-                return Swal.fire({icon: 'error', title: 'Oops', text: t.err_pin_len, background: '#1c1c2d', color: '#fff'});
+                return Swal.fire({icon: 'error', title: 'Oops', text: t.err_pin_len});
             }
-
             if (newPin !== confirmPin) {
-                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pin_match, background: '#1c1c2d', color: '#fff'});
+                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pin_match});
             }
             
             const payload = { userId: user.id, newPin: newPin };
@@ -923,20 +616,15 @@
                     user.hasPin = true; 
                     localStorage.setItem('userData', JSON.stringify(user));
                     pinModal.hide();
-                    Swal.fire({icon:'success', title: lang === 'id' ? 'Sukses' : 'Success', text: lang === 'id' ? 'PIN berhasil disimpan!' : 'PIN saved successfully!', background:'#1c1c2d', color:'#fff'});
+                    Swal.fire({icon:'success', title: lang === 'id' ? 'Sukses' : 'Success', text: lang === 'id' ? 'PIN berhasil disimpan!' : 'PIN saved successfully!'});
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1c1c2d', color: '#fff'});
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message});
                 }
-            } catch(e) { 
-                console.error(e); 
-            }
+            } catch(e) { console.error(e); }
         }
 
         const topupModal = new bootstrap.Modal(document.getElementById('topupModal'));
-        function openTopupModal() {
-            document.getElementById('topupAmount').value = '';
-            topupModal.show();
-        }
+        function openTopupModal() { document.getElementById('topupAmount').value = ''; topupModal.show(); }
 
         async function processTopup() {
             const amount = parseInt(document.getElementById('topupAmount').value);
@@ -944,8 +632,7 @@
             const lang = localStorage.getItem('lang') || 'id';
             
             if (!amount || amount < 10000) {
-                Swal.fire({icon: 'error', title: 'Oops...', text: 'Minimal top up Rp 10.000', background: '#1c1c2d', color: '#fff'});
-                return;
+                return Swal.fire({icon: 'error', title: 'Oops...', text: 'Minimal top up Rp 10.000'});
             }
 
             btnPay.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...`;
@@ -953,14 +640,8 @@
 
             try {
                 const res = await fetch('/api/topup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        userId: user.id, 
-                        email: user.email,
-                        name: user.fullName || user.username,
-                        amount: amount 
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, email: user.email, name: user.fullName || user.username, amount: amount })
                 });
 
                 const data = await res.json();
@@ -969,25 +650,23 @@
                     topupModal.hide();
                     window.snap.pay(data.token, {
                         onSuccess: function(result) {
-                            Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Top Up sukses! Saldo sedang diproses.', background: '#1c1c2d', color: '#fff'})
-                            .then(() => fetchLatestProfile()); 
+                            Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Top Up sukses! Saldo sedang diproses.'}).then(() => fetchLatestProfile()); 
                         },
                         onPending: function(result) {
-                            Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di instruksi Midtrans.', background: '#1c1c2d', color: '#fff'});
+                            Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di instruksi Midtrans.'});
                         },
                         onError: function(result) {
-                            Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.', background: '#1c1c2d', color: '#fff'});
+                            Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.'});
                         },
                         onClose: function() {
-                            Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup popup pembayaran.', background: '#1c1c2d', color: '#fff'})
-                            .then(() => fetchLatestProfile()); 
+                            Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup popup pembayaran.'}).then(() => fetchLatestProfile()); 
                         }
                     });
                 } else {
                     throw new Error(data.message || 'Gagal mendapatkan token transaksi');
                 }
             } catch (err) {
-                Swal.fire({icon: 'error', title: 'Error', text: err.message, background: '#1c1c2d', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Error', text: err.message});
             } finally {
                 btnPay.innerHTML = translations[lang].btn_pay_topup;
                 btnPay.disabled = false;
@@ -995,57 +674,30 @@
         }
 
         const passModal = new bootstrap.Modal(document.getElementById('passModal'));
-        
-        function openPassModal() { 
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
-            passModal.show(); 
-        }
+        function openPassModal() { document.getElementById('oldPass').value = ''; document.getElementById('newPass').value = ''; passModal.show(); }
 
         async function savePassword() { 
             const oldPass = document.getElementById('oldPass').value;
             const newPass = document.getElementById('newPass').value;
 
-            if (!oldPass || !newPass) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!', background: '#1c1c2d', color: '#fff'});
-            }
-
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, background: '#1c1c2d', color: '#fff' });
+            if (!oldPass || !newPass) return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!'});
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
             try {
                 const res = await fetch('/api/user/change-password', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: user.id, 
-                        oldPassword: oldPass,
-                        newPassword: newPass
-                    })
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, oldPassword: oldPass, newPassword: newPass })
                 });
-
                 const data = await res.json();
-
                 if (res.ok && data.success) {
                     passModal.hide(); 
-                    Swal.fire({
-                        icon: 'success', 
-                        title: 'Sukses', 
-                        text: 'Password berhasil diubah! Silakan login ulang.', 
-                        background: '#1c1c2d', 
-                        color: '#fff'
-                    }).then(() => logout()); 
+                    Swal.fire({icon: 'success', title: 'Sukses', text: 'Password berhasil diubah! Silakan login ulang.'}).then(() => logout()); 
                 } else {
-                    Swal.fire({
-                        icon: 'error', 
-                        title: 'Gagal', 
-                        text: data.message || 'Gagal mengubah password.', 
-                        background: '#1c1c2d', 
-                        color: '#fff'
-                    });
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah password.'});
                 }
             } catch (e) {
                 console.error(e);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#1c1c2d', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.'});
             }
         }
 
@@ -1060,18 +712,18 @@
         function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             const btn = document.getElementById('theme-btn');
+            
+            // 👇 PENGAMAN NYA ADA DI SINI SEKARANG 👇
+            if (!icon || !btn) return; 
+
             if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill');
-                icon.classList.add('bi-sun-fill');
+                icon.classList.remove('bi-moon-stars-fill'); icon.classList.add('bi-sun-fill');
                 icon.style.color = "#FFD700";
-                btn.classList.add('btn-dark');
-                btn.classList.remove('btn-light');
+                btn.classList.add('btn-dark'); btn.classList.remove('btn-light');
             } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-stars-fill');
+                icon.classList.remove('bi-sun-fill'); icon.classList.add('bi-moon-stars-fill');
                 icon.style.color = "";
-                btn.classList.add('btn-light');
-                btn.classList.remove('btn-dark');
+                btn.classList.add('btn-light'); btn.classList.remove('btn-dark');
             }
         }
 
@@ -1090,11 +742,9 @@
             if(langBtn) {
                 langBtn.innerText = lang.toUpperCase();
                 if(lang === 'en') {
-                    langBtn.classList.add('btn-primary');
-                    langBtn.classList.remove('btn-outline-secondary');
+                    langBtn.classList.add('btn-primary'); langBtn.classList.remove('btn-outline-secondary');
                 } else {
-                    langBtn.classList.add('btn-outline-secondary');
-                    langBtn.classList.remove('btn-primary');
+                    langBtn.classList.add('btn-outline-secondary'); langBtn.classList.remove('btn-primary');
                 }
             }
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1120,7 +770,6 @@
                 if (!res.ok) throw new Error("API Gagal");
                 
                 myAllTickets = await res.json(); 
-                
                 filterMyTickets('Terdekat');
             } catch (err) { 
                 list.innerHTML = `<div class="col-12 text-center text-danger py-5"><i class="bi bi-exclamation-triangle display-4"></i><p class="mt-2">Gagal load data tiket.</p></div>`;
@@ -1139,8 +788,7 @@
                 btnAll.className = "btn btn-glass btn-sm rounded-pill px-3 fw-bold";
                 btnClosest.className = "btn btn-primary btn-sm rounded-pill px-3 fw-bold"; 
                 
-                const now = new Date();
-                now.setHours(0,0,0,0);
+                const now = new Date(); now.setHours(0,0,0,0);
                 
                 let filtered = myAllTickets.filter(ticket => {
                     if (!ticket.eventId || !ticket.eventId.date) return false;
@@ -1170,7 +818,7 @@
                 const category = event.category || 'General';
                 const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
                 
-let dateStr = t.txt_date_tba;
+                let dateStr = t.txt_date_tba;
                 if (event.date) {
                     try {
                         const localeConfig = lang === 'id' ? 'id-ID' : 'en-US';
@@ -1178,12 +826,8 @@ let dateStr = t.txt_date_tba;
                         const startStr = dStart.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                         dateStr = startStr;
 
-// 👇 DETEKSI MASA BERLAKU SUPER CERDAS 👇
                         const tierLower = (ticket.tierName || '').toLowerCase();
-                        
-                        // Cek apakah tiket terusan (Contoh: "3 Days Pass")
                         const multiDayMatch = tierLower.match(/([0-9]+)\s*day/);
-                        // Cek apakah tiket hari spesifik (Contoh: "Day 2" atau "Day 3")
                         const specificDayMatch = tierLower.match(/day\s*([0-9]+)/);
                         
                         if (multiDayMatch) {
@@ -1195,36 +839,26 @@ let dateStr = t.txt_date_tba;
                                 const separator = lang === 'id' ? 's/d' : 'to';
                                 dateStr = `${startStr} ${separator} ${endStr}`;
                             }
-                        } 
-                        else if (specificDayMatch) {
+                        } else if (specificDayMatch) {
                             const dayNumber = parseInt(specificDayMatch[1]);
                             if (dayNumber > 1) {
-                                // Otomatis hitung maju tanggalnya sesuai angka Day
                                 const dSpecific = new Date(dStart);
                                 dSpecific.setDate(dSpecific.getDate() + (dayNumber - 1));
                                 dateStr = dSpecific.toLocaleDateString(localeConfig, { day: 'numeric', month: 'long', year: 'numeric' });
                             }
                         }
-                        } catch (e) { 
-                        dateStr = event.date; 
-                    }
-                } // 👈 TUTUP KURUNG UNTUK if (event.date)
-                        // CATATAN: Bagian 'else if (event.endDate)' kita HAPUS.
-                        // Jadi kalau cuma "Reguler Festival", otomatis cuma nampil 1 hari (Tanggal Mulai).
-                        // 👆 ---------------------------------- 👆
+                    } catch (e) { dateStr = event.date; }
+                }
 
-const headerClass = isStreaming ? 'streaming' : '';
+                const headerClass = isStreaming ? 'streaming' : '';
                 const labelHeader = isStreaming ? t.lbl_account_premium : t.lbl_ticket_entry;
                 const iconHeader = isStreaming ? '<i class="bi bi-camera-reels-fill me-2"></i>' : '<i class="bi bi-ticket-perforated-fill me-2"></i>';
                 
-// 👇 CEK APAKAH TIKET SUDAH DI-SCAN HARI INI 👇
                 const now = new Date();
-                // Kurangi 5 jam agar gembok baru terbuka tepat jam 05.00 pagi
                 const resetTime = new Date(now.getTime() - (5 * 60 * 60 * 1000));
                 const todayStr = resetTime.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 
                 let isScannedToday = false;
-                // Kalau tiket masih valid (masih ada sisa hari) DAN tanggal hari ini ada di riwayat scan
                 if (ticket.status === 'valid' && ticket.scanHistory && ticket.scanHistory.includes(todayStr)) {
                     isScannedToday = true;
                 }
@@ -1237,12 +871,9 @@ const headerClass = isStreaming ? 'streaming' : '';
                 } else {
                     statusBadge = `<span class="badge bg-success rounded-pill">${t.status_active}</span>`;
                 }
-                // 👆 -------------------------------------- 👆
 
-                let descText = event.description || "";
-                let descClean = descText.replace(/\n/g, " | ");
-                let secretText = event.secretData || "Akun belum tersedia / Hubungi Admin.";
-                let secretClean = secretText.replace(/\n/g, " | ");
+                let descText = event.description || ""; let descClean = descText.replace(/\n/g, " | ");
+                let secretText = event.secretData || "Akun belum tersedia / Hubungi Admin."; let secretClean = secretText.replace(/\n/g, " | ");
                 
                 const pemesanName = ticket.customerName || user.fullName || user.username;
                 const pemesanPhone = ticket.phone || '-';
@@ -1254,10 +885,8 @@ const headerClass = isStreaming ? 'streaming' : '';
                 const ticketData = encodeURIComponent(JSON.stringify({
                     eventName: event.name, date: dateStr, location: event.location || 'TBA',
                     code: ticket.ticketCode, isStreaming: isStreaming, desc: descText,
-                    secretData: secretText,
-                    buyerName: pemesanName, buyerPhone: pemesanPhone, paymentMethod: metodeBayar,
-                    tierName: tierName, 
-                    quantity: qty
+                    secretData: secretText, buyerName: pemesanName, buyerPhone: pemesanPhone, 
+                    paymentMethod: metodeBayar, tierName: tierName, quantity: qty
                 }));
 
                 let locationText = event.location || 'TBA';
@@ -1269,17 +898,13 @@ const headerClass = isStreaming ? 'streaming' : '';
                     let linkHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="text-muted">${locationText}</span>`;
                     if (event.mapsUrl && event.mapsUrl.startsWith('http')) {
                         linkHTML = `<a href="${event.mapsUrl}" target="_blank" style="color: #00c6ff; text-decoration: underline; font-weight: 500;">
-                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} 
-                                        <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>${locationText} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
                                     </a>`;
                     }
                     
                     let iframePeta = isStreaming ? '' : `
                         <div class="mt-2" style="border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 45%; height: 0;">
-                            <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
-                                allowfullscreen="" loading="lazy">
-                            </iframe>
+                            <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen="" loading="lazy"></iframe>
                         </div>
                     `;
 
@@ -1289,7 +914,7 @@ const headerClass = isStreaming ? 'streaming' : '';
                                 <i class="bi bi-geo-alt me-1"></i> Lihat Lokasi
                             </button>
                             <div class="collapse mt-2" id="lokasi-${ticket.ticketCode}">
-                                <div class="p-2 border rounded text-start" style="background: rgba(0,0,0,0.2); border-color: var(--glass-border) !important;">
+                                <div class="p-2 border rounded text-start" style="background: rgba(0,0,0,0.2); border-color: var(--border-color) !important;">
                                     <div class="info-value" style="font-size: 0.85rem;">${linkHTML}</div>
                                     ${iframePeta}
                                 </div>
@@ -1308,14 +933,11 @@ const headerClass = isStreaming ? 'streaming' : '';
                             <div class="info-label">Tipe Tiket</div>
                             <div class="info-value text-primary fw-bold" style="word-break: break-word; font-size: 0.85rem;">${tierName}</div>
                         </div>
-                        
                         ${gridLokasiHTML}
-<!-- 👇 TAMBAHAN KOTAK MASA BERLAKU 👇 -->
                         <div style="grid-column: span 2; background: rgba(0, 255, 127, 0.1); border: 1px dashed rgba(0, 255, 127, 0.4); padding: 10px; border-radius: 8px;">
                             <div class="info-label text-success"><i class="bi bi-calendar-check me-1"></i> Masa Berlaku Tiket</div>
                             <div class="info-value fw-bold text-success" style="font-size: 0.9rem;">${dateStr}</div>
                         </div>
-                        <!-- 👆 -------------------------- 👆 -->
                         <div>
                             <div class="info-label">Jumlah</div>
                             <div class="info-value fw-bold text-danger">${qty} Tiket</div>
@@ -1324,7 +946,7 @@ const headerClass = isStreaming ? 'streaming' : '';
                             <div class="info-label">Pembayaran</div>
                             <div class="info-value"><i class="bi ${metodeBayar === 'SALDO' ? 'bi-wallet2 text-primary' : 'bi-credit-card text-success'}"></i> ${metodeBayar}</div>
                         </div>
-                        <div style="grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 10px; margin-top: 5px;">
+                        <div style="grid-column: span 2; border-top: 1px dashed var(--border-color); padding-top: 10px; margin-top: 5px;">
                             <div class="info-label">Total Harga</div>
                             <div class="info-value">Rp ${hargaTiket.toLocaleString('id-ID')}</div>
                         </div>
@@ -1350,10 +972,8 @@ const headerClass = isStreaming ? 'streaming' : '';
                             </button>` : ''}
                         </div>
                     `;
-} else {
+                } else {
                     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticketCode}&bgcolor=ffffff`;
-                    
-                    // 👇 NOTIFIKASI RESET BESOK KALAU SUDAH DI-SCAN 👇
                     let notifReset = '';
                     if (isScannedToday) {
                         notifReset = `
@@ -1363,15 +983,13 @@ const headerClass = isStreaming ? 'streaming' : '';
                         `;
                     }
 
-// 👇 LOGIKA SENSOR BARCODE JIKA SUDAH CHECK-IN 👇
                     let btnTampil = `<button class="btn btn-sm btn-outline-info mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}"><i class="bi bi-qr-code-scan me-1"></i> Tampilkan Barcode</button>`;
                     let qrBox = `<img src="${qrUrl}" class="qr-image" alt="QR" crossorigin="anonymous" style="background: white; padding: 5px; border-radius: 8px;">`;
-                    let boxBorderColor = "#00c6ff";
+                    let boxBorderColor = "var(--primary)";
                     let scanLabel = t.lbl_scan;
                     let scanLabelColor = "text-info";
 
                     if (isScannedToday || ticket.status === 'used') {
-                        // Kalau sudah di-scan, ubah tombol dan sensor gambarnya
                         btnTampil = `<button class="btn btn-sm btn-outline-warning mt-1 fw-bold w-100 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#barcode-${ticket.ticketCode}"><i class="bi bi-lock-fill me-1"></i> Barcode Terkunci</button>`;
                         boxBorderColor = "#ffc107";
                         scanLabel = "KODE SEMENTARA DIKUNCI";
@@ -1390,7 +1008,6 @@ const headerClass = isStreaming ? 'streaming' : '';
                     mainContent += `
                         ${notifReset}
                         ${btnTampil}
-                        
                         <div class="collapse mt-2" id="barcode-${ticket.ticketCode}">
                             <div class="qr-container w-100 text-center" style="background: rgba(255,255,255,0.05); border: 1px dashed ${boxBorderColor};">
                                 <small class="${scanLabelColor} fw-bold mb-2 d-block">${scanLabel}</small>
@@ -1440,9 +1057,7 @@ const headerClass = isStreaming ? 'streaming' : '';
                                 <span class="ticket-date mb-3" style="display: block;">
                                     <i class="bi bi-calendar-event me-1"></i> ${dateStr}
                                 </span>
-                                
                                 ${mainContent}
-                                
                                 <div class="mt-auto w-100 pt-3">
                                     <div>${statusBadge}</div>
                                     <div class="ticket-code mt-2">${ticket.ticketCode}</div>
@@ -1454,7 +1069,7 @@ const headerClass = isStreaming ? 'streaming' : '';
             });
             list.innerHTML = htmlContent;
         }
-        
+
         function searchTickets() {
             const input = document.getElementById('searchTicketInput').value.toLowerCase();
             const tickets = document.querySelectorAll('.ticket-card-wrapper');
@@ -1494,9 +1109,7 @@ const headerClass = isStreaming ? 'streaming' : '';
             const receiverEmail = document.getElementById('receiverEmail').value;
             const lang = localStorage.getItem('lang') || 'id';
 
-            if (!receiverEmail) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: 'Email penerima wajib diisi!', background: '#1e293b', color: '#fff'});
-            }
+            if (!receiverEmail) return Swal.fire({icon: 'warning', title: 'Oops', text: 'Email penerima wajib diisi!'});
 
             transferModalInstance.hide();
 
@@ -1506,15 +1119,10 @@ const headerClass = isStreaming ? 'streaming' : '';
                     <p class="text-muted small mb-3">Kirim tiket ke: <br><b class="text-primary">${receiverEmail}</b></p>
                     <input id="swal-transfer-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" inputmode="numeric" style="letter-spacing: 15px;">
                 `,
-                showCancelButton: true,
-                confirmButtonColor: '#0049CC',
-                cancelButtonColor: '#475569',
+                showCancelButton: true, confirmButtonColor: '#0049CC',
                 confirmButtonText: lang === 'id' ? 'Kirim Tiket' : 'Send Ticket',
                 cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1e293b', color: '#fff',
-                didOpen: () => {
-                    document.getElementById('swal-transfer-pin').focus();
-                },
+                didOpen: () => { document.getElementById('swal-transfer-pin').focus(); },
                 preConfirm: () => {
                     const inputPin = document.getElementById('swal-transfer-pin').value;
                     if (!inputPin || inputPin.length !== 6) {
@@ -1527,47 +1135,26 @@ const headerClass = isStreaming ? 'streaming' : '';
 
             if (!pin) return;
 
-            Swal.fire({
-                title: 'Memproses Transfer...',
-                allowOutsideClick: false,
-                background: '#1e293b', color: '#fff',
-                didOpen: () => Swal.showLoading()
-            });
+            Swal.fire({ title: 'Memproses Transfer...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 const res = await fetch('/api/tickets/transfer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ticket_code: ticketCode,
-                        receiver_email: receiverEmail,
-                        userId: user.id, 
-                        pin: pin         
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticket_code: ticketCode, receiver_email: receiverEmail, userId: user.id, pin: pin })
                 });
-
                 const data = await res.json();
-
                 if (res.ok) {
-                    Swal.fire({
-                        icon: 'success', 
-                        title: 'Sukses!', 
-                        text: lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}`, 
-                        background: '#1e293b', color: '#fff'
-                    }).then(() => {
-                        loadTickets(); 
-                    });
+                    Swal.fire({ icon: 'success', title: 'Sukses!', text: lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}` }).then(() => { loadTickets(); });
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message, background: '#1e293b', color: '#fff'});
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message});
                 }
             } catch (error) {
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.', background: '#1e293b', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.'});
             }
         }
 
         async function bukaModalUpgrade(ticketId, eventId, totalPaid, qty) {
             document.getElementById('upgTicketId').value = ticketId;
-            
             const unitPrice = Math.round(totalPaid / qty); 
             document.getElementById('upgCurrentPrice').value = unitPrice;
             document.getElementById('upgPriceBox').classList.add('d-none'); 
@@ -1581,24 +1168,18 @@ const headerClass = isStreaming ? 'streaming' : '';
             try {
                 const res = await fetch(`/api/events/${eventId}`);
                 const event = await res.json();
-                
                 let optionsHtml = '<option value="">-- Pilih Tiket Tujuan --</option>';
-                
-                const now = new Date(); // Ambil waktu sekarang
+                const now = new Date();
 
-                // FILTER: Harga lebih mahal, stok cukup, DAN WAKTU SUDAH BUKA!
                 const tiketTersedia = event.tickets.filter(t => {
                     const hargaMasuk = parseInt(t.price) > unitPrice;
                     const stokAman = parseInt(t.availableSeats) >= qty;
-                    
-                    // Cek apakah tiket sudah buka (kalau null berarti langsung buka, kalau ada tanggalnya pastikan sudah lewat)
                     const tiketSudahBuka = !t.salesOpenDate || new Date(t.salesOpenDate) <= now;
-                    
                     return hargaMasuk && stokAman && tiketSudahBuka;
                 });
                 
                 if(tiketTersedia.length === 0) {
-                    optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out / Stok Kurang)</option>';
+                    optionsHtml = '<option value="">(Tidak ada opsi upgrade / Sold Out)</option>';
                 } else {
                     tiketTersedia.forEach(t => {
                         optionsHtml += `<option value="${t.tierName}" data-price="${t.price}" data-qty="${qty}">${t.tierName} - Sisa ${t.availableSeats} kursi</option>`;
@@ -1616,14 +1197,11 @@ const headerClass = isStreaming ? 'streaming' : '';
             const priceBox = document.getElementById('upgPriceBox');
             const priceText = document.getElementById('upgPriceText');
             
-            if(!selectEl.value) {
-                priceBox.classList.add('d-none'); return;
-            }
+            if(!selectEl.value) { priceBox.classList.add('d-none'); return; }
 
             const optionDipilih = selectEl.options[selectEl.selectedIndex];
             const newUnitPrice = parseInt(optionDipilih.getAttribute('data-price'));
             const qty = parseInt(optionDipilih.getAttribute('data-qty'));
-            
             const selisihTotal = (newUnitPrice - currentUnitPrice) * qty;
             
             priceText.innerText = 'Rp ' + selisihTotal.toLocaleString('id-ID');
@@ -1634,7 +1212,7 @@ const headerClass = isStreaming ? 'streaming' : '';
             const ticketId = document.getElementById('upgTicketId').value;
             const newTierName = document.getElementById('upgTierSelect').value;
             
-            if(!newTierName) return Swal.fire({icon: 'warning', title: 'Tunggu', text: 'Pilih tiket tujuan dulu!', background: '#1c1c2d', color: '#fff'});
+            if(!newTierName) return Swal.fire({icon: 'warning', title: 'Tunggu', text: 'Pilih tiket tujuan dulu!'});
 
             const btn = document.getElementById('btnProsesUpgrade');
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
@@ -1642,33 +1220,24 @@ const headerClass = isStreaming ? 'streaming' : '';
 
             try {
                 const res = await fetch('/api/upgrade-ticket', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ticketId, newTierName, userId: user.id }) 
                 });
                 const data = await res.json();
-
                 if(!res.ok) throw new Error(data.message);
 
                 bootstrap.Modal.getInstance(document.getElementById('upgradeModal')).hide();
 
                 window.snap.pay(data.token, {
                     onSuccess: function() {
-                        Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Tiket di-upgrade ke ' + newTierName, background: '#1c1c2d', color: '#fff'})
-                        .then(() => location.reload());
+                        Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Tiket di-upgrade ke ' + newTierName}).then(() => location.reload());
                     },
-                    onPending: function() {
-                        Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di Midtrans.', background: '#1c1c2d', color: '#fff'});
-                    },
-                    onError: function() {
-                        Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.', background: '#1c1c2d', color: '#fff'});
-                    },
-                    onClose: function () {
-                        Swal.fire({icon: 'warning', title: 'Batal', text: 'Menutup jendela pembayaran.', background: '#1c1c2d', color: '#fff'});
-                    }
+                    onPending: function() { Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di Midtrans.'}); },
+                    onError: function() { Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.'}); },
+                    onClose: function () { Swal.fire({icon: 'warning', title: 'Batal', text: 'Menutup jendela pembayaran.'}); }
                 });
             } catch (error) {
-                Swal.fire({icon: 'error', title: 'Gagal', text: error.message, background: '#1c1c2d', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Gagal', text: error.message});
             } finally {
                 btn.innerHTML = 'Bayar'; btn.disabled = false;
             }
@@ -1679,10 +1248,9 @@ const headerClass = isStreaming ? 'streaming' : '';
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
-            Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading(), background: '#1c1c2d', color: '#fff' });
+            Swal.fire({ title: t.toast_pdf_gen, didOpen: () => Swal.showLoading()});
 
-            const currentScroll = window.scrollY;
-            window.scrollTo(0, 0);
+            const currentScroll = window.scrollY; window.scrollTo(0, 0);
 
             const element = document.createElement('div');
             document.body.appendChild(element);
@@ -1786,7 +1354,7 @@ const headerClass = isStreaming ? 'streaming' : '';
                 await html2pdf().set(opt).from(element.querySelector('#pdf-print-area')).save();
             } catch (error) {
                 console.error("Error Cetak PDF:", error);
-                Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF', background: '#1c1c2d', color: '#fff'});
+                Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF'});
             } finally {
                 document.body.removeChild(element);
                 window.scrollTo(0, currentScroll);
@@ -1798,7 +1366,7 @@ const headerClass = isStreaming ? 'streaming' : '';
             navigator.clipboard.writeText(text); 
             const lang = localStorage.getItem('lang') || 'id'; 
             const t = translations[lang]; 
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#1c1c2d', color: '#fff' }); 
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }); 
             Toast.fire({ icon: 'success', title: t.toast_copy }); 
         }
         
@@ -1816,21 +1384,9 @@ const headerClass = isStreaming ? 'streaming' : '';
             const newName = document.getElementById('inputNewName').value;
             try {
                 await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
-                user.fullName = newName; localStorage.setItem('userData',JSON.stringify(user)); renderProfile(); nameModal.hide(); Swal.fire({icon:'success', title:'Sukses', background:'#1c1c2d', color:'#fff'}); 
+                user.fullName = newName; localStorage.setItem('userData',JSON.stringify(user)); renderProfile(); nameModal.hide(); Swal.fire({icon:'success', title:'Sukses'}); 
             } catch(e) {}
         }
-    </script>
-
-    <script>
-        (async function() {
-            try {
-                const res = await fetch('/api/maintenance'); const data = await res.json();
-                const isAdmin = localStorage.getItem('adminToken');
-                if (data.isActive && !isAdmin) {
-                    document.body.innerHTML = `<style>body{margin:0;padding:0;font-family:'Inter',sans-serif;background:linear-gradient(-45deg,#0e1e3b,#2b1055,#0049CC,#4facfe);background-size:400% 400%;animation:gradientBG 15s ease infinite;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}@keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.glass-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(255,255,255,0.1);padding:50px 40px;text-align:center;color:white}h1{font-size:2rem;font-weight:800;margin-bottom:10px;background:linear-gradient(to right,#fff,#b0c0d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.btn-retry{background:white;color:#0e1e3b;border:none;padding:12px 35px;border-radius:50px;font-weight:700;cursor:pointer}</style><div class="glass-card"><h1>Maintenance 🛠️</h1><p>Dashboard sedang diperbaiki.</p><button onclick="location.reload()" class="btn-retry">Cek Lagi</button></div>`;
-                }
-            } catch (e) {}
-        })();
     </script>
 </body>
 </html>
