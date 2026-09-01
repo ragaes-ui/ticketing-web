@@ -95,6 +95,25 @@
         .custom-search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; padding: 12px 10px; outline: none; }
         .custom-search-box input::placeholder { color: var(--text-muted); }
         .custom-search-box i { color: var(--text-muted); font-size: 1.2rem; margin-right: 5px; }
+        /* ========================================= */
+        /* 🔥 TITIK DENYUT NOTIFIKASI DI AVATAR 🔥 */
+        /* ========================================= */
+        @keyframes pulse-avatar-dot {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.8); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        .avatar-pulse-dot {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 14px;
+            height: 14px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            border: 2px solid var(--bg-nav);
+            animation: pulse-avatar-dot 2s infinite;
+        }
     </style>
 </head>
 <body>
@@ -125,6 +144,8 @@
                 <div class="dropdown">
                     <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Profile" width="45" height="45" class="rounded-circle border border-2 shadow-sm" style="object-fit: cover; background: var(--bg-card); padding: 2px;">
+                        <!-- 👇 INI TITIK DENYUTNYA 👇 -->
+                        <span class="avatar-pulse-dot"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end custom-profile-menu shadow-lg mt-3">
                         <li class="px-3 pb-3 border-bottom border-light-subtle mb-2" style="border-color: var(--border-color) !important;">
