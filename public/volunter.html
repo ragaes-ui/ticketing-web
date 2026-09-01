@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Volunteer Hub | RCELLFEST</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --bg-body: #121212; --bg-card: #1e1e1e;
+            --text-main: #f8f9fa; --text-muted: #a1a1aa;
+            --primary: #3b82f6; --success: #10b981; --warning: #f59e0b;
+        }
+        body { 
+            background-color: var(--bg-body); color: var(--text-main); 
+            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 30px;
+        }
+        .header-nav {
+            background-color: var(--bg-card); padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px dashed var(--success); border-radius: 15px;
+            padding: 20px; text-align: center; margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 3rem; font-weight: 800; color: var(--success); line-height: 1; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+        .scanner-box {
+            background-color: var(--bg-card); border-radius: 15px; padding: 15px;
+            border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #reader {
+            width: 100%; border-radius: 10px; overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+        #reader video { object-fit: cover; }
+        .kiosk-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff; border: none; font-weight: 700; font-size: 1.1rem;
+            padding: 12px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); transition: 0.2s;
+        }
+        .kiosk-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.6); color: white;}
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="header-nav">
+        <div class="d-flex align-items-center gap-2">
+            <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo" width="35" height="35" class="rounded-circle">
+            <div>
+                <h6 class="mb-0 fw-bold" id="volName">Loading...</h6>
+                <span class="badge bg-primary rounded-pill" style="font-size: 0.65rem;">VOLUNTEER</span>
+            </div>
+        </div>
+        <button class="btn btn-sm btn-outline-danger rounded-pill fw-bold" onclick="logout()">Keluar</button>
+    </div>
+
+    <div class="container mt-4">
+        
+        <!-- INTEGRASI KIOSK -->
+        <a href="/kiosk" target="_blank" class="kiosk-btn text-decoration-none w-100 mb-4">
+            <i class="bi bi-display"></i> Buka Layar Kiosk / Antrean
+        </a>
+
+        <!-- STATISTIK SCAN VOLUNTEER -->
+        <div class="stats-card shadow-sm">
+            <p class="text-success fw-bold mb-2"><i class="bi bi-check-circle-fill me-1"></i> TIKET BERHASIL DI-SCAN</p>
+            <div class="stats-number" id="scanCounter">0</div>
+            <p class="text-muted small mt-2 mb-0">Total pencapaian Anda hari ini</p>
+        </div>
+
+        <!-- AREA KAMERA -->
+        <div class="scanner-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0"><i class="bi bi-qr-code-scan text-primary me-2"></i> Area Scan Tiket</h6>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status" id="scanIndicator" style="display: none;"></div>
+            </div>
+            
+            <div id="reader"></div>
+            
+            <button class="btn btn-primary w-100 fw-bold py-2 mt-3 rounded-pill shadow" id="btnRescan" onclick="startScanner()" style="display: none;">
+                Lanjut Scan Tiket Berikutnya <i class="bi bi-arrow-right-circle ms-1"></i>
+            </button>
+        </div>
+        
+    </div>
+
+    <script>
+        // ==========================================
+        // 🔒 AUTENTIKASI & SETUP AWAL
+        // ==========================================
+        let user = JSON.parse(localStorage.getItem('userData'));
+        if (!user) {
+            window.location.href = '/user-login';
+        } else if (user.role !== 'admin' && user.role !== 'volunteer') {
+            Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'Halaman ini khusus Volunteer RCELLFEST!'})
+            .then(() => { window.location.href = '/'; });
+        }
+
+        // Tampilkan Nama Volunteer
+        document.getElementById('volName').innerText = user.fullName || user.username;
+
+        // ==========================================
+        // 📊 LOGIKA COUNTER SCAN (Tersimpan di Memori HP)
+        // ==========================================
+        // Kita simpan berdasarkan ID Volunteer biar akurat
+        const counterKey = `rcell_vol_scan_count_${user.id}`;
+        let totalScanned = parseInt(localStorage.getItem(counterKey)) || 0;
+        
+        function updateCounterDisplay() {
+            document.getElementById('scanCounter').innerText = totalScanned;
+        }
+        updateCounterDisplay(); // Tampilkan saat load pertama
+
+        // ==========================================
+        // 📷 LOGIKA SCANNER QR CODE
+        // ==========================================
+        let html5QrcodeScanner;
+        const btnRescan = document.getElementById('btnRescan');
+        const scanIndicator = document.getElementById('scanIndicator');
+        const beepSound = new Audio('https://www.soundjay.com/buttons/beep-07.wav'); // Efek suara
+
+        function startScanner() {
+            btnRescan.style.display = 'none';
+            scanIndicator.style.display = 'block';
+
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+            
+            html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+            .catch(err => {
+                scanIndicator.style.display = 'none';
+                Swal.fire('Kamera Gagal', 'Pastikan izin kamera diaktifkan di browser HP Anda!', 'error');
+            });
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            html5QrcodeScanner.stop(); // Matikan kamera sementara
+            scanIndicator.style.display = 'none';
+            beepSound.play(); 
+
+            Swal.fire({ title: 'Memvalidasi Tiket...', text: `Kode: ${decodedText}`, allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
+
+            try {
+                // Tembak ke API backend Mas Raga
+                const res = await fetch('/api/validate', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticketCode: decodedText })
+                });
+                const data = await res.json();
+
+                if (data.valid) {
+                    // 🎉 TIKET SUKSES: Tambah Counter!
+                    totalScanned += 1;
+                    localStorage.setItem(counterKey, totalScanned);
+                    updateCounterDisplay();
+
+                    Swal.fire({
+                        icon: 'success', title: 'LOLOS!',
+                        html: `<h3 class="text-success fw-bold">${decodedText}</h3>
+                               <div class="text-start mt-3 p-3" style="background: rgba(16,185,129,0.1); border-radius:10px; border:1px solid #10b981;">
+                                   <p class="mb-1"><b>Nama:</b> ${data.data.name}</p>
+                                   <p class="mb-0"><b>Event:</b> ${data.data.event}</p>
+                               </div>`,
+                        confirmButtonText: 'OK', confirmButtonColor: '#10b981', background: '#1e1e1e', color: '#fff'
+                    }).then(() => { btnRescan.style.display = 'block'; });
+
+                } else {
+                    // ❌ TIKET GAGAL: Jangan tambah counter
+                    Swal.fire({
+                        icon: 'error', title: data.message || 'DITOLAK',
+                        html: `<h4 class="text-danger fw-bold">${decodedText}</h4><p class="mt-2">${data.detail || 'Tiket tidak valid atau hangus.'}</p>`,
+                        confirmButtonText: 'Tutup', confirmButtonColor: '#ef4444', background: '#1e1e1e', color: '#fff'
+                    }).then(() => { btnRescan.style.display = 'block'; });
+                }
+            } catch (err) {
+                Swal.fire({icon: 'error', title: 'Sinyal Putus', text: 'Gagal terhubung ke server.'})
+                .then(() => { btnRescan.style.display = 'block'; });
+            }
+        }
+
+        function onScanFailure(error) { /* Abaikan error pencarian garis QR */ }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/user-login';
+        }
+
+        // Auto start kamera saat halaman beres diload
+        document.addEventListener('DOMContentLoaded', () => {
+            startScanner();
+        });
+    </script>
+</body>
+</html>
