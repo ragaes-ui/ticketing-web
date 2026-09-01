@@ -218,13 +218,13 @@ async function loadEventsForGate() {
                     const category = (ev.category || '').toLowerCase();
                     if (category.includes('stream')) return false; 
 
-                    // 1. Cek status event (Jika di database statusnya 'completed', 'selesai', atau sejenisnya, buang!)
+                    // 1. Cek status event (Sembunyikan jika sudah selesai/completed/closed)
                     const status = (ev.status || '').toLowerCase();
                     if (status === 'completed' || status === 'selesai' || status === 'closed') {
                         return false; 
                     }
 
-                    // 2. Cek tanggal event (Buang jika tanggalnya sudah lewat dari hari ini)
+                    // 2. Cek tanggal event (Sembunyikan jika tanggalnya sudah lewat)
                     if (ev.date) {
                         const eventDateStr = new Date(ev.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                         if (eventDateStr < todayStr) return false;
@@ -249,6 +249,17 @@ async function loadEventsForGate() {
             } catch (err) {
                 listEl.innerHTML = '<li><span class="dropdown-item text-danger text-center py-2">Gagal memuat event</span></li>';
             }
+        }
+
+        // Fungsi pendukung untuk memilih event
+        function selectEvent(id, name) {
+            document.getElementById('selectEventGate').value = id;
+            document.getElementById('selectedEventText').innerText = name;
+        }
+
+        // Mencegah error karakter kutip pada nama event
+        function escapeHtml(text) {
+            return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
 
         // ==========================================
