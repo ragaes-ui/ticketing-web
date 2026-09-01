@@ -115,12 +115,20 @@
         // ==========================================
         // 🔒 AUTENTIKASI & SETUP AWAL
         // ==========================================
-        let user = JSON.parse(localStorage.getItem('userData'));
+let user = JSON.parse(localStorage.getItem('userData'));
         if (!user) {
             window.location.href = '/user-login';
-        } else if (user.role !== 'admin' && user.role !== 'volunteer') {
-            Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'Halaman ini khusus Volunteer RCELLFEST!'})
-            .then(() => { window.location.href = '/'; });
+        } else {
+            // Ubah huruf jadi huruf besar semua biar gampang dicocokkan
+            const userRole = (user.role || '').toUpperCase();
+            
+            // Izinkan jika rolenya adalah PENGURUS / ADMIN / PANITIA (Scan)
+            const isAllowed = userRole.includes('PANITIA') || userRole.includes('ADMIN') || userRole.includes('SUPER');
+            
+            if (!isAllowed) {
+                Swal.fire({icon: 'error', title: 'Akses Ditolak', text: 'Halaman ini khusus Panitia / Scanner!'})
+                .then(() => { window.location.href = '/'; });
+            }
         }
 
         // Tampilkan Nama Volunteer
