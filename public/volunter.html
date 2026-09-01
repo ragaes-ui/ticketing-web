@@ -140,20 +140,42 @@
         // ==========================================
         // 📥 AMBIL LIST EVENT UNTUK DROPDOWN
         // ==========================================
-        async function loadEventsForGate() {
+async function loadEventsForGate() {
             const selectEl = document.getElementById('selectEventGate');
             try {
                 const res = await fetch('/api/events');
                 const events = await res.json();
                 
-                if (events.length === 0) {
-                    selectEl.innerHTML = '<option value="">Tidak ada event aktif</option>';
+                // Ambil tanggal hari ini (Format YYYY-MM-DD waktu lokal)
+                const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+
+                // Filter ketat:
+                // 1. Buang event kategori "Streaming"
+                // 2. Buang event yang tanggalnya sudah lewat dari hari ini
+                const activeEvents = events.filter(ev => {
+                    const category = (ev.category || '').toLowerCase();
+                    const isStreaming = category.includes('stream');
+                    
+                    if (isStreaming) return false; // Sembunyikan streaming
+
+                    if (ev.date) {
+                        const eventDateStr = new Date(ev.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+                        // Jika tanggal event kurang dari hari ini (sudah lewat), sembunyikan!
+                        if (eventDateStr < todayStr) return false;
+                    }
+
+                    return true;
+                });
+
+                if (activeEvents.length === 0) {
+                    selectEl.innerHTML = '<option value="">Tidak ada event fisik aktif hari ini</option>';
                     return;
                 }
 
                 let html = '<option value="">-- Pilih Event yang Sedang Dijaga --</option>';
-                events.forEach(ev => {
-                    html += `<option value="${ev._id}">${ev.name} (${ev.location || 'TBA'})</option>`;
+                activeEvents.forEach(ev => {
+                    let tglFormat = ev.date ? new Date(ev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA';
+                    html += `<option value="${ev._id}">${ev.name} (${tglFormat} - ${ev.location || 'TBA'})</option>`;
                 });
                 selectEl.innerHTML = html;
             } catch (err) {
