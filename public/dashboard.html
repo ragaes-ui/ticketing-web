@@ -646,15 +646,6 @@
             }
         };
 
-        function renderProfile() {
-            if(user) {
-                document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
-                document.getElementById('userEmailDisplay').innerText = user.email;
-                if(user.saldo !== undefined) {
-                    document.getElementById('saldoDisplay').innerText = user.saldo.toLocaleString('id-ID');
-                }
-            }
-        }
 
         async function fetchLatestProfile() {
             if(!user || !user.id) return;
