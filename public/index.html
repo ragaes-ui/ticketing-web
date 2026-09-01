@@ -466,7 +466,81 @@
                 filter: none !important; /* Hapus efek abu-abu agar CPU tidak kerja keras */
             }
         }
+    /* ========================================= */
+        /* 🔥 FIX NAVBAR INDEX NUMPUK DI HP 🔥 */
+        /* ========================================= */
+        
+        /* Paksa area Navbar tetap 1 baris (jangan sampai jatuh ke bawah) */
+        .navbar .container {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center;
+        }
+        
+        /* Paksa kelompok tombol kanan tetap sejajar */
+        .navbar .d-flex {
+            flex-wrap: nowrap !important;
+            align-items: center;
+        }
 
+        /* Penyesuaian ukuran khusus untuk layar HP */
+        @media (max-width: 576px) {
+            /* 1. Kecilkan teks dan logo RCELLFEST biar ngasih ruang */
+            .navbar-brand {
+                font-size: 1.05rem !important;
+                margin-right: auto !important; /* Dorong menu kanan mentok ke kanan */
+                white-space: nowrap;
+            }
+            .navbar-brand img {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            /* 2. Kecilkan tombol Bahasa (EN/ID) */
+            .navbar #lang-btn {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                font-size: 0.8rem !important;
+                height: 32px !important;
+                min-width: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* 3. Kecilkan tombol Tema (Bulan/Bintang) */
+            .navbar #theme-btn {
+                width: 32px !important;
+                height: 32px !important;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .navbar #theme-btn i {
+                font-size: 0.8rem !important;
+            }
+
+            /* 4. Kecilkan tombol Profil (adm_rcellnet) dan batasi teksnya */
+            .navbar .dropdown-toggle {
+                padding: 4px 10px !important;
+                font-size: 0.8rem !important;
+                height: 32px !important;
+                max-width: 120px; /* Batasi panjang maksimal */
+                display: flex;
+                align-items: center;
+            }
+            
+            /* Potong nama user dengan titik-titik (...) kalau kepanjangan */
+            .navbar .dropdown-toggle span {
+                max-width: 60px;
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                vertical-align: middle;
+            }
+        }
     </style>
 </head>
 <body>
