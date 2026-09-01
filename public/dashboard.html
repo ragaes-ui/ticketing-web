@@ -114,6 +114,24 @@
             border: 2px solid var(--bg-nav);
             animation: pulse-avatar-dot 2s infinite;
         }
+        /* ========================================= */
+        /* 🔥 FIX MENU PROFIL KEPOTONG DI HP 🔥 */
+        /* ========================================= */
+        @media (max-width: 576px) {
+            .dropdown-menu.custom-profile-menu {
+                transform: none !important; /* Matikan sistem geser otomatis bawaan Bootstrap */
+                top: 110% !important; /* Posisikan pas di bawah avatar */
+                right: -5px !important; /* Rapatkan ke pinggir kanan layar */
+                left: auto !important; /* Kunci agar tidak tumpah ke kiri */
+                min-width: 240px !important; /* Rampingkan sedikit khusus di HP */
+            }
+            
+            /* Kecilin dikit tulisan menunya biar gak sesak */
+            .custom-profile-menu .dropdown-item {
+                font-size: 0.85rem !important;
+                padding: 10px 15px !important;
+            }
+        }
     </style>
 </head>
 <body>
