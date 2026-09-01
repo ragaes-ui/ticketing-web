@@ -369,9 +369,11 @@
 
     <div class="container pb-5 mt-4">
         
-        <div class="glass-card mb-4">
+<div class="glass-card mb-4">
             <div class="row align-items-center">
-                <div class="col-md-5 mb-3 mb-md-0">
+                
+                <!-- Kiri: Foto Profil & Nama -->
+                <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
                         <div class="profile-img">
                             <i class="bi bi-person-fill"></i>
@@ -383,11 +385,15 @@
                     </div>
                 </div>
                 
-<div class="col-md-7 text-md-end d-flex flex-wrap justify-content-md-end align-items-center gap-2">
-                    <div class="saldo-box me-2" title="Saldo Saya">
+                <!-- Kanan: Sisa Saldo Saja -->
+                <div class="col-md-6 d-flex justify-content-md-end justify-content-start">
+                    <div class="saldo-box shadow-sm" title="Saldo Saya">
                         <i class="bi bi-wallet2 me-2"></i> Rp <span id="saldoDisplay" class="ms-1">0</span>
                     </div>
                 </div>
+
+            </div>
+        </div>
                     
                     <button onclick="openPinModal()" class="btn btn-glass btn-sm text-warning border-warning" title="Atur/Ubah PIN Saldo">
                         <i class="bi bi-shield-lock-fill"></i>
