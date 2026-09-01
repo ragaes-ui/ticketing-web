@@ -147,30 +147,28 @@
                         <!-- 👇 INI TITIK DENYUTNYA 👇 -->
                         <span class="avatar-pulse-dot"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end custom-profile-menu shadow-lg mt-3">
+<ul class="dropdown-menu dropdown-menu-end custom-profile-menu shadow-lg mt-3">
                         <li class="px-3 pb-3 border-bottom border-light-subtle mb-2" style="border-color: var(--border-color) !important;">
-                            <button class="btn w-100 fw-bold btn-lihat-profil shadow-sm" onclick="openNameModal()">Ubah Nama</button>
+                            <button class="btn w-100 fw-bold btn-lihat-profil shadow-sm" onclick="openNameModal()" data-i18n="menu_profile">Lihat Profil</button>
                         </li>
                         <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openTopupModal()">
-                            <i class="bi bi-wallet2 text-primary fs-5"></i> <span class="fw-medium">Isi Saldo / Top Up</span>
+                            <i class="bi bi-wallet2 text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_topup">Isi Saldo / Top Up</span>
                         </a></li>
                         <li><a class="dropdown-item d-flex align-items-center" href="#topups-pane" onclick="document.getElementById('topups-tab').click()">
-                            <i class="bi bi-receipt text-primary fs-5"></i> <span class="fw-medium">Riwayat Pesanan</span>
+                            <i class="bi bi-receipt text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_orders">Pesanan Saya</span>
                         </a></li>
                         <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openPinModal()">
-                            <i class="bi bi-shield-check text-primary fs-5"></i> <span class="fw-medium">Privasi & Keamanan (PIN)</span>
+                            <i class="bi bi-shield-check text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_privacy">Privasi & Keamanan (PIN)</span>
                         </a></li>
                         <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openPassModal()">
-                            <i class="bi bi-key-fill text-primary fs-5"></i> <span class="fw-medium">Ubah Kata Sandi</span>
+                            <i class="bi bi-key-fill text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_password">Ubah Kata Sandi</span>
                         </a></li>
-                        <!-- 👇 INI DIA MENU RIWAYAT LOGIN YANG HILANG 👇 -->
                         <li><a class="dropdown-item d-flex align-items-center" href="/history">
-                            <i class="bi bi-pc-display-horizontal text-primary fs-5"></i> <span class="fw-medium">Perangkat Masuk</span>
+                            <i class="bi bi-pc-display-horizontal text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_devices">Perangkat Masuk</span>
                         </a></li>
-                        <!-- 👆 -------------------------------------- 👆 -->
                         <li><hr class="dropdown-divider mx-3 my-2" style="border-color: var(--border-color);"></li>
                         <li><a class="dropdown-item d-flex align-items-center text-danger" href="#" onclick="logout()">
-                            <i class="bi bi-box-arrow-right fs-5"></i> <span class="fw-medium">Keluar</span>
+                            <i class="bi bi-box-arrow-right fs-5"></i> <span class="fw-medium" data-i18n="nav_logout">Keluar</span>
                         </a></li>
                     </ul>
                 </div>
@@ -481,9 +479,11 @@
         }
 
         // --- KAMUS BAHASA ---
+// --- KAMUS BAHASA ---
         const translations = {
             id: {
-                nav_home: "Home", nav_logout: "Keluar", section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
+                nav_home: "Home", nav_logout: "Keluar",
+                section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
                 btn_topup: "Top Up", modal_topup_title: "Isi Saldo", lbl_amount: "Nominal Top Up", btn_pay_topup: "Lanjutkan Pembayaran",
                 modal_pin_title: "Atur PIN Keamanan", modal_pin_old: "Masukkan PIN Lama", modal_pin_desc: "PIN Baru (6 Digit)", modal_pin_confirm: "Konfirmasi PIN Baru", 
                 modal_pin_note: "Ingat PIN ini! Digunakan saat membeli tiket dengan saldo.", btn_save_pin: "Simpan PIN", btn_change_pin: "Update PIN",
@@ -497,10 +497,19 @@
                 error_fetch: "Gagal mengambil data. Cek koneksi backend.", err_pin_match: "PIN Baru tidak cocok!", err_pin_len: "PIN wajib 6 angka bulat!", err_old_pin: "PIN Lama wajib diisi!",
                 tab_tickets: "Aset Digital", tab_history: "Riwayat Saldo", section_history_title: "Riwayat Mutasi Saldo", empty_history: "Belum ada riwayat mutasi.",
                 status_success: "BERHASIL", status_pending: "MENUNGGU", status_failed: "GAGAL",
-                btn_transfer: "Transfer", modal_transfer_title: "Transfer Tiket", modal_transfer_desc: "Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!", lbl_receiver_email: "Email Penerima", btn_send_ticket: "Kirim Tiket Sekarang"
+                btn_transfer: "Transfer", modal_transfer_title: "Transfer Tiket", modal_transfer_desc: "Kirim tiket ini ke teman. Tiket yang sudah dikirim tidak bisa ditarik kembali!", lbl_receiver_email: "Email Penerima", btn_send_ticket: "Kirim Tiket Sekarang",
+                
+                // 👇 TAMBAHAN KOSAKATA MENU PROFIL 👇
+                menu_profile: "Lihat Profil",
+                menu_topup: "Isi Saldo / Top Up",
+                menu_orders: "Pesanan Saya",
+                menu_privacy: "Privasi & Keamanan (PIN)",
+                menu_password: "Ubah Kata Sandi",
+                menu_devices: "Perangkat Masuk"
             },
             en: {
-                nav_home: "Home", nav_logout: "Logout", section_assets: "My Digital Assets", btn_buy_new: "Buy New",
+                nav_home: "Home", nav_logout: "Logout",
+                section_assets: "My Digital Assets", btn_buy_new: "Buy New",
                 btn_topup: "Top Up", modal_topup_title: "Add Balance", lbl_amount: "Top Up Amount", btn_pay_topup: "Proceed to Payment",
                 modal_pin_title: "Set Security PIN", modal_pin_old: "Enter Old PIN", modal_pin_desc: "New PIN (6 Digits)", modal_pin_confirm: "Confirm New PIN",
                 modal_pin_note: "Remember this PIN! Used when buying tickets with balance.", btn_save_pin: "Save PIN", btn_change_pin: "Update PIN",
@@ -514,7 +523,15 @@
                 error_fetch: "Failed to fetch data.", err_pin_match: "New PINs do not match!", err_pin_len: "PIN must be exactly 6 digits!", err_old_pin: "Old PIN is required!",
                 tab_tickets: "My Assets", tab_history: "Balance History", section_history_title: "Balance Transaction History", empty_history: "No balance history found.",
                 status_success: "SUCCESS", status_pending: "PENDING", status_failed: "FAILED",
-                btn_transfer: "Transfer", modal_transfer_title: "Transfer Ticket", modal_transfer_desc: "Send this ticket to a friend. Tickets cannot be pulled back once sent!", lbl_receiver_email: "Receiver Email", btn_send_ticket: "Send Ticket Now"
+                btn_transfer: "Transfer", modal_transfer_title: "Transfer Ticket", modal_transfer_desc: "Send this ticket to a friend. Tickets cannot be pulled back once sent!", lbl_receiver_email: "Receiver Email", btn_send_ticket: "Send Ticket Now",
+                
+                // 👇 TAMBAHAN KOSAKATA MENU PROFIL 👇
+                menu_profile: "View Profile",
+                menu_topup: "Top Up Balance",
+                menu_orders: "My Orders",
+                menu_privacy: "Privacy & Security (PIN)",
+                menu_password: "Change Password",
+                menu_devices: "Logged-in Devices"
             }
         };
 
