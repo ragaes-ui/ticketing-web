@@ -1306,6 +1306,38 @@ app.put('/api/user/change-password', async (req, res) => {
         res.json({ success: true });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
+// ==========================================
+// 🔥 ENDPOINT UPDATE AVATAR USER 🔥
+// ==========================================
+app.put('/api/user/update-avatar', async (req, res) => {
+    try {
+        const { userId, avatar } = req.body;
+
+        // Validasi input
+        if (!userId || !avatar) {
+            return res.status(400).json({ success: false, message: "User ID dan Avatar URL wajib dikirim!" });
+        }
+
+        // Cari user di database dan update kolom avatar-nya
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { avatar: avatar }, 
+            { new: true } 
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User tidak ditemukan." });
+        }
+
+        res.json({ success: true, message: "Avatar berhasil diupdate!", data: updatedUser });
+
+    } catch (error) {
+        console.error("Error update avatar:", error);
+        res.status(500).json({ success: false, message: "Terjadi kesalahan di server." });
+    }
+});
+
+// 👆 -------------------------------------- 👆
 
 app.get('/api/maintenance', async (req, res) => {
     try {
