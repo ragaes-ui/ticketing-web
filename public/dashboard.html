@@ -160,8 +160,8 @@
 
                 <!-- Avatar Dropdown Menu -->
                 <div class="dropdown">
-                    <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Profile" width="45" height="45" class="rounded-circle border border-2 shadow-sm" style="object-fit: cover; background: var(--bg-card); padding: 2px;">
+<a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" id="navAvatarDisplay" alt="Profile" width="45" height="45" class="rounded-circle border border-2 shadow-sm" style="object-fit: cover; background: var(--bg-card); padding: 2px;">
                         <!-- 👇 INI TITIK DENYUTNYA 👇 -->
                         <span class="avatar-pulse-dot"></span>
                     </a>
@@ -200,7 +200,15 @@
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="profile-img shadow-sm"><i class="bi bi-person-fill"></i></div>
+                        <!-- 👇 FOTO PROFIL BISA DIKLIK 👇 -->
+                        <div class="profile-img shadow-sm position-relative" style="cursor: pointer; padding: 0; overflow: hidden;" onclick="document.getElementById('avatarUpload').click()" title="Ganti Foto Profil">
+                            <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" id="mainAvatarDisplay" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            
+                            <!-- Ikon Kamera Transparan di Bawah Foto -->
+                            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-50 text-center" style="height: 20px; padding-bottom: 2px;">
+                                <i class="bi bi-camera-fill text-white" style="font-size: 0.7rem;"></i>
+                            </div>
+                        </div>
                         <div>
                             <h4 class="fw-bold mb-0" id="userNameDisplay">Loading...</h4>
                             <small class="text-muted" id="userEmailDisplay">...</small>
@@ -282,6 +290,8 @@
     </div>
 
     <!-- Modals -->
+    <!-- 👇 INPUT FILE HIDDEN UNTUK UPLOAD FOTO 👇 -->
+    <input type="file" id="avatarUpload" accept="image/png, image/jpeg, image/jpg" style="display: none;" onchange="uploadAvatar(this)">
     <div class="modal fade" id="nameModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -440,6 +450,89 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // ==========================================
+        // 🔥 LOGIKA UPLOAD AVATAR KE IMGBB 🔥
+        // ==========================================
+        async function uploadAvatar(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const lang = localStorage.getItem('lang') || 'id';
+            
+            // Validasi ukuran maksimal 2MB
+            if (file.size > 2 * 1024 * 1024) {
+                return Swal.fire({icon: 'error', title: 'Oops', text: lang === 'id' ? 'Ukuran foto maksimal 2MB!' : 'Max file size is 2MB!'});
+            }
+
+            Swal.fire({ title: lang === 'id' ? 'Mengunggah Foto...' : 'Uploading Photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
+
+            const formData = new FormData();
+            formData.append("image", file);
+            
+            // ⚠️ MASUKKAN API KEY IMGBB MAS RAGA DI SINI ⚠️
+            const imgbbKey = "ba9a1e3254683e971dd75e82b9eb0a9f"; 
+
+            try {
+                // 1. Tembak gambar ke server ImgBB
+                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const dataImg = await resImg.json();
+
+                if (dataImg.success) {
+                    const newAvatarUrl = dataImg.data.display_url;
+
+                    // 2. Simpan URL gambar yang baru ke database Backend Mas Raga
+                    // (Pastikan endpoint '/api/user/update-avatar' ini dibuat di backend Node.js nya ya)
+                    try {
+                        await fetch('/api/user/update-avatar', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: user.id, avatar: newAvatarUrl })
+                        });
+                    } catch (err) {
+                        console.log("Backend belum ada endpoint update-avatar, tapi lanjut di frontend.");
+                    }
+
+                    // 3. Update tampilan Frontend langsung
+                    user.avatar = newAvatarUrl;
+                    localStorage.setItem('userData', JSON.stringify(user));
+                    renderProfile(); // Panggil fungsi render ulang
+
+                    Swal.fire({icon: 'success', title: 'Sukses', text: lang === 'id' ? 'Foto profil berhasil diperbarui!' : 'Profile picture updated!', background: '#1e1e1e', color: '#fff'});
+                } else {
+                    throw new Error("Gagal dari ImgBB");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'Gagal', text: lang === 'id' ? 'Terjadi kesalahan saat mengunggah foto.' : 'Upload failed.', background: '#1e1e1e', color: '#fff'});
+            } finally {
+                input.value = ''; // Reset input agar bisa upload file yang sama lagi kalau batal
+            }
+        }
+
+        // ==========================================
+        // 🔥 UPDATE FUNGSI RENDER PROFILE LAMA 🔥
+        // ==========================================
+        // Cari fungsi renderProfile() yang lama dan TIMPA dengan yang ini:
+        function renderProfile() {
+            if(user) {
+                document.getElementById('userNameDisplay').innerText = user.fullName || user.username || 'User';
+                document.getElementById('userEmailDisplay').innerText = user.email;
+                if(user.saldo !== undefined) {
+                    document.getElementById('saldoDisplay').innerText = user.saldo.toLocaleString('id-ID');
+                }
+                
+                // Set gambar dari database jika ada, jika tidak pakai gambar default RCELL
+                const currentAvatar = user.avatar || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
+                
+                const mainAvatar = document.getElementById('mainAvatarDisplay');
+                if(mainAvatar) mainAvatar.src = currentAvatar;
+                
+                const navAvatar = document.getElementById('navAvatarDisplay');
+                if(navAvatar) navAvatar.src = currentAvatar;
+            }
+        }
         // --- CEK LOGIN ---
         let user = JSON.parse(localStorage.getItem('userData'));
         let myAllTickets = [];
