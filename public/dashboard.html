@@ -249,6 +249,61 @@
         
         /* Opsi pilihan dropdown (misal pas mau Upgrade Tiket) */
         [data-theme="dark"] select option { background-color: var(--bg-input) !important; color: var(--text-main) !important; }
+    /* ========================================= */
+        /* 🔥 DROPDOWN MENU PROFIL MODERN 🔥 */
+        /* ========================================= */
+        .custom-profile-menu {
+            border-radius: 20px !important;
+            min-width: 270px;
+            padding: 15px 0 10px 0;
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        
+        .btn-lihat-profil {
+            background-color: #0d9488 !important; /* Warna Hijau/Teal persis di gambar */
+            color: #ffffff !important;
+            border: none;
+            border-radius: 50px !important;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        
+        .custom-profile-menu .dropdown-item {
+            padding: 12px 20px;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+        
+        .custom-profile-menu .dropdown-item:hover {
+            background-color: var(--bg-section);
+            color: var(--primary);
+            padding-left: 25px; /* Efek geser halus saat disentuh */
+        }
+        
+        .custom-profile-menu i { width: 30px; text-align: left; display: inline-block; }
+
+        /* Tombol Jelajahi dengan Badge NEW */
+        .btn-jelajahi {
+            background-color: var(--bg-section) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: 0.2s;
+        }
+        .btn-jelajahi:hover { background-color: var(--border-color) !important; }
+        .badge-new {
+            position: absolute; top: -5px; right: -10px;
+            background-color: #d90429; color: white;
+            font-size: 0.6rem; padding: 3px 6px; border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -261,20 +316,53 @@
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
             </a>
-            <div class="d-flex align-items-center gap-2">
-            
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" id="lang-btn" style="min-width: 40px;">ID</button>
+<div class="d-flex align-items-center gap-2 gap-md-3">
+                
+                <!-- Ganti Bahasa / Tema (Mewakili Icon Bendera) -->
+                <div class="dropdown">
+                    <button class="btn btn-light rounded-pill fw-bold border d-flex align-items-center px-2 px-md-3" data-bs-toggle="dropdown" style="background: var(--bg-card); color: var(--text-main); border-color: var(--border-color) !important; height: 42px;">
+                        <span id="lang-btn-text">ID</span> <i class="bi bi-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu shadow border-0" style="background: var(--bg-card); border-radius: 12px; min-width: 200px;">
+                        <li><button class="dropdown-item fw-medium py-2" onclick="toggleLanguage()"><i class="bi bi-translate me-2 text-primary"></i> Ganti Bahasa</button></li>
+                        <li><button class="dropdown-item fw-medium py-2" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill me-2 text-warning"></i> Ganti Tema Tampilan</button></li>
+                    </ul>
+                </div>
 
-                <button onclick="toggleTheme()" class="btn rounded-circle" id="theme-btn" style="width: 40px; height: 40px; border: 1px solid var(--text-muted);">
-                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-                </button>
-
-                <a href="/" class="btn btn-outline-primary btn-sm rounded-pill px-2 px-md-3 fw-bold">
-                    <i class="bi bi-house-door-fill"></i> <span class="d-none d-md-inline">Home</span>
+                <!-- Tombol Jelajahi -->
+                <a href="/" class="btn-jelajahi text-decoration-none" style="height: 42px;">
+                    <i class="bi bi-compass-fill fs-5"></i> <span class="d-none d-md-inline">Jelajahi</span>
+                    <span class="badge-new">NEW</span>
                 </a>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-4" data-i18n="nav_logout">
-                    <i class="bi bi-box-arrow-right me-1"></i> Keluar
-                </button>
+
+                <!-- Avatar Dropdown Menu -->
+                <div class="dropdown">
+                    <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Profile" width="45" height="45" class="rounded-circle border border-2 shadow-sm" style="object-fit: cover; background: var(--bg-card); padding: 2px;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end custom-profile-menu shadow-lg mt-3">
+                        <li class="px-3 pb-3 border-bottom border-light-subtle mb-2" style="border-color: var(--border-color) !important;">
+                            <button class="btn w-100 fw-bold btn-lihat-profil shadow-sm" onclick="openNameModal()">Lihat Profil</button>
+                        </li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openTopupModal()">
+                            <i class="bi bi-wallet2 text-primary fs-5"></i> <span class="fw-medium">Isi Saldo / Top Up</span>
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="#topups-pane" onclick="document.getElementById('topups-tab').click()">
+                            <i class="bi bi-receipt text-primary fs-5"></i> <span class="fw-medium">Pesanan Saya</span>
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openPinModal()">
+                            <i class="bi bi-shield-check text-primary fs-5"></i> <span class="fw-medium">Privasi & Keamanan (PIN)</span>
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openPassModal()">
+                            <i class="bi bi-key-fill text-primary fs-5"></i> <span class="fw-medium">Ubah Kata Sandi</span>
+                        </a></li>
+                        <li><hr class="dropdown-divider mx-3 my-2" style="border-color: var(--border-color);"></li>
+                        <li><a class="dropdown-item d-flex align-items-center text-danger" href="#" onclick="logout()">
+                            <i class="bi bi-box-arrow-right fs-5"></i> <span class="fw-medium">Keluar</span>
+                        </a></li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </nav>
@@ -295,15 +383,11 @@
                     </div>
                 </div>
                 
-                <div class="col-md-7 text-md-end d-flex flex-wrap justify-content-md-end align-items-center gap-2">
-                    
+<div class="col-md-7 text-md-end d-flex flex-wrap justify-content-md-end align-items-center gap-2">
                     <div class="saldo-box me-2" title="Saldo Saya">
                         <i class="bi bi-wallet2 me-2"></i> Rp <span id="saldoDisplay" class="ms-1">0</span>
                     </div>
-
-                    <button onclick="openTopupModal()" class="btn btn-primary-neon btn-sm">
-                        <i class="bi bi-plus-circle me-1"></i> <span data-i18n="btn_topup">Top Up</span>
-                    </button>
+                </div>
                     
                     <button onclick="openPinModal()" class="btn btn-glass btn-sm text-warning border-warning" title="Atur/Ubah PIN Saldo">
                         <i class="bi bi-shield-lock-fill"></i>
