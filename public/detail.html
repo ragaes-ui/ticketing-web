@@ -160,6 +160,25 @@
         
         /* Pastikan tulisan di bagian atas banner kebaca saat gelap */
         [data-theme="dark"] .event-hero-content { color: #ffffff !important; }
+    /* ========================================= */
+        /* 🔥 FIX BANNER EVENT KETUMPUK DI HP 🔥 */
+        /* ========================================= */
+        .event-hero {
+            min-height: 350px;
+            height: auto !important; /* Biar kotaknya bisa melar ke bawah kalau teks panjang */
+            padding: 50px 20px 25px 20px !important; /* Kasih ruang bernapas di atasnya */
+        }
+
+        /* Khusus layar HP, ukuran judulnya dikecilin dikit biar muat */
+        @media (max-width: 576px) {
+            #elTitle {
+                font-size: 1.8rem !important;
+                line-height: 1.3 !important;
+            }
+            .event-hero {
+                min-height: 300px;
+            }
+        }
     </style>
 </head>
 <body>
