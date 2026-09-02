@@ -1164,7 +1164,71 @@ async function loadEvents() {
             loadMoreEvents(true); 
         }
 
+// ==============================================
+        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
+        // ==============================================
+        let currentRenderData = [];
+        let currentVisibleCount = 0;
+        const limitPerLoad = 12; // Menampilkan 12 event tiap kali mentok bawah
+        let isFetchingMore = false; // 👈 GEMBOK ANTI-SPAM LOADING
+
+        // Sensor Pengawas Layar
+        let scrollObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreEvents(false);
+            }
+        }, { rootMargin: "150px" });
+
+        function renderEvents(data) {
+            currentRenderData = data; 
+            currentVisibleCount = 0; 
+            isFetchingMore = false; // Reset gembok
+            
+            const container = document.getElementById('event-list');
+            const containerSoon = document.getElementById('event-coming-soon-list');
+            const sectionSoon = document.getElementById('section-coming-soon');
+            const scrollContainer = document.getElementById('scrollLoadContainer');
+            
+            container.innerHTML = ''; 
+            if (containerSoon) containerSoon.innerHTML = '';
+            
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
+            const soonEvents = currentRenderData.filter(e => e.availableSeats === -2);
+
+            // Tampilkan Event Akan Datang (Soon)
+            if (soonEvents.length > 0 && sectionSoon) {
+                sectionSoon.style.display = 'block';
+                let htmlSoon = '';
+                soonEvents.forEach(event => { htmlSoon += buildCard(event, lang, t); });
+                containerSoon.innerHTML = htmlSoon;
+            } else if (sectionSoon) {
+                sectionSoon.style.display = 'none';
+            }
+
+            // Jika kosong
+            if (activeEvents.length === 0) {
+                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
+                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
+                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
+                
+                if(scrollContainer) {
+                    scrollContainer.style.display = 'none';
+                    scrollObserver.unobserve(scrollContainer);
+                }
+                return;
+            }
+
+            if(scrollContainer) scrollObserver.observe(scrollContainer);
+            loadMoreEvents(true); 
+        }
+
         function loadMoreEvents(isInitial = false) {
+            // 👈 CEGAH DOUBLE LOADING (KALAU MASIH LOADING, TOLAK PERINTAH BARU)
+            if (isFetchingMore) return; 
+            
             const container = document.getElementById('event-list');
             const scrollContainer = document.getElementById('scrollLoadContainer');
             const lang = localStorage.getItem('lang') || 'id';
@@ -1173,14 +1237,21 @@ async function loadEvents() {
             const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
             const startIndex = currentVisibleCount;
             const endIndex = startIndex + limitPerLoad;
+            
+            if (startIndex >= activeEvents.length) return;
+            
+            isFetchingMore = true; // Kunci gembok loading!
+
             const eventsToAppend = activeEvents.slice(startIndex, endIndex);
 
-            if (startIndex >= activeEvents.length) return;
-
             const appendData = () => {
+                let htmlChunk = '';
                 eventsToAppend.forEach(event => { 
-                    container.innerHTML += buildCard(event, lang, t); 
+                    htmlChunk += buildCard(event, lang, t); 
                 });
+                
+                // 👈 PAKE insertAdjacentHTML BIAR HP GAK NGE-LAG RENDER ULANG!
+                container.insertAdjacentHTML('beforeend', htmlChunk); 
                 
                 currentVisibleCount += eventsToAppend.length;
 
@@ -1192,6 +1263,8 @@ async function loadEvents() {
                 } else {
                     if(scrollContainer) scrollContainer.style.display = 'block';
                 }
+                
+                isFetchingMore = false; // Buka gembok loading kembali
             };
 
             if (isInitial) {
