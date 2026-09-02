@@ -834,13 +834,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+<script>
         let allEvents = [];
         let detailModal; 
         
         const translations = {
             id: {
-                page_title_index: "Beranda | RCELLFEST", // 👈 Tambahkan ini
+                page_title_index: "Beranda | RCELLFEST", 
                 nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan & Bantuan", nav_login: "Masuk / Daftar", nav_my_ticket: "Profil Saya", nav_logout: "Keluar",
                 hero_title: "Satu sentuhan,<br>Untuk semua solusi event anda.", hero_subtitle: "Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.",
                 search_placeholder: "Cari konser, artis, atau lokasi...", btn_search: "Cari",
@@ -851,7 +851,7 @@
                 txt_tba: "Lokasi TBA", txt_date_tba: "Tanggal TBA", alert_login_title: "Login Dulu", alert_login_text: "Silakan login member untuk membeli.", alert_confirm_title: "Konfirmasi"
             },
             en: {
-                page_title_index: "Home | RCELLFEST", // 👈 Tambahkan ini juga
+                page_title_index: "Home | RCELLFEST", 
                 nav_explore: "Explore", nav_about: "About Us", nav_guide: "Help & Guide", nav_login: "Login / Register", nav_my_ticket: "My Profiles", nav_logout: "Logout",
                 hero_title: "One touch,<br>For all your event solutions.", hero_subtitle: "Explore thousands of exciting events, streaming accounts & music concerts. Book your ticket Now.",
                 search_placeholder: "Search concerts, artists, or venue...", btn_search: "Search",
@@ -880,12 +880,12 @@
             checkServerPing();
             setInterval(checkServerPing, 10000);
 
-// Menutup Preloader Aesthetic yang baru
+            // Menutup Preloader Aesthetic yang baru
             const loader = document.getElementById('aesthetic-preloader');
             if(loader) {
                 setTimeout(() => {
                     loader.classList.add('hide-preloader');
-                }, 500); // Jeda setengah detik biar animasinya kelihatan mulus
+                }, 500); 
             }
         });
 
@@ -1062,17 +1062,16 @@
             window.location.reload();
         }
 
-async function loadEvents() {
+        async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
                 let dataEventCetak = await res.json();
                 
-                // 👇 TAMBAHKAN 1 BARIS INI BIAR YANG DI-PIN NAIK KE ATAS 👇
                 dataEventCetak.sort((a, b) => (b.isPinned === true ? 1 : 0) - (a.isPinned === true ? 1 : 0));
                 
                 allEvents = dataEventCetak;
                 renderEvents(allEvents);
-                updateHeroSlider(allEvents); // <-- INI TAMBAHANNYA
+                updateHeroSlider(allEvents); 
             } catch (err) { 
                 console.error("Gagal memuat event:", err);
                 const lang = localStorage.getItem('lang') || 'id';
@@ -1107,14 +1106,14 @@ async function loadEvents() {
             }
         }
 
-// ==============================================
+        // ==============================================
         // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
         // ==============================================
         let currentRenderData = [];
         let currentVisibleCount = 0;
-        const limitPerLoad = 12; // Menampilkan 12 event tiap kali mentok bawah
+        const limitPerLoad = 12; 
+        let isFetchingMore = false; 
 
-        // Sensor Pengawas Layar
         let scrollObserver = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 loadMoreEvents(false);
@@ -1124,6 +1123,7 @@ async function loadEvents() {
         function renderEvents(data) {
             currentRenderData = data; 
             currentVisibleCount = 0; 
+            isFetchingMore = false; 
             
             const container = document.getElementById('event-list');
             const containerSoon = document.getElementById('event-coming-soon-list');
@@ -1139,69 +1139,6 @@ async function loadEvents() {
             const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
             const soonEvents = currentRenderData.filter(e => e.availableSeats === -2);
 
-            // Tampilkan Event Akan Datang (Soon)
-            if (soonEvents.length > 0 && sectionSoon) {
-                sectionSoon.style.display = 'block';
-                soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event, lang, t); });
-            } else if (sectionSoon) {
-                sectionSoon.style.display = 'none';
-            }
-
-            // Jika kosong
-            if (activeEvents.length === 0) {
-                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
-                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
-                
-                if(scrollContainer) {
-                    scrollContainer.style.display = 'none';
-                    scrollObserver.unobserve(scrollContainer);
-                }
-                return;
-            }
-
-            if(scrollContainer) scrollObserver.observe(scrollContainer);
-            loadMoreEvents(true); 
-        }
-
-// ==============================================
-        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
-        // ==============================================
-// ==============================================
-        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
-        // ==============================================
-        let currentRenderData = [];
-        let currentVisibleCount = 0;
-        const limitPerLoad = 12; // Menampilkan 12 event tiap kali mentok bawah
-        let isFetchingMore = false; // 👈 GEMBOK ANTI-SPAM LOADING
-
-        // Sensor Pengawas Layar
-        let scrollObserver = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                loadMoreEvents(false);
-            }
-        }, { rootMargin: "150px" });
-
-        function renderEvents(data) {
-            currentRenderData = data; 
-            currentVisibleCount = 0; 
-            isFetchingMore = false; // Reset gembok
-            
-            const container = document.getElementById('event-list');
-            const containerSoon = document.getElementById('event-coming-soon-list');
-            const sectionSoon = document.getElementById('section-coming-soon');
-            const scrollContainer = document.getElementById('scrollLoadContainer');
-            
-            container.innerHTML = ''; 
-            if (containerSoon) containerSoon.innerHTML = '';
-            
-            const lang = localStorage.getItem('lang') || 'id';
-            const t = translations[lang];
-
-            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
-            const soonEvents = currentRenderData.filter(e => e.availableSeats === -2);
-
-            // Tampilkan Event Akan Datang (Soon)
             if (soonEvents.length > 0 && sectionSoon) {
                 sectionSoon.style.display = 'block';
                 let htmlSoon = '';
@@ -1211,7 +1148,6 @@ async function loadEvents() {
                 sectionSoon.style.display = 'none';
             }
 
-            // Jika kosong
             if (activeEvents.length === 0) {
                 const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
                 const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
@@ -1242,7 +1178,7 @@ async function loadEvents() {
             
             if (startIndex >= activeEvents.length) return;
             
-            isFetchingMore = true; // Kunci gembok loading!
+            isFetchingMore = true; 
 
             const eventsToAppend = activeEvents.slice(startIndex, endIndex);
 
@@ -1265,7 +1201,7 @@ async function loadEvents() {
                     if(scrollContainer) scrollContainer.style.display = 'block';
                 }
                 
-                isFetchingMore = false; // Buka gembok loading kembali
+                isFetchingMore = false; 
             };
 
             if (isInitial) {
@@ -1275,7 +1211,6 @@ async function loadEvents() {
             }
         }
 
-        // Pembuat HTML Kotak Event
         function buildCard(event, lang, t) {
             const harga = new Intl.NumberFormat('id-ID').format(event.price);
             const isFinished = event.availableSeats === -1;
@@ -1360,21 +1295,6 @@ async function loadEvents() {
             </div>`;
         }
 
-            // RENDER 1: Event Aktif ke atas
-            if (activeEvents.length === 0) {
-                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
-                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
-            } else {
-                activeEvents.forEach(event => { container.innerHTML += buildCard(event); });
-            }
-
-            // RENDER 2: Event Akan Datang ke bawah
-            if (soonEvents.length > 0 && containerSoon) {
-                soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event); });
-            }
-        }
-
         // 👇 --- MESIN HITUNG MUNDUR --- 👇
         function mulaiHitungMundur(eventId, targetDateStr) {
             const targetWaktu = new Date(targetDateStr).getTime();
@@ -1386,12 +1306,10 @@ async function loadEvents() {
                 const tempatNampilin = document.getElementById(`timer-${eventId}`);
                 const wadahTombol = document.getElementById(`btn-container-${eventId}`);
 
-                // KALAU WAKTUNYA SUDAH HABIS (Tiket Dibuka)
                 if (selisih < 0) {
                     clearInterval(intervalTimer); 
                     
                     if (wadahTombol) {
-                        // Ambil nama link yang aman
                         const lang = localStorage.getItem('lang') || 'id';
                         const btnText = lang === 'id' ? 'BELI TIKET' : 'BUY TICKET';
                         wadahTombol.innerHTML = `
@@ -1403,7 +1321,6 @@ async function loadEvents() {
                     return;
                 }
 
-                // PERHITUNGAN MUNDUR (Bulan, Hari, Jam, Menit, Detik)
                 const bulan = Math.floor(selisih / (1000 * 60 * 60 * 24 * 30));
                 const hari = Math.floor((selisih % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
                 const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -1420,27 +1337,24 @@ async function loadEvents() {
                 }
             }, 1000);
         }
-        // 👆 --- MESIN HITUNG MUNDUR (END) --- 👆
-function updateHeroSlider(data) {
+
+        function updateHeroSlider(data) {
             const sliderContainer = document.getElementById('heroSliderContent');
             const indicatorContainer = document.getElementById('heroSliderIndicators');
-            const sliderWrapper = document.getElementById('heroEventSlider'); // Ambil bungkus utamanya
+            const sliderWrapper = document.getElementById('heroEventSlider'); 
             
             if (!sliderContainer || !sliderWrapper || data.length === 0) {
-                if(sliderWrapper) sliderWrapper.style.display = 'none'; // Sembunyikan kalau kosong
+                if(sliderWrapper) sliderWrapper.style.display = 'none'; 
                 return;
             }
 
-            // Ambil maksimal 5 event aktif
             const slideEvents = data.filter(e => e.availableSeats !== -2).slice(0, 5);
             
-            // Kalau ternyata nggak ada event aktif sama sekali, hilangkan slidernya
             if (slideEvents.length === 0) {
                 sliderWrapper.style.display = 'none'; 
                 return;
             }
 
-            // Kalau ada isinya, pastikan slidernya tampil
             sliderWrapper.style.display = 'block';
 
             let html = '';
@@ -1452,10 +1366,8 @@ function updateHeroSlider(data) {
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
 
-                // Titik Indikator
                 indicatorsHtml += `<button type="button" data-bs-target="#heroEventSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}"></button>`;
 
-                // Gambar Slide Memanjang
                 html += `
                     <div class="carousel-item ${index === 0 ? 'active' : ''}" data-bs-interval="4000" style="cursor: pointer;" onclick="window.location.href='${linkDetail}'">
                         <img src="${imageUrl}" class="d-block w-100" alt="${event.name}">
@@ -1469,6 +1381,7 @@ function updateHeroSlider(data) {
             sliderContainer.innerHTML = html;
             if(indicatorContainer) indicatorContainer.innerHTML = indicatorsHtml;
         }
+
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
@@ -1494,8 +1407,8 @@ function updateHeroSlider(data) {
             if (event.category === 'Streaming') { 
                 safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; 
             }
-            // --- UBAH TEKS JADI LINK BISA DIKLIK ---
-            const urlRegex = /(https?:\/\/[^\s]+)/g; // Rumus pendeteksi tulisan "http://" atau "https://"
+            
+            const urlRegex = /(https?:\/\/[^\s]+)/g; 
             const linkedDesc = safeDescription.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${url}</a>`);
             
             document.getElementById('modalDesc').innerHTML = linkedDesc;
@@ -1821,7 +1734,7 @@ function updateHeroSlider(data) {
                             userId: user.id, 
                             eventId: eventId, 
                             tierName: selectedTier.tierName, 
-                            price: totalTagihan,       
+                            price: totalTagihan,        
                             quantity: quantity,  
                             pin: pin, 
                             promoCode: promo,
