@@ -685,6 +685,14 @@
                 <p class="mt-2 text-secondary small" data-i18n="loading_text">Memuat event...</p>
             </div>
         </div>
+        <!-- 👇 SENSOR INFINITE SCROLL OTOMATIS 👇 -->
+        <div class="col-12 text-center mt-4 mb-4" id="scrollLoadContainer" style="display: none;">
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
+            <div class="spinner-grow spinner-grow-sm text-primary mx-1" role="status" style="animation-delay: 0.2s;"></div>
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.4s;"></div>
+            <div class="d-block mt-2 text-muted small fw-bold" style="letter-spacing: 2px;">MENARIK DATA...</div>
+        </div>
+        <!-- 👆 --------------------------------- 👆 -->
         <!-- 👇 TAMBAHAN WADAH EVENT AKAN DATANG 👇 -->
         <div id="section-coming-soon" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-3 px-2 mt-5 border-top pt-4">
@@ -1099,10 +1107,28 @@ async function loadEvents() {
             }
         }
 
-function renderEvents(data) {
+// ==============================================
+        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
+        // ==============================================
+        let currentRenderData = [];
+        let currentVisibleCount = 0;
+        const limitPerLoad = 12; // Menampilkan 12 event tiap kali mentok bawah
+
+        // Sensor Pengawas Layar
+        let scrollObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreEvents(false);
+            }
+        }, { rootMargin: "150px" });
+
+        function renderEvents(data) {
+            currentRenderData = data; 
+            currentVisibleCount = 0; 
+            
             const container = document.getElementById('event-list');
             const containerSoon = document.getElementById('event-coming-soon-list');
             const sectionSoon = document.getElementById('section-coming-soon');
+            const scrollContainer = document.getElementById('scrollLoadContainer');
             
             container.innerHTML = ''; 
             if (containerSoon) containerSoon.innerHTML = '';
@@ -1110,112 +1136,155 @@ function renderEvents(data) {
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
 
-            const activeEvents = data.filter(e => e.availableSeats !== -2);
-            const soonEvents = data.filter(e => e.availableSeats === -2);
+            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
+            const soonEvents = currentRenderData.filter(e => e.availableSeats === -2);
 
+            // Tampilkan Event Akan Datang (Soon)
             if (soonEvents.length > 0 && sectionSoon) {
                 sectionSoon.style.display = 'block';
+                soonEvents.forEach(event => { containerSoon.innerHTML += buildCard(event, lang, t); });
             } else if (sectionSoon) {
                 sectionSoon.style.display = 'none';
             }
 
-            const buildCard = (event) => {
-                const harga = new Intl.NumberFormat('id-ID').format(event.price);
-                const isFinished = event.availableSeats === -1;
-                const isComingSoon = event.availableSeats === -2;
-                const isSoldOut = event.availableSeats === 0;
+            // Jika kosong
+            if (activeEvents.length === 0) {
+                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
+                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
+                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
                 
-                let dateStr = t.txt_date_tba;
-                if (event.date) { 
-                    try { 
-                        const dateObj = new Date(event.date); 
-                        dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
-                    } catch (e) { dateStr = event.date; } 
+                if(scrollContainer) {
+                    scrollContainer.style.display = 'none';
+                    scrollObserver.unobserve(scrollContainer);
                 }
-                const catName = event.category || 'General'; 
-                const locationName = event.location || t.txt_tba;
-                const imageUrl = getEventImage(event);
-                const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
+                return;
+            }
+
+            if(scrollContainer) scrollObserver.observe(scrollContainer);
+            loadMoreEvents(true); 
+        }
+
+        function loadMoreEvents(isInitial = false) {
+            const container = document.getElementById('event-list');
+            const scrollContainer = document.getElementById('scrollLoadContainer');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            
+            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
+            const startIndex = currentVisibleCount;
+            const endIndex = startIndex + limitPerLoad;
+            const eventsToAppend = activeEvents.slice(startIndex, endIndex);
+
+            if (startIndex >= activeEvents.length) return;
+
+            const appendData = () => {
+                eventsToAppend.forEach(event => { 
+                    container.innerHTML += buildCard(event, lang, t); 
+                });
                 
-                // 👇 --- LOGIKA 3 SKENARIO WAKTU (START) --- 👇
-                let btnText = 'BELI';
-                let btnClass = 'btn-outline-book';
-                let btnAction = `onclick="event.stopPropagation(); window.location.href='${'/detail?event=' + (event.name || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '&id=' + event._id}'"`;
-                let timerHtml = '';
-                const now = new Date();
+                currentVisibleCount += eventsToAppend.length;
 
-                // 🗓️ RUMUS WAKTU SELESAI
-                const waktuSelesaiEvent = new Date(`${event.date}T${event.endTime || '23:59'}`);
-
-                // Skenario 1: EVENT SELESAI
-                if (now > waktuSelesaiEvent) {
-                    btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
-                    btnClass = 'btn-outline-book disabled text-danger border-danger';
-                    btnAction = 'disabled';
-                } 
-                // Skenario 2: BELUM BUKA TIKET (COUNTDOWN)
-                else if (event.salesOpenDate && new Date(event.salesOpenDate) > now) {
-                    btnText = '<i class="bi bi-clock-history"></i> AKAN HADIR';
-                    btnClass = 'btn-outline-book disabled border-secondary text-secondary';
-                    btnAction = 'disabled';
-                    timerHtml = `<div id="timer-${event._id}" style="font-size: 0.75rem; font-weight: bold; margin-top: 5px; color: var(--primary);">Menghitung...</div>`;
-                    
-                    // Panggil fungsi timer
-                    setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate); }, 100);
+                if (currentVisibleCount >= activeEvents.length) {
+                    if(scrollContainer) {
+                        scrollContainer.style.display = 'none';
+                        scrollObserver.unobserve(scrollContainer); 
+                    }
+                } else {
+                    if(scrollContainer) scrollContainer.style.display = 'block';
                 }
-                // Skenario 3: NORMAL (Sudah buka, belum selesai)
-                else if (isComingSoon) {
-                    btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
-                    btnClass += ' disabled'; btnAction = 'disabled';
-                } else if (isFinished) { // Ini fallback manual dari panel admin
-                    btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
-                    btnClass += ' disabled'; btnAction = 'disabled';
-                } else if (isSoldOut) {
-                    btnText = t.btn_sold_out;
-                    btnClass += ' disabled'; btnAction = 'disabled';
-                } else if (catName === 'Streaming') {
-                    btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
-                }
-                // 👆 --- LOGIKA 3 SKENARIO WAKTU (END) --- 👆
+            };
 
-                const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
-                const namaAman = event.name ? event.name : "event";
-                const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
+            if (isInitial) {
+                appendData(); 
+            } else {
+                setTimeout(() => { appendData(); }, 500); 
+            }
+        }
 
-                return `
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card-event" onclick="window.location.href='${linkDetail}'">
-                        <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
-                            ${pinBadge}
-                            <span class="category-badge-img">${catName}</span>
-                            <div class="date-float">${dateStr}</div>
+        // Pembuat HTML Kotak Event
+        function buildCard(event, lang, t) {
+            const harga = new Intl.NumberFormat('id-ID').format(event.price);
+            const isFinished = event.availableSeats === -1;
+            const isComingSoon = event.availableSeats === -2;
+            const isSoldOut = event.availableSeats === 0;
+            
+            let dateStr = t.txt_date_tba;
+            if (event.date) { 
+                try { 
+                    const dateObj = new Date(event.date); 
+                    dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
+                } catch (e) { dateStr = event.date; } 
+            }
+            const catName = event.category || 'General'; 
+            const locationName = event.location || t.txt_tba;
+            const imageUrl = getEventImage(event);
+            const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
+            
+            let btnText = 'BELI';
+            let btnClass = 'btn-outline-book';
+            let btnAction = `onclick="event.stopPropagation(); window.location.href='${'/detail?event=' + (event.name || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '&id=' + event._id}'"`;
+            let timerHtml = '';
+            const now = new Date();
+            const waktuSelesaiEvent = new Date(`${event.date}T${event.endTime || '23:59'}`);
+
+            if (now > waktuSelesaiEvent) {
+                btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                btnClass = 'btn-outline-book disabled text-danger border-danger';
+                btnAction = 'disabled';
+            } 
+            else if (event.salesOpenDate && new Date(event.salesOpenDate) > now) {
+                btnText = '<i class="bi bi-clock-history"></i> AKAN HADIR';
+                btnClass = 'btn-outline-book disabled border-secondary text-secondary';
+                btnAction = 'disabled';
+                timerHtml = `<div id="timer-${event._id}" style="font-size: 0.75rem; font-weight: bold; margin-top: 5px; color: var(--primary);">Menghitung...</div>`;
+                setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate); }, 100);
+            }
+            else if (isComingSoon) {
+                btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (isFinished) { 
+                btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (isSoldOut) {
+                btnText = t.btn_sold_out;
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (catName === 'Streaming') {
+                btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
+            }
+
+            const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
+            const namaAman = event.name ? event.name : "event";
+            const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
+
+            return `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card-event" onclick="window.location.href='${linkDetail}'">
+                    <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
+                        ${pinBadge}
+                        <span class="category-badge-img">${catName}</span>
+                        <div class="date-float">${dateStr}</div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="event-title" style="white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8rem; margin-bottom: 10px;">
+                            ${event.name}
+                        </h5>
+                        <div class="event-venue justify-content-center" style="overflow: hidden; padding: 0 10px;">
+                            <marquee scrollamount="3" style="white-space: nowrap; width: 100%;">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
+                            </marquee>
                         </div>
-<div class="card-body text-center">
-    
-    <h5 class="event-title" style="white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8rem; margin-bottom: 10px;">
-        ${event.name}
-    </h5>
-
-    <div class="event-venue justify-content-center" style="overflow: hidden; padding: 0 10px;">
-        <marquee scrollamount="3" style="white-space: nowrap; width: 100%;">
-            <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
-        </marquee>
-    </div>
-    
-    <div class="price-val">${hargaLabel}</div>
-                            
-                            <div id="btn-container-${event._id}">
-                                <button ${btnAction} class="${btnClass}">
-                                    ${btnText}
-                                </button>
-                                ${timerHtml}
-                            </div>
-                            
+                        <div class="price-val">${hargaLabel}</div>
+                        <div id="btn-container-${event._id}">
+                            <button ${btnAction} class="${btnClass}">
+                                ${btnText}
+                            </button>
+                            ${timerHtml}
                         </div>
                     </div>
-                </div>`;
-            };
+                </div>
+            </div>`;
+        }
 
             // RENDER 1: Event Aktif ke atas
             if (activeEvents.length === 0) {
