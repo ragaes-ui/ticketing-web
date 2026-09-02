@@ -1167,6 +1167,9 @@ async function loadEvents() {
 // ==============================================
         // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
         // ==============================================
+// ==============================================
+        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
+        // ==============================================
         let currentRenderData = [];
         let currentVisibleCount = 0;
         const limitPerLoad = 12; // Menampilkan 12 event tiap kali mentok bawah
@@ -1226,7 +1229,6 @@ async function loadEvents() {
         }
 
         function loadMoreEvents(isInitial = false) {
-            // 👈 CEGAH DOUBLE LOADING (KALAU MASIH LOADING, TOLAK PERINTAH BARU)
             if (isFetchingMore) return; 
             
             const container = document.getElementById('event-list');
@@ -1250,7 +1252,6 @@ async function loadEvents() {
                     htmlChunk += buildCard(event, lang, t); 
                 });
                 
-                // 👈 PAKE insertAdjacentHTML BIAR HP GAK NGE-LAG RENDER ULANG!
                 container.insertAdjacentHTML('beforeend', htmlChunk); 
                 
                 currentVisibleCount += eventsToAppend.length;
