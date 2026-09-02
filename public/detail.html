@@ -430,7 +430,10 @@ async function loadEventDetail(id) {
                 const linkedDesc = rawDesc.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${url}</a>`);
                 
                 document.getElementById('elDesc').innerHTML = linkedDesc;
-                document.getElementById('eventHero').style.backgroundImage = `url('${getEventImage(currentEvent)}')`;
+                // 👇 TRIK ANTI CACHE NYANGKUT KHUSUS IMGBB 👇
+const heroImg = getEventImage(currentEvent);
+const safeHeroImg = heroImg.includes('ibb.co') ? `${heroImg}?v=${new Date().getTime()}` : heroImg;
+document.getElementById('eventHero').style.backgroundImage = `url('${safeHeroImg}')`;
                 
                 const breadcrumbContainer = document.getElementById('breadcrumb-container');
                 if (breadcrumbContainer && currentEvent) {
@@ -491,6 +494,7 @@ document.getElementById('elTime').innerText = timeStr; // Menampilkan jam ke HTM
                     let htmlLineUp = '';
                     
 currentEvent.lineupImages.forEach(imgUrl => {
+    const safeImgUrl = imgUrl.includes('ibb.co') ? `${imgUrl}?v=${new Date().getTime()}` : imgUrl;
                         htmlLineUp += `
                         <div class="col-6 col-md-4 mb-3 d-flex justify-content-center">
                             <div onclick="previewPoster('${imgUrl}')" class="lineup-card">
