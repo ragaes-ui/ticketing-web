@@ -12,13 +12,13 @@
     <!-- Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <style>
+<style>
         :root {
             --bg-dark: #0f172a; 
             --bg-card: #1e293b;
             --primary: #2563eb; 
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-main: #ffffff; /* Putih bersih */
+            --text-muted: #cbd5e1; /* Abu-abu terang */
             --border-color: #334155;
         }
         
@@ -31,7 +31,7 @@
         
         .nav-sidebar { list-style: none; padding: 20px 0; margin: 0; flex-grow: 1; overflow-y: auto; }
         .nav-item-side { padding: 12px 25px; color: var(--text-muted); cursor: pointer; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; border-right: 3px solid transparent; }
-        .nav-item-side:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .nav-item-side:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
         .nav-item-side.active { color: var(--primary); background: rgba(37, 99, 235, 0.1); border-right-color: var(--primary); font-weight: 700; }
         
         /* Main Content */
@@ -42,10 +42,18 @@
         .card-custom { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
         
         /* Form Inputs */
-        .form-control, .form-select { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
+        .form-control, .form-select { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main) !important; border-radius: 8px; padding: 12px 15px; }
         .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.3); border-color: var(--primary); color: var(--text-main); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
-        .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
+        /* =================================================== */
+        /* 🔥 FIX WARNA TENGGELAM (GLOBAL) 🔥 */
+        /* =================================================== */
+        .text-muted { color: #cbd5e1 !important; } /* Abu-abu terang untuk sub-judul & deskripsi */
+        .text-white-50 { color: #f8fafc !important; } /* Putih sedikit redup untuk area form */
+        .form-label { color: #f8fafc !important; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        ::placeholder { color: #64748b !important; opacity: 1 !important; } /* Warna placeholder abu kalem */
+        /* =================================================== */
+
         /* Tables & Previews */
         .modal-content { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; color: var(--text-main); }
         .table-dark { --bs-table-bg: transparent; --bs-table-color: var(--text-main); --bs-table-border-color: var(--border-color); }
@@ -61,9 +69,6 @@
             .topbar { padding: 0 15px; }
             .content-area { padding: 15px; }
         }
-        /* Perbaikan Kontras Warna Teks */
-        .text-muted { color: #94a3b8 !important; }
-        .text-white-50 { color: #cbd5e1 !important; }
     </style>
 </head>
 <body>
