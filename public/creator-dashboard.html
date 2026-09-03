@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard | RCELLFEST</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a; 
+            --bg-card: #1e293b;
+            --primary: #2563eb; 
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; background-color: var(--bg-card); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
+        .sidebar-brand { height: 76px; display: flex; align-items: center; padding: 0 25px; font-weight: 900; color: var(--text-main); font-size: 1.2rem; border-bottom: 1px solid var(--border-color); }
+        .sidebar-brand i { color: var(--primary); font-size: 1.5rem; margin-right: 10px; }
+        
+        .nav-sidebar { list-style: none; padding: 20px 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .nav-item-side { padding: 12px 25px; color: var(--text-muted); cursor: pointer; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; border-right: 3px solid transparent; }
+        .nav-item-side:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .nav-item-side.active { color: var(--primary); background: rgba(37, 99, 235, 0.1); border-right-color: var(--primary); font-weight: 700; }
+        
+        /* Main Content */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 76px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
+        
+        .card-custom { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        
+        /* Form Inputs */
+        .form-control, .form-select { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
+        .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.3); border-color: var(--primary); color: var(--text-main); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Table Custom */
+        .table-dark { --bs-table-bg: transparent; --bs-table-color: var(--text-main); --bs-table-border-color: var(--border-color); }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -260px; height: 100%; }
+            .sidebar.show { left: 0; }
+            .topbar { padding: 0 15px; }
+            .content-area { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-layers-fill"></i> RCELL CREATOR
+        </div>
+        <ul class="nav-sidebar">
+            <li class="nav-item-side" onclick="alert('Fitur ringkasan segera hadir!')"><i class="bi bi-grid-1x2-fill fs-5"></i> Dasbor</li>
+            <li class="nav-item-side active" onclick="switchMenu('create')"><i class="bi bi-calendar-plus-fill fs-5"></i> Buat Event Baru</li>
+            <li class="nav-item-side" onclick="switchMenu('myevents')"><i class="bi bi-collection-play-fill fs-5"></i> Event Saya</li>
+            <li class="nav-item-side" onclick="alert('Scanner khusus EO segera hadir!')"><i class="bi bi-qr-code-scan fs-5"></i> Scan Tiket</li>
+        </ul>
+        <div class="p-3 border-top" style="border-color: var(--border-color) !important;">
+            <button onclick="logoutCreator()" class="btn btn-outline-danger w-100 rounded-pill fw-bold">
+                <i class="bi bi-box-arrow-left me-2"></i> Keluar
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h5 class="fw-bold m-0 d-none d-md-block" id="pageTitle">Buat Event Baru</h5>
+            <button class="btn btn-dark d-md-none border border-secondary" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block">
+                    <h6 class="m-0 fw-bold" id="eoNameDisplay">Loading...</h6>
+                    <small class="text-success"><i class="bi bi-check-circle-fill"></i> Verified Organizer</small>
+                </div>
+                <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; border: 2px solid #fff;">
+                    EO
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area" id="createEventArea">
+            <div class="card-custom">
+                <div class="alert alert-info border-info bg-opacity-10 d-flex align-items-center gap-3 mb-4">
+                    <i class="bi bi-info-circle-fill fs-4 text-info"></i>
+                    <div>
+                        <h6 class="fw-bold m-0 text-info">Mode Kreator Aktif</h6>
+                        <small>Event yang Anda buat di sini akan otomatis terhubung ke akun organisasi Anda.</small>
+                    </div>
+                </div>
+
+                <form id="creatorEventForm" onsubmit="submitCreatorEvent(event)">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Event</label>
+                            <input type="text" class="form-control" id="eventName" placeholder="Nama event/konser..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kategori</label>
+                            <select class="form-select" id="eventCategory" required>
+                                <option value="Konser">Konser</option>
+                                <option value="Streaming">Streaming</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Olahraga">Olahraga</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tanggal Mulai</label>
+                            <input type="date" class="form-control" id="eventDate" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Jam Mulai</label>
+                            <input type="time" class="form-control" id="eventStartTime">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Harga Tiket Dasar (Rp)</label>
+                            <input type="number" class="form-control" id="eventPrice" value="0" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Lokasi</label>
+                            <input type="text" class="form-control" id="eventLocation" placeholder="Contoh: Stadion GBK" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="eventDesc" rows="4" placeholder="Ceritakan keseruan event ini..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Link Gambar Banner (ImgBB)</label>
+                            <input type="url" class="form-control" id="eventImage" placeholder="https://i.ibb.co/...">
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4 border-secondary">
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold" id="btnSubmitEvent">
+                            Terbitkan Event <i class="bi bi-send-fill ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="content-area d-none" id="myEventsArea">
+            <div class="card-custom">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0"><i class="bi bi-collection-play-fill text-primary me-2"></i> Daftar Event Saya</h5>
+                    <button class="btn btn-sm btn-outline-light rounded-pill" onclick="loadMyEvents()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle" style="background-color: transparent;">
+                        <thead style="border-bottom: 2px solid var(--border-color);">
+                            <tr>
+                                <th>Nama Event</th>
+                                <th>Kategori</th>
+                                <th>Tanggal</th>
+                                <th>Harga</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myEventsTableBody">
+                            <tr><td colspan="5" class="text-center py-4">Klik menu "Event Saya" untuk memuat data.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let organizerInfo = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const orgData = localStorage.getItem('organizerData');
+            
+            if (!orgData) {
+                Swal.fire({
+                    icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator/EO terlebih dahulu.',
+                    background: '#1e293b', color: '#fff', allowOutsideClick: false
+                }).then(() => {
+                    window.location.href = '/creator-auth.html';
+                });
+                return;
+            }
+
+            organizerInfo = JSON.parse(orgData);
+            document.getElementById('eoNameDisplay').innerText = organizerInfo.organizerName || 'Organizer';
+        });
+
+        // Logika Perpindahan Menu Kiri (Sidebar)
+        function switchMenu(menuName) {
+            document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
+            document.getElementById('createEventArea').classList.add('d-none');
+            document.getElementById('myEventsArea').classList.add('d-none');
+            
+            if (menuName === 'create') {
+                document.querySelectorAll('.nav-item-side')[1].classList.add('active'); 
+                document.getElementById('createEventArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = 'Buat Event Baru';
+            } 
+            else if (menuName === 'myevents') {
+                document.querySelectorAll('.nav-item-side')[2].classList.add('active'); 
+                document.getElementById('myEventsArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = 'Manajemen Event';
+                
+                loadMyEvents(); // Otomatis tarik data saat menunya diklik
+            }
+
+            // Tutup sidebar di HP saat menu diklik
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        function logoutCreator() {
+            localStorage.removeItem('organizerToken');
+            localStorage.removeItem('organizerData');
+            window.location.href = '/creator-auth.html';
+        }
+
+        // ========================================================
+        // LOGIKA SUBMIT FORM (MENYELIPKAN ID KREATOR)
+        // ========================================================
+        async function submitCreatorEvent(e) {
+            e.preventDefault();
+            
+            const eventPayload = {
+                name: document.getElementById('eventName').value,
+                category: document.getElementById('eventCategory').value,
+                date: document.getElementById('eventDate').value,
+                startTime: document.getElementById('eventStartTime').value,
+                price: Number(document.getElementById('eventPrice').value),
+                location: document.getElementById('eventLocation').value,
+                description: document.getElementById('eventDesc').value,
+                image: document.getElementById('eventImage').value,
+                
+                // KUNCI UTAMA: Menyelipkan data Kreator
+                creatorId: organizerInfo.id,             
+                organizer: organizerInfo.organizerName,   
+                status: "active"                         
+            };
+
+            const btn = document.getElementById('btnSubmitEvent');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`;
+            btn.disabled = true;
+
+            try {
+                // Tembak API yang sama dengan admin biasa
+                const res = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(eventPayload)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event berhasil diterbitkan.', background: '#1e293b', color: '#fff' });
+                    document.getElementById('creatorEventForm').reset();
+                } else {
+                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal menyimpan event', background: '#1e293b', color: '#fff'});
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server terputus', background: '#1e293b', color: '#fff'});
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ========================================================
+        // LOGIKA MENAMPILKAN EVENT MILIK KREATOR INI SAJA
+        // ========================================================
+        async function loadMyEvents() {
+            const tbody = document.getElementById('myEventsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span><br>Mengambil data...</td></tr>';
+            
+            try {
+                const res = await fetch('/api/events');
+                const allEvents = await res.json();
+                
+                // FILTER: Hanya ambil event yang creatorId-nya sama dengan akun yang sedang login
+                const myEvents = allEvents.filter(event => event.creatorId === organizerInfo.id);
+
+                if (myEvents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Anda belum membuat event apapun.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                myEvents.forEach(event => {
+                    const harga = new Intl.NumberFormat('id-ID').format(event.price || 0);
+                    html += `
+                        <tr style="border-color: var(--border-color);">
+                            <td class="fw-bold text-white">${event.name}</td>
+                            <td><span class="badge bg-secondary">${event.category || 'General'}</span></td>
+                            <td>${event.date || '-'}</td>
+                            <td class="text-success fw-bold">Rp ${harga}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="alert('Fitur edit EO segera hadir!')">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal menarik data dari server.</td></tr>';
+            }
+        }
+    </script>
+</body>
+</html>
