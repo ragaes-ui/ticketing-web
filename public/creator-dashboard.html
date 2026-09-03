@@ -381,8 +381,11 @@
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content p-4">
-                <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan Akun & Keamanan</span></h5>
-                
+<!-- 👇 HEADER MODAL (DITAMBAH TOMBOL SILANG/X) 👇 -->
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
+                    <h5 class="fw-bold m-0"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan Akun & Keamanan</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>                
                 <div class="row g-4">
                     <!-- Kolom Kiri: Nama & Password -->
                     <div class="col-md-6 border-end border-secondary">
@@ -414,7 +417,10 @@
                         </div>
                     </div>
                 </div>
-
+<!-- 👇 FOOTER MODAL (DITAMBAH TOMBOL TUTUP UNTUK HP) 👇 -->
+                <div class="mt-4 pt-3 border-top border-secondary text-end">
+                    <button type="button" class="btn btn-secondary fw-bold px-4 rounded-pill" data-bs-dismiss="modal">Tutup Pengaturan</button>
+                </div>
             </div>
         </div>
     </div>
