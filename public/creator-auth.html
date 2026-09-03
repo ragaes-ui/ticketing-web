@@ -236,15 +236,74 @@
         }
 
         // FUNGSI POPUP LUPA SANDI
+// FUNGSI MODAL LUPA SANDI DENGAN PIN
         function lupaSandi() {
             Swal.fire({
-                icon: 'info',
-                title: 'Lupa Kata Sandi?',
-                text: 'Silakan hubungi Admin Pusat RCELLFEST via WhatsApp untuk memulihkan atau mereset kata sandi akun Kreator Anda.',
+                title: 'Reset Kata Sandi EO',
+                html: `
+                    <p class="text-muted small text-start mb-3">Masukkan username/email akun dan PIN 6-digit keamanan Anda untuk membuat kata sandi baru.</p>
+                    <input type="text" id="swalUsername" class="swal2-input m-0 mb-2 w-100" placeholder="Username / Email" style="font-size: 0.95rem; box-sizing: border-box;">
+                    <input type="password" id="swalPin" class="swal2-input m-0 mb-2 w-100" placeholder="PIN Keamanan (6 Angka)" maxlength="6" style="font-size: 0.95rem; box-sizing: border-box;">
+                    <input type="password" id="swalNewPass" class="swal2-input m-0 w-100" placeholder="Kata Sandi Baru" style="font-size: 0.95rem; box-sizing: border-box;">
+                `,
                 background: '#1e293b',
                 color: '#fff',
                 confirmButtonColor: '#2563eb',
-                confirmButtonText: 'Tutup'
+                confirmButtonText: 'Reset Password',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const username = document.getElementById('swalUsername').value;
+                    const pin = document.getElementById('swalPin').value;
+                    const newPassword = document.getElementById('swalNewPass').value;
+
+                    if (!username || !pin || !newPassword) {
+                        Swal.showValidationMessage('Semua kolom wajib diisi!');
+                        return false;
+                    }
+                    return { username, pin, newPassword };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const { username, pin, newPassword } = result.value;
+                    
+                    try {
+                        // Tembak API reset password yang sudah ada di server.js
+                        const res = await fetch('/api/reset-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, pin, newPassword })
+                        });
+                        const data = await res.json();
+
+                        if (res.ok && data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Kata sandi berhasil direset. Silakan login dengan sandi baru.',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'PIN atau Akun tidak valid.',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+                        }
+                    } catch (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Koneksi ke server gagal.',
+                            background: '#1e293b',
+                            color: '#fff'
+                        });
+                    }
+                }
             });
         }
 
