@@ -103,7 +103,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div><i class="bi bi-layers-fill"></i> CREATOR</div>
+            <div><i class="bi bi-layers-fill"></i> RCELLFEST CREATOR MANAGER</div>
             <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')"><i class="bi bi-x-lg"></i></button>
         </div>
         <ul class="nav-sidebar">
@@ -129,21 +129,30 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
+<!-- TOPBAR -->
         <div class="topbar">
-            <h5 class="fw-bold m-0" id="pageTitle" data-i18n="menu_dash">Ringkasan Dasbor</h5>
-            <button class="btn btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.toggle('show')">
-                <i class="bi bi-list fs-4"></i>
-            </button>
+            <!-- Kiri: Tombol Hamburger & Judul -->
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-secondary d-md-none border-0 p-1" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                <h5 class="fw-bold m-0 d-none d-sm-block" id="pageTitle" data-i18n="menu_dash">Ringkasan Dasbor</h5>
+            </div>
             
-            <div class="d-none d-md-flex align-items-center gap-3">
-                <button onclick="toggleTheme()" class="btn btn-sm btn-outline-secondary rounded-pill border-0 fs-5" id="theme-btn" title="Ubah Tema"><i class="bi bi-moon-stars-fill" id="theme-icon"></i></button>
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-primary rounded-pill fw-bold px-3" id="lang-btn" title="Ubah Bahasa">ID</button>
+            <!-- Kanan: Tombol Tema, Bahasa & Profil -->
+            <div class="d-flex align-items-center gap-2 gap-md-3">
+                <button onclick="toggleTheme()" class="btn btn-sm btn-outline-secondary rounded-circle border-0 fs-5" id="theme-btn" title="Ubah Tema" style="width: 35px; height: 35px; padding: 0;">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-primary rounded-pill fw-bold px-2 px-md-3" id="lang-btn" title="Ubah Bahasa" style="font-size: 0.8rem;">ID</button>
                 
-                <div class="text-end ms-2">
+                <!-- Nama hanya muncul di laptop/tablet -->
+                <div class="text-end ms-1 d-none d-md-block">
                     <h6 class="m-0 fw-bold" id="eoNameDisplay">Loading...</h6>
                     <small class="text-success"><i class="bi bi-check-circle-fill"></i> <span data-i18n="txt_verified">Verified Organizer</span></small>
                 </div>
-                <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1rem;">EO</div>
+                <!-- Ikon Profil selalu muncul -->
+                <div style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 0.9rem; flex-shrink: 0;">EO</div>
             </div>
         </div>
 
