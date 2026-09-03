@@ -112,7 +112,17 @@ const eventSchema = new mongoose.Schema({
         accessCode: { type: String, default: "" }    // Kode rahasianya
     }],
     // ----------------------------------------------------
-    isPinned: { type: Boolean, default: false }
+    isPinned: { type: Boolean, default: false },
+    // 👇 --- TAMBAHAN UNTUK FITUR MULTI-TENANT (CREATOR / EO) --- 👇
+    creatorId: { 
+        type: String, 
+        default: 'admin-pusat' // Jika admin utama yang buat, defaultnya ini
+    },
+    status: {
+        type: String,
+        default: 'active'
+    }
+    // 👆 -------------------------------------------------------- 👆
     // ---------------------------
     
 }, { timestamps: true });
