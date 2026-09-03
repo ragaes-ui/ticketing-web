@@ -38,14 +38,18 @@
         
         .card-custom { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         
-        /* Form Inputs */
+        /* Form Inputs (Disamakan dengan admin.html) */
         .form-control, .form-select { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
         .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.3); border-color: var(--primary); color: var(--text-main); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
         .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
         /* Table Custom */
         .table-dark { --bs-table-bg: transparent; --bs-table-color: var(--text-main); --bs-table-border-color: var(--border-color); }
-        
+        .img-preview-box { width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 8px; background: rgba(0,0,0,0.2); }
+        .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .tier-row { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 16px; margin-bottom: 12px; position: relative; }
+        .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
         @media (max-width: 768px) {
             .sidebar { position: fixed; left: -260px; height: 100%; }
             .sidebar.show { left: 0; }
@@ -56,6 +60,7 @@
 </head>
 <body>
 
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="bi bi-layers-fill"></i> RCELL CREATOR
@@ -73,7 +78,9 @@
         </div>
     </div>
 
+    <!-- MAIN CONTENT -->
     <div class="main-content">
+        <!-- TOPBAR -->
         <div class="topbar">
             <h5 class="fw-bold m-0 d-none d-md-block" id="pageTitle">Buat Event Baru</h5>
             <button class="btn btn-dark d-md-none border border-secondary" onclick="document.getElementById('sidebar').classList.toggle('show')">
@@ -91,6 +98,7 @@
             </div>
         </div>
 
+        <!-- AREA 1: KONTEN BUAT EVENT -->
         <div class="content-area" id="createEventArea">
             <div class="card-custom">
                 <div class="alert alert-info border-info bg-opacity-10 d-flex align-items-center gap-3 mb-4">
@@ -101,58 +109,106 @@
                     </div>
                 </div>
 
-                <form id="creatorEventForm" onsubmit="submitCreatorEvent(event)">
+                <form id="formEvent">
+                    <!-- Link Gambar -->
+                    <div class="mb-3">
+                        <label class="small text-white-50 fw-bold mb-1">Link Gambar Banner (ImgBB)</label>
+                        <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview')">
+                        <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-white-50 small"><i class="bi bi-image fs-4"></i></span></div>
+                    </div>
+                    
+                    <!-- Lineup Artis -->
+                    <div class="mb-3 p-3 mt-3" style="background: rgba(0,255,255,0.05); border: 1px dashed rgba(0,255,255,0.3); border-radius: 12px;">
+                        <label class="small text-info fw-bold mb-2"><i class="bi bi-people-fill me-1"></i> Poster Line Up Artis (Opsional)</label>
+                        <div id="addLineups"></div>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster Line Up</button>
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Nama Event</label>
-                            <input type="text" class="form-control" id="eventName" placeholder="Nama event/konser..." required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Kategori</label>
-                            <select class="form-select" id="eventCategory" required>
+                            <label class="small text-white-50 fw-bold mb-1">Kategori</label>
+                            <select id="category" class="form-select">
+                                <option value="General">General</option>
                                 <option value="Konser">Konser</option>
-                                <option value="Streaming">Streaming</option>
-                                <option value="Workshop">Workshop</option>
                                 <option value="Olahraga">Olahraga</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Streaming">Streaming</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Tanggal Mulai</label>
-                            <input type="date" class="form-control" id="eventDate" required>
+                        <div class="col-md-6">
+                            <label class="small text-warning fw-bold mb-1"><i class="bi bi-bank me-1"></i> Pajak Event (%) - Opsional</label>
+                            <input type="number" id="taxRate" class="form-control" placeholder="0" min="0" max="100">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Jam Mulai</label>
-                            <input type="time" class="form-control" id="eventStartTime">
+                    </div>
+
+                    <div class="mb-3 mt-3">
+                        <label class="small text-white-50 fw-bold mb-1">Nama Event</label>
+                        <input type="text" id="name" class="form-control" placeholder="Nama Event" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-white-50 fw-bold mb-1">Lokasi</label>
+                        <input type="text" id="location" class="form-control" placeholder="Stadion / Venue" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
+                        <input type="text" id="mapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/...">
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="small text-white-50 fw-bold mb-1">Tanggal Mulai</label>
+                            <input type="date" id="date" class="form-control" required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Harga Tiket Dasar (Rp)</label>
-                            <input type="number" class="form-control" id="eventPrice" value="0" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Lokasi</label>
-                            <input type="text" class="form-control" id="eventLocation" placeholder="Contoh: Stadion GBK" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="eventDesc" rows="4" placeholder="Ceritakan keseruan event ini..."></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Link Gambar Banner (ImgBB)</label>
-                            <input type="url" class="form-control" id="eventImage" placeholder="https://i.ibb.co/...">
+                        <div class="col-6">
+                            <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai (Opsional)</label>
+                            <input type="date" id="endDate" class="form-control">
                         </div>
                     </div>
                     
-                    <hr class="my-4 border-secondary">
-                    
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold" id="btnSubmitEvent">
-                            Terbitkan Event <i class="bi bi-send-fill ms-2"></i>
-                        </button>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
+                            <input type="time" id="startTime" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="small text-white-50 fw-bold mb-1">Jam Selesai</label>
+                            <input type="time" id="endTime" class="form-control" required>
+                        </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="small text-white-50 fw-bold mb-1">Waktu Buka Tiket (Opsional)</label>
+                        <input type="datetime-local" id="salesOpenDate" class="form-control">
+                        <small class="text-info" style="font-size: 0.75rem;">*Kosongkan jika tiket ingin langsung dijual sekarang.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small text-white-50 fw-bold mb-1">Deskripsi Event</label>
+                        <textarea id="description" class="form-control" rows="3" placeholder="Ceritakan keseruan event..."></textarea>
+                    </div>
+
+                    <div class="mb-3" id="streamingAccountBox" style="display: none;">
+                        <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Akun Streaming)</label>
+                        <textarea id="secretData" class="form-control border-danger" rows="2" placeholder="Email: ... | Pass: ... (Hanya terlihat setelah user BAYAR)"></textarea>
+                    </div>
+                    
+                    <!-- TIKET DAN STOK -->
+                    <div class="mb-4 mt-4 pt-3 border-top border-secondary">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="small fw-bold text-warning m-0">Tiket & Stok</label>
+                            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('addTiers')"><i class="bi bi-plus"></i> Tambah</button>
+                        </div>
+                        <div id="addTiers"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fs-6 rounded-pill fw-bold" id="btnSubmitEvent">
+                        <i class="bi bi-rocket-takeoff me-2"></i> Terbitkan Event
+                    </button>
                 </form>
             </div>
         </div>
 
+        <!-- AREA 2: DAFTAR EVENT SAYA -->
         <div class="content-area d-none" id="myEventsArea">
             <div class="card-custom">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -169,7 +225,7 @@
                                 <th>Nama Event</th>
                                 <th>Kategori</th>
                                 <th>Tanggal</th>
-                                <th>Harga</th>
+                                <th>Harga Dasar</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -180,31 +236,34 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let organizerInfo = null;
 
+        // 1. CEK LOGIN
         document.addEventListener('DOMContentLoaded', () => {
             const orgData = localStorage.getItem('organizerData');
-            
             if (!orgData) {
-                Swal.fire({
-                    icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator/EO terlebih dahulu.',
-                    background: '#1e293b', color: '#fff', allowOutsideClick: false
-                }).then(() => {
-                    window.location.href = '/creator-auth.html';
-                });
+                Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator/EO terlebih dahulu.', background: '#1e293b', color: '#fff', allowOutsideClick: false })
+                .then(() => { window.location.href = '/creator-auth.html'; });
                 return;
             }
-
             organizerInfo = JSON.parse(orgData);
             document.getElementById('eoNameDisplay').innerText = organizerInfo.organizerName || 'Organizer';
+            
+            // Siapkan 1 form tiket kosong
+            addTierRow('addTiers');
         });
 
-        // Logika Perpindahan Menu Kiri (Sidebar)
+        // 2. FUNGSI LOGOUT & MENU
+        function logoutCreator() {
+            localStorage.removeItem('organizerToken');
+            localStorage.removeItem('organizerData');
+            window.location.href = '/creator-auth.html';
+        }
+
         function switchMenu(menuName) {
             document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
             document.getElementById('createEventArea').classList.add('d-none');
@@ -219,77 +278,153 @@
                 document.querySelectorAll('.nav-item-side')[2].classList.add('active'); 
                 document.getElementById('myEventsArea').classList.remove('d-none');
                 document.getElementById('pageTitle').innerText = 'Manajemen Event';
-                
-                loadMyEvents(); // Otomatis tarik data saat menunya diklik
+                loadMyEvents(); 
             }
 
-            // Tutup sidebar di HP saat menu diklik
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('show');
+            if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
+        }
+
+        // 3. FUNGSI-FUNGSI HELPER DARI ADMIN.HTML
+        function previewImage(u, i) { 
+            const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u;
+            if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; }
+            if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
+        }
+
+        function addLineupRow(containerId, url = '') {
+            const html = `
+                <div class="input-group mb-2 lineup-row">
+                    <span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span>
+                    <input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}">
+                    <button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
+        }
+
+        function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
+            document.getElementById(id).insertAdjacentHTML('beforeend', `
+                <div class="tier-row">
+                    <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+                    <div class="row g-2 mb-2">
+                        <div class="col-7">
+                            <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required>
+                        </div>
+                        <div class="col-5">
+                            <input type="datetime-local" class="form-control form-control-sm mb-2 tier-open" value="${o}" title="Waktu Penjualan Dibuka">
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div>
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
+                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
+                    </div>
+                    <div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50">
+                        <div class="col-12 col-md-5 d-flex align-items-center">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input tier-is-locked" type="checkbox" role="switch" ${isLocked ? 'checked' : ''} onchange="toggleAccessCode(this)">
+                                <label class="form-check-label small fw-bold text-warning ms-1"><i class="bi bi-lock-fill"></i> Gembok Tiket?</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia (Misal: CREW26)" style="${isLocked ? '' : 'display: none;'}">
+                        </div>
+                    </div>
+                </div>`);
+        }
+
+        function toggleAccessCode(checkbox) {
+            const input = checkbox.closest('.tier-row').querySelector('.tier-access-code');
+            if (checkbox.checked) {
+                input.style.display = 'block'; input.setAttribute('required', 'true');
+            } else {
+                input.style.display = 'none'; input.removeAttribute('required'); input.value = '';
             }
         }
 
-        function logoutCreator() {
-            localStorage.removeItem('organizerToken');
-            localStorage.removeItem('organizerData');
-            window.location.href = '/creator-auth.html';
+        function getTiers(id) {
+            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
+                tierName: r.querySelector('.tier-name').value, 
+                price: parseInt(r.querySelector('.tier-price').value),
+                availableSeats: parseInt(r.querySelector('.tier-stock').value), 
+                totalSeats: parseInt(r.querySelector('.tier-stock').value),
+                minQty: parseInt(r.querySelector('.tier-min').value) || 1,
+                salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null,
+                isLocked: r.querySelector('.tier-is-locked').checked,
+                accessCode: r.querySelector('.tier-access-code').value
+            }));
         }
 
-        // ========================================================
-        // LOGIKA SUBMIT FORM (MENYELIPKAN ID KREATOR)
-        // ========================================================
-        async function submitCreatorEvent(e) {
-            e.preventDefault();
+        // Tampilkan/Sembunyikan Secret Data Streaming
+        document.getElementById('category').addEventListener('change', function() {
+            const box = document.getElementById('streamingAccountBox');
+            if(this.value === 'Streaming') { box.style.display = 'block'; } 
+            else { box.style.display = 'none'; document.getElementById('secretData').value = ''; }
+        });
+
+        // 4. SUBMIT FORM BUAT EVENT
+        document.getElementById('formEvent').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const tiers = getTiers('addTiers');
+            if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
             
-            const eventPayload = {
-                name: document.getElementById('eventName').value,
-                category: document.getElementById('eventCategory').value,
-                date: document.getElementById('eventDate').value,
-                startTime: document.getElementById('eventStartTime').value,
-                price: Number(document.getElementById('eventPrice').value),
-                location: document.getElementById('eventLocation').value,
-                description: document.getElementById('eventDesc').value,
-                image: document.getElementById('eventImage').value,
-                
-                // KUNCI UTAMA: Menyelipkan data Kreator
-                creatorId: organizerInfo.id,             
-                organizer: organizerInfo.organizerName,   
-                status: "active"                         
-            };
+            const secretEl = document.getElementById('secretData');
+            const lineupImagesAdd = Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
+            const taxInput = document.getElementById('taxRate');
+            const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
 
             const btn = document.getElementById('btnSubmitEvent');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`;
             btn.disabled = true;
 
+            const data = {
+                name: document.getElementById('name').value, 
+                category: document.getElementById('category').value, 
+                
+                // 👇 PASTIKAN NAMA EO DIAMBIL DARI AKUN MEREKA SENDIRI 👇
+                organizer: organizerInfo.organizerName, 
+                creatorId: organizerInfo.id, 
+                
+                location: document.getElementById('location').value, 
+                date: document.getElementById('date').value,
+                endDate: document.getElementById('endDate').value || null, 
+                startTime: document.getElementById('startTime').value, 
+                endTime: document.getElementById('endTime').value,
+                salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '',
+                mapsUrl: document.getElementById('mapsUrl').value, 
+                description: document.getElementById('description').value, 
+                image: document.getElementById('image').value,
+                secretData: secretEl ? secretEl.value : '', 
+                price: tiers[0]?.price || 0, 
+                capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+                availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+                tickets: tiers,
+                lineupImages: lineupImagesAdd,
+                taxRate: taxRateValue 
+            };
+
             try {
-                // Tembak API yang sama dengan admin biasa
-                const res = await fetch('/api/events', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(eventPayload)
-                });
-
-                const data = await res.json();
-
+                const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
                 if (res.ok) {
                     Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event berhasil diterbitkan.', background: '#1e293b', color: '#fff' });
-                    document.getElementById('creatorEventForm').reset();
+                    e.target.reset(); 
+                    document.getElementById('addTiers').innerHTML = ''; 
+                    addTierRow('addTiers');
+                    previewImage('', 'addPreview');
+                    switchMenu('myevents'); // Otomatis pindah ke tab Event Saya
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal menyimpan event', background: '#1e293b', color: '#fff'});
+                    Swal.fire('Gagal', 'Gagal menyimpan event', 'error');
                 }
-            } catch (error) {
-                console.error(error);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Koneksi ke server terputus', background: '#1e293b', color: '#fff'});
+            } catch (err) { 
+                Swal.fire('Error', 'Koneksi ke server terputus', 'error'); 
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
-        }
+        });
 
-        // ========================================================
-        // LOGIKA MENAMPILKAN EVENT MILIK KREATOR INI SAJA
-        // ========================================================
+        // 5. LOAD EVENT SAYA
         async function loadMyEvents() {
             const tbody = document.getElementById('myEventsTableBody');
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span><br>Mengambil data...</td></tr>';
@@ -313,7 +448,7 @@
                         <tr style="border-color: var(--border-color);">
                             <td class="fw-bold text-white">${event.name}</td>
                             <td><span class="badge bg-secondary">${event.category || 'General'}</span></td>
-                            <td>${event.date || '-'}</td>
+                            <td>${event.date ? event.date.split('T')[0] : '-'}</td>
                             <td class="text-success fw-bold">Rp ${harga}</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="alert('Fitur edit EO segera hadir!')">
