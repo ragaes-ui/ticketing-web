@@ -18,18 +18,28 @@
     
     <style>
         /* =================================================== */
-        /* 🔥 VARIABEL WARNA (DARK & LIGHT MODE) 🔥 */
+        /* 🔥 VARIABEL WARNA (DARK & LIGHT MODE PROFESIONAL) 🔥 */
         /* =================================================== */
         :root[data-theme="dark"] {
-            --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #2563eb; 
-            --text-main: #ffffff; --text-muted: #cbd5e1; --border-color: #334155;
-            --input-bg: rgba(0,0,0,0.2); --input-border: #334155;
+            --bg-dark: #0a0a0a;      /* Hitam pekat premium ala OLED */
+            --bg-card: #141414;      /* Abu-abu super gelap untuk kedalaman kartu */
+            --primary: #3b82f6;      /* Biru yang lebih menyala di latar gelap */
+            --text-main: #f4f4f5;    /* Putih tajam tapi tidak menyilaukan mata */
+            --text-muted: #a1a1aa;    /* Abu-abu metalik elegan untuk teks deskripsi */
+            --border-color: #27272a; /* Garis batas tipis yang sangat halus */
+            --input-bg: #000000;     /* Kolom input hitam pekat agar menjorok ke dalam */
+            --input-border: #3f3f46;
         }
 
         :root[data-theme="light"] {
-            --bg-dark: #f1f5f9; --bg-card: #ffffff; --primary: #2563eb; 
-            --text-main: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0;
-            --input-bg: #f8fafc; --input-border: #cbd5e1;
+            --bg-dark: #f8fafc; 
+            --bg-card: #ffffff;
+            --primary: #2563eb; 
+            --text-main: #0f172a; 
+            --text-muted: #64748b; 
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+            --input-border: #cbd5e1;
         }
         
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; transition: 0.3s; }
