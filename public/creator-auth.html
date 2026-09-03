@@ -194,6 +194,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // ==========================================
+        // AUTO-REDIRECT JIKA SUDAH LOGIN
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const orgData = localStorage.getItem('organizerData');
+            if (orgData) {
+                // Jika sudah ada data login EO, langsung tendang ke dashboard!
+                window.location.href = '/creator-dashboard.html';
+            }
+        });
         function switchTab(tab) {
             document.getElementById('tabLogin').classList.remove('active');
             document.getElementById('tabRegister').classList.remove('active');
