@@ -60,7 +60,31 @@ const app = express();
 app.set('trust proxy', true);
 app.use(cors());
 app.use(express.json());
-
+// ==========================================
+// POLISI LALU LINTAS SUBDOMAIN (RCM)
+// ==========================================
+app.use((req, res, next) => {
+    // Tangkap nama domain yang sedang diketik user di browser
+    const host = req.get('host'); 
+    
+    // Jika domainnya mengandung 'rcm' dan user mengakses halaman depan ('/')
+    if (host && host.includes('rcm.rcellfest.my.id')) {
+        
+        if (req.path === '/') {
+            // Langsung tembak ke halaman Login Creator
+            // (Sesuaikan path file-nya jika ada di dalam folder 'public' atau 'views')
+            return res.sendFile(__dirname + '/creator-auth.html'); 
+        }
+        
+        // (Opsional) Jika ingin membuat '/dashboard' jadi lebih rapi tanpa .html
+        if (req.path === '/dashboard') {
+            return res.sendFile(__dirname + '/creator-dashboard.html');
+        }
+    }
+    
+    // Jika bukan dari rcm, atau mengakses path lain, lanjutkan seperti biasa
+    next();
+});
 // ==========================================
 // 🛡️ KONFIGURASI KEYCLOAK SSO (SINGLE SIGN-ON)
 // ==========================================
