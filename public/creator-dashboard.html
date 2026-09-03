@@ -101,6 +101,7 @@
     </style>
 <!-- CEK LOGIN INSTAN & ANTI-BACK CACHE -->
 <!-- ANTI-BACK CACHE & HIDE PAGE -->
+<!-- ANTI-BACK CACHE & HIDE PAGE -->
     <style id="antiBocor"> html { display: none !important; } </style>
     <script>
         function verifikasiKeamanan() {
@@ -122,9 +123,22 @@
                 window.location.reload();
             }
         });
+
+        // ==========================================
+        // OBAT ANTI PANAS & HEMAT BATERAI (VISIBILITY API)
+        // ==========================================
+        let isAppAwake = true;
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                isAppAwake = false;
+                console.log("Dasbor ditidurkan. Menghemat baterai...");
+            } else {
+                isAppAwake = true;
+                console.log("Dasbor dibangunkan. Memuat data terbaru...");
+            }
+        });
     </script>
-</head>
-<body>
 </head>
 <body>
 
