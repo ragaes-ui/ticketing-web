@@ -209,7 +209,7 @@
             }
         }
 
-        async function handleLogin(e) {
+async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
             const originalText = btn.innerHTML;
@@ -219,22 +219,17 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            // ⚠️ Nanti ganti dengan fetch asli ke Backend Mas Raga
-            setTimeout(() => {
-                const fakeResponse = {
-                    success: true,
-                    token: "dummy-token-eo",
-                    data: {
-                        id: "ORG-" + Math.floor(Math.random() * 10000),
-                        organizerName: "Admin " + email.split('@')[0],
-                        email: email,
-                        role: "organizer" 
-                    }
-                };
+            try {
+                const res = await fetch('/api/creator/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const responseData = await res.json();
 
-                if (fakeResponse.success) {
-                    localStorage.setItem('organizerToken', fakeResponse.token);
-                    localStorage.setItem('organizerData', JSON.stringify(fakeResponse.data));
+                if (res.ok && responseData.success) {
+                    localStorage.setItem('organizerToken', responseData.token);
+                    localStorage.setItem('organizerData', JSON.stringify(responseData.data));
 
                     Swal.fire({
                         icon: 'success', title: 'Login Berhasil', text: 'Mengarahkan ke Dasbor Kreator...',
@@ -243,14 +238,17 @@
                         window.location.href = '/creator-dashboard.html';
                     });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Login Gagal', text: 'Email atau sandi salah.', background: '#1e293b', color: '#fff' });
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    Swal.fire({ icon: 'error', title: 'Login Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
                 }
-            }, 1500);
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1e293b', color: '#fff' });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
-        async function handleRegister(e) {
+async function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('btnRegister');
             const originalText = btn.innerHTML;
@@ -265,20 +263,33 @@
                 role: "organizer"
             };
 
-            // ⚠️ Nanti ganti dengan fetch asli ke Backend Mas Raga
-            setTimeout(() => {
-                Swal.fire({
-                    icon: 'success', title: 'Pendaftaran Berhasil!', 
-                    text: 'Akun organisasimu telah dibuat. Silakan login untuk melanjutkan.',
-                    background: '#1e293b', color: '#fff'
-                }).then(() => {
-                    document.getElementById('formRegister').reset();
-                    document.getElementById('loginEmail').value = payload.email; 
-                    switchTab('login');
+            try {
+                const res = await fetch('/api/creator/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
+                const responseData = await res.json();
+
+                if (res.ok && responseData.success) {
+                    Swal.fire({
+                        icon: 'success', title: 'Pendaftaran Berhasil!', 
+                        text: 'Akun organisasimu telah dibuat. Silakan login untuk melanjutkan.',
+                        background: '#1e293b', color: '#fff'
+                    }).then(() => {
+                        document.getElementById('formRegister').reset();
+                        document.getElementById('loginEmail').value = payload.email; 
+                        switchTab('login');
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1e293b', color: '#fff' });
+            } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-            }, 2000);
+            }
         }
     </script>
 </body>
