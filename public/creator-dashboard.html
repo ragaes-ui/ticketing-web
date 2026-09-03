@@ -310,13 +310,44 @@
     <!-- 🔥 AREA INVISIBLE UNTUK CETAK GELANG 🔥 -->
     <div id="printGelangArea"></div>
 
-    <!-- MODAL PENGATURAN -->
+<!-- MODAL PENGATURAN -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content p-4">
-                <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan</span></h5>
-                <div class="mb-4"><label class="form-label" data-i18n="lbl_org_name">Nama Organizer</label><div class="input-group"><input type="text" id="settingName" class="form-control"><button class="btn btn-outline-info" onclick="saveEoName()" data-i18n="btn_update">Update</button></div></div>
-                <div class="mb-3"><label class="form-label text-warning"><i class="bi bi-key-fill"></i> <span data-i18n="lbl_change_pass">Ganti Password</span></label><input type="password" id="settingOldPass" class="form-control mb-2" placeholder="Password Lama"><input type="password" id="settingNewPass" class="form-control mb-2" placeholder="Password Baru"><button class="btn btn-warning w-100 fw-bold text-dark" onclick="saveEoPassword()" data-i18n="btn_save_pass">Simpan Password</button></div>
+                <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan Akun & Keamanan</span></h5>
+                
+                <div class="row g-4">
+                    <!-- Kolom Kiri: Nama & Password -->
+                    <div class="col-md-6 border-end border-secondary">
+                        <div class="mb-4">
+                            <label class="form-label" data-i18n="lbl_org_name">Nama Organizer</label>
+                            <div class="input-group">
+                                <input type="text" id="settingName" class="form-control">
+                                <button class="btn btn-outline-info" onclick="saveEoName()" data-i18n="btn_update">Update</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-warning"><i class="bi bi-key-fill"></i> <span data-i18n="lbl_change_pass">Ganti Password</span></label>
+                            <input type="password" id="settingOldPass" class="form-control mb-2" placeholder="Password Lama">
+                            <input type="password" id="settingNewPass" class="form-control mb-2" placeholder="Password Baru">
+                            <button class="btn btn-warning w-100 fw-bold text-dark" onclick="saveEoPassword()" data-i18n="btn_save_pass">Simpan Password</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Kolom Kanan: Keamanan PIN -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-success"><i class="bi bi-shield-lock-fill"></i> Atur PIN Keamanan</label>
+                            <p class="small text-muted mb-3" style="line-height: 1.4;">PIN 6-angka digunakan sebagai lapis keamanan ganda untuk mereset kata sandi jika Anda lupa.</p>
+                            
+                            <input type="password" id="settingOldPin" class="form-control mb-2" placeholder="PIN Lama (Kosongkan jika baru pertama kali buat)" maxlength="6">
+                            <input type="password" id="settingNewPin" class="form-control mb-3 border-success" placeholder="Buat PIN Baru (6 Angka)" maxlength="6">
+                            
+                            <button class="btn btn-success w-100 fw-bold" onclick="saveEoPin()">Simpan PIN Keamanan</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
