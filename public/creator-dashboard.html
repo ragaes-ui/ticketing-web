@@ -111,11 +111,22 @@
 <body>
 
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <div><i class="bi bi-layers-fill"></i> RCELLFEST CREATOR MANAGER</div>
-            <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')"><i class="bi bi-x-lg"></i></button>
+<div class="sidebar-brand">
+    <div class="d-flex align-items-center">
+        <!-- Masukkan link gambar atau nama file logo Mas Raga di bagian src="..." -->
+        <img src="https://i.ibb.co.com/Q734Kb26/gemini-svg.jpg" alt="Logo RCM" style="height: 38px; width: auto; margin-right: 12px; border-radius: 8px;">
+        
+        <div class="d-flex flex-column justify-content-center">
+            <span style="font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.1;">RCELLFEST</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">CREATOR MANAGER</span>
         </div>
+    </div>
+    
+    <!-- Tombol Silang (X) untuk tutup sidebar di HP -->
+    <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
         <ul class="nav-sidebar">
             <li class="nav-item-side active" onclick="switchMenu('dashboard')"><i class="bi bi-grid-1x2-fill fs-5"></i> <span data-i18n="menu_dash">Ringkasan Dasbor</span></li>
             <li class="nav-item-side" onclick="switchMenu('create')"><i class="bi bi-calendar-plus-fill fs-5"></i> <span data-i18n="menu_create">Buat Event Baru</span></li>
