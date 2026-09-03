@@ -538,6 +538,73 @@ app.post('/api/creator/login', async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 // ==========================================
+// 📊 API LAPORAN & GRAFIK KHUSUS KREATOR/EO
+// ==========================================
+app.post('/api/creator/reports', async (req, res) => {
+    try {
+        const { creatorId } = req.body;
+        
+        // 1. Cari semua event milik EO ini
+        const myEvents = await Event.find({ creatorId: creatorId });
+        const myEventIds = myEvents.map(e => e._id.toString());
+
+        // 2. Cari semua transaksi (Order) yang tiketnya berasal dari event milik EO ini
+        const myOrders = await Order.find({ 
+            eventId: { $in: myEventIds }, 
+            status: { $in: ['valid', 'used'] } 
+        }).sort({ _id: -1 }).populate('eventId');
+
+        let totalPendapatan = 0;
+        let totalTiket = 0;
+        
+        myOrders.forEach(order => {
+            totalPendapatan += (order.price || 0); 
+            totalTiket += (order.quantity || 1);
+        });
+
+        // 3. Siapkan data Transaksi Terakhir (Maksimal 10)
+        const transaksiTerbaru = myOrders.slice(0, 10).map(order => ({
+            date: order.createdAt || order._id.getTimestamp(),
+            customerName: order.customerName || '-',
+            eventName: order.eventId ? order.eventId.name : 'Tiket Event',
+            price: order.price || 0,
+            paymentMethod: order.paymentMethod || 'MIDTRANS'
+        }));
+
+        // 4. Siapkan data Grafik 7 Hari Terakhir
+        const chartData = {};
+        const hariIni = new Date();
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(hariIni);
+            d.setDate(d.getDate() - i);
+            const tglString = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            chartData[tglString] = 0; 
+        }
+
+        myOrders.forEach(order => {
+            const orderDate = new Date(order.createdAt || order._id.getTimestamp());
+            const tglString = orderDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            if (chartData[tglString] !== undefined) {
+                chartData[tglString] += (order.price || 0);
+            }
+        });
+
+        res.json({
+            success: true,
+            totalPendapatan,
+            totalTiket,
+            totalEvent: myEvents.length,
+            transaksiTerbaru,
+            chartLabels: Object.keys(chartData), 
+            chartValues: Object.values(chartData) 
+        });
+
+    } catch (error) {
+        console.error("Gagal memuat laporan kreator:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil data laporan." });
+    }
+});
+// ==========================================
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
