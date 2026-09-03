@@ -12,17 +12,33 @@
     <!-- Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-<style>
-        :root {
+    <style>
+        /* =================================================== */
+        /* 🔥 VARIABEL WARNA (DARK & LIGHT MODE) 🔥 */
+        /* =================================================== */
+        :root[data-theme="dark"] {
             --bg-dark: #0f172a; 
             --bg-card: #1e293b;
             --primary: #2563eb; 
-            --text-main: #ffffff; /* Putih bersih */
-            --text-muted: #cbd5e1; /* Abu-abu terang */
+            --text-main: #ffffff; 
+            --text-muted: #cbd5e1; 
             --border-color: #334155;
+            --input-bg: rgba(0,0,0,0.2);
+            --input-border: #334155;
+        }
+
+        :root[data-theme="light"] {
+            --bg-dark: #f1f5f9; 
+            --bg-card: #ffffff;
+            --primary: #2563eb; 
+            --text-main: #0f172a; 
+            --text-muted: #64748b; 
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
         }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
         
         /* Sidebar Styling */
         .sidebar { width: 260px; background-color: var(--bg-card); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
@@ -31,35 +47,32 @@
         
         .nav-sidebar { list-style: none; padding: 20px 0; margin: 0; flex-grow: 1; overflow-y: auto; }
         .nav-item-side { padding: 12px 25px; color: var(--text-muted); cursor: pointer; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; border-right: 3px solid transparent; }
-        .nav-item-side:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .nav-item-side:hover { color: var(--text-main); background: rgba(128,128,128,0.1); }
         .nav-item-side.active { color: var(--primary); background: rgba(37, 99, 235, 0.1); border-right-color: var(--primary); font-weight: 700; }
         
         /* Main Content */
         .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { height: 76px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .topbar { height: 76px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; transition: 0.3s; }
         .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
         
-        .card-custom { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .card-custom { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; transition: 0.3s; }
         
         /* Form Inputs */
-        .form-control, .form-select { background-color: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main) !important; border-radius: 8px; padding: 12px 15px; }
-        .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.3); border-color: var(--primary); color: var(--text-main); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        .form-control, .form-select { background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main) !important; border-radius: 8px; padding: 12px 15px; transition: 0.3s; }
+        .form-control:focus, .form-select:focus { background-color: var(--input-bg); border-color: var(--primary); color: var(--text-main); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
         
-        /* =================================================== */
-        /* 🔥 FIX WARNA TENGGELAM (GLOBAL) 🔥 */
-        /* =================================================== */
-        .text-muted { color: #cbd5e1 !important; } /* Abu-abu terang untuk sub-judul & deskripsi */
-        .text-white-50 { color: #f8fafc !important; } /* Putih sedikit redup untuk area form */
-        .form-label { color: #f8fafc !important; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        ::placeholder { color: #64748b !important; opacity: 1 !important; } /* Warna placeholder abu kalem */
-        /* =================================================== */
+        /* Fix Teks Biar Gak Tenggelam */
+        .text-muted { color: var(--text-muted) !important; }
+        .text-white-50 { color: var(--text-muted) !important; } 
+        .form-label { color: var(--text-main) !important; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        ::placeholder { color: #94a3b8 !important; opacity: 1 !important; }
 
         /* Tables & Previews */
         .modal-content { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; color: var(--text-main); }
-        .table-dark { --bs-table-bg: transparent; --bs-table-color: var(--text-main); --bs-table-border-color: var(--border-color); }
-        .img-preview-box { width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 8px; background: rgba(0,0,0,0.2); }
+        .table-custom { --bs-table-bg: transparent; --bs-table-color: var(--text-main); --bs-table-border-color: var(--border-color); }
+        .img-preview-box { width: 100%; height: 140px; border: 2px dashed var(--border-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 8px; background: var(--input-bg); }
         .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        .tier-row { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 16px; margin-bottom: 12px; position: relative; }
+        .tier-row { background: var(--input-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 16px; margin-bottom: 12px; position: relative; }
         .btn-remove-tier { position: absolute; top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .promo-ticket { border: 1px dashed #10b981; background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
@@ -77,21 +90,21 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div><i class="bi bi-layers-fill"></i> CREATOR</div>
-            <button class="btn btn-sm btn-dark d-md-none border-secondary" onclick="document.getElementById('sidebar').classList.remove('show')"><i class="bi bi-x-lg"></i></button>
+            <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')"><i class="bi bi-x-lg"></i></button>
         </div>
         <ul class="nav-sidebar">
-            <li class="nav-item-side active" onclick="switchMenu('dashboard')"><i class="bi bi-grid-1x2-fill fs-5"></i> Ringkasan Dasbor</li>
-            <li class="nav-item-side" onclick="switchMenu('create')"><i class="bi bi-calendar-plus-fill fs-5"></i> Buat Event Baru</li>
-            <li class="nav-item-side" onclick="switchMenu('myevents')"><i class="bi bi-collection-play-fill fs-5"></i> Event Saya</li>
-            <li class="nav-item-side" onclick="switchMenu('promo')"><i class="bi bi-ticket-perforated fs-5"></i> Kelola Promo</li>
-            <li class="nav-item-side" onclick="switchMenu('scanner')"><i class="bi bi-qr-code-scan fs-5"></i> Scan Tiket</li>
+            <li class="nav-item-side active" onclick="switchMenu('dashboard')"><i class="bi bi-grid-1x2-fill fs-5"></i> <span data-i18n="menu_dash">Ringkasan Dasbor</span></li>
+            <li class="nav-item-side" onclick="switchMenu('create')"><i class="bi bi-calendar-plus-fill fs-5"></i> <span data-i18n="menu_create">Buat Event Baru</span></li>
+            <li class="nav-item-side" onclick="switchMenu('myevents')"><i class="bi bi-collection-play-fill fs-5"></i> <span data-i18n="menu_events">Event Saya</span></li>
+            <li class="nav-item-side" onclick="switchMenu('promo')"><i class="bi bi-ticket-perforated fs-5"></i> <span data-i18n="menu_promo">Kelola Promo</span></li>
+            <li class="nav-item-side" onclick="switchMenu('scanner')"><i class="bi bi-qr-code-scan fs-5"></i> <span data-i18n="menu_scan">Scan Tiket</span></li>
         </ul>
         <div class="p-3 border-top" style="border-color: var(--border-color) !important;">
             <button onclick="openSettingsModal()" class="btn btn-outline-info w-100 rounded-pill fw-bold mb-2">
-                <i class="bi bi-gear-fill me-2"></i> Pengaturan
+                <i class="bi bi-gear-fill me-2"></i> <span data-i18n="btn_settings">Pengaturan</span>
             </button>
             <button onclick="logoutCreator()" class="btn btn-outline-danger w-100 rounded-pill fw-bold">
-                <i class="bi bi-box-arrow-left me-2"></i> Keluar
+                <i class="bi bi-box-arrow-left me-2"></i> <span data-i18n="btn_logout">Keluar</span>
             </button>
         </div>
     </div>
@@ -100,45 +113,49 @@
     <div class="main-content">
         <!-- TOPBAR -->
         <div class="topbar">
-            <h5 class="fw-bold m-0" id="pageTitle">Ringkasan Dasbor</h5>
-            <button class="btn btn-dark d-md-none border border-secondary" onclick="document.getElementById('sidebar').classList.toggle('show')">
+            <h5 class="fw-bold m-0" id="pageTitle" data-i18n="menu_dash">Ringkasan Dasbor</h5>
+            <button class="btn btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.toggle('show')">
                 <i class="bi bi-list fs-4"></i>
             </button>
             
             <div class="d-none d-md-flex align-items-center gap-3">
-                <div class="text-end">
+                <!-- 🔥 TOGGLE THEME & BAHASA 🔥 -->
+                <button onclick="toggleTheme()" class="btn btn-sm btn-outline-secondary rounded-pill border-0 fs-5" id="theme-btn" title="Ubah Tema">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
+                <button onclick="toggleLanguage()" class="btn btn-sm btn-primary rounded-pill fw-bold px-3" id="lang-btn" title="Ubah Bahasa">ID</button>
+                
+                <div class="text-end ms-2">
                     <h6 class="m-0 fw-bold" id="eoNameDisplay">Loading...</h6>
-                    <small class="text-success"><i class="bi bi-check-circle-fill"></i> Verified Organizer</small>
+                    <small class="text-success"><i class="bi bi-check-circle-fill"></i> <span data-i18n="txt_verified">Verified Organizer</span></small>
                 </div>
-                <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; border: 2px solid #fff;">
-                    EO
-                </div>
+                <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1rem;">EO</div>
             </div>
         </div>
 
-<!-- ============================================== -->
-        <!-- AREA 1: DASHBOARD / RINGKASAN (TERDAPAT GRAFIK) -->
+        <!-- ============================================== -->
+        <!-- AREA 1: DASHBOARD / RINGKASAN -->
         <!-- ============================================== -->
         <div class="content-area" id="dashboardArea">
-            <h3 class="fw-bold mb-1">Halo, <span id="dashEoName" class="text-primary">Kreator</span>! 👋</h3>
-            <p class="mb-4" style="color: #cbd5e1;">Selamat datang di pusat kendali penjualan event Anda.</p>
+            <h3 class="fw-bold mb-1"><span data-i18n="dash_hello">Halo,</span> <span id="dashEoName" class="text-primary">Kreator</span>! 👋</h3>
+            <p class="text-muted mb-4" data-i18n="dash_desc">Selamat datang di pusat kendali penjualan event Anda.</p>
             
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="card-custom text-center" style="border-bottom: 4px solid var(--primary); padding: 20px;">
-                        <h6 class="fw-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1.5px; color: #94a3b8;">TOTAL PENDAPATAN</h6>
+                        <h6 class="fw-bold mb-2 text-muted" style="font-size: 0.75rem; letter-spacing: 1.5px;" data-i18n="stat_rev">TOTAL PENDAPATAN</h6>
                         <h3 class="fw-bold text-primary m-0" id="statPendapatan">Rp 0</h3>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-custom text-center" style="border-bottom: 4px solid #10b981; padding: 20px;">
-                        <h6 class="fw-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1.5px; color: #94a3b8;">TIKET TERJUAL</h6>
+                        <h6 class="fw-bold mb-2 text-muted" style="font-size: 0.75rem; letter-spacing: 1.5px;" data-i18n="stat_sold">TIKET TERJUAL</h6>
                         <h3 class="fw-bold text-success m-0" id="statTiket">0</h3>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-custom text-center" style="border-bottom: 4px solid #f59e0b; padding: 20px;">
-                        <h6 class="fw-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1.5px; color: #94a3b8;">TOTAL EVENT ANDA</h6>
+                        <h6 class="fw-bold mb-2 text-muted" style="font-size: 0.75rem; letter-spacing: 1.5px;" data-i18n="stat_total">TOTAL EVENT ANDA</h6>
                         <h3 class="fw-bold text-warning m-0" id="statTotalEvents">0</h3>
                     </div>
                 </div>
@@ -147,17 +164,17 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-8">
                     <div class="card-custom h-100">
-                        <h6 class="fw-bold text-info mb-4">Grafik Pendapatan (7 Hari)</h6>
+                        <h6 class="fw-bold text-info mb-4" data-i18n="chart_title">Grafik Pendapatan (7 Hari)</h6>
                         <div style="height: 280px;"><canvas id="revenueChart"></canvas></div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="card-custom h-100">
-                        <h6 class="fw-bold text-info mb-3">Transaksi Terakhir</h6>
+                        <h6 class="fw-bold text-info mb-3" data-i18n="recent_trx">Transaksi Terakhir</h6>
                         <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
-                            <table class="table table-dark small align-middle text-nowrap">
+                            <table class="table table-custom small align-middle text-nowrap">
                                 <tbody id="tabelLaporanEO">
-                                    <tr><td class="text-center py-4" style="color: #94a3b8;">Belum ada transaksi</td></tr>
+                                    <tr><td class="text-center py-4 text-muted" data-i18n="txt_no_trx">Belum ada transaksi</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -171,30 +188,22 @@
         <!-- ============================================== -->
         <div class="content-area d-none" id="createEventArea">
             <div class="card-custom">
-                <div class="alert alert-info border-info bg-opacity-10 d-flex align-items-center gap-3 mb-4">
-                    <i class="bi bi-info-circle-fill fs-4 text-info"></i>
-                    <div>
-                        <h6 class="fw-bold m-0 text-info">Mode Kreator Aktif</h6>
-                        <small>Event yang Anda buat otomatis tertaut dengan akun Anda.</small>
-                    </div>
-                </div>
-
                 <form id="formEvent">
                     <div class="mb-3">
-                        <label class="small text-white-50 fw-bold mb-1">Link Gambar Banner (ImgBB)</label>
+                        <label class="form-label" data-i18n="lbl_banner">Link Gambar Banner (ImgBB)</label>
                         <input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview')">
-                        <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-white-50 small"><i class="bi bi-image fs-4"></i></span></div>
+                        <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div>
                     </div>
                     
-                    <div class="mb-3 p-3 mt-3" style="background: rgba(0,255,255,0.05); border: 1px dashed rgba(0,255,255,0.3); border-radius: 12px;">
-                        <label class="small text-info fw-bold mb-2"><i class="bi bi-people-fill me-1"></i> Poster Line Up Artis (Opsional)</label>
+                    <div class="mb-3 p-3 mt-3" style="border: 1px dashed var(--border-color); border-radius: 12px;">
+                        <label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up Artis (Opsional)</span></label>
                         <div id="addLineups"></div>
-                        <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster Line Up</button>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah Poster Line Up</span></button>
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="small text-white-50 fw-bold mb-1">Kategori</label>
+                            <label class="form-label" data-i18n="lbl_category">Kategori</label>
                             <select id="category" class="form-select">
                                 <option value="General">General</option>
                                 <option value="Konser">Konser</option>
@@ -204,71 +213,42 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="small text-warning fw-bold mb-1"><i class="bi bi-bank me-1"></i> Pajak Event (%) - Opsional</label>
+                            <label class="form-label text-warning"><i class="bi bi-bank me-1"></i> <span data-i18n="lbl_tax">Pajak Event (%)</span></label>
                             <input type="number" id="taxRate" class="form-control" placeholder="0" min="0" max="100">
                         </div>
                     </div>
 
-                    <div class="mb-3 mt-3">
-                        <label class="small text-white-50 fw-bold mb-1">Nama Event</label>
-                        <input type="text" id="name" class="form-control" placeholder="Nama Event" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="small text-white-50 fw-bold mb-1">Lokasi / Venue</label>
-                        <input type="text" id="location" class="form-control" placeholder="Contoh: Stadion GBK" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
-                        <input type="text" id="mapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/...">
-                    </div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="name" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi / Venue</label><input type="text" id="location" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Google Maps</label><input type="text" id="mapsUrl" class="form-control"></div>
 
                     <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label class="small text-white-50 fw-bold mb-1">Tanggal Mulai</label>
-                            <input type="date" id="date" class="form-control" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai (Opsional)</label>
-                            <input type="date" id="endDate" class="form-control">
-                        </div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_start_date">Tanggal Mulai</label><input type="date" id="date" class="form-control" required></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_end_date">Tanggal Selesai (Opsional)</label><input type="date" id="endDate" class="form-control"></div>
                     </div>
-                    
                     <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
-                            <input type="time" id="startTime" class="form-control" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="small text-white-50 fw-bold mb-1">Jam Selesai</label>
-                            <input type="time" id="endTime" class="form-control" required>
-                        </div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_start_time">Jam Mulai</label><input type="time" id="startTime" class="form-control" required></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_end_time">Jam Selesai</label><input type="time" id="endTime" class="form-control" required></div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="small text-white-50 fw-bold mb-1">Waktu Buka Tiket (Opsional)</label>
-                        <input type="datetime-local" id="salesOpenDate" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="small text-white-50 fw-bold mb-1">Deskripsi Event</label>
-                        <textarea id="description" class="form-control" rows="3" placeholder="Ceritakan keseruan event..."></textarea>
-                    </div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_open_date">Waktu Buka Tiket (Opsional)</label><input type="datetime-local" id="salesOpenDate" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_desc">Deskripsi Event</label><textarea id="description" class="form-control" rows="3"></textarea></div>
 
                     <div class="mb-3" id="streamingAccountBox" style="display: none;">
-                        <label class="small text-danger fw-bold mb-1"><i class="bi bi-lock-fill"></i> Data Rahasia (Akun Streaming)</label>
+                        <label class="form-label text-danger"><i class="bi bi-lock-fill"></i> <span data-i18n="lbl_secret">Data Rahasia (Akun Streaming)</span></label>
                         <textarea id="secretData" class="form-control border-danger" rows="2" placeholder="Email: ... | Pass: ..."></textarea>
                     </div>
                     
                     <div class="mb-4 mt-4 pt-3 border-top border-secondary">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <label class="small fw-bold text-warning m-0">Tiket & Stok</label>
-                            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('addTiers')"><i class="bi bi-plus"></i> Tambah</button>
+                            <label class="form-label text-warning m-0" data-i18n="lbl_tickets">Tiket & Stok</label>
+                            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('addTiers')"><i class="bi bi-plus"></i> <span data-i18n="btn_add">Tambah</span></button>
                         </div>
                         <div id="addTiers"></div>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 py-3 fs-6 rounded-pill fw-bold" id="btnSubmitEvent">
-                        <i class="bi bi-rocket-takeoff me-2"></i> Terbitkan Event
+                        <i class="bi bi-rocket-takeoff me-2"></i> <span data-i18n="btn_publish">Terbitkan Event</span>
                     </button>
                 </form>
             </div>
@@ -280,25 +260,25 @@
         <div class="content-area d-none" id="myEventsArea">
             <div class="card-custom">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0"><i class="bi bi-collection-play-fill text-primary me-2"></i> Daftar Event Saya</h5>
-                    <button class="btn btn-sm btn-outline-light rounded-pill" onclick="loadMyEvents()">
-                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    <h5 class="fw-bold m-0"><i class="bi bi-collection-play-fill text-primary me-2"></i> <span data-i18n="menu_events">Daftar Event Saya</span></h5>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="loadMyEvents()">
+                        <i class="bi bi-arrow-clockwise"></i> <span data-i18n="btn_refresh">Refresh</span>
                     </button>
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="table table-dark table-hover align-middle text-nowrap" style="background-color: transparent;">
+                    <table class="table table-custom table-hover align-middle text-nowrap">
                         <thead style="border-bottom: 2px solid var(--border-color);">
                             <tr>
-                                <th>Nama Event</th>
-                                <th>Tanggal</th>
-                                <th>Harga Dasar</th>
-                                <th>Status</th>
-                                <th class="text-end">Aksi</th>
+                                <th data-i18n="th_event_name">Nama Event</th>
+                                <th data-i18n="th_date">Tanggal</th>
+                                <th data-i18n="th_price">Harga Dasar</th>
+                                <th data-i18n="th_status">Status</th>
+                                <th class="text-end" data-i18n="th_action">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="myEventsTableBody">
-                            <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
+                            <tr><td colspan="5" class="text-center py-4" data-i18n="txt_loading">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -306,61 +286,59 @@
         </div>
 
         <!-- ============================================== -->
-        <!-- AREA 4: KELOLA PROMO (KHUSUS EVENT EO INI) -->
+        <!-- AREA 4: KELOLA PROMO -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="promoArea">
             <div class="card-custom">
-                <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i>Kelola Kode Promo</h5>
+                <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i><span data-i18n="menu_promo">Kelola Kode Promo</span></h5>
                 
                 <form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
                     <div class="col-md-6">
-                        <label class="small text-white-50 fw-bold mb-1">Target Event Promo</label>
-                        <select id="promoEventId" class="form-select text-white" required>
-                            <!-- Diisi Otomatis Lewat Javascript -->
-                        </select>
+                        <label class="form-label" data-i18n="lbl_promo_target">Target Event Promo</label>
+                        <select id="promoEventId" class="form-select" required></select>
                     </div>
                     <div class="col-md-6">
-                        <label class="small text-white-50 fw-bold mb-1">Kode Promo</label>
+                        <label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label>
                         <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="small text-white-50 fw-bold mb-1">Potongan Harga (Rp)</label>
+                        <label class="form-label" data-i18n="lbl_promo_disc">Potongan Harga (Rp)</label>
                         <input type="number" id="promoDisc" class="form-control" placeholder="20000" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="small text-white-50 fw-bold mb-1">Batas Kuota</label>
+                        <label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label>
                         <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="small text-white-50 fw-bold mb-1">Masa Aktif (Hari)</label>
+                        <label class="form-label" data-i18n="lbl_promo_days">Masa Aktif (Hari)</label>
                         <input type="number" id="promoDays" class="form-control" placeholder="7" required>
                     </div>
                     <div class="col-12 mt-3">
-                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2"><i class="bi bi-plus-lg"></i> Buat Kode Promo</button>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_create_promo">Buat Kode Promo</span></button>
                     </div>
                 </form>
                 
-                <h6 class="fw-bold text-white-50 mb-3">Daftar Promo Event Anda</h6>
+                <h6 class="fw-bold text-muted mb-3" data-i18n="txt_promo_list">Daftar Promo Event Anda</h6>
                 <div id="promoList" class="row g-3"></div>
             </div>
         </div>
 
         <!-- ============================================== -->
-        <!-- AREA 5: SCANNER TIKET KHUSUS EO -->
+        <!-- AREA 5: SCANNER TIKET -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="scannerArea">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="card-custom text-center">
-                        <h4 class="fw-bold mb-2"><i class="bi bi-qr-code-scan text-primary me-2"></i> Scanner Tiket</h4>
-                        <p class="text-muted small mb-4">Pastikan kursor berada di dalam kotak di bawah ini sebelum memindai QR Code menggunakan alat scanner fisik.</p>
+                        <h4 class="fw-bold mb-2"><i class="bi bi-qr-code-scan text-primary me-2"></i> <span data-i18n="menu_scan">Scanner Tiket</span></h4>
+                        <p class="text-muted small mb-4" data-i18n="scan_desc">Pastikan kursor berada di dalam kotak di bawah ini sebelum memindai QR Code.</p>
                         
                         <div class="mb-4">
-                            <input type="text" id="scanInputData" class="form-control form-control-lg text-center fw-bold text-warning border-primary" placeholder="Scan atau ketik KODE TIKET di sini..." style="font-size: 1.2rem; letter-spacing: 2px;" autocomplete="off">
+                            <input type="text" id="scanInputData" class="form-control form-control-lg text-center fw-bold text-warning border-primary" placeholder="Scan Kode..." style="font-size: 1.2rem; letter-spacing: 2px;" autocomplete="off">
                         </div>
                         
                         <button onclick="prosesScanManual()" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold" id="btnScanManual">
-                            <i class="bi bi-upc-scan me-2"></i> Verifikasi Tiket
+                            <i class="bi bi-upc-scan me-2"></i> <span data-i18n="btn_verify">Verifikasi Tiket</span>
                         </button>
                         
                         <div id="scanResultAlert" class="mt-4" style="display: none;"></div>
@@ -370,440 +348,348 @@
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- MODAL & SCRIPTS TERSEMBUNYI -->
-    <!-- ============================================== -->
+    <!-- MODAL PENGATURAN -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
-                <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3"><i class="bi bi-gear-fill text-info me-2"></i> Pengaturan Akun</h5>
+                <h5 class="fw-bold mb-4 border-bottom border-secondary pb-3"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan</span></h5>
                 <div class="mb-4">
-                    <label class="form-label">Nama Organizer / Pembuat</label>
+                    <label class="form-label" data-i18n="lbl_org_name">Nama Organizer</label>
                     <div class="input-group">
                         <input type="text" id="settingName" class="form-control">
-                        <button class="btn btn-outline-info" onclick="saveEoName()">Update</button>
+                        <button class="btn btn-outline-info" onclick="saveEoName()" data-i18n="btn_update">Update</button>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-warning"><i class="bi bi-key-fill"></i> Ganti Password</label>
+                    <label class="form-label text-warning"><i class="bi bi-key-fill"></i> <span data-i18n="lbl_change_pass">Ganti Password</span></label>
                     <input type="password" id="settingOldPass" class="form-control mb-2" placeholder="Password Lama">
                     <input type="password" id="settingNewPass" class="form-control mb-2" placeholder="Password Baru">
-                    <button class="btn btn-warning w-100 fw-bold" onclick="saveEoPassword()">Simpan Password</button>
+                    <button class="btn btn-warning w-100 fw-bold text-dark" onclick="saveEoPassword()" data-i18n="btn_save_pass">Simpan Password</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Edit Event disingkat untuk menghemat ruang, tapi form lengkap -->
+    <!-- MODAL EDIT EVENT -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0"><i class="bi bi-pencil-square text-info me-2"></i>Edit Event</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <h5 class="fw-bold m-0"><i class="bi bi-pencil-square text-info me-2"></i><span data-i18n="modal_edit">Edit Event</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(var(--invert-icon, 1));"></button>
                 </div>
                 <div style="max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
                     <input type="hidden" id="editId">
-                    <div class="mb-3"><label class="form-label">Link Gambar Banner</label><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"><div class="img-preview-box mt-2"><img id="editPreview"></div></div>
-                    <div class="mb-3 p-3" style="background: rgba(0,255,255,0.05); border: 1px dashed rgba(0,255,255,0.3); border-radius: 12px;">
-                        <label class="small text-info fw-bold mb-2"><i class="bi bi-people-fill me-1"></i> Poster Line Up</label>
-                        <div id="editLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster</button>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_banner">Link Gambar Banner</label><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"><div class="img-preview-box mt-2"><img id="editPreview"></div></div>
+                    <div class="mb-3 p-3" style="border: 1px dashed var(--border-color); border-radius: 12px;">
+                        <label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label>
+                        <div id="editLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button>
                     </div>
                     <div class="row g-2 mb-3">
-                        <div class="col-md-6"><label class="form-label text-warning">Pajak Event (%)</label><input type="number" id="editTaxRate" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label">Kategori</label><select id="editCategory" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div>
+                        <div class="col-md-6"><label class="form-label text-warning" data-i18n="lbl_tax">Pajak Event (%)</label><input type="number" id="editTaxRate" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="editCategory" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div>
                     </div>
-                    <div class="mb-3"><label class="form-label">Nama Event</label><input type="text" id="editName" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Lokasi</label><input type="text" id="editLocation" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Link Maps</label><input type="text" id="editMapsUrl" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="editName" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi</label><input type="text" id="editLocation" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Maps</label><input type="text" id="editMapsUrl" class="form-control"></div>
                     <div class="row g-2 mb-3">
-                        <div class="col-6"><label class="form-label">Tgl Mulai</label><input type="date" id="editDate" class="form-control"></div>
-                        <div class="col-6"><label class="form-label">Tgl Selesai</label><input type="date" id="editEndDate" class="form-control"></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_start_date">Tgl Mulai</label><input type="date" id="editDate" class="form-control"></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_end_date">Tgl Selesai</label><input type="date" id="editEndDate" class="form-control"></div>
                     </div>
                     <div class="row g-2 mb-3">
-                        <div class="col-6"><label class="form-label">Jam Mulai</label><input type="time" id="editStartTime" class="form-control"></div>
-                        <div class="col-6"><label class="form-label">Jam Selesai</label><input type="time" id="editEndTime" class="form-control"></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_start_time">Jam Mulai</label><input type="time" id="editStartTime" class="form-control"></div>
+                        <div class="col-6"><label class="form-label" data-i18n="lbl_end_time">Jam Selesai</label><input type="time" id="editEndTime" class="form-control"></div>
                     </div>
-                    <div class="mb-3"><label class="form-label">Waktu Buka Tiket</label><input type="datetime-local" id="editSalesOpenDate" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Deskripsi</label><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
-                    <div class="mb-3"><label class="form-label text-danger">Data Rahasia</label><textarea id="editSecretData" class="form-control border-danger" rows="2"></textarea></div>
-                    <div class="mb-3 border-top border-secondary pt-3"><div class="d-flex justify-content-between align-items-center mb-2"><label class="form-label text-warning m-0">Tipe Tiket & Harga</label><button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('editTiers')"><i class="bi bi-plus"></i></button></div><div id="editTiers"></div></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_open_date">Waktu Buka Tiket</label><input type="datetime-local" id="editSalesOpenDate" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_desc">Deskripsi</label><textarea id="editDescription" class="form-control" rows="2"></textarea></div>
+                    <div class="mb-3"><label class="form-label text-danger" data-i18n="lbl_secret">Data Rahasia</label><textarea id="editSecretData" class="form-control border-danger" rows="2"></textarea></div>
+                    <div class="mb-3 border-top border-secondary pt-3"><div class="d-flex justify-content-between align-items-center mb-2"><label class="form-label text-warning m-0" data-i18n="lbl_tickets">Tipe Tiket & Harga</label><button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-0 px-3" onclick="addTierRow('editTiers')"><i class="bi bi-plus"></i></button></div><div id="editTiers"></div></div>
                 </div>
-                <div class="mt-4 pt-3 border-top border-secondary"><button onclick="saveEditEvent()" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" id="btnSaveEdit">Simpan Perubahan</button></div>
+                <div class="mt-4 pt-3 border-top border-secondary"><button onclick="saveEditEvent()" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" id="btnSaveEdit" data-i18n="btn_save_changes">Simpan Perubahan</button></div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        let organizerInfo = null;
-        let myEventsData = [];
-        let myChart = null;
-        
+        // ==========================================
+        // 🌍 TRANSLATION DICTIONARY
+        // ==========================================
+        const translations = {
+            id: {
+                menu_dash: "Ringkasan Dasbor", menu_create: "Buat Event Baru", menu_events: "Event Saya", menu_promo: "Kelola Promo", menu_scan: "Scan Tiket",
+                btn_settings: "Pengaturan", btn_logout: "Keluar", txt_verified: "Verified Organizer",
+                dash_hello: "Halo,", dash_desc: "Selamat datang di pusat kendali penjualan event Anda.",
+                stat_rev: "TOTAL PENDAPATAN", stat_sold: "TIKET TERJUAL", stat_total: "TOTAL EVENT ANDA",
+                chart_title: "Grafik Pendapatan (7 Hari)", recent_trx: "Transaksi Terakhir", txt_no_trx: "Belum ada transaksi",
+                lbl_banner: "Link Gambar Banner", lbl_lineup: "Poster Line Up Artis", btn_add_lineup: "Tambah Poster",
+                lbl_category: "Kategori", lbl_tax: "Pajak Event (%)", lbl_event_name: "Nama Event", lbl_location: "Lokasi / Venue",
+                lbl_maps: "Link Google Maps", lbl_start_date: "Tanggal Mulai", lbl_end_date: "Tanggal Selesai",
+                lbl_start_time: "Jam Mulai", lbl_end_time: "Jam Selesai", lbl_open_date: "Waktu Buka Tiket",
+                lbl_desc: "Deskripsi", lbl_secret: "Data Rahasia (Streaming)", lbl_tickets: "Tiket & Stok",
+                btn_add: "Tambah", btn_publish: "Terbitkan Event", btn_refresh: "Refresh",
+                th_event_name: "Nama Event", th_date: "Tanggal", th_price: "Harga Dasar", th_status: "Status", th_action: "Aksi",
+                txt_loading: "Memuat data...", lbl_promo_target: "Target Event Promo", lbl_promo_code: "Kode Promo",
+                lbl_promo_disc: "Potongan Harga (Rp)", lbl_promo_quota: "Batas Kuota", lbl_promo_days: "Masa Aktif (Hari)",
+                btn_create_promo: "Buat Kode Promo", txt_promo_list: "Daftar Promo Event Anda",
+                scan_desc: "Pastikan kursor berada di dalam kotak di bawah ini sebelum memindai QR Code.", btn_verify: "Verifikasi Tiket",
+                lbl_org_name: "Nama Organizer", btn_update: "Update", lbl_change_pass: "Ganti Password", btn_save_pass: "Simpan Password",
+                modal_edit: "Edit Event", btn_save_changes: "Simpan Perubahan"
+            },
+            en: {
+                menu_dash: "Dashboard Overview", menu_create: "Create New Event", menu_events: "My Events", menu_promo: "Manage Promo", menu_scan: "Scan Tickets",
+                btn_settings: "Settings", btn_logout: "Logout", txt_verified: "Verified Organizer",
+                dash_hello: "Hello,", dash_desc: "Welcome to your event sales control center.",
+                stat_rev: "TOTAL REVENUE", stat_sold: "TICKETS SOLD", stat_total: "YOUR TOTAL EVENTS",
+                chart_title: "Revenue Chart (7 Days)", recent_trx: "Recent Transactions", txt_no_trx: "No transactions yet",
+                lbl_banner: "Banner Image Link", lbl_lineup: "Artist Line Up Poster", btn_add_lineup: "Add Poster",
+                lbl_category: "Category", lbl_tax: "Event Tax (%)", lbl_event_name: "Event Name", lbl_location: "Location / Venue",
+                lbl_maps: "Google Maps Link", lbl_start_date: "Start Date", lbl_end_date: "End Date",
+                lbl_start_time: "Start Time", lbl_end_time: "End Time", lbl_open_date: "Ticket Sales Open",
+                lbl_desc: "Description", lbl_secret: "Secret Data (Streaming)", lbl_tickets: "Tickets & Stock",
+                btn_add: "Add", btn_publish: "Publish Event", btn_refresh: "Refresh",
+                th_event_name: "Event Name", th_date: "Date", th_price: "Base Price", th_status: "Status", th_action: "Action",
+                txt_loading: "Loading data...", lbl_promo_target: "Target Event Promo", lbl_promo_code: "Promo Code",
+                lbl_promo_disc: "Discount (Rp)", lbl_promo_quota: "Quota Limit", lbl_promo_days: "Active Days",
+                btn_create_promo: "Create Promo Code", txt_promo_list: "Your Event Promos",
+                scan_desc: "Ensure your cursor is inside the box below before scanning the QR Code.", btn_verify: "Verify Ticket",
+                lbl_org_name: "Organizer Name", btn_update: "Update", lbl_change_pass: "Change Password", btn_save_pass: "Save Password",
+                modal_edit: "Edit Event", btn_save_changes: "Save Changes"
+            }
+        };
+
+        let organizerInfo = null; let myEventsData = []; let myChart = null;
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
         const settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'));
 
         // ==========================================
-        // 1. INISIALISASI
+        // 🔥 INISIALISASI (THEME, LANG, LOGIN) 🔥
         // ==========================================
         document.addEventListener('DOMContentLoaded', async () => {
+            // Cek Login EO
             const orgData = localStorage.getItem('organizerData');
             if (!orgData) {
                 Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator.', background: '#1e293b', color: '#fff', allowOutsideClick: false })
-                .then(() => { window.location.href = '/creator-auth.html'; });
-                return;
+                .then(() => { window.location.href = '/creator-auth.html'; }); return;
             }
             organizerInfo = JSON.parse(orgData);
             document.getElementById('eoNameDisplay').innerText = organizerInfo.organizerName || 'Organizer';
             document.getElementById('dashEoName').innerText = organizerInfo.organizerName || 'Organizer';
             document.getElementById('settingName').value = organizerInfo.organizerName || '';
             
+            // Terapkan Tema & Bahasa
+            const savedTheme = localStorage.getItem('creatorTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            const savedLang = localStorage.getItem('creatorLang') || 'id';
+            updateLanguage(savedLang);
+
             addTierRow('addTiers');
-            
-            // Tarik data wajib saat pertama kali buka
-            await loadMyEvents();
-            await loadDashboardStats();
+            await loadMyEvents(); await loadDashboardStats();
             
             // Scanner Auto Listener
             const scanInput = document.getElementById('scanInputData');
-            if (scanInput) {
-                scanInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') { e.preventDefault(); prosesScanManual(); }
-                });
-            }
+            if (scanInput) scanInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); prosesScanManual(); } });
         });
 
-        function logoutCreator() {
-            localStorage.removeItem('organizerToken');
-            localStorage.removeItem('organizerData');
-            window.location.href = '/creator-auth.html';
+        // --- FUNGSI THEME & LANGUAGE ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('creatorTheme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            // Update warna font di Grafik jika ada
+            if(myChart) {
+                myChart.options.scales.x.ticks.color = newTheme === 'dark' ? 'rgba(255,255,255,0.6)' : '#64748b';
+                myChart.options.scales.y.ticks.color = newTheme === 'dark' ? 'rgba(255,255,255,0.6)' : '#64748b';
+                myChart.options.scales.y.grid.color = newTheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                myChart.update();
+            }
+        }
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') { icon.className = 'bi bi-sun-fill text-warning'; document.documentElement.style.setProperty('--invert-icon', '1'); } 
+            else { icon.className = 'bi bi-moon-stars-fill text-dark'; document.documentElement.style.setProperty('--invert-icon', '0'); }
         }
 
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('creatorLang') || 'id';
+            const newLang = currentLang === 'id' ? 'en' : 'id';
+            localStorage.setItem('creatorLang', newLang);
+            updateLanguage(newLang);
+        }
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(t[key]) el.innerHTML = t[key]; });
+            document.getElementById('lang-btn').innerText = lang.toUpperCase();
+        }
+
+        function logoutCreator() { localStorage.removeItem('organizerToken'); localStorage.removeItem('organizerData'); window.location.href = '/creator-auth.html'; }
+
+        // ==========================================
+        // NAVIGASI MENU KIRI
+        // ==========================================
         function switchMenu(menuName) {
             document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
             ['dashboardArea', 'createEventArea', 'myEventsArea', 'promoArea', 'scannerArea'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            const lang = localStorage.getItem('creatorLang') || 'id'; const t = translations[lang];
             
             if (menuName === 'dashboard') {
-                document.querySelectorAll('.nav-item-side')[0].classList.add('active'); 
-                document.getElementById('dashboardArea').classList.remove('d-none');
-                document.getElementById('pageTitle').innerText = 'Ringkasan Dasbor';
-                loadDashboardStats();
+                document.querySelectorAll('.nav-item-side')[0].classList.add('active'); document.getElementById('dashboardArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = t.menu_dash; loadDashboardStats();
+            } else if (menuName === 'create') {
+                document.querySelectorAll('.nav-item-side')[1].classList.add('active'); document.getElementById('createEventArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = t.menu_create;
+            } else if (menuName === 'myevents') {
+                document.querySelectorAll('.nav-item-side')[2].classList.add('active'); document.getElementById('myEventsArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = t.menu_events; loadMyEvents(); 
+            } else if (menuName === 'promo') {
+                document.querySelectorAll('.nav-item-side')[3].classList.add('active'); document.getElementById('promoArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = t.menu_promo; loadPromos(); 
+            } else if (menuName === 'scanner') {
+                document.querySelectorAll('.nav-item-side')[4].classList.add('active'); document.getElementById('scannerArea').classList.remove('d-none');
+                document.getElementById('pageTitle').innerText = t.menu_scan; setTimeout(() => document.getElementById('scanInputData').focus(), 500);
             }
-            else if (menuName === 'create') {
-                document.querySelectorAll('.nav-item-side')[1].classList.add('active'); 
-                document.getElementById('createEventArea').classList.remove('d-none');
-                document.getElementById('pageTitle').innerText = 'Buat Event Baru';
-            } 
-            else if (menuName === 'myevents') {
-                document.querySelectorAll('.nav-item-side')[2].classList.add('active'); 
-                document.getElementById('myEventsArea').classList.remove('d-none');
-                document.getElementById('pageTitle').innerText = 'Manajemen Event';
-                loadMyEvents(); 
-            }
-            else if (menuName === 'promo') {
-                document.querySelectorAll('.nav-item-side')[3].classList.add('active'); 
-                document.getElementById('promoArea').classList.remove('d-none');
-                document.getElementById('pageTitle').innerText = 'Kelola Kode Promo';
-                loadPromos(); 
-            }
-            else if (menuName === 'scanner') {
-                document.querySelectorAll('.nav-item-side')[4].classList.add('active'); 
-                document.getElementById('scannerArea').classList.remove('d-none');
-                document.getElementById('pageTitle').innerText = 'Scan Kehadiran';
-                setTimeout(() => document.getElementById('scanInputData').focus(), 500);
-            }
-
             if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
         }
 
         // ==========================================
-        // 2. STATISTIK DASHBOARD KHUSUS EO
+        // STATISTIK DASHBOARD KHUSUS EO
         // ==========================================
         async function loadDashboardStats() {
             try {
-                // Tembak API Laporan Khusus Kreator yang baru dibuat
-                const res = await fetch('/api/creator/reports', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ creatorId: organizerInfo.id })
-                });
-
+                const res = await fetch('/api/creator/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId: organizerInfo.id }) });
                 if (res.ok) {
                     const data = await res.json();
                     document.getElementById('statPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`;
-                    document.getElementById('statTiket').innerText = data.totalTiket;
-                    document.getElementById('statTotalEvents').innerText = data.totalEvent;
+                    document.getElementById('statTiket').innerText = data.totalTiket; document.getElementById('statTotalEvents').innerText = data.totalEvent;
 
-                    // Isi Tabel Transaksi Terakhir
                     const tbody = document.getElementById('tabelLaporanEO');
                     if(data.transaksiTerbaru.length === 0) {
-                        tbody.innerHTML = '<tr><td class="text-center py-4 text-muted">Belum ada transaksi</td></tr>';
+                        tbody.innerHTML = `<tr><td class="text-center py-4 text-muted">${translations[localStorage.getItem('creatorLang') || 'id'].txt_no_trx}</td></tr>`;
                     } else {
-                        tbody.innerHTML = data.transaksiTerbaru.map(trx => `
-                            <tr>
-                                <td>
-                                    <div class="fw-bold text-white">${trx.customerName}</div>
-                                    <div class="text-white-50" style="font-size:0.7rem;">${trx.eventName}</div>
-                                </td>
-                                <td class="text-end">
-                                    <span class="text-success fw-bold">+Rp ${trx.price.toLocaleString('id-ID')}</span><br>
-                                    <span class="badge bg-primary" style="font-size: 0.6rem;">${trx.paymentMethod}</span>
-                                </td>
-                            </tr>
-                        `).join('');
+                        tbody.innerHTML = data.transaksiTerbaru.map(trx => `<tr><td><div class="fw-bold">${trx.customerName}</div><div class="text-muted" style="font-size:0.7rem;">${trx.eventName}</div></td><td class="text-end"><span class="text-success fw-bold">+Rp ${trx.price.toLocaleString('id-ID')}</span><br><span class="badge bg-primary" style="font-size: 0.6rem;">${trx.paymentMethod}</span></td></tr>`).join('');
                     }
-
-                    // Render Grafik Pendapatan
                     renderChart(data.chartLabels, data.chartValues);
                 }
-            } catch (error) { console.error("Gagal memuat statistik", error); }
+            } catch (error) { console.error(error); }
         }
 
         function renderChart(labels, values) {
-            const ctx = document.getElementById('revenueChart'); 
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, { 
-                type: 'line', 
-                data: { 
-                    labels: labels, 
-                    datasets: [{ data: values, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#0072ff', pointRadius: 4 }] 
-                }, 
-                options: { 
-                    responsive: true, maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.6)' } }, 
-                        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)' } } 
-                    } 
-                } 
-            });
+            const ctx = document.getElementById('revenueChart'); if (myChart) myChart.destroy();
+            const theme = document.documentElement.getAttribute('data-theme');
+            const tickColor = theme === 'dark' ? 'rgba(255,255,255,0.6)' : '#64748b';
+            const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: values, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#0072ff', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: gridColor }, ticks: { color: tickColor } }, x: { grid: { display: false }, ticks: { color: tickColor } } } } });
         }
 
         // ==========================================
-        // 3. KELOLA PROMO KHUSUS EO
+        // KELOLA PROMO KHUSUS EO
         // ==========================================
         async function loadPromos() {
-            // Isi Dropdown Event hanya dengan Event milik EO ini
             const promoSelect = document.getElementById('promoEventId');
             if (myEventsData.length > 0) {
-                let opts = '';
-                if(myEventsData.length > 1) {
-                    opts += '<option value="ALL">-- Berlaku Untuk Semua Event Saya --</option>';
-                }
+                let opts = myEventsData.length > 1 ? '<option value="ALL">-- Berlaku Untuk Semua Event Saya --</option>' : '';
                 myEventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
                 promoSelect.innerHTML = opts;
-            } else {
-                promoSelect.innerHTML = '<option value="">Buat event terlebih dahulu</option>';
-            }
+            } else { promoSelect.innerHTML = '<option value="">Buat event terlebih dahulu</option>'; }
 
-            // Tarik Daftar Promo
             try { 
-                const res = await fetch('/api/promos'); 
-                const allPromos = await res.json(); 
-                
-                // FILTER: Hanya ambil promo yang terhubung ke ID Event milik EO ini
+                const res = await fetch('/api/promos'); const allPromos = await res.json(); 
                 const myEventIds = myEventsData.map(e => e._id.toString());
                 const myPromos = allPromos.filter(p => p.eventId === 'ALL' || myEventIds.includes(p.eventId));
-
                 const promoListHTML = document.getElementById('promoList');
-                if(myPromos.length === 0) {
-                    promoListHTML.innerHTML = `<div class="text-white-50 col-12">Belum ada promo yang dibuat.</div>`;
-                } else {
-                    promoListHTML.innerHTML = myPromos.map(p => `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="promo-ticket m-0 h-100">
-                            <div>
-                                <b class="text-warning fs-5">${p.code}</b><br>
-                                <span class="badge bg-success text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT SAYA'}</span><br>
-                                <small class="text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small>
-                            </div>
-                            <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </div>`).join(''); 
-                }
-            } catch(e) { console.error("Gagal menarik daftar promo", e); }
+                if(myPromos.length === 0) { promoListHTML.innerHTML = `<div class="text-muted col-12">Belum ada promo.</div>`; } 
+                else { promoListHTML.innerHTML = myPromos.map(p => `<div class="col-md-6 col-lg-4"><div class="promo-ticket m-0 h-100"><div><b class="text-warning fs-5">${p.code}</b><br><span class="badge bg-success text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT SAYA'}</span><br><small class="text-muted">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="fw-bold">${p.quota}</span></small></div><button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></div></div>`).join(''); }
+            } catch(e) { }
         }
-
         document.getElementById('formPromo').addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const promoSelect = document.getElementById('promoEventId');
+            e.preventDefault(); const promoSelect = document.getElementById('promoEventId');
             if(!promoSelect.value) return Swal.fire('Error', 'Buat event terlebih dahulu!', 'warning');
-            
-            const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
-
-            const data = { 
-                code: document.getElementById('promoCode').value, 
-                discount: document.getElementById('promoDisc').value, 
-                quota: document.getElementById('promoQuota').value, 
-                daysActive: document.getElementById('promoDays').value,
-                eventId: promoSelect.value, 
-                eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : selectedEventName 
-            };
-
+            const data = { code: document.getElementById('promoCode').value, discount: document.getElementById('promoDisc').value, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value, eventId: promoSelect.value, eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text };
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
-            e.target.reset(); 
-            loadPromos(); 
-            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo berhasil dibuat', background: '#1e293b', color: '#fff' });
+            e.target.reset(); loadPromos(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' });
         });
-        
-        async function hapusPromo(id) { 
-            await fetch(`/api/promos/${id}`, { method: 'DELETE' }); 
-            loadPromos(); 
-        }
+        async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
 
         // ==========================================
-        // 4. PENGATURAN AKUN (NAMA & PASSWORD)
+        // PENGATURAN AKUN (NAMA & PASSWORD)
         // ==========================================
         function openSettingsModal() { settingsModal.show(); }
-
         async function saveEoName() {
-            const newName = document.getElementById('settingName').value.trim();
-            if (!newName) return Swal.fire('Error', 'Nama tidak boleh kosong', 'warning');
+            const newName = document.getElementById('settingName').value.trim(); if (!newName) return Swal.fire('Error', 'Nama kosong', 'warning');
             try {
-                const res = await fetch('/api/user/update-name', { 
-                    method: 'PUT', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ userId: organizerInfo.id, newName: newName }) 
-                });
-                if (res.ok) {
-                    organizerInfo.organizerName = newName;
-                    localStorage.setItem('organizerData', JSON.stringify(organizerInfo));
-                    document.getElementById('eoNameDisplay').innerText = newName;
-                    document.getElementById('dashEoName').innerText = newName;
-                    Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Nama berhasil diubah', showConfirmButton:false, timer:2000, background: '#1e293b', color: '#fff' });
-                }
-            } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
+                const res = await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, newName: newName }) });
+                if (res.ok) { organizerInfo.organizerName = newName; localStorage.setItem('organizerData', JSON.stringify(organizerInfo)); document.getElementById('eoNameDisplay').innerText = newName; document.getElementById('dashEoName').innerText = newName; Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Nama diubah', showConfirmButton:false, timer:2000, background: 'var(--bg-card)', color: 'var(--text-main)' }); }
+            } catch (err) {}
         }
-
         async function saveEoPassword() {
-            const oldPass = document.getElementById('settingOldPass').value;
-            const newPass = document.getElementById('settingNewPass').value;
-            if (!oldPass || !newPass) return Swal.fire('Peringatan', 'Harap isi kedua kolom password', 'warning');
+            const oldPass = document.getElementById('settingOldPass').value; const newPass = document.getElementById('settingNewPass').value;
+            if (!oldPass || !newPass) return Swal.fire('Peringatan', 'Isi kedua kolom', 'warning');
             try {
-                const res = await fetch('/api/user/change-password', { 
-                    method: 'PUT', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ userId: organizerInfo.id, oldPassword: oldPass, newPassword: newPass }) 
-                });
-                if (res.ok) {
-                    Swal.fire({ icon:'success', title:'Berhasil', text:'Password diubah!', background: '#1e293b', color: '#fff' });
-                    document.getElementById('settingOldPass').value = ''; document.getElementById('settingNewPass').value = ''; settingsModal.hide();
-                } else {
-                    const data = await res.json(); Swal.fire({ icon:'error', title:'Gagal', text: data.message || 'Password lama salah', background: '#1e293b', color: '#fff' });
-                }
-            } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
+                const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, oldPassword: oldPass, newPassword: newPass }) });
+                if (res.ok) { Swal.fire({ icon:'success', title:'Berhasil', text:'Password diubah!', background: 'var(--bg-card)', color: 'var(--text-main)' }); document.getElementById('settingOldPass').value = ''; document.getElementById('settingNewPass').value = ''; settingsModal.hide(); } 
+                else { const data = await res.json(); Swal.fire({ icon:'error', title:'Gagal', text: data.message, background: 'var(--bg-card)', color: 'var(--text-main)' }); }
+            } catch (err) {}
         }
 
         // ==========================================
-        // 5. FITUR SCANNER TIKET
+        // FITUR SCANNER TIKET
         // ==========================================
         async function prosesScanManual() {
-            const input = document.getElementById('scanInputData');
-            const code = input.value.trim();
-            const alertBox = document.getElementById('scanResultAlert');
-            
+            const input = document.getElementById('scanInputData'); const code = input.value.trim(); const alertBox = document.getElementById('scanResultAlert');
             if (!code) return;
-
-            const btn = document.getElementById('btnScanManual');
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`; btn.disabled = true;
-
+            const btn = document.getElementById('btnScanManual'); btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`; btn.disabled = true;
             try {
-                const response = await fetch('/api/validate', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticketCode: code }) 
-                });
-                const data = await response.json();
-                
-                alertBox.style.display = 'block';
-                if (data.valid) {
-                    alertBox.className = 'alert alert-success border-success text-start';
-                    alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-check-circle-fill me-2"></i> TIKET VALID!</h4><hr><p class="mb-1"><b>Nama:</b> ${data.data.name}</p><p class="mb-1"><b>Event:</b> ${data.data.event}</p><p class="mb-0 text-success fw-bold">${data.data.info || 'Akses Masuk Diizinkan.'}</p>`;
-                    input.value = ''; 
-                } else {
-                    alertBox.className = 'alert alert-danger border-danger text-start';
-                    alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-x-octagon-fill me-2"></i> ${data.message}</h4><hr><p class="mb-0">${data.detail}</p>`;
-                    input.select(); 
-                }
-            } catch (error) {
-                alertBox.style.display = 'block'; alertBox.className = 'alert alert-warning border-warning'; alertBox.innerHTML = `<i class="bi bi-wifi-off me-2"></i> Sinyal terputus atau server mati.`;
-            } finally { btn.innerHTML = `<i class="bi bi-upc-scan me-2"></i> Verifikasi Tiket`; btn.disabled = false; input.focus(); }
+                const response = await fetch('/api/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticketCode: code }) });
+                const data = await response.json(); alertBox.style.display = 'block';
+                if (data.valid) { alertBox.className = 'alert alert-success border-success text-start'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold text-dark"><i class="bi bi-check-circle-fill me-2"></i> TIKET VALID!</h4><hr><p class="mb-1 text-dark"><b>Nama:</b> ${data.data.name}</p><p class="mb-1 text-dark"><b>Event:</b> ${data.data.event}</p><p class="mb-0 text-success fw-bold">${data.data.info || 'Akses Masuk Diizinkan.'}</p>`; input.value = ''; } 
+                else { alertBox.className = 'alert alert-danger border-danger text-start'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold text-dark"><i class="bi bi-x-octagon-fill me-2"></i> ${data.message}</h4><hr><p class="mb-0 text-dark">${data.detail}</p>`; input.select(); }
+            } catch (error) { alertBox.style.display = 'block'; alertBox.className = 'alert alert-warning border-warning'; alertBox.innerHTML = `<i class="bi bi-wifi-off me-2"></i> Sinyal terputus.`; } 
+            finally { btn.innerHTML = `<i class="bi bi-upc-scan me-2"></i> Verifikasi Tiket`; btn.disabled = false; input.focus(); }
         }
 
         // ==========================================
-        // 6. HELPER FORM EVENT (GAMBAR, TIER, DLL)
+        // HELPER FORM EVENT (GAMBAR, TIER, DLL)
         // ==========================================
-        function previewImage(u, i) { 
-            const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u;
-            if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; }
-            if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
-        }
-        function addLineupRow(containerId, url = '') {
-            document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="input-group mb-2 lineup-row"><span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span><input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}"><button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button></div>`);
-        }
-        function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
-            document.getElementById(id).insertAdjacentHTML('beforeend', `<div class="tier-row"><button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="row g-2 mb-2"><div class="col-7"><input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required></div><div class="col-5"><input type="datetime-local" class="form-control form-control-sm mb-2 tier-open" value="${o}" title="Waktu Buka Tiket"></div></div><div class="row g-2"><div class="col-4"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div></div><div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50"><div class="col-12 col-md-5 d-flex align-items-center"><div class="form-check form-switch m-0"><input class="form-check-input tier-is-locked" type="checkbox" role="switch" ${isLocked ? 'checked' : ''} onchange="toggleAccessCode(this)"><label class="form-check-label small fw-bold text-warning ms-1"><i class="bi bi-lock-fill"></i> Gembok Tiket?</label></div></div><div class="col-12 col-md-7"><input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia (Misal: CREW26)" style="${isLocked ? '' : 'display: none;'}"></div></div></div>`);
-        }
+        function previewImage(u, i) { const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u; if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; } if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; } }
+        function addLineupRow(containerId, url = '') { document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="input-group mb-2 lineup-row"><span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span><input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}"><button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button></div>`); }
+        function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') { document.getElementById(id).insertAdjacentHTML('beforeend', `<div class="tier-row"><button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="row g-2 mb-2"><div class="col-7"><input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required></div><div class="col-5"><input type="datetime-local" class="form-control form-control-sm mb-2 tier-open" value="${o}" title="Waktu Buka Tiket"></div></div><div class="row g-2"><div class="col-4"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div></div><div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50"><div class="col-12 col-md-5 d-flex align-items-center"><div class="form-check form-switch m-0"><input class="form-check-input tier-is-locked" type="checkbox" role="switch" ${isLocked ? 'checked' : ''} onchange="toggleAccessCode(this)"><label class="form-check-label small fw-bold text-warning ms-1"><i class="bi bi-lock-fill"></i> Gembok Tiket?</label></div></div><div class="col-12 col-md-7"><input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia (Misal: CREW26)" style="${isLocked ? '' : 'display: none;'}"></div></div></div>`); }
         function toggleAccessCode(checkbox) { const input = checkbox.closest('.tier-row').querySelector('.tier-access-code'); if (checkbox.checked) { input.style.display = 'block'; input.setAttribute('required', 'true'); } else { input.style.display = 'none'; input.removeAttribute('required'); input.value = ''; } }
         function getTiers(id) { return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({ tierName: r.querySelector('.tier-name').value, price: parseInt(r.querySelector('.tier-price').value), availableSeats: parseInt(r.querySelector('.tier-stock').value), totalSeats: parseInt(r.querySelector('.tier-stock').value), minQty: parseInt(r.querySelector('.tier-min').value) || 1, salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null, isLocked: r.querySelector('.tier-is-locked').checked, accessCode: r.querySelector('.tier-access-code').value })); }
-
         document.getElementById('category').addEventListener('change', function() { const box = document.getElementById('streamingAccountBox'); if(this.value === 'Streaming') { box.style.display = 'block'; } else { box.style.display = 'none'; document.getElementById('secretData').value = ''; } });
         document.getElementById('editCategory').addEventListener('change', function() { const box = document.getElementById('editSecretData'); box.style.display = this.value === 'Streaming' ? 'block' : 'none'; if (this.value !== 'Streaming') box.value = ''; });
 
         // ==========================================
-        // 7. SUBMIT & HAPUS & EDIT EVENT
+        // SUBMIT & HAPUS & EDIT EVENT
         // ==========================================
         document.getElementById('formEvent').addEventListener('submit', async (e) => {
             e.preventDefault(); const tiers = getTiers('addTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
             const btn = document.getElementById('btnSubmitEvent'); const originalText = btn.innerHTML; btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; btn.disabled = true;
-
-            const data = {
-                name: document.getElementById('name').value, category: document.getElementById('category').value, 
-                organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, 
-                location: document.getElementById('location').value, date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, 
-                startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '',
-                mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value,
-                secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', price: tiers[0]?.price || 0, 
-                capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
-                lineupImages: Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''),
-                taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 
-            };
-
-            try {
-                const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-                if (res.ok) {
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event diterbitkan.', background: '#1e293b', color: '#fff' });
-                    e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); previewImage('', 'addPreview');
-                    await loadMyEvents(); switchMenu('myevents'); 
-                } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); }
-            } catch (err) { Swal.fire('Error', 'Koneksi ke server terputus', 'error'); } 
-            finally { btn.innerHTML = originalText; btn.disabled = false; }
+            const data = { name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value, secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, lineupImages: Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 };
+            try { const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); if (res.ok) { Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event diterbitkan.', background: 'var(--bg-card)', color: 'var(--text-main)' }); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); previewImage('', 'addPreview'); await loadMyEvents(); switchMenu('myevents'); } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } } catch (err) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
         });
 
         async function loadMyEvents() {
-            const tbody = document.getElementById('myEventsTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span><br>Mengambil data...</td></tr>';
+            const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>';
             try {
-                const res = await fetch('/api/events'); const allEvents = await res.json();
-                myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id);
-
-                if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Anda belum membuat event apapun.</td></tr>'; return; }
-
+                const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id);
+                if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; }
                 tbody.innerHTML = myEventsData.map(event => {
-                    const harga = new Intl.NumberFormat('id-ID').format(event.price || 0);
-                    let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>';
-                    return `<tr style="border-color: var(--border-color);"><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-white text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')"><i class="bi bi-trash"></i></button></td></tr>`;
+                    const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>';
+                    return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')"><i class="bi bi-trash"></i></button></td></tr>`;
                 }).join('');
-            } catch (err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal menarik data.</td></tr>'; }
+            } catch (err) {}
         }
 
-        async function hapusEvent(id) {
-            Swal.fire({ title: 'Hapus Event?', text: "Dihapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!', background: '#1e293b', color: '#fff'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try { const res = await fetch(`/api/events/${id}`, { method: 'DELETE' }); if (res.ok) { Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Dihapus!', showConfirmButton:false, timer:2000, background: '#1e293b', color: '#fff' }); await loadMyEvents(); loadDashboardStats(); } } catch (err) { Swal.fire('Error', 'Koneksi terputus', 'error'); }
-                }
-            });
-        }
-
+        async function hapusEvent(id) { Swal.fire({ title: 'Hapus Event?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya', background: 'var(--bg-card)', color: 'var(--text-main)' }).then(async (result) => { if (result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); await loadMyEvents(); loadDashboardStats(); } }); }
+        
         function bukaModalEdit(id) {
             const ev = myEventsData.find(e => e._id === id);
             if(ev) {
@@ -811,40 +697,17 @@
                 if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
                 if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = '';
                 document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
-                
-                if(ev.salesOpenDate) {
-                    const d = new Date(ev.salesOpenDate); const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0'); const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0');
-                    document.getElementById('editSalesOpenDate').value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-                } else { document.getElementById('editSalesOpenDate').value = ''; }
-
+                if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; }
                 document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url));
-                document.getElementById('editTiers').innerHTML = ''; 
-                if(ev.tickets) {
-                    ev.tickets.forEach(t => {
-                        let openDateFormatted = '';
-                        if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0'); const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0'); openDateFormatted = `${yyyy}-${mm}-${dd}T${hh}:${min}`; }
-                        addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode);
-                    });
-                }
+                document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); }
                 editModal.show();
             }
         }
-
+        
         async function saveEditEvent() {
-            const id = document.getElementById('editId').value; const tiers = getTiers('editTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error');
-            const btn = document.getElementById('btnSaveEdit'); const originalText = btn.innerHTML; btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; btn.disabled = true;
-
-            const data = {
-                name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '',
-                location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, image: document.getElementById('editImage').value, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
-                lineupImages: Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0,
-                creatorId: organizerInfo.id, organizer: organizerInfo.organizerName
-            };
-
-            try {
-                const res = await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-                if (res.ok) { editModal.hide(); await loadMyEvents(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Perubahan Disimpan!', background: '#1e293b', color: '#fff' }); } else { Swal.fire('Gagal', 'Tidak dapat mengedit event', 'error'); }
-            } catch (err) { Swal.fire('Error', 'Kesalahan server', 'error'); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+            const id = document.getElementById('editId').value; const tiers = getTiers('editTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error');
+            const data = { name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, image: document.getElementById('editImage').value, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, lineupImages: Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, creatorId: organizerInfo.id, organizer: organizerInfo.organizerName };
+            await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); editModal.hide(); await loadMyEvents(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Tersimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' });
         }
     </script>
 </body>
