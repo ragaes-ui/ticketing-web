@@ -201,7 +201,7 @@
             const orgData = localStorage.getItem('organizerData');
             if (orgData) {
                 // Jika sudah ada data login EO, langsung tendang ke dashboard!
-                window.location.href = '/creator-dashboard.html';
+                window.location.href = '/creator-dashboard';
             }
         });
         function switchTab(tab) {
@@ -245,7 +245,7 @@ async function handleLogin(e) {
                         icon: 'success', title: 'Login Berhasil', text: 'Mengarahkan ke Dasbor Kreator...',
                         showConfirmButton: false, timer: 1500, background: '#1e293b', color: '#fff'
                     }).then(() => {
-                        window.location.href = '/creator-dashboard.html';
+                        window.location.href = '/creator-dashboard';
                     });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Login Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
