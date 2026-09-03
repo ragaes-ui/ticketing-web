@@ -100,21 +100,26 @@
         }
     </style>
 <!-- CEK LOGIN INSTAN & ANTI-BACK CACHE -->
+<!-- ANTI-BACK CACHE & HIDE PAGE -->
+    <style id="antiBocor"> html { display: none !important; } </style>
     <script>
-        function paksaKeluar() {
+        function verifikasiKeamanan() {
             if (!localStorage.getItem('organizerData') || !localStorage.getItem('organizerToken')) {
+                // Jika tidak ada token, paksa ke halaman login
                 window.location.replace('/creator-auth');
+            } else {
+                // Jika aman, hapus CSS penutup layar
+                const pelindung = document.getElementById('antiBocor');
+                if (pelindung) pelindung.remove();
             }
         }
         
-        // 1. Cek saat halaman pertama kali dibuka
-        paksaKeluar();
+        verifikasiKeamanan();
 
-        // 2. Cek lagi jika user memaksa klik tombol "Back" di browser
+        // Jika browser memaksa memuat dari memori (BFCache), paksa muat ulang halaman
         window.addEventListener('pageshow', function (event) {
-            // event.persisted artinya halaman dimuat dari riwayat (cache) tombol Back
-            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-                paksaKeluar();
+            if (event.persisted) {
+                window.location.reload();
             }
         });
     </script>
