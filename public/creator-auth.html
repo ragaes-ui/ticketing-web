@@ -10,7 +10,7 @@
     <script>
         // 1. Jika sudah login, lempar ke dasbor
         if (localStorage.getItem('organizerData') && localStorage.getItem('organizerToken')) {
-            window.location.replace('/creator-dashboard.html');
+            window.location.replace('/creator-dashboard');
         }
 
         // 2. MATIKAN TOMBOL BACK: Jika user baru saja logout dan mendarat di sini,
@@ -380,7 +380,7 @@
                         icon: 'success', title: 'Login Berhasil', text: 'Mengarahkan ke Dasbor Kreator...',
                         showConfirmButton: false, timer: 1500, background: '#1e293b', color: '#fff'
                     }).then(() => {
-                        window.location.replace('/creator-dashboard.html');
+                        window.location.replace('/creator-dashboard');
                     });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Login Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
