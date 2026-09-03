@@ -213,11 +213,16 @@
                         </div>
                     </div>
 
+<!-- 👇 CHECKBOX SYARAT & KETENTUAN (WAJIB) 👇 -->
+                    <div class="form-check mb-4 mt-2 d-flex align-items-center gap-2">
+                        <input class="form-check-input" type="checkbox" id="regTerms" required style="cursor: pointer; width: 1.2rem; height: 1.2rem; margin-top: 0;">
+                        <label class="form-check-label text-muted small" for="regTerms" style="cursor: pointer; line-height: 1.4;">
+                            Saya telah membaca dan menyetujui <a href="javascript:void(0)" onclick="lihatSyarat()" class="text-primary text-decoration-none fw-bold">Syarat & Ketentuan</a> RCELLFEST. <span class="text-danger">*</span>
+                        </label>
+                    </div>
+
                     <button type="submit" class="btn-primary-custom w-100" id="btnRegister">Buat Akun Kreator</button>
                 </form>
-                <p class="text-center text-muted small mt-4">
-                    Dengan mendaftar, Anda menyetujui <a href="#" class="text-primary text-decoration-none">Syarat & Ketentuan</a> penyelenggara event.
-                </p>
             </div>
 
             <div class="text-center mt-5">
@@ -313,6 +318,29 @@
                         });
                     }
                 }
+            });
+        }
+        // FUNGSI POPUP SYARAT & KETENTUAN
+        function lihatSyarat() {
+            Swal.fire({
+                title: 'Syarat & Ketentuan Kreator',
+                html: `
+                    <div style="text-align: left; font-size: 0.9rem; max-height: 60vh; overflow-y: auto; color: #cbd5e1; line-height: 1.6;">
+                        <p>Dengan mendaftar sebagai Kreator (Event Organizer) di RCELLFEST, Anda menyetujui poin-poin berikut:</p>
+                        <ol style="padding-left: 20px;">
+                            <li style="margin-bottom: 10px;"><b>Kebenaran Data:</b> Semua data event, harga tiket, dan informasi promosi yang dibuat adalah tanggung jawab penuh pihak Kreator.</li>
+                            <li style="margin-bottom: 10px;"><b>Potongan Pajak/Biaya:</b> Pendapatan penjualan tiket dapat dikenakan potongan pajak atau biaya admin platform sesuai kesepakatan.</li>
+                            <li style="margin-bottom: 10px;"><b>Pembatalan Event:</b> Jika event batal, Kreator wajib bertanggung jawab atas proses pengembalian dana (refund) kepada pembeli tiket.</li>
+                            <li style="margin-bottom: 10px;"><b>Keamanan Akun:</b> Kreator wajib menjaga kerahasiaan kata sandi dan PIN. Pihak RCELLFEST tidak bertanggung jawab atas kerugian akibat kelalaian Kreator.</li>
+                        </ol>
+                        <p class="mb-0 mt-3 text-warning"><i>*Kebijakan ini dapat berubah sewaktu-waktu tanpa pemberitahuan sebelumnya.</i></p>
+                    </div>
+                `,
+                background: '#1e293b',
+                color: '#fff',
+                confirmButtonColor: '#2563eb',
+                confirmButtonText: 'Saya Mengerti & Setuju',
+                width: '600px'
             });
         }
 
