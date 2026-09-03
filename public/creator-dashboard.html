@@ -99,11 +99,24 @@
             @page { size: 250mm 25mm; margin: 0; }
         }
     </style>
-    <!-- CEK LOGIN INSTAN (SEBELUM HALAMAN DIMUAT) -->
+<!-- CEK LOGIN INSTAN & ANTI-BACK CACHE -->
     <script>
-        if (!localStorage.getItem('organizerData') || !localStorage.getItem('organizerToken')) {
-            window.location.replace('/creator-auth');
+        function paksaKeluar() {
+            if (!localStorage.getItem('organizerData') || !localStorage.getItem('organizerToken')) {
+                window.location.replace('/creator-auth');
+            }
         }
+        
+        // 1. Cek saat halaman pertama kali dibuka
+        paksaKeluar();
+
+        // 2. Cek lagi jika user memaksa klik tombol "Back" di browser
+        window.addEventListener('pageshow', function (event) {
+            // event.persisted artinya halaman dimuat dari riwayat (cache) tombol Back
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                paksaKeluar();
+            }
+        });
     </script>
 </head>
 <body>
@@ -455,7 +468,7 @@
         // ==========================================
         document.addEventListener('DOMContentLoaded', async () => {
             const orgData = localStorage.getItem('organizerData');
-            if (!orgData) { Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator.', background: '#1e293b', color: '#fff', allowOutsideClick: false }).then(() => { window.location.href = '/creator-auth.html'; }); return; }
+            if (!orgData) { Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Silakan login sebagai Kreator.', background: '#1e293b', color: '#fff', allowOutsideClick: false }).then(() => { window.location.href = '/creator-auth'; }); return; }
             organizerInfo = JSON.parse(orgData); document.getElementById('eoNameDisplay').innerText = organizerInfo.organizerName || 'Organizer'; document.getElementById('dashEoName').innerText = organizerInfo.organizerName || 'Organizer'; document.getElementById('settingName').value = organizerInfo.organizerName || '';
             
             const savedTheme = localStorage.getItem('creatorTheme') || 'dark'; document.documentElement.setAttribute('data-theme', savedTheme); updateThemeIcon(savedTheme);
@@ -477,7 +490,14 @@
         function updateThemeIcon(theme) { const icon = document.getElementById('theme-icon'); if (theme === 'dark') { icon.className = 'bi bi-sun-fill text-warning'; document.documentElement.style.setProperty('--invert-icon', '1'); } else { icon.className = 'bi bi-moon-stars-fill text-dark'; document.documentElement.style.setProperty('--invert-icon', '0'); } }
         function toggleLanguage() { const newLang = (localStorage.getItem('creatorLang') || 'id') === 'id' ? 'en' : 'id'; localStorage.setItem('creatorLang', newLang); updateLanguage(newLang); }
         function updateLanguage(lang) { const t = translations[lang]; document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(t[key]) el.innerHTML = t[key]; }); document.getElementById('lang-btn').innerText = lang.toUpperCase(); }
-        function logoutCreator() { localStorage.removeItem('organizerToken'); localStorage.removeItem('organizerData'); window.location.href = '/creator-auth.html'; }
+        function logoutCreator() { 
+            // Hapus data sesi
+            localStorage.removeItem('organizerToken'); 
+            localStorage.removeItem('organizerData'); 
+            
+            // Gunakan 'replace' agar halaman dasbor dihapus dari riwayat browser
+            window.location.replace('/creator-auth'); 
+        }
 
         // ==========================================
         // NAVIGASI MENU KIRI
