@@ -11,6 +11,7 @@
     
     <!-- Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         /* =================================================== */
@@ -164,7 +165,12 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-8">
                     <div class="card-custom h-100">
-                        <h6 class="fw-bold text-info mb-4" data-i18n="chart_title">Grafik Pendapatan (7 Hari)</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+    <h6 class="fw-bold text-info m-0" data-i18n="chart_title">Grafik Pendapatan (7 Hari)</h6>
+    <button onclick="cetakLaporanEO()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
+        <i class="bi bi-file-pdf me-1"></i> Cetak Laporan
+    </button>
+</div>
                         <div style="height: 280px;"><canvas id="revenueChart"></canvas></div>
                     </div>
                 </div>
@@ -708,6 +714,28 @@
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error');
             const data = { name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, image: document.getElementById('editImage').value, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, lineupImages: Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, creatorId: organizerInfo.id, organizer: organizerInfo.organizerName };
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); editModal.hide(); await loadMyEvents(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Tersimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' });
+        }
+        // ==========================================
+        // FITUR CETAK LAPORAN PDF EO
+        // ==========================================
+        function cetakLaporanEO() {
+            // Pilih area yang mau dicetak (seluruh halaman ringkasan)
+            const areaCetak = document.getElementById('dashboardArea');
+            
+            // Ambil tema yang sedang aktif biar warna background PDF-nya menyesuaikan
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const bgColor = currentTheme === 'dark' ? '#0f172a' : '#f1f5f9';
+
+            const opsiPDF = {
+                margin: 0.5,
+                filename: `Laporan_Event_${organizerInfo.organizerName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: bgColor },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            // Proses cetak
+            html2pdf().set(opsiPDF).from(areaCetak).save();
         }
     </script>
 </body>
