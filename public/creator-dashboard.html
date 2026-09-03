@@ -89,6 +89,14 @@
             @page { size: 250mm 25mm; margin: 0; }
         }
     </style>
+    <!-- CEK LOGIN INSTAN (SEBELUM HALAMAN DIMUAT) -->
+    <script>
+        if (!localStorage.getItem('organizerData') || !localStorage.getItem('organizerToken')) {
+            window.location.replace('/creator-auth');
+        }
+    </script>
+</head>
+<body>
 </head>
 <body>
 
