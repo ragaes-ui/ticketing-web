@@ -703,8 +703,16 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { username, pin, newPassword } = req.body;
-        const user = await User.findOne({ username: new RegExp('^' + username + '$', 'i') });
-        if (!user) return res.status(404).json({ success: false, message: "Username tidak ditemukan." });
+        
+        // 👇 PERBAIKAN: Gunakan $or untuk mencari di kolom Username ATAU Email 👇
+        const user = await User.findOne({ 
+            $or: [
+                { username: new RegExp('^' + username + '$', 'i') },
+                { email: new RegExp('^' + username + '$', 'i') }
+            ]
+        });
+
+        if (!user) return res.status(404).json({ success: false, message: "Username atau Email tidak ditemukan." });
 
         if (!user.pin) return res.status(400).json({ success: false, message: "Akun ini belum mengatur PIN. Silakan hubungi Admin untuk reset manual." });
 
@@ -714,7 +722,9 @@ app.post('/api/reset-password', async (req, res) => {
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
         res.json({ success: true, message: "Password berhasil direset." });
-    } catch (error) { res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." }); }
+    } catch (error) { 
+        res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." }); 
+    }
 });
 
 app.post('/api/history', async (req, res) => {
