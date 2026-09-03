@@ -605,6 +605,42 @@ app.post('/api/creator/reports', async (req, res) => {
     }
 });
 // ==========================================
+// 🎟️ API DATA PEMBELI KHUSUS EO
+// ==========================================
+app.post('/api/creator/buyers', async (req, res) => {
+    try {
+        const { creatorId } = req.body;
+        
+        // 1. Cari event milik EO ini
+        const myEvents = await Event.find({ creatorId: creatorId });
+        const myEventIds = myEvents.map(e => e._id.toString());
+
+        // 2. Cari semua order tiket yang valid/used untuk event-event tersebut
+        const myOrders = await Order.find({ 
+            eventId: { $in: myEventIds }, 
+            status: { $in: ['valid', 'used'] } 
+        }).sort({ _id: -1 }).populate('eventId');
+
+        // 3. Format datanya untuk dikirim ke frontend
+        const dataPembeli = myOrders.map(order => ({
+            date: order.createdAt || order._id.getTimestamp(),
+            customerName: order.customerName || '-',
+            eventName: order.eventId ? order.eventId.name : 'Tiket Event',
+            ticketCode: order.ticketCode || '-',
+            tierName: order.tierName || 'GENERAL',
+            price: order.price || 0,
+            paymentMethod: order.paymentMethod || 'MIDTRANS',
+            location: order.eventId ? order.eventId.location : 'Lokasi TBA'
+        }));
+
+        res.json({ success: true, data: dataPembeli });
+
+    } catch (error) {
+        console.error("Gagal memuat data pembeli EO:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil data pembeli." });
+    }
+});
+// ==========================================
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
