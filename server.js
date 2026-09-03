@@ -447,7 +447,8 @@ app.post('/api/events', async (req, res) => {
             // 👇 3. Pastikan tickets (array) yang sudah mengandung salesOpenDate per-tier ikut tersimpan 👇
             tickets: tickets || [],
             lineupImages: lineupImages || [],
-            taxRate: taxRate || 0 
+            taxRate: taxRate || 0,
+            creatorId: creatorId || "admin-pusat" // 👈 2. SIMPAN ID KREATOR KE DATABASE
         });
         
         await newEvent.save();
@@ -486,7 +487,57 @@ app.delete('/api/events/:id', async (req, res) => {
 });
 
 // --- API AUTHENTICATION & HISTORY ---
+// ==========================================
+// 🔥 API KHUSUS CREATOR / ORGANIZER 🔥
+// ==========================================
+app.post('/api/creator/register', async (req, res) => {
+    try {
+        const { organizerName, email, phone, password, role } = req.body;
+        const cekEmail = await User.findOne({ email });
+        if(cekEmail) return res.status(400).json({ success: false, message: "Email sudah terdaftar!" });
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newOrganizer = new User({ 
+            username: organizerName, 
+            fullName: organizerName, 
+            email: email, 
+            password: hashedPassword, 
+            role: "organizer", // 👈 Penanda akun khusus Kreator
+            phone: phone, 
+            saldo: 0 
+        });
+        await newOrganizer.save();
+        res.json({ success: true, message: "Akun Organizer berhasil dibuat!" });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+app.post('/api/creator/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan!" });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ success: false, message: "Password salah!" });
+
+        // Tolak jika akun biasa mencoba masuk ke portal EO
+        if (user.role !== "organizer") {
+            return res.status(403).json({ success: false, message: "Akun ini bukan akun Kreator/EO!" });
+        }
+
+        res.json({ 
+            success: true, 
+            token: "token-eo-" + user._id, 
+            data: { 
+                id: user._id, 
+                organizerName: user.fullName || user.username, 
+                email: user.email, 
+                role: user.role 
+            } 
+        });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+// ==========================================
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone } = req.body;
