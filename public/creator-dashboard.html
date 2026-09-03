@@ -111,33 +111,37 @@
 <body>
 
     <!-- SIDEBAR -->
-<div class="sidebar-brand">
-    <div class="d-flex align-items-center">
-        <!-- Masukkan link gambar atau nama file logo Mas Raga di bagian src="..." -->
-        <img src="https://i.ibb.co.com/Q734Kb26/gemini-svg.jpg" alt="Logo RCM" style="height: 38px; width: auto; margin-right: 12px; border-radius: 8px;">
+<!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
         
-        <div class="d-flex flex-column justify-content-center">
-            <span style="font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.1;">RCELLFEST</span>
-            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">CREATOR MANAGER</span>
+        <!-- BAGIAN LOGO (Sudah ditutup rapi) -->
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <!-- Pastikan link src gambar di bawah ini aktif/benar -->
+                <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCM" style="height: 38px; width: auto; margin-right: 12px; border-radius: 8px;">
+                
+                <div class="d-flex flex-column justify-content-center text-start">
+                    <span style="font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.1;">RCELLFEST</span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">CREATOR MANAGER</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
-    </div>
-    
-    <!-- Tombol Silang (X) untuk tutup sidebar di HP -->
-    <button class="btn btn-sm btn-outline-secondary d-md-none border-0" onclick="document.getElementById('sidebar').classList.remove('show')">
-        <i class="bi bi-x-lg"></i>
-    </button>
-</div>
+        
+        <!-- BAGIAN MENU TENGAH -->
         <ul class="nav-sidebar">
             <li class="nav-item-side active" onclick="switchMenu('dashboard')"><i class="bi bi-grid-1x2-fill fs-5"></i> <span data-i18n="menu_dash">Ringkasan Dasbor</span></li>
             <li class="nav-item-side" onclick="switchMenu('create')"><i class="bi bi-calendar-plus-fill fs-5"></i> <span data-i18n="menu_create">Buat Event Baru</span></li>
             <li class="nav-item-side" onclick="switchMenu('myevents')"><i class="bi bi-collection-play-fill fs-5"></i> <span data-i18n="menu_events">Event Saya</span></li>
-            
-            <!-- 🔥 MENU BARU: PESANAN & TIKET 🔥 -->
             <li class="nav-item-side" onclick="switchMenu('buyers')"><i class="bi bi-receipt fs-5"></i> <span data-i18n="menu_buyers">Pesanan & Tiket</span></li>
-            
             <li class="nav-item-side" onclick="switchMenu('promo')"><i class="bi bi-ticket-perforated fs-5"></i> <span data-i18n="menu_promo">Kelola Promo</span></li>
             <li class="nav-item-side" onclick="switchMenu('scanner')"><i class="bi bi-qr-code-scan fs-5"></i> <span data-i18n="menu_scan">Scan Tiket</span></li>
         </ul>
+
+        <!-- BAGIAN TOMBOL BAWAH -->
         <div class="p-3 border-top" style="border-color: var(--border-color) !important;">
             <button onclick="openSettingsModal()" class="btn btn-outline-info w-100 rounded-pill fw-bold mb-2">
                 <i class="bi bi-gear-fill me-2"></i> <span data-i18n="btn_settings">Pengaturan</span>
@@ -146,6 +150,7 @@
                 <i class="bi bi-box-arrow-left me-2"></i> <span data-i18n="btn_logout">Keluar</span>
             </button>
         </div>
+
     </div>
 
     <!-- MAIN CONTENT -->
