@@ -254,12 +254,17 @@
                 </button>
             </form>
 
-            <div class="switcher-box">
-                <span id="textInfo">Belum bergabung dengan kami?</span> 
-                <span class="link-accent ms-1" onclick="toggleMode()">Daftar Akun Baru</span>
+<div class="switcher-box">
+                <div class="mb-4">
+                    <span id="textInfo">Belum punya akun?</span> 
+                    <span class="link-accent ms-1" onclick="toggleMode()">Daftar Akun Baru</span>
+                </div>
+                
+                <!-- 👇 TOMBOL KEMBALI KE BERANDA 👇 -->
+                <a href="/" class="text-muted text-decoration-none" style="font-size: 0.85rem; font-weight: 500; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
+                </a>
             </div>
-        </div>
-    </div>
 
     <!-- SEMUA JAVASCRIPT DI BAWAH SINI 100% AMAN DAN TIDAK ADA YANG DIHAPUS -->
     <script>
