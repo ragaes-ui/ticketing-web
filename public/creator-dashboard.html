@@ -98,6 +98,17 @@
             .gelang-bottom .date-text { font-size: 9px; font-weight: bold; color: #000; }
             @page { size: 250mm 25mm; margin: 0; }
         }
+        /* ========================================== */
+        /* 🔥 EFEK LOADING TRANSISI MENU 🔥 */
+        /* ========================================== */
+        #menuLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s;
+        }
+        #menuLoader.show { opacity: 1; visibility: visible; }
+        .spinner-custom { width: 3rem; height: 3rem; color: var(--primary); }
     </style>
 <!-- CEK LOGIN INSTAN & ANTI-BACK CACHE -->
 <!-- ANTI-BACK CACHE & HIDE PAGE -->
@@ -141,7 +152,12 @@
     </script>
 </head>
 <body>
-
+<!-- 👇 WADAH LOADING TRANSISI MENU 👇 -->
+    <div id="menuLoader">
+        <div class="spinner-border spinner-custom" role="status"></div>
+        <div class="mt-3 fw-bold text-muted small" style="letter-spacing: 2px;">MEMUAT...</div>
+    </div>
+    <!-- 👆 ---------------------------- 👆 -->
     <!-- SIDEBAR -->
 <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
@@ -527,18 +543,32 @@
         // ==========================================
         // NAVIGASI MENU KIRI
         // ==========================================
+// ==========================================
+        // NAVIGASI MENU KIRI (DENGAN EFEK LOADING)
+        // ==========================================
         function switchMenu(menuName) {
-            document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
-            ['dashboardArea', 'createEventArea', 'myEventsArea', 'buyersArea', 'promoArea', 'scannerArea'].forEach(id => document.getElementById(id).classList.add('d-none'));
-            const t = translations[localStorage.getItem('creatorLang') || 'id'];
-            
-            if (menuName === 'dashboard') { document.querySelectorAll('.nav-item-side')[0].classList.add('active'); document.getElementById('dashboardArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_dash; loadDashboardStats(); } 
-            else if (menuName === 'create') { document.querySelectorAll('.nav-item-side')[1].classList.add('active'); document.getElementById('createEventArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_create; } 
-            else if (menuName === 'myevents') { document.querySelectorAll('.nav-item-side')[2].classList.add('active'); document.getElementById('myEventsArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_events; loadMyEvents(); } 
-            else if (menuName === 'buyers') { document.querySelectorAll('.nav-item-side')[3].classList.add('active'); document.getElementById('buyersArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_buyers; loadBuyers(); } 
-            else if (menuName === 'promo') { document.querySelectorAll('.nav-item-side')[4].classList.add('active'); document.getElementById('promoArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_promo; loadPromos(); } 
-            else if (menuName === 'scanner') { document.querySelectorAll('.nav-item-side')[5].classList.add('active'); document.getElementById('scannerArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_scan; setTimeout(() => document.getElementById('scanInputData').focus(), 500); }
-            if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
+            // 1. Tampilkan layar loading
+            const loader = document.getElementById('menuLoader');
+            loader.classList.add('show');
+
+            // 2. Beri jeda 300ms agar animasinya terasa mulus
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
+                ['dashboardArea', 'createEventArea', 'myEventsArea', 'buyersArea', 'promoArea', 'scannerArea'].forEach(id => document.getElementById(id).classList.add('d-none'));
+                const t = translations[localStorage.getItem('creatorLang') || 'id'];
+                
+                if (menuName === 'dashboard') { document.querySelectorAll('.nav-item-side')[0].classList.add('active'); document.getElementById('dashboardArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_dash; loadDashboardStats(); } 
+                else if (menuName === 'create') { document.querySelectorAll('.nav-item-side')[1].classList.add('active'); document.getElementById('createEventArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_create; } 
+                else if (menuName === 'myevents') { document.querySelectorAll('.nav-item-side')[2].classList.add('active'); document.getElementById('myEventsArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_events; loadMyEvents(); } 
+                else if (menuName === 'buyers') { document.querySelectorAll('.nav-item-side')[3].classList.add('active'); document.getElementById('buyersArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_buyers; loadBuyers(); } 
+                else if (menuName === 'promo') { document.querySelectorAll('.nav-item-side')[4].classList.add('active'); document.getElementById('promoArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_promo; loadPromos(); } 
+                else if (menuName === 'scanner') { document.querySelectorAll('.nav-item-side')[5].classList.add('active'); document.getElementById('scannerArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_scan; setTimeout(() => document.getElementById('scanInputData').focus(), 500); }
+                
+                if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
+
+                // 3. Matikan layar loading setelah menu selesai diganti
+                loader.classList.remove('show');
+            }, 300);
         }
 
         // ==========================================
