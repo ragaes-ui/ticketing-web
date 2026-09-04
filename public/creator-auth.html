@@ -127,10 +127,39 @@
             .auth-form-area { padding: 30px 20px; width: 100%; max-width: 100%; }
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* NOTIFIKASI TOAST KECIL DI ATAS */
+#toast-notif {
+    position: fixed;
+    top: -100px; /* Sembunyi di luar layar atas */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10B981; /* Hijau keren */
+    color: white;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek animasi membal */
+    z-index: 9999;
+}
+
+/* Class untuk memunculkan toast */
+#toast-notif.show {
+    top: 24px; 
+}
     </style>
 </head>
 <body>
-
+<!-- WADAH NOTIFIKASI TOAST -->
+<div id="toast-notif">
+    <span id="toast-icon">✅</span>
+    <span id="toast-message">Sukses!</span>
+</div>
+    
     <div class="auth-container">
         <div class="auth-banner">
 <div class="brand-logo align-items-center">
@@ -373,16 +402,18 @@
                 });
                 const responseData = await res.json();
 
-                if (res.ok && responseData.success) {
+if (res.ok && responseData.success) {
                     localStorage.setItem('organizerToken', responseData.token);
                     localStorage.setItem('organizerData', JSON.stringify(responseData.data));
 
-                    Swal.fire({
-                        icon: 'success', title: 'Login Berhasil', text: 'Mengarahkan ke Dasbor Kreator...',
-                        showConfirmButton: false, timer: 1500, background: '#1e293b', color: '#fff'
-                    }).then(() => {
-                        window.location.replace('/creator-dashboard');
-                    });
+                    // 👇 Panggil Toast animasi kecil di sini 👇
+                    showToast("Login Berhasil! Mengalihkan...");
+                    
+                    // Jeda 1.5 detik biar animasinya kelihatan, lalu pindah ke dashboard
+                    setTimeout(() => {
+                        window.location.replace('/creator-dashboard'); 
+                    }, 1500);
+
                 } else {
                     Swal.fire({ icon: 'error', title: 'Login Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
                 }
@@ -393,7 +424,19 @@
                 btn.disabled = false;
             }
         }
+// Fungsi untuk memunculkan notifikasi kecil di atas
+function showToast(message) {
+    const toast = document.getElementById('toast-notif');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toastMessage.textContent = message; // Ubah teks pesan
+    toast.classList.add('show'); // Turunkan pop-up
 
+    // Sembunyikan otomatis setelah 3 detik
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
         async function handleRegister(e) {
             e.preventDefault();
             
@@ -428,16 +471,15 @@
                 });
                 const responseData = await res.json();
 
-                if (res.ok && responseData.success) {
-                    Swal.fire({
-                        icon: 'success', title: 'Pendaftaran Berhasil!', 
-                        text: 'Akun organisasimu telah dibuat. Silakan login untuk melanjutkan.',
-                        background: '#1e293b', color: '#fff'
-                    }).then(() => {
-                        document.getElementById('formRegister').reset();
-                        document.getElementById('loginEmail').value = payload.email; 
-                        switchTab('login');
-                    });
+if (res.ok && responseData.success) {
+                    
+                    // 👇 Panggil Toast animasi kecil di sini 👇
+                    showToast("Pendaftaran Berhasil! Silakan Login.");
+                    
+                    document.getElementById('formRegister').reset();
+                    document.getElementById('loginEmail').value = payload.email; 
+                    switchTab('login');
+                    
                 } else {
                     Swal.fire({ icon: 'error', title: 'Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
                 }
