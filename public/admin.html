@@ -416,7 +416,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Potongan Harga (Rp)</label>
-                            <input type="number" id="promoDisc" class="form-control" placeholder="20000" required>
+                            <input type="text" id="promoDisc" class="form-control fw-bold text-info" placeholder="20.000" required oninput="formatRupiah(this)">
                         </div>
                         <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Batas Kuota</label>
@@ -701,6 +701,7 @@
         }
 
 function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
+            let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : '';
             document.getElementById(id).insertAdjacentHTML('beforeend', `
                 <div class="tier-row">
                     <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
@@ -714,7 +715,8 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                         </div>
                     </div>
                     <div class="row g-2">
-                        <div class="col-4"><input type="number" class="form-control form-control-sm tier-price" value="${p}" placeholder="Harga (Rp)" required></div>
+                        <!-- 👇 INI UBAH JADI TYPE TEXT & DITAMBAH FORMAT RUPIAH 👇 -->
+                        <div class="col-4"><input type="text" class="form-control form-control-sm tier-price fw-bold" value="${formatP}" placeholder="Harga (Rp)" required oninput="formatRupiah(this)"></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
                     </div>
@@ -733,6 +735,7 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                     <!-- 👆 ------------------ 👆 -->
                 </div>`);
         }
+
         // Fungsi animasi untuk memunculkan kolom input kode
         function toggleAccessCode(checkbox) {
             const input = checkbox.closest('.tier-row').querySelector('.tier-access-code');
@@ -745,6 +748,7 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                 input.value = ''; // Kosongkan jika gembok dimatikan
             }
         }
+        
         function addLineupRow(containerId, url = '') {
             const html = `
                 <div class="input-group mb-2 lineup-row">
@@ -756,14 +760,14 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
             document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
         }
 
-function getTiers(id) {
+        // 👇 TARIK DATA DENGAN MENGHAPUS TITIK DI HARGANYA 👇
+        function getTiers(id) {
             return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
                 tierName: r.querySelector('.tier-name').value, 
-                price: parseInt(r.querySelector('.tier-price').value),
+                price: parseInt(r.querySelector('.tier-price').value.replace(/\./g, '')) || 0,
                 availableSeats: parseInt(r.querySelector('.tier-stock').value), 
                 totalSeats: parseInt(r.querySelector('.tier-stock').value),
                 minQty: parseInt(r.querySelector('.tier-min').value) || 1,
-                // 👇 TARIK DATA TANGGAL BUKA TIKET DARI FORM 👇
                 salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null,
                 isLocked: r.querySelector('.tier-is-locked').checked,
                 accessCode: r.querySelector('.tier-access-code').value
@@ -915,7 +919,7 @@ document.getElementById('editTiers').innerHTML = '';
 
             const data = { 
                 code: document.getElementById('promoCode').value, 
-                discount: document.getElementById('promoDisc').value, 
+                discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0,discount: document.getElementById('promoDisc').value, 
                 quota: document.getElementById('promoQuota').value, 
                 daysActive: document.getElementById('promoDays').value,
                 eventId: promoSelect.value, // Simpan ID Event-nya
@@ -989,6 +993,11 @@ document.getElementById('editTiers').innerHTML = '';
         }
 
         // --- HELPERS & CHART ---
+        // 👇 FUNGSI OTOMATIS KASIH TITIK RUPIAH 👇
+        function formatRupiah(input) {
+            let angka = input.value.replace(/[^0-9]/g, '');
+            input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
+        }
         function updateChart(l, v) {
             const ctx = document.getElementById('revenueChart'); if (myChart) myChart.destroy();
             myChart = new Chart(ctx, { type: 'line', data: { labels: l, datasets: [{ data: v, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#0072ff', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.6)' } }, x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)' } } } } });
