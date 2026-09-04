@@ -153,10 +153,24 @@
 
         /* Utility */
         .d-none { display: none; }
+        /* NOTIFIKASI TOAST KECIL DI ATAS */
+        #toast-notif {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: #10B981; color: white; padding: 10px 24px; border-radius: 50px;
+            font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.3s; 
+            z-index: 9999; width: max-content; max-width: 90%;
+        }
+        #toast-notif.show { top: 24px; }
     </style>
 </head>
 <body>
-
+<!-- WADAH NOTIFIKASI TOAST -->
+    <div id="toast-notif">
+        <span id="toast-icon">✅</span>
+        <span id="toast-message">Sukses!</span>
+    </div>
     <div class="login-card">
         <div class="brand-header">
             <i class="bi bi-robot logo-icon"></i>
@@ -231,15 +245,20 @@
         let isLogin = true;
 
         // Toast Ringan
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 2500,
-            background: '#18181b',
-            color: '#fff',
-            customClass: { popup: 'colored-toast' }
-        });
+function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notif');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message; 
+            if (type === 'error') {
+                toast.style.background = '#EF4444'; toastIcon.textContent = '❌';
+            } else {
+                toast.style.background = '#10B981'; toastIcon.textContent = '✅';
+            }
+            toast.classList.add('show'); 
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
 
         // Mode Switcher (Login / Register)
         function toggleMode() {
@@ -419,21 +438,21 @@
                         // Lolos pengecekan, ini murni USER BIASA
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
-                        Toast.fire({ icon: 'success', title: 'Login Berhasil' });
+                        showToast("Login Berhasil! Mengalihkan...", "success");
                         setTimeout(() => {
                              window.location.href = 'index.html'; // Paten ke index.html
                         }, 1000);
                     } else {
-                        Toast.fire({ icon: 'success', title: 'Registrasi Berhasil! Silakan Login.' });
+                        showToast("Registrasi Berhasil! Silakan Login.", "success");
                         toggleMode();
                         grecaptcha.reset(); // Reset captcha setelah sukses daftar
                     }
                 } else {
-                    Toast.fire({ icon: 'error', title: data.message || 'Gagal' });
+                    showToast(data.message || "Gagal!", "error");
                     grecaptcha.reset(); // Reset captcha jika password/data salah
                 }
             } catch (err) {
-                Toast.fire({ icon: 'warning', title: 'Cek koneksi internet Anda' });
+                showToast("Cek koneksi internet Anda", "error");
                 grecaptcha.reset(); // Reset captcha jika error jaringan
             } finally {
                 btn.disabled = false;
