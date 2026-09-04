@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Creator Portal | RCELLFEST</title>
     
-    <!-- CEK LOGIN INSTAN (AUTO REDIRECT KE DASHBOARD) -->
-<!-- CEK LOGIN INSTAN & JEBAKAN TOMBOL BACK -->
+    <!-- CEK LOGIN INSTAN & JEBAKAN TOMBOL BACK -->
     <script>
-        // 1. Jika sudah login, lempar ke dasbor
         if (localStorage.getItem('organizerData') && localStorage.getItem('organizerToken')) {
             window.location.replace('/creator-dashboard');
         }
 
-        // 2. MATIKAN TOMBOL BACK: Jika user baru saja logout dan mendarat di sini,
-        // kita jebak riwayat browsernya agar tidak bisa mundur ke dasbor.
         history.pushState(null, null, window.location.href);
         window.addEventListener('popstate', function () {
             history.pushState(null, null, window.location.href);
@@ -32,8 +28,8 @@
             --primary-hover: #1d4ed8;
             --bg-dark: #0f172a;
             --bg-card: #1e293b;
-            --text-main: #ffffff; /* Lebih cerah */
-            --text-muted: #cbd5e1; /* Lebih cerah dari abu-abu standar */
+            --text-main: #ffffff;
+            --text-muted: #cbd5e1;
             --border-color: #334155;
         }
 
@@ -47,7 +43,6 @@
             overflow-x: hidden;
         }
 
-        /* FIX WARNA TEXT TENGGELAM */
         .text-muted { color: var(--text-muted) !important; }
         .text-white-50 { color: #f8fafc !important; }
         p, small { color: var(--text-muted); }
@@ -127,44 +122,44 @@
             .auth-form-area { padding: 30px 20px; width: 100%; max-width: 100%; }
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         /* NOTIFIKASI TOAST KECIL DI ATAS */
-#toast-notif {
-    width: max-content;
-    max-width: 90%;
-    position: fixed;
-    top: -100px; /* Sembunyi di luar layar atas */
-    left: 50%;
-    transform: translateX(-50%);
-    background: #10B981; /* Hijau keren */
-    color: white;
-    padding: 10px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek animasi membal */
-    z-index: 9999;
-}
+        #toast-notif {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10B981;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.3s; 
+            z-index: 9999;
+            width: max-content;
+            max-width: 90%;
+        }
 
-/* Class untuk memunculkan toast */
-#toast-notif.show {
-    top: 24px; 
-}
+        #toast-notif.show {
+            top: 24px; 
+        }
     </style>
 </head>
 <body>
-<!-- WADAH NOTIFIKASI TOAST -->
-<div id="toast-notif">
-    <span id="toast-icon">✅</span>
-    <span id="toast-message">Sukses!</span>
-</div>
+    <!-- WADAH NOTIFIKASI TOAST -->
+    <div id="toast-notif">
+        <span id="toast-icon">✅</span>
+        <span id="toast-message">Sukses!</span>
+    </div>
     
     <div class="auth-container">
         <div class="auth-banner">
-<div class="brand-logo align-items-center">
+            <div class="brand-logo align-items-center">
                 <img src="https://i.ibb.co/GvpPC8Fg/rcm-logo.jpg" alt="Logo RCM" style="height: 50px; width: auto; border-radius: 10px;">
                 <div class="d-flex flex-column justify-content-center text-start">
                     <span style="font-size: 1.8rem; font-weight: 900; line-height: 1;">RCELLFEST</span>
@@ -187,7 +182,7 @@
         </div>
 
         <div class="auth-form-area">
-<div class="brand-logo d-lg-none justify-content-center mb-4 align-items-center text-start gap-2">
+            <div class="brand-logo d-lg-none justify-content-center mb-4 align-items-center text-start gap-2">
                 <img src="https://i.ibb.co/GvpPC8Fg/rcm-logo.jpg" alt="Logo RCM" style="height: 42px; width: auto; border-radius: 8px;">
                 <div class="d-flex flex-column justify-content-center">
                     <span style="font-size: 1.5rem; font-weight: 900; line-height: 1; color: #fff;">RCELLFEST</span>
@@ -213,7 +208,6 @@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between">
                             <label class="form-label">Kata Sandi</label>
-                            <!-- 👇 FITUR LUPA SANDI DITAMBAHKAN 👇 -->
                             <a href="javascript:void(0)" onclick="lupaSandi()" class="text-primary text-decoration-none small fw-bold">Lupa Sandi?</a>
                         </div>
                         <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
@@ -246,14 +240,12 @@
                             <label class="form-label">Buat Kata Sandi <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" id="regPassword" placeholder="Min. 6 karakter" minlength="6" required>
                         </div>
-                        <!-- 👇 FITUR KONFIRMASI PASSWORD DITAMBAHKAN 👇 -->
                         <div class="col-md-6">
                             <label class="form-label">Konfirmasi Sandi <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" id="regConfirmPassword" placeholder="Ulangi sandi" minlength="6" required>
                         </div>
                     </div>
 
-<!-- 👇 CHECKBOX SYARAT & KETENTUAN (WAJIB) 👇 -->
                     <div class="form-check mb-4 mt-2 d-flex align-items-center gap-2">
                         <input class="form-check-input" type="checkbox" id="regTerms" required style="cursor: pointer; width: 1.2rem; height: 1.2rem; margin-top: 0;">
                         <label class="form-check-label text-muted small" for="regTerms" style="cursor: pointer; line-height: 1.4;">
@@ -266,8 +258,7 @@
             </div>
 
             <div class="text-center mt-5">
-                <a href="https://rcellfest.my.id">Kembali ke Beranda</a>
-
+                <a href="https://rcellfest.my.id" class="text-decoration-none">Kembali ke Beranda</a>
             </div>
 
         </div>
@@ -290,8 +281,7 @@
             }
         }
 
-        // FUNGSI POPUP LUPA SANDI
-// FUNGSI MODAL LUPA SANDI DENGAN PIN
+        // FUNGSI MODAL LUPA SANDI DENGAN PIN
         function lupaSandi() {
             Swal.fire({
                 title: 'Reset Kata Sandi EO',
@@ -324,7 +314,6 @@
                     const { username, pin, newPassword } = result.value;
                     
                     try {
-                        // Tembak API reset password yang sudah ada di server.js
                         const res = await fetch('/api/reset-password', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -361,6 +350,7 @@
                 }
             });
         }
+
         // FUNGSI POPUP SYARAT & KETENTUAN
         function lihatSyarat() {
             Swal.fire({
@@ -385,6 +375,29 @@
             });
         }
 
+        // 👇 FUNGSI TOAST UPDATE WARNA 👇
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notif');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message; 
+
+            if (type === 'error') {
+                toast.style.background = '#EF4444'; // Merah untuk Error
+                toastIcon.textContent = '❌';
+            } else {
+                toast.style.background = '#10B981'; // Hijau untuk Sukses
+                toastIcon.textContent = '✅';
+            }
+
+            toast.classList.add('show'); 
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
@@ -396,7 +409,6 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                // Fetch API Login yang ada di server.js
                 const res = await fetch('/api/creator/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -404,50 +416,37 @@
                 });
                 const responseData = await res.json();
 
-if (res.ok && responseData.success) {
+                if (res.ok && responseData.success) {
                     localStorage.setItem('organizerToken', responseData.token);
                     localStorage.setItem('organizerData', JSON.stringify(responseData.data));
 
-                    // 👇 Panggil Toast animasi kecil di sini 👇
-                    showToast("Login Berhasil! Mengalihkan...");
+                    // Toast Hijau
+                    showToast("Login Berhasil! Mengalihkan...", "success");
                     
-                    // Jeda 1.5 detik biar animasinya kelihatan, lalu pindah ke dashboard
                     setTimeout(() => {
                         window.location.replace('/creator-dashboard'); 
                     }, 1500);
 
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Login Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
+                    // Toast Merah jika password salah
+                    showToast(responseData.message || "Login Gagal!", "error");
                 }
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1e293b', color: '#fff' });
+                showToast("Koneksi ke server gagal.", "error");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
-// Fungsi untuk memunculkan notifikasi kecil di atas
-function showToast(message) {
-    const toast = document.getElementById('toast-notif');
-    const toastMessage = document.getElementById('toast-message');
-    
-    toastMessage.textContent = message; // Ubah teks pesan
-    toast.classList.add('show'); // Turunkan pop-up
 
-    // Sembunyikan otomatis setelah 3 detik
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
         async function handleRegister(e) {
             e.preventDefault();
             
-            // 👇 VALIDASI KONFIRMASI PASSWORD 👇
             const pass = document.getElementById('regPassword').value;
             const confirmPass = document.getElementById('regConfirmPassword').value;
             
             if (pass !== confirmPass) {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Konfirmasi kata sandi tidak cocok!', background: '#1e293b', color: '#fff' });
+                showToast("Konfirmasi kata sandi tidak cocok!", "error");
                 return;
             }
 
@@ -465,7 +464,6 @@ function showToast(message) {
             };
 
             try {
-                // Fetch API Register yang ada di server.js
                 const res = await fetch('/api/creator/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -473,20 +471,18 @@ function showToast(message) {
                 });
                 const responseData = await res.json();
 
-if (res.ok && responseData.success) {
-                    
-                    // 👇 Panggil Toast animasi kecil di sini 👇
-                    showToast("Pendaftaran Berhasil! Silakan Login.");
+                if (res.ok && responseData.success) {
+                    showToast("Pendaftaran Berhasil! Silakan Login.", "success");
                     
                     document.getElementById('formRegister').reset();
                     document.getElementById('loginEmail').value = payload.email; 
                     switchTab('login');
                     
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: responseData.message, background: '#1e293b', color: '#fff' });
+                    showToast(responseData.message || "Pendaftaran Gagal!", "error");
                 }
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#1e293b', color: '#fff' });
+                showToast("Koneksi ke server gagal.", "error");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
