@@ -525,9 +525,22 @@
             if (scanInput) scanInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); prosesScanManual(); } });
             
             // Listeners Filter Buyers
+// Listeners Filter Buyers
             document.getElementById('filterDay').addEventListener('change', () => { document.getElementById('filterMonth').value = ''; filterBuyers(); }); 
             document.getElementById('filterMonth').addEventListener('change', () => { document.getElementById('filterDay').value = ''; filterBuyers(); }); 
             document.getElementById('searchBuyer').addEventListener('keyup', filterBuyers);
+
+            // 👇 SAPU PEMBERSIH ANTI-NYANGKUT UNTUK SEMUA MODAL DI HP 👇
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                });
+            });
+            // 👆 -------------------------------------------------- 👆
+
         });
         // 👇 FUNGSI OTOMATIS KASIH TITIK RUPIAH 👇
         function formatRupiah(input) {
@@ -643,7 +656,14 @@
         document.getElementById('formPromo').addEventListener('submit', async (e) => { e.preventDefault(); const promoSelect = document.getElementById('promoEventId'); if(!promoSelect.value) return Swal.fire('Error', 'Buat event dulu!', 'warning'); const data = { code: document.getElementById('promoCode').value, discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value, eventId: promoSelect.value, eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text }; await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); e.target.reset(); loadPromos(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' }); });
         async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
 
-        function openSettingsModal() { settingsModal.show(); }
+        function openSettingsModal() { 
+            // 1. Tutup sidebar otomatis di HP biar tidak nyangkut di belakang
+            if (window.innerWidth <= 768) { 
+                document.getElementById('sidebar').classList.remove('show'); 
+            }
+            // 2. Baru tampilkan modalnya
+            settingsModal.show(); 
+        }
         async function saveEoName() { const newName = document.getElementById('settingName').value.trim(); if (!newName) return Swal.fire('Error', 'Nama kosong', 'warning'); try { const res = await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, newName: newName }) }); if (res.ok) { organizerInfo.organizerName = newName; localStorage.setItem('organizerData', JSON.stringify(organizerInfo)); document.getElementById('eoNameDisplay').innerText = newName; document.getElementById('dashEoName').innerText = newName; Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Nama diubah', showConfirmButton:false, timer:2000, background: 'var(--bg-card)', color: 'var(--text-main)' }); } } catch (err) {} }
         async function saveEoPassword() { const oldPass = document.getElementById('settingOldPass').value; const newPass = document.getElementById('settingNewPass').value; if (!oldPass || !newPass) return Swal.fire('Peringatan', 'Isi kedua kolom', 'warning'); try { const res = await fetch('/api/user/change-password', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, oldPassword: oldPass, newPassword: newPass }) }); if (res.ok) { Swal.fire({ icon:'success', title:'Berhasil', text:'Password diubah!', background: 'var(--bg-card)', color: 'var(--text-main)' }); document.getElementById('settingOldPass').value = ''; document.getElementById('settingNewPass').value = ''; settingsModal.hide(); } else { const data = await res.json(); Swal.fire({ icon:'error', title:'Gagal', text: data.message, background: 'var(--bg-card)', color: 'var(--text-main)' }); } } catch (err) {} }
         async function saveEoPin() {
