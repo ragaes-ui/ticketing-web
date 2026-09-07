@@ -326,13 +326,11 @@
                         <input type="month" id="filterMonth" class="form-control form-control-sm">
                     </div>
                     <!-- 👇 TAMBAHAN FILTER TAHUNAN 👇 -->
-                    <div class="col-lg-2 col-md-4">
+<div class="col-lg-2 col-md-4">
                         <label class="small text-muted mb-1 fw-bold">Tahunan</label>
                         <select id="filterYear" class="form-control form-control-sm">
-                            <option value="">Semua</option>
-                            <option value="2025">2025</option>
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
+                            <option value="">Semua Tahun</option>
+                            <!-- Tahun akan diisi otomatis oleh Javascript dari Database -->
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -621,7 +619,27 @@
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-info spinner-border-sm me-2"></div> ${t.txt_loading}</td></tr>`;
             try {
                 const res = await fetch('/api/creator/buyers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId: organizerInfo.id }) });
-                if (res.ok) { const responseData = await res.json(); if (responseData.success) { myBuyersData = responseData.data || []; currentFilteredBuyers = myBuyersData; renderBuyerTable(myBuyersData); } else { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat.</td></tr>`; } }
+                if (res.ok) { const responseData = await res.json(); if (responseData.success) { 
+                    myBuyersData = responseData.data || []; 
+                    currentFilteredBuyers = myBuyersData; 
+                    
+                    // 👇 LOGIKA DETEKSI TAHUN OTOMATIS DARI DATA TRANSAKSI 👇
+                    const uniqueYears = [...new Set(myBuyersData.map(b => new Date(b.date).getFullYear()))].sort((a, b) => b - a);
+                    const yearSelect = document.getElementById('filterYear');
+                    const selectedBefore = yearSelect.value; // Ingat pilihan sebelumnya
+                    
+                    let optHtml = '<option value="">Semua Tahun</option>';
+                    uniqueYears.forEach(y => { 
+                        if (!isNaN(y)) optHtml += `<option value="${y}">${y}</option>`; 
+                    });
+                    
+                    yearSelect.innerHTML = optHtml;
+                    yearSelect.value = selectedBefore; // Kembalikan ke pilihan user (kalau ada)
+                    // 👆 ------------------------------------------------ 👆
+
+                    renderBuyerTable(myBuyersData); 
+                }
+                else { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat.</td></tr>`; } }
             } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Koneksi terputus.</td></tr>`; }
         }
 
