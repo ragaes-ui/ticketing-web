@@ -514,7 +514,10 @@
             
             const savedTheme = localStorage.getItem('creatorTheme') || 'dark'; document.documentElement.setAttribute('data-theme', savedTheme); updateThemeIcon(savedTheme);
             const savedLang = localStorage.getItem('creatorLang') || 'id'; updateLanguage(savedLang);
-
+            // 👇 TAMBAHKAN 2 BARIS INI UNTUK MEMBUKA MENU TERAKHIR 👇
+            const lastMenu = localStorage.getItem('lastCreatorMenu') || 'dashboard';
+            switchMenu(lastMenu);
+            
             addTierRow('addTiers');
             await loadMyEvents(); await loadDashboardStats();
             
@@ -557,6 +560,7 @@
 
             // 2. Beri jeda 300ms agar animasinya terasa mulus
             setTimeout(() => {
+                localStorage.setItem('lastCreatorMenu', menuName);
                 document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
                 ['dashboardArea', 'createEventArea', 'myEventsArea', 'buyersArea', 'promoArea', 'scannerArea'].forEach(id => document.getElementById(id).classList.add('d-none'));
                 const t = translations[localStorage.getItem('creatorLang') || 'id'];
