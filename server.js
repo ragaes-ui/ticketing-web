@@ -87,13 +87,49 @@ app.use((req, res, next) => {
 // ==========================================
 // 🛡️ KONFIGURASI KEYCLOAK SSO (SINGLE SIGN-ON)
 // ==========================================
+// ==========================================
+// 🛠️ KONEKSI DATABASE (Global Cache Anti-Bocor)
+// ==========================================
+// Kita pindah ke atas agar bisa dipakai bersama oleh Sesi & API
+let cached = global.mongoose;
+if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
+
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    const opts = { 
+        bufferCommands: false, 
+        serverSelectionTimeoutMS: 5000, // 👈 5 detik saja, biar tidak digantung Vercel
+        maxPoolSize: 10, // 👈 KUNCI: Batasi maksimal 10 koneksi per mesin Vercel
+        minPoolSize: 1
+    };
+    const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
+      console.log('✅ DATABASE TERHUBUNG!');
+      return mongoose;
+    });
+  }
+  try { cached.conn = await cached.promise; } catch (e) { cached.promise = null; throw e; }
+  return cached.conn;
+}
+
+// ==========================================
+// 🛡️ KONFIGURASI KEYCLOAK SSO (SINGLE SIGN-ON)
+// ==========================================
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 
-// 1. Buat penyimpanan sesi login di MONGODB (Biar Vercel ga pelupa)
+// 1. Buat penyimpanan sesi login di MONGODB (Nebeng jalur Mongoose!)
 const MongoStore = require('connect-mongo');
 const sessionStore = MongoStore.create({ 
-    mongoUrl: "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority" 
+    // Tambahkan .catch() agar kalau database kedip, aplikasi nggak mati total
+    clientPromise: connectDB()
+        .then(m => m.connection.getClient())
+        .catch(err => {
+            console.error("Gagal konek Session DB:", err);
+            // Kembalikan null agar tidak crash
+            return null;
+        }) 
 });
 
 app.use(session({
@@ -102,7 +138,6 @@ app.use(session({
     saveUninitialized: true,
     store: sessionStore
 }));
-
 
 // 2. Data sambungan ke Cloud-IAM Kakak
 const keycloakConfig = {
@@ -119,26 +154,22 @@ const keycloakConfig = {
 // 3. Nyalakan mesin Keycloak
 const keycloak = new Keycloak({ store: sessionStore }, keycloakConfig);
 app.use(keycloak.middleware());
-// ==========================================
 
 // ==========================================
 // 🔒 RUTE TERKUNCI OLEH KEYCLOAK
 // ==========================================
-// Jika ada yang buka admin.html, harus lewat Keycloak dulu!
 app.get(['/admin', '/admin.html'], keycloak.protect(), (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
 });
-// Kiosk sekarang bebas dari Lemur-7, tapi akan kita jaga pakai Javascript MongoDB
+
 app.get(['/kiosk', '/kiosk.html'], (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'kiosk.html'));
 });
+
 app.get('/logout', (req, res) => {
     if (req.session) {
-        // 1. Hapus sesi di MongoDB dengan callback agar aman
         req.session.destroy((err) => {
             if (err) console.error("Gagal menghapus session di DB:", err);
-            
-            // 2. Tendang juga sesi di server Keycloak, lalu arahkan ke index.html
             const logoutUrl = keycloak.logoutUrl('https://rcellfest.vercel.app/index.html');
             res.redirect(logoutUrl); 
         });
@@ -146,36 +177,22 @@ app.get('/logout', (req, res) => {
         res.redirect('/index.html');
     }
 });
+
 // 👇 FOLDER PUBLIC (Di bawah pelindung admin)
 app.use(express.static(path.join(process.cwd(), 'public'), {
-    extensions: ['html'] // Otomatis ngebaca file .html tanpa perlu ditulis di URL
+    extensions: ['html']
 }));
 
-// ==========================================
-// 🛠️ KONEKSI DATABASE
-// ==========================================
-let cached = global.mongoose;
-if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
-
-async function connectDB() {
-  if (cached.conn) return cached.conn;
-  if (!cached.promise) {
-    const opts = { bufferCommands: false, serverSelectionTimeoutMS: 15000 };
-    const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
-    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
-      console.log('✅ DATABASE TERHUBUNG!');
-      return mongoose;
-    });
-  }
-  try { cached.conn = await cached.promise; } catch (e) { cached.promise = null; throw e; }
-  return cached.conn;
-}
-
+// Middleware koneksi DB di semua rute API
 app.use(async (req, res, next) => {
     if (req.path.includes('.') && !req.path.startsWith('/api')) return next();
     try { await connectDB(); next(); } 
     catch (error) { res.status(500).json({ error: "Database Connection Failed", detail: error.message }); }
 });
+
+// ==========================================
+// KONFIGURASI MIDTRANS
+// (KODE SETELAH INI BIARKAN SEPERTI ASLINYA)
 
 // ==========================================
 // KONFIGURASI MIDTRANS
@@ -1736,6 +1753,10 @@ app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
-const PORT = process.env.PORT || 5000;
 module.exports = app;
-app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
+
+// Cegah app.listen berjalan di Vercel, hanya jalan kalau Mas Raga test di laptop (lokal)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Server jalan di port ${PORT}`));
+}
