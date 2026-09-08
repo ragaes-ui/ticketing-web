@@ -120,17 +120,17 @@ const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 
 // 1. Buat penyimpanan sesi login di MONGODB (Nebeng jalur Mongoose!)
+// 1. Buat penyimpanan sesi login di MONGODB (Jalur Mandiri Anti-Crash)
 const MongoStore = require('connect-mongo');
 const sessionStore = MongoStore.create({ 
-    // Tambahkan .catch() agar kalau database kedip, aplikasi nggak mati total
-    clientPromise: connectDB()
-        .then(m => m.connection.getClient())
-        .catch(err => {
-            console.error("Gagal konek Session DB:", err);
-            // Kembalikan null agar tidak crash
-            return null;
-        }) 
+    // Beri URL langsung agar dia tidak perlu menunggu Mongoose
+    mongoUrl: "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority",
+    mongoOptions: {
+        maxPoolSize: 3, // 👈 Kunci Anti-Bocor: Batasi sangat kecil karena hanya untuk sesi login
+        serverSelectionTimeoutMS: 5000
+    }
 });
+
 
 app.use(session({
     secret: 'rcellfest-rahasia-super-aman', 
