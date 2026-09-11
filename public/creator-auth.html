@@ -192,11 +192,7 @@
             </div>
 
             <div class="nav-tabs-custom">
-                <!-- Taruh sebelum tombol submit -->
-                <div class="g-recaptcha mb-3" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div>
                 <div class="nav-item active" id="tabLogin" onclick="switchTab('login')">MASUK</div>
-                <!-- Taruh sebelum tombol submit -->
-                <div class="g-recaptcha mb-3" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div>
                 <div class="nav-item" id="tabRegister" onclick="switchTab('register')">DAFTAR EO BARU</div>
             </div>
 
@@ -217,6 +213,7 @@
                         </div>
                         <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
                     </div>
+                    <div class="g-recaptcha mb-3 d-flex justify-content-center" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div>
                     <button type="submit" class="btn-primary-custom w-100" id="btnLogin">Masuk Dasbor <i class="bi bi-arrow-right ms-2"></i></button>
                 </form>
             </div>
@@ -257,7 +254,7 @@
                             Saya telah membaca dan menyetujui <a href="javascript:void(0)" onclick="lihatSyarat()" class="text-primary text-decoration-none fw-bold">Syarat & Ketentuan</a> RCELLFEST. <span class="text-danger">*</span>
                         </label>
                     </div>
-
+                    <div class="g-recaptcha mb-3 d-flex justify-content-center" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div>
                     <button type="submit" class="btn-primary-custom w-100" id="btnRegister">Buat Akun Kreator</button>
                 </form>
             </div>
@@ -420,11 +417,10 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const res = await fetch('/api/creator/login', {
+const res = await fetch('/api/creator/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password, recaptchaToken })
-                    body: JSON.stringify({ email, password })
                 });
                 const responseData = await res.json();
 
