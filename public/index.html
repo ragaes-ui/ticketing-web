@@ -566,6 +566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkServerPing();
             setInterval(checkServerPing, 10000);
 
+            // 👇 INI YANG MENUTUP LAYAR LOADING 👇
             const loader = document.getElementById('aesthetic-preloader');
             if(loader) {
                 setTimeout(() => {
