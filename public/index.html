@@ -549,12 +549,32 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
-            // 👇 TAMBAHKAN FUNGSI INI YANG HILANG 👇
+            updateThemeIcon(savedTheme);
+            
+            const savedLang = localStorage.getItem('lang') || 'id';
+            updateLanguage(savedLang);
+
+            checkLoginStatus();
+            await loadEvents();
+            
+            loadBloggerNews();
+            checkServerPing();
+            setInterval(checkServerPing, 10000);
+
+            const loader = document.getElementById('aesthetic-preloader');
+            if(loader) {
+                setTimeout(() => {
+                    loader.classList.add('hide-preloader');
+                }, 500); 
+            }
+        });
+
+        // 👇 TARUH FUNGSI TOGGLE THEME DI SINI (Di luar kurung DOMContentLoaded) 👇
         function toggleTheme() {
             const htmlTag = document.documentElement;
             const currentTheme = htmlTag.getAttribute('data-theme');
@@ -563,6 +583,21 @@
             htmlTag.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+
+            if (theme === 'dark') {
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
+                icon.style.color = "#FFD700";
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
+                icon.style.color = "#ffffff";
+            }
         }
 
         // Fungsi ini sudah ada, biarkan saja
