@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -11,6 +11,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Tambahan Bootstrap JS untuk Dropdown Bahasa -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
     <style>
@@ -25,12 +28,29 @@
             --border-color: #3f3f46;
         }
 
+        /* 👇 OVERRIDE UNTUK MODE TERANG 👇 */
+        [data-theme="light"] {
+            --bg-dark: #f1f5f9;
+            --bg-panel: #ffffff;
+            --input-bg: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+        }
+        [data-theme="light"] .login-banner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(219, 234, 254, 0.85) 100%), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1200&auto=format&fit=crop') center/cover;
+        }
+        [data-theme="light"] .banner-text h1, [data-theme="light"] .brand-logo { color: #0f172a !important; }
+        [data-theme="light"] .banner-text p, [data-theme="light"] .text-white-50 { color: #475569 !important; }
+        [data-theme="light"] .form-control { color: #0f172a; }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
             overflow-x: hidden;
+            transition: background-color 0.3s;
         }
 
         /* --- SPLIT LAYOUT --- */
@@ -65,7 +85,7 @@
         .brand-logo { font-weight: 900; font-size: 1.8rem; color: #fff; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .brand-logo img { width: 40px; height: 40px; object-fit: contain; }
         
-        .banner-text h1 { font-weight: 800; font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; }
+        .banner-text h1 { font-weight: 800; font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; color: #fff; }
         .banner-text p { font-size: 1.1rem; color: #e2e8f0; opacity: 0.9; max-width: 450px; }
 
         /* --- FORMS --- */
@@ -73,7 +93,8 @@
         .form-header h2 { font-weight: 800; font-size: 2rem; margin-bottom: 8px; }
         .form-header p { color: var(--text-muted); font-size: 0.95rem; }
 
-        .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+        /* 👇 Diubah agar warna menyesuaikan tema dan tidak tembus pandang 👇 */
+        .form-label { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
         
         .input-wrapper { position: relative; margin-bottom: 20px; }
         .input-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
@@ -93,7 +114,7 @@
             background-color: var(--input-bg);
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-            color: white;
+            color: var(--text-main);
         }
         
         .form-control::placeholder { color: #71717a; }
@@ -142,7 +163,7 @@
             margin-bottom: 30px;
             width: fit-content;
         }
-        .back-home:hover { color: white; }
+        .back-home:hover { color: var(--text-main); }
 
         .d-none { display: none !important; }
 
@@ -163,12 +184,40 @@
             z-index: 9999; width: max-content; max-width: 90%;
         }
         #toast-notif.show { top: 24px; }
-        /* FIX WARNA TEXT TENGGELAM DI POPUP & BOOTSTRAP */
         .text-muted { color: var(--text-muted) !important; }
-        .swal2-html-container label { color: #e2e8f0 !important; }
+        .swal2-html-container label { color: var(--text-main) !important; }
     </style>
 </head>
 <body>
+
+    <!-- 👇 TOMBOL SWITCH TEMA & BAHASA 👇 -->
+    <div class="position-fixed top-0 end-0 p-3 d-flex gap-2" style="z-index: 9999;">
+        <!-- Tombol Tema -->
+        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0" id="btnTheme" onclick="toggleTheme()" style="width: 40px; height: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); background-color: #1e293b;">
+            <i class="bi bi-brightness-high-fill" id="themeIcon"></i>
+        </button>
+        
+        <!-- Tombol Dropdown Bahasa -->
+        <div class="dropdown">
+            <button class="btn btn-dark rounded-pill d-flex align-items-center gap-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 40px; padding: 0 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); background-color: #1e293b;" id="btnLang">
+                <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;">
+                <span class="fw-bold" id="langText">ID</span>
+                <i class="bi bi-chevron-down small text-white-50"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('id')">
+                        <img src="https://flagcdn.com/w20/id.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;"> Indonesia
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('en')">
+                        <img src="https://flagcdn.com/w20/gb.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;"> English
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <!-- WADAH NOTIFIKASI TOAST -->
     <div id="toast-notif">
@@ -183,8 +232,8 @@
                 <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo"> RCELLFEST
             </a>
             <div class="banner-text">
-                <h1>Jelajahi<br>Pengalaman<br>Tanpa Batas.</h1>
-                <p>Ribuan event, konser musik, dan hiburan digital menantimu. Masuk sekarang dan mulai petualangan serumu.</p>
+                <h1 data-i18n="bTitle">Jelajahi<br>Pengalaman<br>Tanpa Batas.</h1>
+                <p data-i18n="bDesc">Ribuan event, konser musik, dan hiburan digital menantimu. Masuk sekarang dan mulai petualangan serumu.</p>
             </div>
             <div class="text-white-50 small">&copy; 2025 RCELLTECH ID. All rights reserved.</div>
         </div>
@@ -197,36 +246,36 @@
             </a>
 
             <div class="form-header">
-                <h2 id="mainTitle">Selamat Datang!</h2>
-                <p id="subTitle">Silakan masukkan detail akun Anda untuk melanjutkan.</p>
+                <h2 id="mainTitle" data-i18n="hLogTitle">Selamat Datang!</h2>
+                <p id="subTitle" data-i18n="hLogSub">Silakan masukkan detail akun Anda untuk melanjutkan.</p>
             </div>
 
             <form id="authForm">
                 <div>
-                    <label class="form-label" id="lblIdentifier">Email atau Username</label>
+                    <label class="form-label" id="lblIdentifier" data-i18n="lIdLog">Email atau Username</label>
                     <div class="input-wrapper">
                         <i class="bi bi-person"></i>
-                        <input type="text" id="identifier" class="form-control" placeholder="Ketik email atau username" required>
+                        <input type="text" id="identifier" class="form-control" placeholder="Ketik email / username" required>
                     </div>
                 </div>
 
                 <div id="registerFields" class="d-none">
                     <div>
-                        <label class="form-label">Nama Lengkap</label>
+                        <label class="form-label" data-i18n="lName">Nama Lengkap</label>
                         <div class="input-wrapper">
                             <i class="bi bi-card-text"></i>
                             <input type="text" id="fullName" class="form-control" placeholder="Nama sesuai KTP">
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">Nomor WhatsApp</label>
+                        <label class="form-label" data-i18n="lPhone">Nomor WhatsApp</label>
                         <div class="input-wrapper">
                             <i class="bi bi-telephone"></i>
                             <input type="tel" id="phone" class="form-control" placeholder="Contoh: 08123456789">
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">Email Aktif</label>
+                        <label class="form-label" data-i18n="lEmail">Email Aktif</label>
                         <div class="input-wrapper">
                             <i class="bi bi-envelope"></i>
                             <input type="email" id="email" class="form-control" placeholder="nama@email.com">
@@ -236,8 +285,8 @@
 
                 <div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label mb-0">Kata Sandi</label>
-                        <a href="javascript:void(0)" class="forgot-pass" id="forgotPassLink" onclick="resetPasswordFlow()">Lupa Sandi?</a>
+                        <label class="form-label mb-0" data-i18n="lPass">Kata Sandi</label>
+                        <a href="javascript:void(0)" class="forgot-pass" id="forgotPassLink" onclick="resetPasswordFlow()" data-i18n="lForgot">Lupa Sandi?</a>
                     </div>
                     <div class="input-wrapper">
                         <i class="bi bi-key"></i>
@@ -249,27 +298,128 @@
                     <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs" data-theme="dark"></div>
                 </div>
 
-                <button type="submit" class="btn-primary-custom" id="btnSubmit">
+                <button type="submit" class="btn-primary-custom" id="btnSubmit" data-i18n="bLog">
                     Masuk Sekarang <i class="bi bi-arrow-right ms-2"></i>
                 </button>
             </form>
 
-<div class="switcher-box">
+            <div class="switcher-box">
                 <div class="mb-4">
-                    <span id="textInfo">Belum punya akun?</span> 
-                    <span class="link-accent ms-1" onclick="toggleMode()">Daftar Akun Baru</span>
+                    <span id="textInfo" data-i18n="tQReg">Belum bergabung dengan kami?</span> 
+                    <span class="link-accent ms-1" onclick="toggleMode()" data-i18n="tLReg">Daftar Akun Baru</span>
                 </div>
                 
                 <!-- 👇 TOMBOL KEMBALI KE BERANDA 👇 -->
-                <a href="/" class="text-muted text-decoration-none" style="font-size: 0.85rem; font-weight: 500; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">
+                <a href="/" class="text-muted text-decoration-none" style="font-size: 0.85rem; font-weight: 500; transition: 0.2s;" onmouseover="this.style.color='var(--text-main)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="bBack">
                     <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
                 </a>
             </div>
+        </div>
+    </div>
 
-    <!-- SEMUA JAVASCRIPT DI BAWAH SINI 100% AMAN DAN TIDAK ADA YANG DIHAPUS -->
+    <!-- SEMUA JAVASCRIPT AMAN -->
     <script>
         let isLogin = true;
 
+        // ==========================================
+        // FITUR DARK/LIGHT MODE & MULTI-BAHASA
+        // ==========================================
+        function toggleTheme() {
+            const htmlTag = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (htmlTag.getAttribute('data-theme') === 'dark') {
+                htmlTag.setAttribute('data-theme', 'light');
+                themeIcon.classList.replace('bi-brightness-high-fill', 'bi-moon-stars-fill');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlTag.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('bi-moon-stars-fill', 'bi-brightness-high-fill');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        const dict = {
+            id: {
+                bTitle: "Jelajahi<br>Pengalaman<br>Tanpa Batas.",
+                bDesc: "Ribuan event, konser musik, dan hiburan digital menantimu. Masuk sekarang dan mulai petualangan serumu.",
+                hLogTitle: "Selamat Datang!",
+                hLogSub: "Silakan masukkan detail akun Anda untuk melanjutkan.",
+                hRegTitle: "Buat Akun Baru",
+                hRegSub: "Lengkapi form di bawah ini untuk bergabung.",
+                lIdLog: "Email atau Username",
+                lIdReg: "Username Unik (Tanpa Spasi)",
+                lName: "Nama Lengkap",
+                lPhone: "Nomor WhatsApp",
+                lEmail: "Email Aktif",
+                lPass: "Kata Sandi",
+                lForgot: "Lupa Sandi?",
+                bLog: 'Masuk Sekarang <i class="bi bi-arrow-right ms-2"></i>',
+                bReg: 'Daftar Sekarang <i class="bi bi-person-plus ms-2"></i>',
+                tQReg: "Belum bergabung dengan kami?",
+                tLReg: "Daftar Akun Baru",
+                tQLog: "Sudah memiliki akun?",
+                tLLog: "Masuk di sini",
+                bBack: '<i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda'
+            },
+            en: {
+                bTitle: "Explore<br>Limitless<br>Experiences.",
+                bDesc: "Thousands of events, music concerts, and digital entertainment await. Login now and start your exciting adventure.",
+                hLogTitle: "Welcome Back!",
+                hLogSub: "Please enter your account details to continue.",
+                hRegTitle: "Create New Account",
+                hRegSub: "Fill in the form below to join us.",
+                lIdLog: "Email or Username",
+                lIdReg: "Unique Username (No Spaces)",
+                lName: "Full Name",
+                lPhone: "WhatsApp Number",
+                lEmail: "Active Email",
+                lPass: "Password",
+                lForgot: "Forgot Password?",
+                bLog: 'Login Now <i class="bi bi-arrow-right ms-2"></i>',
+                bReg: 'Register Now <i class="bi bi-person-plus ms-2"></i>',
+                tQReg: "Don't have an account?",
+                tLReg: "Create New Account",
+                tQLog: "Already have an account?",
+                tLLog: "Login here",
+                bBack: '<i class="bi bi-arrow-left me-1"></i> Back to Home'
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'id';
+
+        function applyLanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
+            });
+            
+            // Update Bendera & Teks Tombol
+            document.getElementById('langText').innerText = currentLang.toUpperCase();
+            document.getElementById('langFlag').src = currentLang === 'id' 
+                ? 'https://flagcdn.com/w20/id.png' 
+                : 'https://flagcdn.com/w20/gb.png';
+                
+            localStorage.setItem('lang', currentLang);
+        }
+
+        function changeLang(lang) {
+            currentLang = lang;
+            applyLanguage();
+        }
+
+        // INIT LOAD
+        document.addEventListener("DOMContentLoaded", () => {
+            if(localStorage.getItem('theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('themeIcon').classList.replace('bi-brightness-high-fill', 'bi-moon-stars-fill');
+            }
+            applyLanguage();
+        });
+
+        // ==========================================
+        // LOGIKA APLIKASI
+        // ==========================================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notif');
             const toastMessage = document.getElementById('toast-message');
@@ -299,28 +449,33 @@
             };
 
             if (isLogin) {
-                elements.mainTitle.innerText = "Selamat Datang!";
-                elements.subTitle.innerText = "Silakan masukkan detail akun Anda untuk melanjutkan.";
-                elements.btn.innerHTML = 'Masuk Sekarang <i class="bi bi-arrow-right ms-2"></i>';
-                elements.info.innerText = "Belum bergabung dengan kami?";
-                elements.link.innerText = "Daftar Akun Baru";
+                // Set data-i18n keys for Login
+                elements.mainTitle.setAttribute('data-i18n', 'hLogTitle');
+                elements.subTitle.setAttribute('data-i18n', 'hLogSub');
+                elements.btn.setAttribute('data-i18n', 'bLog');
+                elements.info.setAttribute('data-i18n', 'tQReg');
+                elements.link.setAttribute('data-i18n', 'tLReg');
+                elements.lblId.setAttribute('data-i18n', 'lIdLog');
+                
                 elements.regFields.classList.add('d-none');
                 elements.forgotPass.classList.remove('d-none');
-                elements.lblId.innerText = "Email atau Username";
-                
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).removeAttribute('required'));
             } else {
-                elements.mainTitle.innerText = "Buat Akun Baru";
-                elements.subTitle.innerText = "Lengkapi form di bawah ini untuk bergabung.";
-                elements.btn.innerHTML = 'Daftar Sekarang <i class="bi bi-person-plus ms-2"></i>';
-                elements.info.innerText = "Sudah memiliki akun?";
-                elements.link.innerText = "Masuk di sini";
+                // Set data-i18n keys for Register
+                elements.mainTitle.setAttribute('data-i18n', 'hRegTitle');
+                elements.subTitle.setAttribute('data-i18n', 'hRegSub');
+                elements.btn.setAttribute('data-i18n', 'bReg');
+                elements.info.setAttribute('data-i18n', 'tQLog');
+                elements.link.setAttribute('data-i18n', 'tLLog');
+                elements.lblId.setAttribute('data-i18n', 'lIdReg');
+                
                 elements.regFields.classList.remove('d-none');
                 elements.forgotPass.classList.add('d-none');
-                elements.lblId.innerText = "Username Unik (Tanpa Spasi)";
-
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).setAttribute('required', 'true'));
             }
+            
+            // Panggil applyLanguage agar teks langsung berubah sesuai bahasa yang sedang aktif
+            applyLanguage();
         }
 
         async function resetPasswordFlow() {
@@ -338,8 +493,8 @@
                         <input id="reset-newpass" type="password" class="form-control" placeholder="Minimal 6 karakter">
                     </div>
                 `,
-                background: '#18181b',
-                color: '#fff',
+                background: getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim() || '#18181b',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#fff',
                 showCancelButton: true,
                 confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#3f3f46',
