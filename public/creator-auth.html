@@ -158,9 +158,30 @@
             --border-color: #cbd5e1;
         }
         /* Kunci agar banner kiri selalu gelap/putih meskipun form diubah terang */
-        .auth-banner { --text-main: #ffffff; --text-muted: #cbd5e1; }
-        .auth-banner .glass-box h6 { color: #ffffff !important; }
-        .brand-logo span { color: var(--text-main) !important; }
+/* 👇 BANNER KIRI SAAT MODE TERANG 👇 */
+        [data-theme="light"] .auth-banner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(219, 234, 254, 0.85) 100%), url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop') center/cover;
+        }
+        [data-theme="light"] .auth-banner h1, 
+        [data-theme="light"] .auth-banner h6, 
+        [data-theme="light"] .auth-banner .brand-logo span {
+            color: #0f172a !important;
+        }
+        [data-theme="light"] .auth-banner p, 
+        [data-theme="light"] .auth-banner small {
+            color: #475569 !important;
+        }
+        [data-theme="light"] .auth-banner .glass-box {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 👇 BANNER KIRI SAAT MODE GELAP (Default) 👇 */
+        [data-theme="dark"] .auth-banner h1, 
+        [data-theme="dark"] .auth-banner h6, 
+        [data-theme="dark"] .auth-banner .brand-logo span {
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body>
@@ -200,25 +221,26 @@
     </div>
     
     <div class="auth-container">
-        <div class="auth-banner">
+<div class="auth-banner">
             <div class="brand-logo align-items-center">
                 <img src="https://i.ibb.co/GvpPC8Fg/rcm-logo.jpg" alt="Logo RCM" style="height: 50px; width: auto; border-radius: 10px;">
                 <div class="d-flex flex-column justify-content-center text-start">
                     <span style="font-size: 1.8rem; font-weight: 900; line-height: 1;">RCELLFEST</span>
-                    <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700; letter-spacing: 1.5px; margin-top: 4px;">CREATOR MANAGER</span>
+                    <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px; margin-top: 4px;" class="text-muted">CREATOR MANAGER</span>
                 </div>
             </div>
-            <h1 class="display-4 fw-bold text-white mb-3" style="line-height: 1.1;">Ubah Visimu<br>Menjadi Realita.</h1>
-            <p class="fs-5 mb-0" style="color: #cbd5e1;">Platform manajemen event terbaik untuk kreator, promotor, dan komunitas. Buat, jual, dan pantau tiketmu dalam satu dasbor cerdas.</p>
+            <!-- 👇 Tambahan data-i18n 👇 -->
+            <h1 class="display-4 fw-bold mb-3" style="line-height: 1.1;" data-i18n="bTitle">Ubah Visimu<br>Menjadi Realita.</h1>
+            <p class="fs-5 mb-0 text-muted" data-i18n="bDesc">Platform manajemen event terbaik untuk kreator, promotor, dan komunitas. Buat, jual, dan pantau tiketmu dalam satu dasbor cerdas.</p>
             
             <div class="glass-box">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <i class="bi bi-check-circle-fill text-success fs-4"></i>
-                    <div><h6 class="mb-0 fw-bold text-white">Penjualan Real-time</h6><small style="color: #cbd5e1;">Pantau transaksi tiket detik ini juga.</small></div>
+                    <div><h6 class="mb-0 fw-bold" data-i18n="bF1">Penjualan Real-time</h6><small class="text-muted" data-i18n="bF1D">Pantau transaksi tiket detik ini juga.</small></div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-qr-code-scan text-primary fs-4"></i>
-                    <div><h6 class="mb-0 fw-bold text-white">Sistem Check-in Cepat</h6><small style="color: #cbd5e1;">Scan QR Code ribuan pengunjung tanpa lag.</small></div>
+                    <div><h6 class="mb-0 fw-bold" data-i18n="bF2">Sistem Check-in Cepat</h6><small class="text-muted" data-i18n="bF2D">Scan QR Code ribuan pengunjung tanpa lag.</small></div>
                 </div>
             </div>
         </div>
@@ -567,8 +589,9 @@ const res = await fetch('/api/creator/login', {
             }
         }
 
-        const dict = {
+const dict = {
             id: {
+                // 👇 Terjemahan Form Kanan
                 tLogin: "MASUK", tReg: "DAFTAR EO BARU",
                 hLog: "Selamat Datang Kembali", pLog: "Masuk ke dasbor kreator untuk mengelola eventmu.",
                 lEm: "Email Organizer", lPas: "Kata Sandi", lForgot: "Lupa Sandi?", bLog: 'Masuk Dasbor <i class="bi bi-arrow-right ms-2"></i>',
@@ -576,9 +599,15 @@ const res = await fetch('/api/creator/login', {
                 lOrg: 'Nama Organizer / EO <span class="text-danger">*</span>', lEmR: 'Email Aktif <span class="text-danger">*</span>',
                 lPh: 'No. WhatsApp / Telepon <span class="text-danger">*</span>', lPasR: 'Buat Kata Sandi <span class="text-danger">*</span>',
                 lConf: 'Konfirmasi Sandi <span class="text-danger">*</span>', lTerm: 'Saya setuju <a href="javascript:void(0)" onclick="lihatSyarat()" class="text-primary fw-bold">Syarat & Ketentuan</a>. <span class="text-danger">*</span>',
-                bReg: "Buat Akun Kreator", bHome: "Kembali ke Beranda"
+                bReg: "Buat Akun Kreator", bHome: "Kembali ke Beranda",
+                // 👇 Terjemahan Banner Kiri Baru
+                bTitle: "Ubah Visimu<br>Menjadi Realita.",
+                bDesc: "Platform manajemen event terbaik untuk kreator, promotor, dan komunitas. Buat, jual, dan pantau tiketmu dalam satu dasbor cerdas.",
+                bF1: "Penjualan Real-time", bF1D: "Pantau transaksi tiket detik ini juga.",
+                bF2: "Sistem Check-in Cepat", bF2D: "Scan QR Code ribuan pengunjung tanpa lag."
             },
             en: {
+                // 👇 Terjemahan Form Kanan
                 tLogin: "LOGIN", tReg: "REGISTER EO",
                 hLog: "Welcome Back", pLog: "Login to creator dashboard to manage your events.",
                 lEm: "Organizer Email", lPas: "Password", lForgot: "Forgot Password?", bLog: 'Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>',
@@ -586,7 +615,12 @@ const res = await fetch('/api/creator/login', {
                 lOrg: 'Organizer / EO Name <span class="text-danger">*</span>', lEmR: 'Active Email <span class="text-danger">*</span>',
                 lPh: 'WhatsApp / Phone No. <span class="text-danger">*</span>', lPasR: 'Create Password <span class="text-danger">*</span>',
                 lConf: 'Confirm Password <span class="text-danger">*</span>', lTerm: 'I agree to the <a href="javascript:void(0)" onclick="lihatSyarat()" class="text-primary fw-bold">Terms & Conditions</a>. <span class="text-danger">*</span>',
-                bReg: "Create Creator Account", bHome: "Back to Home"
+                bReg: "Create Creator Account", bHome: "Back to Home",
+                // 👇 Terjemahan Banner Kiri Baru
+                bTitle: "Turn Your Vision<br>Into Reality.",
+                bDesc: "The best event management platform for creators, promoters, and communities. Create, sell, and track your tickets in one smart dashboard.",
+                bF1: "Real-time Sales", bF1D: "Monitor ticket transactions instantly.",
+                bF2: "Fast Check-in System", bF2D: "Scan thousands of QR codes without lag."
             }
         };
 
