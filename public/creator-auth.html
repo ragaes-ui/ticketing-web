@@ -165,13 +165,33 @@
 </head>
 <body>
     <!-- 👇 TOMBOL SWITCH TEMA & BAHASA 👇 -->
+<!-- 👇 TOMBOL SWITCH TEMA & BAHASA 👇 -->
     <div class="position-fixed top-0 end-0 p-3 d-flex gap-2" style="z-index: 9999;">
-        <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center bg-dark text-white border-0" id="btnTheme" onclick="toggleTheme()" style="width: 40px; height: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+        <!-- Tombol Tema -->
+        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0" id="btnTheme" onclick="toggleTheme()" style="width: 40px; height: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); background-color: #1e293b;">
             <i class="bi bi-brightness-high-fill" id="themeIcon"></i>
         </button>
-        <button class="btn btn-outline-secondary rounded d-flex align-items-center justify-content-center fw-bold bg-primary text-white border-0" id="btnLang" onclick="toggleLanguage()" style="width: 45px; height: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-            ID
-        </button>
+        
+        <!-- Tombol Dropdown Bahasa -->
+        <div class="dropdown">
+            <button class="btn btn-dark rounded-pill d-flex align-items-center gap-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 40px; padding: 0 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); background-color: #1e293b;" id="btnLang">
+                <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;">
+                <span class="fw-bold" id="langText">ID</span>
+                <i class="bi bi-chevron-down small text-white-50"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="changeLang('id')">
+                        <img src="https://flagcdn.com/w20/id.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;"> Indonesia
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="changeLang('en')">
+                        <img src="https://flagcdn.com/w20/gb.png" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%;"> English
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
     <!-- WADAH NOTIFIKASI TOAST -->
     <div id="toast-notif">
@@ -290,6 +310,7 @@
         </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function switchTab(tab) {
             document.getElementById('tabLogin').classList.remove('active');
@@ -571,28 +592,26 @@ const res = await fetch('/api/creator/login', {
 
         let currentLang = localStorage.getItem('lang') || 'id';
 
-        function applyLanguage() {
+function applyLanguage() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
             });
-            document.getElementById('btnLang').innerText = currentLang.toUpperCase();
+            
+            // 👇 Update Gambar Bendera & Teks di Tombol Dropdown 👇
+            document.getElementById('langText').innerText = currentLang.toUpperCase();
+            document.getElementById('langFlag').src = currentLang === 'id' 
+                ? 'https://flagcdn.com/w20/id.png' 
+                : 'https://flagcdn.com/w20/gb.png';
+                
             localStorage.setItem('lang', currentLang);
         }
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'id' ? 'en' : 'id';
+        // Fungsi baru menggantikan toggleLanguage
+        function changeLang(lang) {
+            currentLang = lang;
             applyLanguage();
         }
-
-        // Terapkan tema dan bahasa tersimpan saat load
-        document.addEventListener("DOMContentLoaded", () => {
-            if(localStorage.getItem('theme') === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                document.getElementById('themeIcon').classList.replace('bi-brightness-high-fill', 'bi-moon-stars-fill');
-            }
-            applyLanguage();
-        });
     </script>
 </body>
 </html>
