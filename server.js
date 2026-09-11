@@ -532,19 +532,24 @@ app.delete('/api/events/:id', async (req, res) => {
 // ==========================================
 app.post('/api/creator/register', async (req, res) => {
     try {
-        const { organizerName, email, phone, password, role } = req.body;
+        const { organizerName, email, phone, password, role, recaptchaToken } = req.body;
+        
+        // 👇 SATPAM RECAPTCHA 👇
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Centang reCAPTCHA (Saya bukan robot) terlebih dahulu!" });
+        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; // Sesuai secret key Mas Raga
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+        const googleRes = await fetch(verifyUrl, { method: 'POST' });
+        const googleData = await googleRes.json();
+        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal!" });
+        // 👆 ----------------- 👆
+
         const cekEmail = await User.findOne({ email });
         if(cekEmail) return res.status(400).json({ success: false, message: "Email sudah terdaftar!" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newOrganizer = new User({ 
-            username: organizerName, 
-            fullName: organizerName, 
-            email: email, 
-            password: hashedPassword, 
-            role: "organizer", // 👈 Penanda akun khusus Kreator
-            phone: phone, 
-            saldo: 0 
+            username: organizerName, fullName: organizerName, email: email, 
+            password: hashedPassword, role: "organizer", phone: phone, saldo: 0 
         });
         await newOrganizer.save();
         res.json({ success: true, message: "Akun Organizer berhasil dibuat!" });
@@ -553,28 +558,26 @@ app.post('/api/creator/register', async (req, res) => {
 
 app.post('/api/creator/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, recaptchaToken } = req.body;
+
+        // 👇 SATPAM RECAPTCHA 👇
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Centang reCAPTCHA (Saya bukan robot) terlebih dahulu!" });
+        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+        const googleRes = await fetch(verifyUrl, { method: 'POST' });
+        const googleData = await googleRes.json();
+        if (!googleData.success) return res.status(400).json({ success: false, message: "Sistem mendeteksi aktivitas mencurigakan!" });
+        // 👆 ----------------- 👆
+
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ success: false, message: "Akun tidak ditemukan!" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ success: false, message: "Password salah!" });
 
-        // Tolak jika akun biasa mencoba masuk ke portal EO
-        if (user.role !== "organizer") {
-            return res.status(403).json({ success: false, message: "Akun ini bukan akun Kreator/EO!" });
-        }
+        if (user.role !== "organizer") return res.status(403).json({ success: false, message: "Akun ini bukan akun Kreator/EO!" });
 
-        res.json({ 
-            success: true, 
-            token: "token-eo-" + user._id, 
-            data: { 
-                id: user._id, 
-                organizerName: user.fullName || user.username, 
-                email: user.email, 
-                role: user.role 
-            } 
-        });
+        res.json({ success: true, token: "token-eo-" + user._id, data: { id: user._id, organizerName: user.fullName || user.username, email: user.email, role: user.role } });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 // ==========================================
