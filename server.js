@@ -535,12 +535,20 @@ app.post('/api/creator/register', async (req, res) => {
         const { organizerName, email, phone, password, role, recaptchaToken } = req.body;
         
         // 👇 SATPAM RECAPTCHA 👇
-        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Centang reCAPTCHA (Saya bukan robot) terlebih dahulu!" });
-        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; // Sesuai secret key Mas Raga
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
-        const googleRes = await fetch(verifyUrl, { method: 'POST' });
-        const googleData = await googleRes.json();
-        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal!" });
+// 👇 SATPAM CLOUDFLARE TURNSTILE 👇
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Verifikasi keamanan (Turnstile) belum selesai!" });
+        
+        const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+        
+        const cfRes = await fetch(verifyUrl, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
+        });
+        const cfData = await cfRes.json();
+        
+        if (!cfData.success) return res.status(400).json({ success: false, message: "Sistem mendeteksi aktivitas bot/mencurigakan!" });
         // 👆 ----------------- 👆
 
         const cekEmail = await User.findOne({ email });
@@ -561,12 +569,20 @@ app.post('/api/creator/login', async (req, res) => {
         const { email, password, recaptchaToken } = req.body;
 
         // 👇 SATPAM RECAPTCHA 👇
-        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Centang reCAPTCHA (Saya bukan robot) terlebih dahulu!" });
-        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
-        const googleRes = await fetch(verifyUrl, { method: 'POST' });
-        const googleData = await googleRes.json();
-        if (!googleData.success) return res.status(400).json({ success: false, message: "Sistem mendeteksi aktivitas mencurigakan!" });
+// 👇 SATPAM CLOUDFLARE TURNSTILE 👇
+        if (!recaptchaToken) return res.status(400).json({ success: false, message: "Verifikasi keamanan (Turnstile) belum selesai!" });
+        
+        const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+        
+        const cfRes = await fetch(verifyUrl, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
+        });
+        const cfData = await cfRes.json();
+        
+        if (!cfData.success) return res.status(400).json({ success: false, message: "Sistem mendeteksi aktivitas bot/mencurigakan!" });
         // 👆 ----------------- 👆
 
         const user = await User.findOne({ email });
