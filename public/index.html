@@ -572,9 +572,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     loader.classList.add('hide-preloader');
                 }, 500); 
             }
-        }); // 👈 PENUTUP DOMContentLoaded ADA DI SINI
+        });
 
-        // 👇 FUNGSI TOGGLE TEMA BERADA DI LUAR 👇
+        // ==========================================
+        // FUNGSI GANTI TEMA (DARK / LIGHT MODE)
+        // ==========================================
         function toggleTheme() {
             const htmlTag = document.documentElement;
             const currentTheme = htmlTag.getAttribute('data-theme');
@@ -585,7 +587,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateThemeIcon(newTheme);
         }
 
-        // 👇 FUNGSI UPDATE ICON TEMA BERADA DI LUAR 👇
         function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if (!icon) return;
@@ -593,14 +594,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700";
+                icon.style.color = "#FFD700"; // Kuning Matahari
             } else {
                 icon.classList.remove('bi-sun-fill');
                 icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "#ffffff";
+                icon.style.color = "#ffffff"; // Putih Bulan
             }
         }
-            updateThemeIcon(savedTheme);
             
             const savedLang = localStorage.getItem('lang') || 'id';
             updateLanguage(savedLang);
