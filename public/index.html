@@ -223,14 +223,15 @@
         .navbar .container { display: flex !important; flex-wrap: nowrap !important; align-items: center; }
         .navbar .d-flex { flex-wrap: nowrap !important; align-items: center; }
 
-        @media (max-width: 576px) {
+@media (max-width: 576px) {
             .navbar-brand { font-size: 1.05rem !important; margin-right: auto !important; white-space: nowrap; }
             .navbar-brand img { width: 24px !important; height: 24px !important; }
-            .navbar #lang-btn { padding-left: 10px !important; padding-right: 10px !important; font-size: 0.8rem !important; height: 32px !important; min-width: 40px; display: flex; align-items: center; justify-content: center; }
-            .navbar #theme-btn { width: 32px !important; height: 32px !important; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
-            .navbar #theme-btn i { font-size: 0.8rem !important; }
-            .navbar .dropdown-toggle { padding: 4px 10px !important; font-size: 0.8rem !important; height: 32px !important; max-width: 120px; display: flex; align-items: center; }
-            .navbar .dropdown-toggle span { max-width: 60px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+            
+            /* Sembunyikan teks ID/EN di HP agar tombol bendera muat */
+            .navbar #langText { display: none !important; } 
+            .navbar #btnLang { padding: 0 10px !important; height: 34px !important; }
+            .navbar #theme-btn { width: 34px !important; height: 34px !important; }
+            .navbar #theme-btn i { font-size: 0.85rem !important; }
         }
 
         #aesthetic-preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-body); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease-out, visibility 0.6s ease-out; }
@@ -273,17 +274,37 @@
                     <li class="nav-item"><a class="nav-link" href="/guide" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-            <div class="d-flex align-items-center gap-1 gap-md-2 flex-nowrap">
-                <button onclick="toggleLanguage()" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="min-width: 36px; padding: 4px 8px;" id="lang-btn">ID</button>              
-                <button onclick="toggleTheme()" class="btn rounded-circle d-flex align-items-center justify-content-center" id="theme-btn" style="width: 36px; height: 36px; border: 1px solid var(--border-color); padding: 0;">
-                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+<div class="d-flex align-items-center gap-2 flex-nowrap">
+                <!-- 👇 Tombol Tema Baru 👇 -->
+                <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); background-color: #1e293b;">
+                    <i class="bi bi-moon-stars-fill text-white" id="theme-icon"></i>
                 </button>                
-                <div id="navUserArea">
+                
+                <!-- 👇 Tombol Dropdown Bahasa Bendera 👇 -->
+                <div class="dropdown">
+                    <button class="btn btn-dark rounded-pill d-flex align-items-center gap-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); background-color: #1e293b;" id="btnLang">
+                        <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
+                        <span class="fw-bold small text-white" id="langText">ID</span>
+                        <i class="bi bi-chevron-down small text-white-50" style="font-size: 0.7rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('id')">
+                                <img src="https://flagcdn.com/w20/id.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> Indonesia
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('en')">
+                                <img src="https://flagcdn.com/w20/gb.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> English
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div id="navUserArea" class="ms-1">
                     <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
                 </div>
             </div>
-        </div>
-    </nav>
 
     <section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
         <div class="hero-bg-circle"></div>
@@ -637,15 +658,7 @@
             document.body.appendChild(scriptEl);
         }
 
-        function toggleLanguage() {
-            const currentLang = localStorage.getItem('lang') || 'id';
-            const newLang = currentLang === 'id' ? 'en' : 'id';
-            localStorage.setItem('lang', newLang);
-            updateLanguage(newLang);
-            if(allEvents.length > 0) renderEvents(allEvents);
-        }
-
-        function updateLanguage(lang) {
+function updateLanguage(lang) {
             const t = translations[lang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -653,44 +666,35 @@
             });
             const searchInput = document.getElementById('searchInput');
             if(searchInput) searchInput.placeholder = t.search_placeholder;
-            const langBtn = document.getElementById('lang-btn');
-            if(langBtn) {
-                langBtn.innerText = lang.toUpperCase();
-                if(lang === 'en') {
-                    langBtn.classList.add('btn-primary');
-                    langBtn.classList.remove('btn-outline-secondary');
-                } else {
-                    langBtn.classList.add('btn-outline-secondary');
-                    langBtn.classList.remove('btn-primary');
-                }
+            
+            // 👇 Update Gambar Bendera & Teks 👇
+            const langText = document.getElementById('langText');
+            const langFlag = document.getElementById('langFlag');
+            if (langText) langText.innerText = lang.toUpperCase();
+            if (langFlag) {
+                langFlag.src = lang === 'id' ? 'https://flagcdn.com/w20/id.png' : 'https://flagcdn.com/w20/gb.png';
             }
         }
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+        // Fungsi baru menggantikan toggleLanguage
+        function changeLang(lang) {
+            localStorage.setItem('lang', lang);
+            updateLanguage(lang);
+            if(allEvents.length > 0) renderEvents(allEvents);
         }
 
         function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
-            const btn = document.getElementById('theme-btn');
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
                 icon.style.color = "#FFD700";
-                btn.classList.add('btn-dark');
-                btn.classList.remove('btn-light');
             } else {
                 icon.classList.remove('bi-sun-fill');
                 icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "";
-                btn.classList.add('btn-light');
-                btn.classList.remove('btn-dark');
+                icon.style.color = "#ffffff";
             }
+            // Tidak perlu mengubah background tombol karena sudah dikunci warna dark elegant (#1e293b)
         }
 
         function checkLoginStatus() {
