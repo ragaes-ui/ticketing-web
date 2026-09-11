@@ -603,24 +603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
             
-            const savedLang = localStorage.getItem('lang') || 'id';
-            updateLanguage(savedLang);
 
-            checkLoginStatus();
-            await loadEvents();
-            
-            loadBloggerNews();
-            checkServerPing();
-            setInterval(checkServerPing, 10000);
-
-            // Menutup Preloader Aesthetic yang baru
-            const loader = document.getElementById('aesthetic-preloader');
-            if(loader) {
-                setTimeout(() => {
-                    loader.classList.add('hide-preloader');
-                }, 500); 
-            }
-        });
 
         async function checkServerPing() {
             const speedText = document.getElementById('networkSpeed');
