@@ -29,29 +29,41 @@
         }
 
         /* 👇 OVERRIDE UNTUK MODE TERANG 👇 */
+/* 👇 OVERRIDE UNTUK MODE TERANG 👇 */
         [data-theme="light"] {
-            --bg-dark: #f1f5f9;
-            --bg-panel: #ffffff;
-            --input-bg: #f8fafc;
+            --bg-dark: #f8fafc; /* Latar luar abu-abu sangat muda */
+            --bg-panel: #ffffff; /* Panel form putih bersih */
+            --input-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #cbd5e1;
+            --border-color: #e2e8f0; /* Garis tepi sangat tipis dan halus */
         }
-        [data-theme="light"] .login-banner {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(219, 234, 254, 0.85) 100%), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1200&auto=format&fit=crop') center/cover;
+        
+        /* 1. Perhalus Bayangan (Shadow) Panel Kanan agar lebih menyatu */
+        [data-theme="light"] .login-form-area {
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.04);
         }
-        [data-theme="light"] .banner-text h1, [data-theme="light"] .brand-logo { color: #0f172a !important; }
-        [data-theme="light"] .banner-text p, [data-theme="light"] .text-white-50 { color: #475569 !important; }
-        [data-theme="light"] .form-control { color: #0f172a; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            overflow-x: hidden;
-            transition: background-color 0.3s;
+        /* 2. Banner Kiri Lebih Cerah dan Modern */
+        [data-theme="light"] .login-banner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(226, 232, 240, 0.9) 100%), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1200&auto=format&fit=crop') center/cover;
         }
+        
+        [data-theme="light"] .banner-text h1, 
+        [data-theme="light"] .brand-logo { color: #0f172a !important; }
+        
+        [data-theme="light"] .banner-text p, 
+        [data-theme="light"] .text-white-50 { color: #475569 !important; }
+
+        /* 3. Input Form Lebih Mewah (Efek Timbul Tipis) */
+        [data-theme="light"] .form-control { 
+            color: #0f172a; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03); 
+        }
+        [data-theme="light"] .form-control::placeholder { color: #94a3b8; }
+        
+        /* Warna ikon di dalam input agar lebih soft */
+        [data-theme="light"] .input-wrapper i { color: #94a3b8; }
 
         /* --- SPLIT LAYOUT --- */
         .login-wrapper {
@@ -295,7 +307,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mb-4 mt-2">
-                    <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs" data-theme="dark"></div>
+                    <div class="g-recaptcha" data-sitekey="6LdjRpcsAAAAAEejBupue5_ziQxyCpKC_grKrgCs"></div>
                 </div>
 
                 <button type="submit" class="btn-primary-custom" id="btnSubmit" data-i18n="bLog">
