@@ -121,15 +121,16 @@ const Keycloak = require('keycloak-connect');
 
 // 1. Buat penyimpanan sesi login di MONGODB (Nebeng jalur Mongoose!)
 // 1. Buat penyimpanan sesi login di MONGODB (Jalur Mandiri Anti-Crash)
+// 1. Buat penyimpanan sesi login di MONGODB (Nebeng Mongoose Anti-Zombie)
 const MongoStore = require('connect-mongo');
 const sessionStore = MongoStore.create({ 
-    // Beri URL langsung agar dia tidak perlu menunggu Mongoose
-    mongoUrl: "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority",
-    mongoOptions: {
-        maxPoolSize: 3, // 👈 Kunci Anti-Bocor: Batasi sangat kecil karena hanya untuk sesi login
-        serverSelectionTimeoutMS: 5000
-    }
+    // 👇 KUNCI SAKTI VERCEL: Paksa connect-mongo nebeng ke fungsi connectDB()
+    clientPromise: connectDB().then(m => m.connection.getClient()),
+    stringify: false,
+    autoRemove: 'interval',
+    autoRemoveInterval: 10
 });
+
 
 
 app.use(session({
