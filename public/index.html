@@ -240,6 +240,18 @@
         @keyframes pulse-glow { 0% { text-shadow: 0 0 10px rgba(59,130,246,0.1); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(59,130,246,0.8); transform: scale(1.05); } }
         @keyframes spin-smooth { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hide-preloader { opacity: 0; visibility: hidden; }
+        /* 🔥 TOMBOL KACA (GLASSMORPHISM) UNTUK NAVBAR 🔥 */
+        .nav-glass-btn {
+            background: rgba(120, 120, 120, 0.15) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(120, 120, 120, 0.25) !important;
+            transition: all 0.3s ease;
+        }
+        .nav-glass-btn:hover {
+            background: rgba(120, 120, 120, 0.25) !important;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -275,17 +287,17 @@
                 </ul>
             </div>
 <div class="d-flex align-items-center gap-2 flex-nowrap">
-                <!-- 👇 Tombol Tema Baru 👇 -->
-                <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); background-color: #1e293b;">
-                    <i class="bi bi-moon-stars-fill text-white" id="theme-icon"></i>
+                <!-- 👇 Tombol Tema Baru (Efek Kaca) 👇 -->
+                <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
                 </button>                
                 
-                <!-- 👇 Tombol Dropdown Bahasa Bendera 👇 -->
+                <!-- 👇 Tombol Dropdown Bahasa Bendera (Efek Kaca) 👇 -->
                 <div class="dropdown">
-                    <button class="btn btn-dark rounded-pill d-flex align-items-center gap-2 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); background-color: #1e293b;" id="btnLang">
+                    <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px;" id="btnLang">
                         <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
-                        <span class="fw-bold small text-white" id="langText">ID</span>
-                        <i class="bi bi-chevron-down small text-white-50" style="font-size: 0.7rem;"></i>
+                        <span class="fw-bold small" id="langText" style="color: var(--text-main);">ID</span>
+                        <i class="bi bi-chevron-down small" style="font-size: 0.7rem; color: var(--text-muted);"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
                         <li>
@@ -301,10 +313,10 @@
                     </ul>
                 </div>
                 
-<div id="navUserArea" class="ms-1">
-                <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
+                <div id="navUserArea" class="ms-1">
+                    <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
+                </div>
             </div>
-        </div>
     </div> <!-- 👈 TAMBAHKAN PENUTUP CONTAINER INI -->
 </nav> <!-- 👈 TAMBAHKAN PENUTUP NAVBAR INI -->
 
@@ -588,18 +600,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateThemeIcon(newTheme);
         }
 
-        function updateThemeIcon(theme) {
+function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if (!icon) return;
 
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700"; // Kuning Matahari
+                icon.style.color = "#FFD700"; // Kuning terang saat mode gelap
             } else {
                 icon.classList.remove('bi-sun-fill');
                 icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "#ffffff"; // Putih Bulan
+                icon.style.color = "#0f172a"; // Hitam elegan saat mode terang
             }
         }
             
