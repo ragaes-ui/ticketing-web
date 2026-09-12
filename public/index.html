@@ -297,12 +297,12 @@
                 </ul>
             </div>
 <div class="d-flex align-items-center gap-2 flex-nowrap">
-                <!-- 👇 Tombol Tema Baru (Efek Kaca) 👇 -->
+                <!-- 👇 Tombol Tema Efek Kaca (Tanpa text-white & btn-dark) 👇 -->
                 <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
                     <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
                 </button>                
                 
-                <!-- 👇 Tombol Dropdown Bahasa Bendera (Efek Kaca) 👇 -->
+                <!-- 👇 Tombol Bahasa Efek Kaca 👇 -->
                 <div class="dropdown">
                     <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px;" id="btnLang">
                         <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
@@ -617,12 +617,11 @@ function updateThemeIcon(theme) {
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700"; // Kuning terang saat mode gelap
+                icon.style.color = "#FFD700"; // Kuning mode gelap
             } else {
                 icon.classList.remove('bi-sun-fill');
                 icon.classList.add('bi-moon-stars-fill');
-                // 👇 Ubah baris ini dari #ffffff menjadi #0f172a 👇
-                icon.style.color = "#0f172a"; 
+                icon.style.color = "#0f172a"; // Hitam elegan mode terang (Seperti di gambar)
             }
         }
             
