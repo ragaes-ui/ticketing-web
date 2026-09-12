@@ -262,6 +262,14 @@
         [data-theme="dark"] .nav-glass-btn:hover {
             background: rgba(255, 255, 255, 0.15) !important;
         }
+        /* 🔥 PAKSA WARNA IKON TEMA SECARA PERMANEN 🔥 */
+        #theme-icon {
+            color: #0f172a !important; /* Hitam pekat untuk Mode Terang */
+            transition: color 0.3s ease;
+        }
+        [data-theme="dark"] #theme-icon {
+            color: #FFD700 !important; /* Kuning terang untuk Mode Gelap */
+        }
     </style>
 </head>
 <body>
@@ -615,16 +623,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateThemeIcon(newTheme);
         }
 
-        function updateThemeIcon(theme) {
+function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if (!icon) return;
 
+            // Hanya tugas mengganti bentuk ikon, urusan warna dipegang CSS
             if (theme === 'dark') {
                 icon.className = 'bi bi-sun-fill';
-                icon.style.setProperty("color", "#FFD700", "important"); // Kuning matahari
             } else {
                 icon.className = 'bi bi-moon-stars-fill';
-                icon.style.setProperty("color", "#0f172a", "important"); // Hitam tegas
             }
         }
 
