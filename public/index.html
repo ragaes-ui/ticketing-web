@@ -615,13 +615,16 @@ function updateThemeIcon(theme) {
             if (!icon) return;
 
             if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill');
+                // Hapus class bulan dan warna hitam, ganti jadi matahari kuning
+                icon.classList.remove('bi-moon-stars-fill', 'text-dark');
+                icon.classList.remove('text-white'); // Jaga-jaga buang sisa class HTML
                 icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700"; // Kuning mode gelap
+                icon.style.setProperty("color", "#FFD700", "important"); // Paksa kuning
             } else {
-                icon.classList.remove('bi-sun-fill');
+                // Hapus class matahari dan warna putih, ganti jadi bulan hitam
+                icon.classList.remove('bi-sun-fill', 'text-white');
                 icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "#0f172a"; // Hitam elegan mode terang (Seperti di gambar)
+                icon.style.setProperty("color", "#0f172a", "important"); // Paksa hitam gelap
             }
         }
             
