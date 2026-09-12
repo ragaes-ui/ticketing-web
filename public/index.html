@@ -284,7 +284,7 @@
     </div>
     <!-- 👆 ----------------------------------- 👆 -->
 
-    <nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
+<nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
@@ -296,13 +296,15 @@
                     <li class="nav-item"><a class="nav-link" href="/guide" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
-<div class="d-flex align-items-center gap-2 flex-nowrap">
-                <!-- 👇 Tombol Tema Efek Kaca (Tanpa text-white & btn-dark) 👇 -->
+            
+            <!-- 👇 KELOMPOK TOMBOL (SEKARANG BERADA DI DALAM CONTAINER) 👇 -->
+            <div class="d-flex align-items-center gap-2 flex-nowrap">
+                <!-- Tombol Tema Efek Kaca -->
                 <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
                     <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
                 </button>                
                 
-                <!-- 👇 Tombol Bahasa Efek Kaca 👇 -->
+                <!-- Tombol Dropdown Bahasa -->
                 <div class="dropdown">
                     <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px;" id="btnLang">
                         <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
@@ -327,8 +329,8 @@
                     <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
                 </div>
             </div>
-    </div> <!-- 👈 TAMBAHKAN PENUTUP CONTAINER INI -->
-</nav> <!-- 👈 TAMBAHKAN PENUTUP NAVBAR INI -->
+        </div> 
+    </nav>
 
 <section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
         <div class="hero-bg-circle"></div>
@@ -600,6 +602,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // ==========================================
         // FUNGSI GANTI TEMA (DARK / LIGHT MODE)
         // ==========================================
+// ==========================================
+        // FUNGSI GANTI TEMA (DARK / LIGHT MODE)
+        // ==========================================
         function toggleTheme() {
             const htmlTag = document.documentElement;
             const currentTheme = htmlTag.getAttribute('data-theme');
@@ -610,25 +615,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateThemeIcon(newTheme);
         }
 
-function updateThemeIcon(theme) {
+        function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if (!icon) return;
 
             if (theme === 'dark') {
-                // Hapus class bulan dan warna hitam, ganti jadi matahari kuning
-                icon.classList.remove('bi-moon-stars-fill', 'text-dark');
-                icon.classList.remove('text-white'); // Jaga-jaga buang sisa class HTML
-                icon.classList.add('bi-sun-fill');
-                icon.style.setProperty("color", "#FFD700", "important"); // Paksa kuning
+                icon.className = 'bi bi-sun-fill';
+                icon.style.setProperty("color", "#FFD700", "important"); // Kuning matahari
             } else {
-                // Hapus class matahari dan warna putih, ganti jadi bulan hitam
-                icon.classList.remove('bi-sun-fill', 'text-white');
-                icon.classList.add('bi-moon-stars-fill');
-                icon.style.setProperty("color", "#0f172a", "important"); // Paksa hitam gelap
+                icon.className = 'bi bi-moon-stars-fill';
+                icon.style.setProperty("color", "#0f172a", "important"); // Hitam tegas
             }
         }
-            
-
 
         async function checkServerPing() {
             const speedText = document.getElementById('networkSpeed');
