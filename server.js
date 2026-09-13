@@ -101,7 +101,8 @@ async function connectDB() {
         bufferCommands: false, 
         serverSelectionTimeoutMS: 5000, // 👈 5 detik saja, biar tidak digantung Vercel
         maxPoolSize: 10, // 👈 KUNCI: Batasi maksimal 10 koneksi per mesin Vercel
-        minPoolSize: 1
+        minPoolSize: 1,
+        family:4
     };
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
