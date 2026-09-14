@@ -113,17 +113,20 @@
         /* ========================================= */
         /* 🔥 NOTIFIKASI NGAMBANG (FLOATING TOAST) 🔥 */
         /* ========================================= */
+/* ========================================= */
+        /* 🔥 NOTIFIKASI NGAMBANG DARI ATAS 🔥 */
+        /* ========================================= */
         .floating-toast {
             position: fixed;
-            bottom: 40px; /* Jarak ngambang dari bawah */
+            top: 20px; /* 👇 Diubah dari bottom ke top */
             left: 50%;
-            transform: translate(-50%, 20px);
-            background: rgba(15, 23, 42, 0.85); /* Warna gelap transparan bergaya glass */
+            transform: translate(-50%, -20px); /* 👇 Animasi turun dari atas */
+            background: rgba(15, 23, 42, 0.85); 
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             color: #ffffff;
             padding: 12px 25px;
-            border-radius: 50px; /* Bentuk pil (oval) */
+            border-radius: 50px; 
             font-size: 0.9rem;
             font-weight: 600;
             display: flex;
@@ -131,16 +134,16 @@
             gap: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
             opacity: 0;
-            z-index: 9999;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efek masuk mantul (bouncy) */
-            pointer-events: none; /* Biar tidak mengganggu klik di bawahnya */
+            z-index: 9999; /* Muncul paling depan, menutupi navbar */
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            pointer-events: none; 
             width: max-content;
             max-width: 90vw;
         }
 
         .floating-toast.show {
             opacity: 1;
-            transform: translate(-50%, 0);
+            transform: translate(-50%, 0); /* 👇 Berhenti tepat di posisinya */
         }
 
         /* Otomatis menyesuaikan jika Mode Gelap (Dark Mode) aktif */
