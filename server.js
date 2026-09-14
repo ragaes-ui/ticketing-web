@@ -1164,7 +1164,18 @@ eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: kumpulanKodeTiket[0], sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
-
+// ==========================================
+// 🔍 API RADAR: CEK STATUS MIDTRANS OTOMATIS
+// ==========================================
+app.get('/api/check-midtrans/:orderId', async (req, res) => {
+    try {
+        // Cek langsung statusnya ke mesin Midtrans
+        const statusResponse = await snap.transaction.status(req.params.orderId);
+        res.json(statusResponse);
+    } catch (error) {
+        res.status(404).json({ error: "Transaksi belum dibayar atau tidak ditemukan" });
+    }
+});
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
