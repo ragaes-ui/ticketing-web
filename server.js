@@ -6,6 +6,9 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const midtransClient = require('midtrans-client');
 const nodemailer = require('nodemailer'); // Pastikan ini ada
+// 👇 1. TAMBAHKAN 2 BARIS INI 👇
+const { createClient } = require('@supabase/supabase-js');
+const multer = require('multer');
 
 // --- MODEL DATABASE ---
 const User = require('./models/users'); 
@@ -60,6 +63,14 @@ const app = express();
 app.set('trust proxy', true);
 app.use(cors());
 app.use(express.json());
+// 👇 2. TAMBAHKAN SETUP SUPABASE & MULTER DI SINI 👇
+const supabaseUrl = process.env.SUPABASE_URL || ''; 
+const supabaseKey = process.env.SUPABASE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Multer dengan memoryStorage agar kompatibel dengan Serverless Vercel
+const upload = multer({ storage: multer.memoryStorage() });
+// 👆 -------------------------------------------- 👆
 // ==========================================
 // POLISI LALU LINTAS SUBDOMAIN (RCM)
 // ==========================================
@@ -496,6 +507,43 @@ app.post('/api/events', async (req, res) => {
         await newEvent.save();
         res.json(newEvent);
     } catch (err) { res.status(500).json({ error: err.message }); }
+});
+// ==========================================
+// 📸 API UPLOAD GAMBAR KE SUPABASE
+// ==========================================
+app.post('/api/upload-image', upload.single('image'), async (req, res) => {
+    try {
+        const file = req.file;
+        if (!file) return res.status(400).json({ success: false, message: 'Gambar belum dipilih!' });
+
+        const fileExtension = file.originalname.split('.').pop();
+        const fileName = `event-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+
+        const { data, error } = await supabase
+            .storage
+            .from('rcell-images') // Sesuaikan dengan nama bucket di Supabase
+            .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                upsert: false 
+            });
+
+        if (error) throw error;
+
+        const { data: publicUrlData } = supabase
+            .storage
+            .from('rcell-images')
+            .getPublicUrl(fileName);
+
+        res.json({ 
+            success: true, 
+            message: 'Upload berhasil!',
+            imageUrl: publicUrlData.publicUrl 
+        });
+
+    } catch (err) {
+        console.error('Error upload Supabase:', err);
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.put('/api/events/:id', async (req, res) => {
