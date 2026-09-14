@@ -23,7 +23,7 @@ const historySchema = new mongoose.Schema({
     ip: String,
     timestamp: { type: Date, default: Date.now }
 });
-const LoginHistory = mongoose.model('LoginHistory', historySchema);
+const LoginHistory = mongoose.models.LoginHistory || mongoose.model('LoginHistory', historySchema);
 
 // --- MODEL BARU: RIWAYAT TOP UP SALDO ---
 const topupSchema = new mongoose.Schema({
@@ -33,7 +33,7 @@ const topupSchema = new mongoose.Schema({
     status: { type: String, default: 'pending' },
     timestamp: { type: Date, default: Date.now }
 });
-const Topup = mongoose.model('Topup', topupSchema);
+const Topup = mongoose.models.Topup || mongoose.model('Topup', topupSchema);
 
 // --- MODEL BARU: KODE PROMO ---
 const promoSchema = new mongoose.Schema({
@@ -46,7 +46,7 @@ const promoSchema = new mongoose.Schema({
     eventName: { type: String, default: 'SEMUA EVENT' },
     // 👆 ---------------------------------------------- 👆
 });
-const Promo = mongoose.model('Promo', promoSchema);
+const Promo = mongoose.models.Promo || mongoose.model('Promo', promoSchema);
 
 // --- MODEL BARU: RIWAYAT TRANSFER TIKET ---
 const transferSchema = new mongoose.Schema({
@@ -57,7 +57,7 @@ const transferSchema = new mongoose.Schema({
     eventName: String,
     timestamp: { type: Date, default: Date.now }
 });
-const TransferHistory = mongoose.model('TransferHistory', transferSchema);
+const TransferHistory = mongoose.models.TransferHistory || mongoose.model('TransferHistory', transferSchema);
 
 const app = express();
 app.set('trust proxy', true);
