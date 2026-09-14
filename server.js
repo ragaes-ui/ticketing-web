@@ -573,7 +573,46 @@ app.put('/api/events/:id', async (req, res) => {
 });
 
 app.delete('/api/events/:id', async (req, res) => {
-    try { await Event.findByIdAndDelete(req.params.id); res.json({ message: "Terhapus!" }); } 
+    try { 
+        // 1. Cari event-nya dulu sebelum dihapus dari Database
+        const event = await Event.findById(req.params.id);
+        if (!event) return res.status(404).json({ message: "Event tidak ditemukan!" });
+
+        // 2. Kumpulkan semua URL gambar (Banner + Poster Lineup) yang berasal dari Supabase
+        let urlsToDelete = [];
+        if (event.image && event.image.includes('supabase.co')) {
+            urlsToDelete.push(event.image);
+        }
+        if (event.lineupImages && event.lineupImages.length > 0) {
+            event.lineupImages.forEach(url => {
+                if (url && url.includes('supabase.co')) urlsToDelete.push(url);
+            });
+        }
+
+        // 3. Ekstrak nama file dari URL dan hapus dari Supabase
+        if (urlsToDelete.length > 0) {
+            const fileNames = urlsToDelete.map(url => {
+                // Mengambil bagian terakhir dari URL (nama filenya saja)
+                return url.split('?')[0].split('/').pop();
+            });
+
+            // Perintah hapus masal ke Supabase
+            const { data, error } = await supabase
+                .storage
+                .from('rcell-images') // Pastikan nama bucket sesuai
+                .remove(fileNames);
+            
+            if (error) {
+                console.error("Gagal menghapus gambar di Supabase:", error);
+            } else {
+                console.log("Gambar berhasil dihapus dari Supabase:", fileNames);
+            }
+        }
+
+        // 4. Setelah gambar bersih, baru hapus data dari MongoDB
+        await Event.findByIdAndDelete(req.params.id); 
+        res.json({ message: "Event beserta gambar-gambarnya berhasil dibersihkan!" }); 
+    } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
