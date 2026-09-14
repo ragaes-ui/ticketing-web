@@ -1047,13 +1047,17 @@ app.post('/api/buy-ticket', async (req, res) => {
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
         
-        const googleRes = await fetch(verifyUrl, { method: 'POST' });
-        const googleData = await googleRes.json();
+        const cfRes = await fetch(verifyUrl, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
+        });
+        const cfData = await cfRes.json();
         
-        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
+        if (!cfData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
         const userCheck = await User.findById(userId);
         if (!userCheck) return res.status(404).json({ success: false, message: "User tidak ditemukan" });
@@ -1168,13 +1172,17 @@ app.post('/api/payment-token', async (req, res) => {
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-        const GOOGLE_SECRET_KEY = "6LdjRpcsAAAAAHjifU---iWnguHtyRnUHRynO__3"; 
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${GOOGLE_SECRET_KEY}&response=${recaptchaToken}`;
+const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
         
-        const googleRes = await fetch(verifyUrl, { method: 'POST' });
-        const googleData = await googleRes.json();
+        const cfRes = await fetch(verifyUrl, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
+        });
+        const cfData = await cfRes.json();
         
-        if (!googleData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
+        if (!cfData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
 const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
