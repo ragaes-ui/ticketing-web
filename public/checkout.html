@@ -244,29 +244,6 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
 
-            // ==========================================
-            // 👇 INJEKSI DATA UNTUK MENCEGAH ERROR SAAT TESTING 👇
-            // Jika data kosong, kita isi otomatis agar halaman tetap jalan
-            // ==========================================
-            if (!localStorage.getItem('checkoutData') || !localStorage.getItem('userData')) {
-                console.log("Menambahkan data dummy untuk keperluan testing...");
-                localStorage.setItem('userData', JSON.stringify({
-                    id: "USR-001",
-                    fullName: "Raga Esa Pratama",
-                    email: "raga@temankonser.com",
-                    phone: "081234567890",
-                    saldo: 1500000
-                }));
-                localStorage.setItem('checkoutData', JSON.stringify({
-                    eventId: "EVT-BM2026",
-                    eventName: "RCELLFESTIVAL BEYOND MEMORIES 2026",
-                    tierName: "Presale 1",
-                    price: 125000,
-                    availableSeats: 10,
-                    minQty: 1,
-                    taxRate: 11
-                }));
-            }
 
             const userRaw = localStorage.getItem('userData');
             const checkoutRaw = localStorage.getItem('checkoutData');
