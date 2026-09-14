@@ -264,41 +264,53 @@
         let diskonPromo = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
 
-            const userRaw = localStorage.getItem('userData');
-            const checkoutRaw = localStorage.getItem('checkoutData');
-            
-            console.log("User Raw:", userRaw);       // Cek F12 Console kalau masih kosong
-            console.log("Checkout Raw:", checkoutRaw); // Cek F12 Console kalau masih kosong
+    const userRaw = localStorage.getItem('userData');
+    const checkoutRaw = localStorage.getItem('checkoutData');
+    
+    console.log("User Raw:", userRaw);       
+    console.log("Checkout Raw:", checkoutRaw); 
 
-            // Tendang ke halaman utama jika data tidak ada
-            if (!userRaw || !checkoutRaw) {
-                window.location.href = '/';
-                return;
-            }
+    // 1. Cek jika data kosong, atau string berupa "undefined" / "null"
+    if (!userRaw || !checkoutRaw || userRaw === 'undefined' || checkoutRaw === 'undefined' || userRaw === 'null' || checkoutRaw === 'null') {
+        console.warn("Data tidak ditemukan atau undefined. Mengalihkan ke halaman utama...");
+        window.location.href = '/';
+        return;
+    }
 
-            userData = JSON.parse(userRaw); 
-            checkoutData = JSON.parse(checkoutRaw);
-            minQty = checkoutData.minQty || 1;
-            qty = minQty; // Paksa jumlah keranjang awal sama dengan minQty
-            
-            const qtyInput = document.getElementById('chkQty');
-            if (qtyInput) qtyInput.value = qty;
+    // 2. Gunakan blok try-catch untuk mencegah crash jika format data (JSON) rusak
+    try {
+        userData = JSON.parse(userRaw); 
+        checkoutData = JSON.parse(checkoutRaw);
+    } catch (e) {
+        console.error("Format data di localStorage rusak (Bukan JSON):", e);
+        // Hapus data yang nyangkut/rusak dan alihkan
+        localStorage.removeItem('checkoutData');
+        window.location.href = '/';
+        return;
+    }
 
-            // Masukkan data user ke form
-            document.getElementById('chkName').value = userData.fullName || userData.username || '';
-            document.getElementById('chkEmail').value = userData.email || '';
-            document.getElementById('chkPhone').value = userData.phone || '';
-            document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
-            
-            // Masukkan data pesanan ke ringkasan sebelah kanan
-            document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
-            document.getElementById('sumTierName').innerText = checkoutData.tierName || 'General';
-            document.getElementById('sumPrice').innerText = `Rp ${(checkoutData.price || 0).toLocaleString('id-ID')}`;
-            
-            hitungTotal();
+    // --- JIKA AMAN, LANJUTKAN MEMASUKKAN DATA KE HTML ---
+    minQty = checkoutData.minQty || 1;
+    qty = minQty; 
+    
+    const qtyInput = document.getElementById('chkQty');
+    if (qtyInput) qtyInput.value = qty;
+
+    // Masukkan data user ke form
+    document.getElementById('chkName').value = userData.fullName || userData.username || '';
+    document.getElementById('chkEmail').value = userData.email || '';
+    document.getElementById('chkPhone').value = userData.phone || '';
+    document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
+    
+    // Masukkan data pesanan ke ringkasan sebelah kanan
+    document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
+    document.getElementById('sumTierName').innerText = checkoutData.tierName || 'General';
+    document.getElementById('sumPrice').innerText = `Rp ${(checkoutData.price || 0).toLocaleString('id-ID')}`;
+    
+    hitungTotal();
 
             // Render Breadcrumb
             const breadcrumbContainer = document.getElementById('breadcrumb-container');
