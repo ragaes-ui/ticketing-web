@@ -110,6 +110,45 @@
         .breadcrumb-item { white-space: nowrap; font-size: 0.85rem; }
         .breadcrumb-item.active { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; display: inline-block; vertical-align: middle; }
         @media (max-width: 576px) { .breadcrumb-item.active { max-width: 140px; } }
+        /* ========================================= */
+        /* 🔥 NOTIFIKASI NGAMBANG (FLOATING TOAST) 🔥 */
+        /* ========================================= */
+        .floating-toast {
+            position: fixed;
+            bottom: 40px; /* Jarak ngambang dari bawah */
+            left: 50%;
+            transform: translate(-50%, 20px);
+            background: rgba(15, 23, 42, 0.85); /* Warna gelap transparan bergaya glass */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 12px 25px;
+            border-radius: 50px; /* Bentuk pil (oval) */
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            z-index: 9999;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efek masuk mantul (bouncy) */
+            pointer-events: none; /* Biar tidak mengganggu klik di bawahnya */
+            width: max-content;
+            max-width: 90vw;
+        }
+
+        .floating-toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        /* Otomatis menyesuaikan jika Mode Gelap (Dark Mode) aktif */
+        [data-theme="dark"] .floating-toast {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -239,7 +278,36 @@
         let qty = 1; 
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
+// ==========================================
+        // 🔥 FUNGSI NOTIFIKASI NGAMBANG KEREN 🔥
+        // ==========================================
+        function showToast(pesan, tipe = 'warning') {
+            // Hapus notif lama jika masih ada (biar tidak numpuk)
+            const oldToast = document.querySelector('.floating-toast');
+            if (oldToast) oldToast.remove();
 
+            const toast = document.createElement('div');
+            toast.className = 'floating-toast';
+            
+            // Atur Ikon & Warna sesuai tipe
+            let icon = 'bi-info-circle-fill';
+            let color = 'inherit';
+            if (tipe === 'warning') { icon = 'bi-exclamation-triangle-fill'; color = '#f59e0b'; } // Kuning/Orange
+            if (tipe === 'error') { icon = 'bi-x-circle-fill'; color = '#ef4444'; } // Merah
+            if (tipe === 'success') { icon = 'bi-check-circle-fill'; color = '#10b981'; } // Hijau
+
+            toast.innerHTML = `<i class="bi ${icon}" style="color: ${color}; font-size: 1.1rem;"></i> <span>${pesan}</span>`;
+            document.body.appendChild(toast);
+
+            // Trigger animasi masuk (kasih jeda 10ms biar transisi jalan)
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Hilangkan dan hapus setelah 3 detik
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400); // Tunggu animasi keluar selesai
+            }, 3000);
+        }
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -305,15 +373,20 @@
             hitungTotal(); 
         }
 
-        function updateQty(change) { 
+function updateQty(change) { 
             const max = checkoutData.availableSeats || 1; 
             let newQty = qty + change; 
+            
             if (newQty >= minQty && newQty <= max) { 
                 qty = newQty; 
                 document.getElementById('chkQty').value = qty; 
                 hitungTotal(); 
             } else if (newQty < minQty) {
-                Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500, icon: 'warning', title: `Minimal pembelian ${minQty} tiket!`, background: 'var(--bg-card)', color: 'var(--text-main)' });
+                // 👇 MEMANGGIL NOTIFIKASI NGAMBANG 👇
+                showToast(`Minimal pembelian ${minQty} tiket!`, 'warning');
+            } else if (newQty > max) {
+                // (Opsional) Notif jika melebihi batas stok tiket
+                showToast(`Maksimal pembelian ${max} tiket!`, 'error');
             }
         }
 
@@ -368,6 +441,7 @@
                     diskonPromo = 0; 
                     statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`; 
                     rowDiskon.classList.add('d-none'); 
+                    showToast(data.message, 'error');
                 }
                 hitungTotal();
             } catch(e) { 
