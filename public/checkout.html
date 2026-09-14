@@ -541,64 +541,94 @@ async function cekPromoLuar() {
                     const data = await res.json(); 
                     Swal.close(); 
                     
-                    if (res.ok && data.token) { 
-                        window.snap.pay(data.token, { 
-onSuccess: async function(result){ 
-                                Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)', allowOutsideClick: false });
+if (res.ok && data.token) { 
+                        let radarPembayaran; // Siapkan variabel radar
+
+                        // 1. Bungkus proses simpan tiket ke dalam fungsi agar bisa dipanggil oleh Snap ATAU oleh Radar
+                        const prosesSuksesMidtrans = async () => {
+                            Swal.fire({ title: 'Menerbitkan Tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)', allowOutsideClick: false });
+                            try {
+                                const saveRes = await fetch('/api/midtrans-success', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
+                                    body: JSON.stringify({ 
+                                        eventId: checkoutData.eventId, 
+                                        userId: userData.id, 
+                                        customerName: name, 
+                                        customerEmail: userData.email, 
+                                        tierName: checkoutData.tierName, 
+                                        price: totalTagihan, 
+                                        quantity: qty, 
+                                        orderId: data.orderId, 
+                                        buyerData: buyerPayload,
+                                        subTotal: (checkoutData.price * qty),
+                                        diskon: diskonPromo,
+                                        pajak: window.pajakAktif || 0
+                                    }) 
+                                });
                                 
-                                try {
-                                    const saveRes = await fetch('/api/midtrans-success', { 
-                                        method: 'POST', 
-                                        headers: { 'Content-Type': 'application/json' }, 
-                                        body: JSON.stringify({ 
-                                            eventId: checkoutData.eventId, 
-                                            userId: userData.id, 
-                                            customerName: name, 
-                                            customerEmail: userData.email, 
-                                            tierName: checkoutData.tierName, 
-                                            price: totalTagihan, 
-                                            quantity: qty, 
-                                            orderId: data.orderId, 
-                                            buyerData: buyerPayload,
-                                            subTotal: (checkoutData.price * qty),
-                                            diskon: diskonPromo,
-                                            pajak: window.pajakAktif || 0
-                                        }) 
-                                    });
-                                    
-                                    const saveData = await saveRes.json();
-                                    
-                                    if(saveData.success) { 
-                                        localStorage.removeItem('checkoutData'); 
-                                        Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
-                                    } else {
-                                        Swal.fire({icon: 'error', title: 'Gagal Menerbitkan', text: saveData.message, background: 'var(--bg-card)', color: 'var(--text-main)'});
-                                    }
-                                } catch(err) {
-                                    Swal.fire({icon: 'error', title: 'Koneksi Terputus', text: 'Gagal menghubungi server database.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                                const saveData = await saveRes.json();
+                                
+                                if(saveData.success) { 
+                                    localStorage.removeItem('checkoutData'); 
+                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
+                                } else {
+                                    Swal.fire({icon: 'error', title: 'Gagal Menerbitkan', text: saveData.message, background: 'var(--bg-card)', color: 'var(--text-main)'});
                                 }
+                            } catch(err) {
+                                Swal.fire({icon: 'error', title: 'Koneksi Terputus', text: 'Gagal menghubungi server database.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                            }
+                        };
+
+                        // 2. Tampilkan Popup Midtrans
+                        window.snap.pay(data.token, { 
+                            onSuccess: function(result){ 
+                                clearInterval(radarPembayaran); // Matikan radar jika midtrans bawaan tembus
+                                prosesSuksesMidtrans(); 
                             },
                             onPending: function(result){ 
+                                clearInterval(radarPembayaran);
                                 Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
-                                grecaptcha.reset(); 
+                                turnstile.reset(); 
                             },
                             onError: function(result){ 
+                                clearInterval(radarPembayaran);
                                 Swal.fire({icon: 'error', title: 'Pembayaran Gagal', text: 'Terjadi kesalahan dari pihak bank.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
-                                grecaptcha.reset(); 
+                                turnstile.reset(); 
                             },
                             onClose: function(){ 
+                                clearInterval(radarPembayaran);
                                 Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup halaman pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
-                                grecaptcha.reset(); 
+                                turnstile.reset(); 
                             }
                         }); 
+
+                        // 👇 3. NYALAKAN RADAR OTOMATIS (Cek per 3 detik) 👇
+                        radarPembayaran = setInterval(async () => {
+                            try {
+                                const cekRes = await fetch(`/api/check-midtrans/${data.orderId}`);
+                                if (cekRes.ok) {
+                                    const dataMidtrans = await cekRes.json();
+                                    const status = dataMidtrans.transaction_status;
+                                    
+                                    if (status === 'capture' || status === 'settlement') {
+                                        clearInterval(radarPembayaran); // Matikan radar
+                                        window.snap.hide();             // Tutup paksa popup Midtrans
+                                        prosesSuksesMidtrans();         // Jalankan proses simpan tiket
+                                    } else if (status === 'cancel' || status === 'expire' || status === 'deny') {
+                                        clearInterval(radarPembayaran);
+                                        window.snap.hide();
+                                        Swal.fire('Gagal', 'Pembayaran dibatalkan atau kadaluarsa.', 'error');
+                                        turnstile.reset();
+                                    }
+                                }
+                            } catch (err) { /* Biarkan jalan terus kalau belum ketemu */ }
+                        }, 3000);
+
                     } else { 
                         Swal.fire('Error', data.message, 'error'); 
-                        grecaptcha.reset(); 
+                        turnstile.reset(); // Perbaikan grecaptcha.reset() yang nyangkut
                     }
-                } catch (err) { 
-                    Swal.fire('Error', 'Gagal memuat gateway', 'error'); 
-                    grecaptcha.reset(); 
-                }
             }
         }
     </script>
