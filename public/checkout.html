@@ -262,13 +262,16 @@
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
 
             const userRaw = localStorage.getItem('userData');
             const checkoutRaw = localStorage.getItem('checkoutData');
             
+            console.log("User Raw:", userRaw);       // Cek F12 Console kalau masih kosong
+            console.log("Checkout Raw:", checkoutRaw); // Cek F12 Console kalau masih kosong
+
             // Tendang ke halaman utama jika data tidak ada
             if (!userRaw || !checkoutRaw) {
                 window.location.href = '/';
@@ -279,44 +282,44 @@
             checkoutData = JSON.parse(checkoutRaw);
             minQty = checkoutData.minQty || 1;
             qty = minQty; // Paksa jumlah keranjang awal sama dengan minQty
+            
             const qtyInput = document.getElementById('chkQty');
             if (qtyInput) qtyInput.value = qty;
-            // 👆 ------------------------------------------- 👆
-            document.getElementById('chkName').value = userData.fullName || userData.username;
-            document.getElementById('chkEmail').value = userData.email;
+
+            // Masukkan data user ke form
+            document.getElementById('chkName').value = userData.fullName || userData.username || '';
+            document.getElementById('chkEmail').value = userData.email || '';
             document.getElementById('chkPhone').value = userData.phone || '';
-            document.getElementById('txtSaldo').innerText = `Rp ${userData.saldo.toLocaleString('id-ID')}`;
+            document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
             
-            document.getElementById('sumEventName').innerText = checkoutData.eventName;
-            document.getElementById('sumTierName').innerText = checkoutData.tierName;
-            document.getElementById('sumPrice').innerText = `Rp ${checkoutData.price.toLocaleString('id-ID')}`;
+            // Masukkan data pesanan ke ringkasan sebelah kanan
+            document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
+            document.getElementById('sumTierName').innerText = checkoutData.tierName || 'General';
+            document.getElementById('sumPrice').innerText = `Rp ${(checkoutData.price || 0).toLocaleString('id-ID')}`;
             
             hitungTotal();
-            // 👇 KODE BREADCRUMB CHECKOUT 👇
+
+            // Render Breadcrumb
             const breadcrumbContainer = document.getElementById('breadcrumb-container');
-            // Kita tambahkan console.log buat ngecek kalau ada error
-        console.log("Wadah Breadcrumb:", breadcrumbContainer);
-        console.log("Data Checkout:", checkoutData);
-if (breadcrumbContainer && checkoutData) {
-            breadcrumbContainer.innerHTML = `
-                <div class="container">
-                    <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
-                        <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
-                            <li class="breadcrumb-item">
-                                <a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="/detail?id=${checkoutData.eventId}" style="color: var(--text-muted); text-decoration: none;">${checkoutData.eventName}</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">
-                                Checkout
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            `;
-        }
-            // 👆 ======================= 👆
+            if (breadcrumbContainer && checkoutData) {
+                breadcrumbContainer.innerHTML = `
+                    <div class="container">
+                        <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
+                            <ol class="breadcrumb mb-0" style="font-size: 15px; font-weight: 500;">
+                                <li class="breadcrumb-item">
+                                    <a href="/" style="color: var(--text-muted); text-decoration: none;">Beranda</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="/detail?id=${checkoutData.eventId}" style="color: var(--text-muted); text-decoration: none;">${checkoutData.eventName}</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-main); font-weight: 700;">
+                                    Checkout
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                `;
+            }
             
             // Ilusi URL
             window.history.replaceState(null, '', `/detail?checkout=true&id=${checkoutData.eventId}`);
