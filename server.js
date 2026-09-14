@@ -501,7 +501,8 @@ app.post('/api/events', async (req, res) => {
             tickets: tickets || [],
             lineupImages: lineupImages || [],
             taxRate: taxRate || 0,
-            creatorId: creatorId || "admin-pusat" // 👈 2. SIMPAN ID KREATOR KE DATABASE
+            creatorId: creatorId || "admin-pusat",
+            image: image || "" // 👈 INI YANG KETINGGALAN MAS! WAJIB DITAMBAH BIAR POSTERNYA MUNCUL// 👈 2. SIMPAN ID KREATOR KE DATABASE
         });
         
         await newEvent.save();
