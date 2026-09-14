@@ -289,7 +289,13 @@
         <div class="content-area d-none" id="createEventArea">
             <div class="card-custom">
                 <form id="formEvent">
-                    <div class="mb-3"><label class="form-label" data-i18n="lbl_banner">Link Gambar Banner (ImgBB)</label><input type="text" id="image" class="form-control" placeholder="https://..." oninput="previewImage(this.value, 'addPreview')"><div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div></div>
+                    <div class="mb-3">
+    <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
+    <!-- 👇 Diubah ke file input 👇 -->
+    <input type="file" id="eventImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'addPreview', 'addTxt')">
+    <small class="text-info mt-1 d-block" style="font-size: 0.75rem;">*Gambar akan otomatis masuk ke Supabase</small>
+    <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div>
+</div>
                     <div class="mb-3 p-3 mt-3" style="border: 1px dashed var(--border-color); border-radius: 12px;"><label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label><div id="addLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button></div>
                     <div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="category" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div><div class="col-md-6"><label class="form-label text-warning"><i class="bi bi-bank me-1"></i> <span data-i18n="lbl_tax">Pajak Event (%)</span></label><input type="text" id="taxRate" class="form-control" placeholder="0" min="0" max="100"></div></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="name" class="form-control" required></div>
@@ -473,7 +479,13 @@
                 <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold m-0"><i class="bi bi-pencil-square text-info me-2"></i><span data-i18n="modal_edit">Edit Event</span></h5><button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(var(--invert-icon, 1));"></button></div>
                 <div style="max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
                     <input type="hidden" id="editId">
-                    <div class="mb-3"><label class="form-label" data-i18n="lbl_banner">Link Gambar Banner</label><input type="text" id="editImage" class="form-control" oninput="previewImage(this.value, 'editPreview')"><div class="img-preview-box mt-2"><img id="editPreview"></div></div>
+                    <div class="mb-3">
+    <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
+    <!-- 👇 Diubah ke file input & tambah hidden input 👇 -->
+    <input type="file" id="editImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'editPreview', null)">
+    <input type="hidden" id="editImageUrl"> <!-- Menyimpan link lama -->
+    <div class="img-preview-box mt-2"><img id="editPreview"></div>
+</div>
                     <div class="mb-3 p-3" style="border: 1px dashed var(--border-color); border-radius: 12px;"><label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label><div id="editLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button></div>
                     <div class="row g-2 mb-3"><div class="col-md-6"><label class="form-label text-warning" data-i18n="lbl_tax">Pajak Event (%)</label><input type="number" id="editTaxRate" class="form-control"></div><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="editCategory" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="editName" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi</label><input type="text" id="editLocation" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Maps</label><input type="text" id="editMapsUrl" class="form-control"></div>
@@ -746,8 +758,47 @@
         }
         async function prosesScanManual() { const input = document.getElementById('scanInputData'); const code = input.value.trim(); const alertBox = document.getElementById('scanResultAlert'); if (!code) return; const btn = document.getElementById('btnScanManual'); btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`; btn.disabled = true; try { const response = await fetch('/api/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticketCode: code }) }); const data = await response.json(); alertBox.style.display = 'block'; if (data.valid) { alertBox.className = 'alert alert-success border-success text-start text-dark'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-check-circle-fill me-2"></i> TIKET VALID!</h4><hr><p class="mb-1"><b>Nama:</b> ${data.data.name}</p><p class="mb-1"><b>Event:</b> ${data.data.event}</p><p class="mb-0 text-success fw-bold">${data.data.info || 'Akses Masuk Diizinkan.'}</p>`; input.value = ''; } else { alertBox.className = 'alert alert-danger border-danger text-start text-dark'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-x-octagon-fill me-2"></i> ${data.message}</h4><hr><p class="mb-0">${data.detail}</p>`; input.select(); } } catch (error) { alertBox.style.display = 'block'; alertBox.className = 'alert alert-warning border-warning'; alertBox.innerHTML = `<i class="bi bi-wifi-off me-2"></i> Sinyal terputus.`; } finally { btn.innerHTML = `<i class="bi bi-upc-scan me-2"></i> Verifikasi Tiket`; btn.disabled = false; input.focus(); } }
 
-        function previewImage(u, i) { const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u; if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; } if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; } }
-        function addLineupRow(containerId, url = '') { document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="input-group mb-2 lineup-row"><span class="input-group-text bg-dark border-secondary"><i class="bi bi-link-45deg text-white-50"></i></span><input type="text" class="form-control lineup-url border-secondary" placeholder="Link gambar artis (https://...)" value="${url}"><button class="btn btn-danger border-secondary" type="button" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button></div>`); }
+        // 👇 Fungsi pratinjau file lokal 👇
+function previewLocalImage(input, imgId, txtId) {
+    const img = document.getElementById(imgId);
+    const txt = txtId ? document.getElementById(txtId) : null;
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            img.style.display = 'block';
+            if (txt) txt.style.display = 'none';
+        }
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        img.style.display = 'none';
+        if (txt) txt.style.display = 'block';
+    }
+}
+
+// 👇 Alat bantu lempar gambar ke Supabase 👇
+async function uploadToSupabase(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch('/api/upload-image', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    return data.imageUrl;
+}
+        function addLineupRow(containerId, existingUrl = '') { 
+    const isEdit = existingUrl !== '';
+    const html = `
+        <div class="mb-2 lineup-row p-2 border border-secondary rounded" style="background: var(--input-bg);">
+            <div class="d-flex gap-2 align-items-center">
+                <input type="file" class="form-control form-control-sm lineup-file border-secondary" accept="image/*">
+                <input type="hidden" class="lineup-existing-url" value="${existingUrl}">
+                <button class="btn btn-sm btn-danger border-secondary" type="button" onclick="this.closest('.lineup-row').remove()"><i class="bi bi-trash"></i></button>
+            </div>
+            ${isEdit ? `<div class="mt-1 small text-info"><i class="bi bi-link-45deg"></i> File lama: <a href="${existingUrl}" target="_blank" class="text-info">Lihat Gambar</a> (Abaikan jika tak diganti)</div>` : ''}
+        </div>
+    `;
+    document.getElementById(containerId).insertAdjacentHTML('beforeend', html); 
+}
         function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') { 
             let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : ''; 
             document.getElementById(id).insertAdjacentHTML('beforeend', `<div class="tier-row"><button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="row g-2 mb-2"><div class="col-7"><input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required></div><div class="col-5"><input type="datetime-local" class="form-control form-control-sm mb-2 tier-open" value="${o}" title="Waktu Buka Tiket"></div></div><div class="row g-2"><div class="col-4"><input type="text" class="form-control form-control-sm tier-price" value="${formatP}" placeholder="Harga (Rp)" required oninput="formatRupiah(this)"></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div><div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div></div><div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50"><div class="col-12 col-md-5 d-flex align-items-center"><div class="form-check form-switch m-0"><input class="form-check-input tier-is-locked" type="checkbox" role="switch" ${isLocked ? 'checked' : ''} onchange="toggleAccessCode(this)"><label class="form-check-label small fw-bold text-warning ms-1"><i class="bi bi-lock-fill"></i> Gembok Tiket?</label></div></div><div class="col-12 col-md-7"><input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia" style="${isLocked ? '' : 'display: none;'}"></div></div></div>`); 
@@ -757,11 +808,113 @@
         document.getElementById('category').addEventListener('change', function() { const box = document.getElementById('streamingAccountBox'); if(this.value === 'Streaming') { box.style.display = 'block'; } else { box.style.display = 'none'; document.getElementById('secretData').value = ''; } });
         document.getElementById('editCategory').addEventListener('change', function() { const box = document.getElementById('editSecretData'); box.style.display = this.value === 'Streaming' ? 'block' : 'none'; if (this.value !== 'Streaming') box.value = ''; });
 
-        document.getElementById('formEvent').addEventListener('submit', async (e) => { e.preventDefault(); const tiers = getTiers('addTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error'); const btn = document.getElementById('btnSubmitEvent'); const originalText = btn.innerHTML; btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; btn.disabled = true; const data = { name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value, secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, lineupImages: Array.from(document.querySelectorAll('#addLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 }; try { const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); if (res.ok) { Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event diterbitkan.', background: 'var(--bg-card)', color: 'var(--text-main)' }); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); previewImage('', 'addPreview'); await loadMyEvents(); switchMenu('myevents'); } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } } catch (err) {} finally { btn.innerHTML = originalText; btn.disabled = false; } });
+        document.getElementById('formEvent').addEventListener('submit', async (e) => { 
+    e.preventDefault(); 
+    const tiers = getTiers('addTiers'); 
+    if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error'); 
+
+    const btn = document.getElementById('btnSubmitEvent'); 
+    const originalText = btn.innerHTML; 
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Mengupload...`; 
+    btn.disabled = true; 
+
+    try {
+        // 1. Upload Banner ke Supabase
+        let bannerUrl = "";
+        const bannerFile = document.getElementById('eventImageFile').files[0];
+        if (bannerFile) bannerUrl = await uploadToSupabase(bannerFile);
+
+        // 2. Upload Semua Line Up Poster
+        let lineupUrls = [];
+        const lineupRows = document.querySelectorAll('#addLineups .lineup-row');
+        for (let row of lineupRows) {
+            const fileInput = row.querySelector('.lineup-file');
+            if (fileInput && fileInput.files[0]) {
+                const url = await uploadToSupabase(fileInput.files[0]);
+                lineupUrls.push(url);
+            }
+        }
+
+        const data = { 
+            name: document.getElementById('name').value, category: document.getElementById('category').value, 
+            organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, 
+            date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, 
+            startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, 
+            salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', 
+            mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, 
+            image: bannerUrl, secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', 
+            price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+            tickets: tiers, lineupImages: lineupUrls, 
+            taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 
+        }; 
+
+        const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+        if (res.ok) { 
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event diterbitkan.', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
+            e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
+            document.getElementById('addLineups').innerHTML = '';
+            previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt'); 
+            await loadMyEvents(); switchMenu('myevents'); 
+        } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } 
+    } catch (err) { Swal.fire('Error', err.message || 'Gagal mengupload gambar.', 'error'); } 
+    finally { btn.innerHTML = originalText; btn.disabled = false; } 
+});
         async function loadMyEvents() { const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; try { const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; } tbody.innerHTML = myEventsData.map(event => { const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')"><i class="bi bi-trash"></i></button></td></tr>`; }).join(''); } catch (err) {} }
         async function hapusEvent(id) { Swal.fire({ title: 'Hapus Event?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya', background: 'var(--bg-card)', color: 'var(--text-main)' }).then(async (result) => { if (result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); await loadMyEvents(); loadDashboardStats(); } }); }
-        function bukaModalEdit(id) { const ev = myEventsData.find(e => e._id === id); if(ev) { document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name; document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || ''; document.getElementById('editCategory').value = ev.category || 'General'; document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; document.getElementById('editSecretData').value = ev.secretData || ''; document.getElementById('editTaxRate').value = ev.taxRate || 0; if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview'); if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } editModal.show(); } }
-        async function saveEditEvent() { const id = document.getElementById('editId').value; const tiers = getTiers('editTiers'); if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error'); const data = { name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, image: document.getElementById('editImage').value, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, lineupImages: Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== ''), taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, creatorId: organizerInfo.id, organizer: organizerInfo.organizerName }; await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); editModal.hide(); await loadMyEvents(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Tersimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' }); }
+        function bukaModalEdit(id) { const ev = myEventsData.find(e => e._id === id); if(ev) { document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name; document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || ''; document.getElementById('editCategory').value = ev.category || 'General'; document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; document.getElementById('editSecretData').value = ev.secretData || ''; document.getElementById('editTaxRate').value = ev.taxRate || 0; if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImageUrl').value = ev.image || ''; 
+document.getElementById('editImageUrl').value = ev.image || ''; 
+document.getElementById('editImageFile').value = ''; 
+previewImage(ev.image, 'editPreview'); 
+if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } editModal.show(); } }
+        async function saveEditEvent() { 
+    const id = document.getElementById('editId').value; 
+    const tiers = getTiers('editTiers'); 
+    if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error'); 
+    
+    const btn = document.getElementById('btnSaveEdit');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; 
+    btn.disabled = true;
+
+    try {
+        // 1. Cek Banner (Timpa kalau ada file baru)
+        let finalBannerUrl = document.getElementById('editImageUrl').value;
+        const bannerFile = document.getElementById('editImageFile').files[0];
+        if (bannerFile) finalBannerUrl = await uploadToSupabase(bannerFile);
+
+        // 2. Cek Line Up (Upload yang baru, pertahankan yang lama)
+        let finalLineupUrls = [];
+        const lineupRows = document.querySelectorAll('#editLineups .lineup-row');
+        for (let row of lineupRows) {
+            const fileInput = row.querySelector('.lineup-file');
+            const hiddenUrl = row.querySelector('.lineup-existing-url').value;
+
+            if (fileInput && fileInput.files[0]) {
+                const url = await uploadToSupabase(fileInput.files[0]);
+                finalLineupUrls.push(url);
+            } else if (hiddenUrl) {
+                finalLineupUrls.push(hiddenUrl); // Pakai URL lama
+            }
+        }
+
+        const data = { 
+            name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, 
+            startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', 
+            location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, 
+            image: finalBannerUrl, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, 
+            lineupImages: finalLineupUrls, taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, 
+            creatorId: organizerInfo.id, organizer: organizerInfo.organizerName 
+        }; 
+
+        await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+        editModal.hide(); await loadMyEvents(); 
+        Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Tersimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
+    } catch(err) {
+        Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error');
+    } finally {
+        btn.innerHTML = originalText; btn.disabled = false;
+    }
+}
         function formatRupiah(input) {
             let angka = input.value.replace(/[^0-9]/g, '');
             input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
