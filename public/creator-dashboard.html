@@ -777,14 +777,37 @@ function previewLocalImage(input, imgId, txtId) {
 }
 
 // 👇 Alat bantu lempar gambar ke Supabase 👇
+// 👇 Fungsi pengubah file jadi teks Base64 (Anti-Nyangkut di Vercel) 👇
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// 👇 Alat bantu lempar gambar ke Supabase 👇
 async function uploadToSupabase(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-    const res = await fetch('/api/upload-image', { method: 'POST', body: formData });
+    // Ubah gambar jadi teks panjang dulu
+    const base64 = await fileToBase64(file);
+    
+    // Kirim sebagai JSON agar tidak dihadang oleh Vercel
+    const res = await fetch('/api/upload-image', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            imageBase64: base64, 
+            fileName: file.name, 
+            mimeType: file.type 
+        }) 
+    });
+    
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
     return data.imageUrl;
 }
+
         function addLineupRow(containerId, existingUrl = '') { 
     const isEdit = existingUrl !== '';
     const html = `
