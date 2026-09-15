@@ -62,7 +62,9 @@ const TransferHistory = mongoose.models.TransferHistory || mongoose.model('Trans
 const app = express();
 app.set('trust proxy', true);
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
+
 // 👇 2. TAMBAHKAN SETUP SUPABASE & MULTER DI SINI 👇
 const supabaseUrl = process.env.SUPABASE_URL || ''; 
 const supabaseKey = process.env.SUPABASE_KEY || '';
@@ -512,19 +514,27 @@ app.post('/api/events', async (req, res) => {
 // ==========================================
 // 📸 API UPLOAD GAMBAR KE SUPABASE
 // ==========================================
-app.post('/api/upload-image', upload.single('image'), async (req, res) => {
+// ==========================================
+// 📸 API UPLOAD GAMBAR KE SUPABASE (VERSI BASE64 ANTI-VERCEL BUG)
+// ==========================================
+app.post('/api/upload-image', async (req, res) => {
     try {
-        const file = req.file;
-        if (!file) return res.status(400).json({ success: false, message: 'Gambar belum dipilih!' });
+        const { imageBase64, fileName, mimeType } = req.body;
+        
+        if (!imageBase64) return res.status(400).json({ success: false, message: 'Gambar belum dipilih atau terputus!' });
 
-        const fileExtension = file.originalname.split('.').pop();
-        const fileName = `event-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+        // Bersihkan header Base64 dari Frontend
+        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        const fileExtension = fileName.split('.').pop() || 'jpg';
+        const newFileName = `event-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
         const { data, error } = await supabase
             .storage
-            .from('rcell-images') // Sesuaikan dengan nama bucket di Supabase
-            .upload(fileName, file.buffer, {
-                contentType: file.mimetype,
+            .from('rcell-images') // Pastikan nama bucket sesuai
+            .upload(newFileName, buffer, {
+                contentType: mimeType,
                 upsert: false 
             });
 
@@ -533,7 +543,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
         const { data: publicUrlData } = supabase
             .storage
             .from('rcell-images')
-            .getPublicUrl(fileName);
+            .getPublicUrl(newFileName);
 
         res.json({ 
             success: true, 
@@ -546,6 +556,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 });
+
 
 app.put('/api/events/:id', async (req, res) => {
     try {
