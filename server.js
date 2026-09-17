@@ -112,7 +112,7 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = { 
         bufferCommands: false, 
-        serverSelectionTimeoutMS: 5000, // 👈 5 detik saja, biar tidak digantung Vercel
+        serverSelectionTimeoutMS: 15000, // 👈 5 detik saja, biar tidak digantung Vercel
         maxPoolSize: 10, // 👈 KUNCI: Batasi maksimal 10 koneksi per mesin Vercel
         minPoolSize: 1,
         family:4
