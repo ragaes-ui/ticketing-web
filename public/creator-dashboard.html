@@ -126,6 +126,19 @@
         }
         #menuLoader.show { opacity: 1; visibility: visible; }
         .spinner-custom { width: 3rem; height: 3rem; color: var(--primary); }
+        /* ========================================== */
+        /* 🔥 POPUP STANDAR PROFESIONAL 🔥 */
+        /* ========================================== */
+        .swal-blur-backdrop {
+            backdrop-filter: blur(5px) !important;
+            -webkit-backdrop-filter: blur(5px) !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+        .swal-custom-popup {
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+            padding-top: 1rem !important;
+        }
     </style>
 <!-- CEK LOGIN INSTAN & ANTI-BACK CACHE -->
 <!-- ANTI-BACK CACHE & HIDE PAGE -->
@@ -873,7 +886,23 @@ async function uploadToSupabase(file) {
 
         const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
         if (res.ok) { 
-            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Event diterbitkan.', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
+            Swal.fire({ 
+    html: `
+        <div class="mt-2">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <h3 class="fw-bolder mt-3 mb-2">Event Berhasil Dibuat</h3>
+            <p class="text-muted" style="font-size: 0.95rem;">Event baru Anda telah berhasil dipublikasikan ke dalam sistem dan tiket sudah dapat diakses.</p>
+        </div>
+    `,
+    background: 'var(--bg-card)', color: 'var(--text-main)',
+    showConfirmButton: true, confirmButtonText: 'Selesai',
+    buttonsStyling: false,
+    customClass: {
+        popup: 'rounded-4 swal-custom-popup',
+        confirmButton: 'btn btn-primary rounded-pill px-5 py-2 fw-bold mt-2',
+        backdrop: 'swal-blur-backdrop'
+    }
+}); 
             e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
             document.getElementById('addLineups').innerHTML = '';
             previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt'); 
@@ -931,7 +960,21 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
 
         await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
         editModal.hide(); await loadMyEvents(); 
-        Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Tersimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
+        Swal.fire({ 
+    html: `
+        <div class="mt-2 pb-2">
+            <i class="bi bi-check2-circle text-success" style="font-size: 3.5rem;"></i>
+            <h4 class="fw-bolder mt-2 mb-1">Pembaruan Berhasil</h4>
+            <p class="text-muted small mb-0">Perubahan data event telah disimpan.</p>
+        </div>
+    `,
+    background: 'var(--bg-card)', color: 'var(--text-main)',
+    showConfirmButton: false, timer: 2500,
+    customClass: {
+        popup: 'rounded-4 swal-custom-popup',
+        backdrop: 'swal-blur-backdrop'
+    }
+}); 
     } catch(err) {
         Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error');
     } finally {
