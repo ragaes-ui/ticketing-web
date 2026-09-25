@@ -173,6 +173,11 @@
                     <i class="bi bi-ticket-perforated me-1"></i> Kode Promo
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-nowrap" id="rundown-tab" data-bs-toggle="pill" data-bs-target="#rundown-pane" type="button" role="tab" onclick="loadRundownsAdmin()">
+                    <i class="bi bi-calendar2-range me-1"></i> Rundown Event
+                </button>
+            </li>
         </ul>
 
         <!-- ISI DARI SETIAP TAB -->
@@ -452,7 +457,61 @@
                     <div id="promoList" class="row g-3"></div>
                 </div>
             </div>
+<!-- ===================== TAB 6: KELOLA RUNDOWN ===================== -->
+            <div class="tab-pane fade" id="rundown-pane" role="tabpanel">
+                <div class="glass-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold text-info m-0"><i class="bi bi-calendar2-range me-2"></i>Kelola Rundown Event</h5>
+                        <a href="https://rundown.rcellfest.my.id" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Buka Web Rundown
+                        </a>
+                    </div>
 
+                    <!-- Kotak Form Rundown -->
+                    <div class="p-4 rounded-4 mb-4" style="background: rgba(0, 198, 255, 0.05); border: 1px dashed rgba(0, 198, 255, 0.3);">
+                        <div class="mb-3">
+                            <label class="small text-warning fw-bold mb-1"><i class="bi bi-lightning-charge-fill"></i> Ambil Otomatis dari Event yang Ada (Opsional)</label>
+                            <select id="rdSelectEvent" class="form-select" onchange="autoFillRundownEvent(this)">
+                                <option value="">-- Pilih Event untuk Isi Otomatis --</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="small text-white-50 fw-bold mb-1">Slug Link (Tanpa Spasi)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-white-50 small">rundown.../</span>
+                                    <input type="text" id="rdSlug" class="form-control" placeholder="rcellfest-17">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-white-50 fw-bold mb-1">Nama Event</label>
+                                <input type="text" id="rdEventName" class="form-control" placeholder="RCELLFEST 17">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-white-50 fw-bold mb-1">Tanggal Acara (Teks Bebas)</label>
+                                <input type="text" id="rdEventDate" class="form-control" placeholder="Sabtu, 15 Agustus 2026">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <label class="small text-info fw-bold m-0"><i class="bi bi-clock-history me-1"></i> Susunan Jam Acara (Timeline)</label>
+                            <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="addRundownRow()">
+                                <i class="bi bi-plus-circle me-1"></i> Tambah Jam / Sesi
+                            </button>
+                        </div>
+
+                        <div id="rdRowsContainer" class="mb-3"></div>
+
+                        <button type="button" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" onclick="saveRundown()">
+                            <i class="bi bi-save me-1"></i> Simpan & Publish Rundown
+                        </button>
+                    </div>
+
+                    <h6 class="fw-bold text-white-50 mb-3">Daftar Rundown Aktif</h6>
+                    <div id="activeRundownsList" class="row g-3"></div>
+                </div>
+            </div>
         </div> <!-- END TAB CONTENT -->
     </div>
 
@@ -936,7 +995,7 @@ document.getElementById('editTiers').innerHTML = '';
 
             const data = { 
                 code: document.getElementById('promoCode').value, 
-                discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0,discount: document.getElementById('promoDisc').value, 
+                discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
                 quota: document.getElementById('promoQuota').value, 
                 daysActive: document.getElementById('promoDays').value,
                 eventId: promoSelect.value, // Simpan ID Event-nya
@@ -1140,7 +1199,167 @@ document.getElementById('editTiers').innerHTML = '';
                 }
             });
         }
+// ==========================================
+        // ⏳ MANAJEMEN RUNDOWN EVENT
+        // ==========================================
+        let allRundownsAdmin = [];
 
+        function addRundownRow(time = '', title = '', stage = '', desc = '') {
+            const container = document.getElementById('rdRowsContainer');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'row g-2 mb-2 align-items-center rd-item-row p-2 rounded-3';
+            row.style.background = 'rgba(0,0,0,0.25)';
+            row.innerHTML = `
+                <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm rd-time" placeholder="Jam (cth: 16:00 - 17:00)" value="${time}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-sm rd-title fw-bold" placeholder="Nama Artis / Kegiatan" value="${title}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm rd-stage" placeholder="Stage / Lokasi" value="${stage}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm rd-desc" placeholder="Catatan (Opsional)" value="${desc}">
+                </div>
+                <div class="col-md-1 text-end">
+                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.rd-item-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function autoFillRundownEvent(selectEl) {
+            const ev = eventsData.find(e => e._id === selectEl.value);
+            if (!ev) return;
+            const autoSlug = ev.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            document.getElementById('rdSlug').value = autoSlug;
+            document.getElementById('rdEventName').value = ev.name;
+            if (ev.date) {
+                document.getElementById('rdEventDate').value = new Date(ev.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+        }
+
+        async function loadRundownsAdmin() {
+            // 1. Isi dropdown dari eventsData yang sudah dimuat
+            const selectEl = document.getElementById('rdSelectEvent');
+            if (selectEl && eventsData.length > 0) {
+                let opts = '<option value="">-- Pilih Event untuk Isi Otomatis --</option>';
+                eventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
+                selectEl.innerHTML = opts;
+            }
+
+            // Buat 1 baris input kosong jika belum ada sama sekali
+            const rowContainer = document.getElementById('rdRowsContainer');
+            if (rowContainer && rowContainer.children.length === 0) {
+                addRundownRow();
+            }
+
+            // 2. Ambil daftar rundown dari database
+            const listEl = document.getElementById('activeRundownsList');
+            if (!listEl) return;
+            try {
+                const res = await fetch('/api/rundowns');
+                const result = await res.json();
+                if (!result.success || result.data.length === 0) {
+                    listEl.innerHTML = `<div class="col-12 text-white-50 small">Belum ada rundown yang dibuat.</div>`;
+                    return;
+                }
+                allRundownsAdmin = result.data;
+                listEl.innerHTML = allRundownsAdmin.map(rd => `
+                    <div class="col-md-6">
+                        <div class="promo-ticket m-0 h-100">
+                            <div>
+                                <b class="text-info fs-6">${rd.eventName}</b>
+                                <span class="badge bg-primary ms-2">${rd.schedules ? rd.schedules.length : 0} Sesi</span><br>
+                                <small class="text-white-50 d-block mb-1"><i class="bi bi-calendar3 me-1"></i> ${rd.eventDate || 'TBA'}</small>
+                                <a href="https://rundown.rcellfest.my.id/${rd.slug}" target="_blank" class="small text-warning text-decoration-underline">
+                                    rundown.rcellfest.my.id/${rd.slug}
+                                </a>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button onclick="editRundown('${rd._id}')" class="btn btn-sm btn-outline-light" title="Edit Rundown"><i class="bi bi-pencil"></i></button>
+                                <button onclick="deleteRundown('${rd._id}')" class="btn btn-sm btn-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {}
+        }
+
+        function editRundown(id) {
+            const rd = allRundownsAdmin.find(r => r._id === id);
+            if (!rd) return;
+            document.getElementById('rdSlug').value = rd.slug;
+            document.getElementById('rdEventName').value = rd.eventName;
+            document.getElementById('rdEventDate').value = rd.eventDate || '';
+            
+            const container = document.getElementById('rdRowsContainer');
+            container.innerHTML = '';
+            if (rd.schedules && rd.schedules.length > 0) {
+                rd.schedules.forEach(s => addRundownRow(s.time, s.title, s.stage, s.description));
+            } else {
+                addRundownRow();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function saveRundown() {
+            const slug = document.getElementById('rdSlug').value.trim();
+            const eventName = document.getElementById('rdEventName').value.trim();
+            const eventDate = document.getElementById('rdEventDate').value.trim();
+
+            if (!slug || !eventName) {
+                return Swal.fire({ icon: 'warning', title: 'Data Kurang', text: 'Slug Link dan Nama Event wajib diisi!', background: '#1c1c2d', color: '#fff' });
+            }
+
+            const schedules = [];
+            document.querySelectorAll('.rd-item-row').forEach(row => {
+                const time = row.querySelector('.rd-time').value.trim();
+                const title = row.querySelector('.rd-title').value.trim();
+                const stage = row.querySelector('.rd-stage').value.trim();
+                const description = row.querySelector('.rd-desc').value.trim();
+                if (time && title) schedules.push({ time, title, stage, description });
+            });
+
+            if (schedules.length === 0) {
+                return Swal.fire({ icon: 'warning', title: 'Jadwal Kosong', text: 'Isi minimal 1 baris Jam dan Nama Artis/Kegiatan!', background: '#1c1c2d', color: '#fff' });
+            }
+
+            try {
+                const res = await fetch('/api/rundowns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slug, eventName, eventDate, schedules })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rundown Disimpan!',
+                        html: `Link aktif:<br><a href="https://rundown.rcellfest.my.id/${data.data.slug}" target="_blank" class="text-info fw-bold">rundown.rcellfest.my.id/${data.data.slug}</a>`,
+                        background: '#1c1c2d', color: '#fff'
+                    });
+                    document.getElementById('rdSlug').value = '';
+                    document.getElementById('rdEventName').value = '';
+                    document.getElementById('rdEventDate').value = '';
+                    document.getElementById('rdRowsContainer').innerHTML = '';
+                    addRundownRow();
+                    loadRundownsAdmin();
+                } else {
+                    Swal.fire('Gagal', data.message || 'Terjadi kesalahan', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Gagal menghubungi server', 'error');
+            }
+        }
+
+        async function deleteRundown(id) {
+            if (!confirm('Yakin ingin menghapus rundown ini?')) return;
+            await fetch(`/api/rundowns/${id}`, { method: 'DELETE' });
+            loadRundownsAdmin();
+        }
         // --- INIT ---
         addTierRow('addTiers');
         loadLaporan(); 
