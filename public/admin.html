@@ -1437,7 +1437,7 @@ document.getElementById('editTiers').innerHTML = '';
                 const startT = row.querySelector('.rd-start').value;
                 const endT = row.querySelector('.rd-end').value;
                 const title = row.querySelector('.rd-title').value.trim();
-                const stage = row.querySelector('.rd-stage').value.trim();
+                const stage = row.querySelector('.rd-stage').value.trim() || 'Main Stage';
                 const description = row.querySelector('.rd-desc').value.trim();
                 const image = row.querySelector('.rd-img-url').value || '';
 
