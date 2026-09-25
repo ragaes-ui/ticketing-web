@@ -269,11 +269,12 @@
                             <button class="btn w-100 fw-bold btn-lihat-profil shadow-sm" onclick="openNameModal()" data-i18n="menu_profile">Lihat Profil</button>
                         </li>
     <!-- 👇 TAMBAHAN TOMBOL HAPUS FOTO 👇 -->
+<!-- 👇 TAMBAHAN TOMBOL HAPUS FOTO 👇 -->
                         <li id="btnDeleteAvatarMenu" style="display: none;">
-                        <li><a class="dropdown-item d-flex align-items-center text-danger" href="#" onclick="deleteAvatar()">
-                            <i class="bi bi-trash3-fill text-danger fs-5"></i> <span class="fw-medium">Hapus Foto Profil</span>
-                        </a></li>
-                        <!-- 👆 -------------------------- 👆 -->
+                            <a class="dropdown-item d-flex align-items-center text-danger" href="#" onclick="deleteAvatar()">
+                                <i class="bi bi-trash3-fill text-danger fs-5"></i> <span class="fw-medium">Hapus Foto Profil</span>
+                            </a>
+                        </li>
                         <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="openTopupModal()">
                             <i class="bi bi-wallet2 text-primary fs-5"></i> <span class="fw-medium" data-i18n="menu_topup">Isi Saldo / Top Up</span>
                         </a></li>
@@ -565,61 +566,101 @@
         // ==========================================
         // 🔥 LOGIKA UPLOAD AVATAR KE IMGBB 🔥
         // ==========================================
+// ==========================================
+        // 🔥 LOGIKA UPLOAD AVATAR KE SUPABASE (BASE64) 🔥
+        // ==========================================
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         async function uploadAvatar(input) {
             if (!input.files || input.files.length === 0) return;
             const file = input.files[0];
             const lang = localStorage.getItem('lang') || 'id';
             
-            // Validasi ukuran maksimal 2MB
-            if (file.size > 2 * 1024 * 1024) {
-                return Swal.fire({icon: 'error', title: 'Oops', text: lang === 'id' ? 'Ukuran foto maksimal 2MB!' : 'Max file size is 2MB!'});
+            // Validasi ukuran maksimal 5MB (Aman untuk Base64 Vercel)
+            if (file.size > 5 * 1024 * 1024) {
+                input.value = '';
+                return Swal.fire({
+                    icon: 'error', 
+                    title: 'Oops', 
+                    text: lang === 'id' ? 'Ukuran foto maksimal 5MB!' : 'Max file size is 5MB!',
+                    background: '#1e1e1e', color: '#fff'
+                });
             }
 
-            Swal.fire({ title: lang === 'id' ? 'Mengunggah Foto...' : 'Uploading Photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
-
-            const formData = new FormData();
-            formData.append("image", file);
-            
-            // ⚠️ MASUKKAN API KEY IMGBB MAS RAGA DI SINI ⚠️
-            const imgbbKey = "ba9a1e3254683e971dd75e82b9eb0a9f"; 
+            Swal.fire({ 
+                title: lang === 'id' ? 'Mengunggah Foto...' : 'Uploading Photo...', 
+                allowOutsideClick: false, 
+                didOpen: () => Swal.showLoading(), 
+                background: '#1e1e1e', 
+                color: '#fff' 
+            });
 
             try {
-                // 1. Tembak gambar ke server ImgBB
-                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+                // 1. Ubah file gambar menjadi teks Base64
+                const base64 = await fileToBase64(file);
+                const ext = file.name.split('.').pop() || 'jpg';
+
+                // 2. Lempar ke Supabase lewat API Backend kita
+                const uploadRes = await fetch('/api/upload-image', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageBase64: base64,
+                        fileName: `avatar-${user.id}.${ext}`,
+                        mimeType: file.type
+                    })
                 });
-                const dataImg = await resImg.json();
+                const uploadData = await uploadRes.json();
 
-                if (dataImg.success) {
-                    const newAvatarUrl = dataImg.data.display_url;
-
-                    // 2. Simpan URL gambar yang baru ke database Backend Mas Raga
-                    // (Pastikan endpoint '/api/user/update-avatar' ini dibuat di backend Node.js nya ya)
-                    try {
-                        await fetch('/api/user/update-avatar', {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ userId: user.id, avatar: newAvatarUrl })
-                        });
-                    } catch (err) {
-                        console.log("Backend belum ada endpoint update-avatar, tapi lanjut di frontend.");
-                    }
-
-                    // 3. Update tampilan Frontend langsung
-                    user.avatar = newAvatarUrl;
-                    localStorage.setItem('userData', JSON.stringify(user));
-                    renderProfile(); // Panggil fungsi render ulang
-
-                    Swal.fire({icon: 'success', title: 'Sukses', text: lang === 'id' ? 'Foto profil berhasil diperbarui!' : 'Profile picture updated!', background: '#1e1e1e', color: '#fff'});
-                } else {
-                    throw new Error("Gagal dari ImgBB");
+                if (!uploadRes.ok || !uploadData.success) {
+                    throw new Error(uploadData.message || "Gagal mengunggah ke Supabase");
                 }
+
+                const newAvatarUrl = uploadData.imageUrl;
+
+                // 3. Simpan URL Supabase ke profil User di MongoDB (Sekaligus hapus foto lama)
+                const updateRes = await fetch('/api/user/update-avatar', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, avatar: newAvatarUrl })
+                });
+                const updateData = await updateRes.json();
+
+                if (!updateRes.ok || !updateData.success) {
+                    throw new Error(updateData.message || "Gagal menyimpan ke database");
+                }
+
+                // 4. Update tampilan Frontend & LocalStorage seketika
+                user.avatar = newAvatarUrl;
+                localStorage.setItem('userData', JSON.stringify(user));
+                renderProfile();
+
+                Swal.fire({
+                    icon: 'success', 
+                    title: 'Sukses 📸', 
+                    text: lang === 'id' ? 'Foto profil berhasil diperbarui!' : 'Profile picture updated!', 
+                    background: '#1e1e1e', 
+                    color: '#fff'
+                });
+
             } catch (error) {
                 console.error(error);
-                Swal.fire({icon: 'error', title: 'Gagal', text: lang === 'id' ? 'Terjadi kesalahan saat mengunggah foto.' : 'Upload failed.', background: '#1e1e1e', color: '#fff'});
+                Swal.fire({
+                    icon: 'error', 
+                    title: 'Gagal', 
+                    text: error.message || (lang === 'id' ? 'Terjadi kesalahan saat mengunggah foto.' : 'Upload failed.'), 
+                    background: '#1e1e1e', 
+                    color: '#fff'
+                });
             } finally {
-                input.value = ''; // Reset input agar bisa upload file yang sama lagi kalau batal
+                input.value = ''; // Reset input file
             }
         }
         // ==========================================
@@ -852,7 +893,7 @@ function renderProfile() {
         };
 
 
-        async function fetchLatestProfile() {
+async function fetchLatestProfile() {
             if(!user || !user.id) return;
             try {
                 const res = await fetch(`/api/user/profile/${user.id}`);
@@ -861,6 +902,10 @@ function renderProfile() {
                     document.getElementById('saldoDisplay').innerText = data.saldo.toLocaleString('id-ID');
                     user.saldo = data.saldo;
                     user.hasPin = data.hasPin; 
+                    // 👇 TAMBAHKAN 2 BARIS INI BIAR FOTO PROFIL SELALU SINKRON 👇
+                    if (data.avatar) user.avatar = data.avatar;
+                    renderProfile();
+                    // 👆 ----------------------------------------------------- 👆
                     localStorage.setItem('userData', JSON.stringify(user));
                 }
             } catch(e) {
