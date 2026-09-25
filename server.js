@@ -69,6 +69,7 @@ const rundownSchema = new mongoose.Schema({
     slug: { type: String, required: true, unique: true, lowercase: true }, // contoh: rcellfest-vol-3
     eventName: { type: String, required: true },
     eventDate: { type: String, default: '' },
+    creatorId: { type: String, default: 'admin-pusat' },
     schedules: [{
         time: String,       // contoh: "19:00 - 20:00"
         title: String,      // contoh: "Neck Deep / Open Gate"
@@ -2018,25 +2019,35 @@ app.get('/api/rundown/:slug', proteksiApiInternal, async (req, res) => {
 });
 
 // 2. Ambil Semua Daftar Rundown (Untuk Tabel Admin)
+// 2. Ambil Daftar Rundown (Bisa semua untuk Admin/Publik, atau khusus 1 EO)
 app.get('/api/rundowns', proteksiApiInternal, async (req, res) => {
     try {
-        const list = await Rundown.find().sort({ updatedAt: -1 });
+        const filter = req.query.creatorId ? { creatorId: req.query.creatorId } : {};
+        const list = await Rundown.find(filter).sort({ updatedAt: -1 });
         res.json({ success: true, data: list });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// 3. Simpan / Update Rundown dari Admin
+// 3. Simpan / Update Rundown (Dari Admin maupun EO)
 app.post('/api/rundowns', proteksiApiInternal, async (req, res) => {
     try {
-        const { slug, eventName, eventDate, schedules } = req.body;
-        // Bersihkan spasi & karakter aneh pada slug (contoh: "Konser Akbar!" -> "konser-akbar")
+        const { slug, eventName, eventDate, schedules, creatorId } = req.body;
         const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+
+        // Cek apakah slug sudah dipakai oleh EO lain
+        const existing = await Rundown.findOne({ slug: cleanSlug });
+        if (existing && creatorId && existing.creatorId !== creatorId && existing.creatorId !== 'admin-pusat') {
+            return res.status(400).json({ success: false, message: "Nama link (slug) ini sudah dipakai event lain. Gunakan nama unik!" });
+        }
+
+        const updateData = { slug: cleanSlug, eventName, eventDate, schedules, updatedAt: Date.now() };
+        if (creatorId) updateData.creatorId = creatorId;
 
         const updated = await Rundown.findOneAndUpdate(
             { slug: cleanSlug },
-            { slug: cleanSlug, eventName, eventDate, schedules, updatedAt: Date.now() },
+            updateData,
             { upsert: true, new: true }
         );
         res.json({ success: true, message: "Rundown berhasil disimpan!", data: updated });
