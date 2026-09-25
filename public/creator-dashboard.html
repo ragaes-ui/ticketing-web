@@ -1064,6 +1064,9 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
 // ==========================================
         // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR (KALENDER & JAM)
         // ==========================================
+// ==========================================
+        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR (LENGKAP + FOTO ARTIS)
+        // ==========================================
         let eoRundownsList = [];
 
         function formatEoRangeDate(startStr, endStr) {
@@ -1083,47 +1086,48 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             });
         }
 
-async function uploadAdminRowPhoto(input) {
+        // Upload foto artis per baris ke Supabase
+        async function uploadRowArtistPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
             if (file.size > 5 * 1024 * 1024) {
                 input.value = '';
-                return Swal.fire('Terlalu Besar', 'Maksimal foto 5MB!', 'warning');
+                return Swal.fire('Terlalu Besar', 'Ukuran foto maksimal 5MB!', 'warning');
             }
 
-            const row = input.closest('.rd-item-row');
+            const row = input.closest('.eo-rd-row');
             const previewImg = row.querySelector('.rd-img-preview');
             const hiddenUrl = row.querySelector('.rd-img-url');
+            const removeBtn = row.querySelector('.rd-remove-img-btn');
+
             previewImg.style.opacity = '0.3';
 
             try {
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = e => reject(e);
-                });
-
-                const res = await fetch('/api/upload-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imageBase64: base64, fileName: file.name, mimeType: file.type })
-                });
-                const data = await res.json();
-                if (!data.success) throw new Error(data.message);
-
-                hiddenUrl.value = data.imageUrl;
-                previewImg.src = data.imageUrl;
+                const uploadedUrl = await uploadToSupabase(file);
+                hiddenUrl.value = uploadedUrl;
+                previewImg.src = uploadedUrl;
+                if (removeBtn) removeBtn.classList.remove('d-none');
             } catch (err) {
-                Swal.fire('Gagal Upload', err.message || 'Gagal upload gambar', 'error');
+                Swal.fire('Gagal Upload', err.message || 'Gagal mengunggah foto artis', 'error');
             } finally {
                 previewImg.style.opacity = '1';
                 input.value = '';
             }
         }
 
-        function addRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '', imgUrl = '') {
-            const container = document.getElementById('rdRowsContainer');
+        // Hapus foto artis manual (tombol X merah)
+        function removeRowArtistPhoto(btn) {
+            const row = btn.closest('.eo-rd-row');
+            const previewImg = row.querySelector('.rd-img-preview');
+            const hiddenUrl = row.querySelector('.rd-img-url');
+            
+            hiddenUrl.value = '';
+            previewImg.src = 'https://placehold.co/80x80/1e293b/ffffff?text=Foto';
+            btn.classList.add('d-none');
+        }
+
+        function addEoRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '', imgUrl = '') {
+            const container = document.getElementById('eoRdRowsContainer');
             if (!container) return;
 
             let startT = '', endT = '';
@@ -1132,30 +1136,34 @@ async function uploadAdminRowPhoto(input) {
                 startT = parts[0] ? parts[0].trim() : '';
                 endT = parts[1] ? parts[1].trim() : '';
             }
-            const defaultDate = dateVal || document.getElementById('rdStartDate')?.value || '';
+            const defaultDate = dateVal || document.getElementById('eoRdStartDate')?.value || '';
             const defaultAvatar = 'https://placehold.co/80x80/1e293b/ffffff?text=Foto';
 
             const row = document.createElement('div');
-            row.className = 'row g-2 mb-2 align-items-center rd-item-row p-2 rounded-3';
-            row.style.background = 'rgba(0,0,0,0.25)';
+            row.className = 'row g-2 mb-2 align-items-center eo-rd-row p-2 rounded-3';
+            row.style.background = 'var(--input-bg)';
+            row.style.border = '1px solid var(--border-color)';
             row.innerHTML = `
-                <div class="col-auto text-center">
+                <div class="col-auto text-center position-relative">
                     <label style="cursor: pointer; position: relative; display: inline-block;" title="Klik untuk Upload Foto Artis">
                         <img src="${imgUrl || defaultAvatar}" class="rd-img-preview rounded-3 border border-secondary" style="width: 42px; height: 42px; object-fit: cover; transition: 0.2s;">
-                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-info text-dark p-1" style="font-size: 0.55rem; transform: translate(20%, 20%);">
+                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-primary p-1" style="font-size: 0.55rem; transform: translate(20%, 20%);">
                             <i class="bi bi-camera-fill"></i>
                         </span>
-                        <input type="file" class="d-none" accept="image/*" onchange="uploadAdminRowPhoto(this)">
+                        <input type="file" class="d-none" accept="image/*" onchange="uploadRowArtistPhoto(this)">
                         <input type="hidden" class="rd-img-url" value="${imgUrl}">
                     </label>
+                    <button type="button" onclick="removeRowArtistPhoto(this)" class="btn btn-danger p-0 rounded-circle position-absolute rd-remove-img-btn ${imgUrl ? '' : 'd-none'}" style="width: 18px; height: 18px; top: -5px; right: 2px; font-size: 0.65rem; line-height: 1; z-index: 3;" title="Hapus Foto Artis">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" class="form-control form-control-sm rd-date" style="color-scheme: dark;" value="${defaultDate}" title="Pilih Tanggal Hari Tampil">
+                    <input type="date" class="form-control form-control-sm rd-date" style="color-scheme: dark;" value="${defaultDate}" title="Tanggal Tampil">
                 </div>
                 <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="time" class="form-control rd-start" style="color-scheme: dark;" value="${startT}" title="Jam Mulai">
-                        <span class="input-group-text bg-dark border-secondary text-white-50">-</span>
+                        <span class="input-group-text bg-dark border-secondary text-muted">-</span>
                         <input type="time" class="form-control rd-end" style="color-scheme: dark;" value="${endT}" title="Jam Selesai">
                     </div>
                 </div>
@@ -1163,49 +1171,109 @@ async function uploadAdminRowPhoto(input) {
                     <input type="text" class="form-control form-control-sm rd-title fw-bold" placeholder="Nama Artis / Kegiatan" value="${title}">
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control form-control-sm rd-stage" placeholder="Stage / Panggung" value="${stage}">
+                    <input type="text" class="form-control form-control-sm rd-stage" placeholder="Main Stage" value="${stage}">
                 </div>
                 <div class="col-md">
                     <input type="text" class="form-control form-control-sm rd-desc" placeholder="Info" value="${desc}">
                 </div>
                 <div class="col-auto text-end">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.rd-item-row').remove()"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.eo-rd-row').remove()"><i class="bi bi-trash"></i></button>
                 </div>
             `;
             container.appendChild(row);
         }
 
-        function editRundown(id) {
-            const rd = allRundownsAdmin.find(r => r._id === id);
-            if (!rd) return;
-            document.getElementById('rdSlug').value = rd.slug;
-            document.getElementById('rdEventName').value = rd.eventName;
-            document.getElementById('rdStartDate').value = rd.startDate || '';
-            document.getElementById('rdEndDate').value = rd.endDate || '';
-            
-            const container = document.getElementById('rdRowsContainer');
-            container.innerHTML = '';
-            if (rd.schedules && rd.schedules.length > 0) {
-                rd.schedules.forEach(s => addRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description, s.image || ''));
-            } else {
-                addRundownRow();
+        function autoFillEoRundown(selectEl) {
+            const ev = myEventsData.find(e => e._id === selectEl.value);
+            if (!ev) return;
+            const autoSlug = ev.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            document.getElementById('eoRdSlug').value = autoSlug;
+            document.getElementById('eoRdEventName').value = ev.name;
+            if (ev.date) {
+                document.getElementById('eoRdStartDate').value = ev.date.split('T')[0];
+                syncEoDefaultDates();
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (ev.endDate) {
+                document.getElementById('eoRdEndDate').value = ev.endDate.split('T')[0];
+            } else {
+                document.getElementById('eoRdEndDate').value = '';
+            }
         }
 
-        async function saveRundown() {
-            const slug = document.getElementById('rdSlug').value.trim();
-            const eventName = document.getElementById('rdEventName').value.trim();
-            const startDate = document.getElementById('rdStartDate').value;
-            const endDate = document.getElementById('rdEndDate').value;
-            const eventDate = formatRangeDateText(startDate, endDate);
+        async function loadCreatorRundowns() {
+            if (!organizerInfo || !organizerInfo.id) return;
 
-            if (!slug || !eventName || !startDate) {
-                return Swal.fire({ icon: 'warning', title: 'Data Kurang', text: 'Slug, Nama Event, dan Tanggal Mulai wajib dipilih!', background: '#1c1c2d', color: '#fff' });
+            if (myEventsData.length === 0) await loadMyEvents();
+            const selectEl = document.getElementById('eoRdSelectEvent');
+            if (selectEl) {
+                let opts = '<option value="">-- Pilih Event Anda untuk Isi Otomatis --</option>';
+                myEventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
+                selectEl.innerHTML = opts;
             }
 
+            const rowContainer = document.getElementById('eoRdRowsContainer');
+            if (rowContainer && rowContainer.children.length === 0) addEoRundownRow();
+
+            const listEl = document.getElementById('eoActiveRundownsList');
+            if (!listEl) return;
+            try {
+                const res = await fetch(`/api/rundowns?creatorId=${organizerInfo.id}`);
+                const result = await res.json();
+                if (!result.success || result.data.length === 0) {
+                    listEl.innerHTML = `<div class="col-12 text-muted small">Belum ada rundown untuk event Anda.</div>`;
+                    return;
+                }
+                eoRundownsList = result.data;
+                listEl.innerHTML = eoRundownsList.map(rd => `
+                    <div class="col-md-6">
+                        <div class="promo-ticket m-0 h-100" style="border-color: var(--primary); background: rgba(59, 130, 246, 0.05);">
+                            <div>
+                                <b class="text-info fs-6">${rd.eventName}</b>
+                                <span class="badge bg-primary ms-2">${rd.schedules ? rd.schedules.length : 0} Sesi</span><br>
+                                <small class="text-muted d-block mb-1"><i class="bi bi-calendar3 me-1"></i> ${rd.eventDate || 'TBA'}</small>
+                                <a href="https://rundown.rcellfest.my.id/${rd.slug}" target="_blank" class="small text-warning text-decoration-underline">
+                                    rundown.rcellfest.my.id/${rd.slug}
+                                </a>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button onclick="editEoRundown('${rd._id}')" class="btn btn-sm btn-outline-info"><i class="bi bi-pencil"></i></button>
+                                <button onclick="deleteEoRundown('${rd._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {}
+        }
+
+        function editEoRundown(id) {
+            const rd = eoRundownsList.find(r => r._id === id);
+            if (!rd) return;
+            document.getElementById('eoRdSlug').value = rd.slug;
+            document.getElementById('eoRdEventName').value = rd.eventName;
+            document.getElementById('eoRdStartDate').value = rd.startDate || '';
+            document.getElementById('eoRdEndDate').value = rd.endDate || '';
+
+            const container = document.getElementById('eoRdRowsContainer');
+            container.innerHTML = '';
+            if (rd.schedules && rd.schedules.length > 0) {
+                rd.schedules.forEach(s => addEoRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description, s.image || ''));
+            } else {
+                addEoRundownRow();
+            }
+            document.getElementById('rundownArea').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function saveEoRundown() {
+            const slug = document.getElementById('eoRdSlug').value.trim();
+            const eventName = document.getElementById('eoRdEventName').value.trim();
+            const startDate = document.getElementById('eoRdStartDate').value;
+            const endDate = document.getElementById('eoRdEndDate').value;
+            const eventDate = formatEoRangeDate(startDate, endDate);
+
+            if (!slug || !eventName || !startDate) return Swal.fire('Data Kurang', 'Slug, Nama Event, dan Tanggal Mulai wajib dipilih!', 'warning');
+
             const schedules = [];
-            document.querySelectorAll('.rd-item-row').forEach(row => {
+            document.querySelectorAll('.eo-rd-row').forEach(row => {
                 const date = row.querySelector('.rd-date').value || startDate;
                 const startT = row.querySelector('.rd-start').value;
                 const endT = row.querySelector('.rd-end').value;
@@ -1220,9 +1288,7 @@ async function uploadAdminRowPhoto(input) {
                 }
             });
 
-            if (schedules.length === 0) {
-                return Swal.fire({ icon: 'warning', title: 'Jadwal Kosong', text: 'Pilih Jam Mulai dan isi Nama Artis minimal 1 baris!', background: '#1c1c2d', color: '#fff' });
-            }
+            if (schedules.length === 0) return Swal.fire('Jadwal Kosong', 'Pilih Jam Mulai dan Nama Artis minimal 1 baris!', 'warning');
 
             schedules.sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
@@ -1230,7 +1296,7 @@ async function uploadAdminRowPhoto(input) {
                 const res = await fetch('/api/rundowns', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slug, eventName, eventDate, startDate, endDate, schedules })
+                    body: JSON.stringify({ slug, eventName, eventDate, startDate, endDate, schedules, creatorId: organizerInfo.id })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -1238,20 +1304,20 @@ async function uploadAdminRowPhoto(input) {
                         icon: 'success',
                         title: 'Rundown Disimpan!',
                         html: `Link aktif:<br><a href="https://rundown.rcellfest.my.id/${data.data.slug}" target="_blank" class="text-info fw-bold">rundown.rcellfest.my.id/${data.data.slug}</a>`,
-                        background: '#1c1c2d', color: '#fff'
+                        background: 'var(--bg-card)', color: 'var(--text-main)'
                     });
-                    document.getElementById('rdSlug').value = '';
-                    document.getElementById('rdEventName').value = '';
-                    document.getElementById('rdStartDate').value = '';
-                    document.getElementById('rdEndDate').value = '';
-                    document.getElementById('rdRowsContainer').innerHTML = '';
-                    addRundownRow();
-                    loadRundownsAdmin();
+                    document.getElementById('eoRdSlug').value = '';
+                    document.getElementById('eoRdEventName').value = '';
+                    document.getElementById('eoRdStartDate').value = '';
+                    document.getElementById('eoRdEndDate').value = '';
+                    document.getElementById('eoRdRowsContainer').innerHTML = '';
+                    addEoRundownRow();
+                    loadCreatorRundowns();
                 } else {
-                    Swal.fire('Gagal', data.message || 'Terjadi kesalahan', 'error');
+                    Swal.fire('Gagal', data.message, 'error');
                 }
             } catch (err) {
-                Swal.fire('Error', 'Gagal menghubungi server', 'error');
+                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
             }
         }
 
