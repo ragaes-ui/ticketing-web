@@ -578,6 +578,18 @@
             filterScheduleItems();
         }
 
+function previewArtistPhoto(imgUrl, title) {
+            Swal.fire({
+                imageUrl: imgUrl,
+                imageAlt: title,
+                title: title,
+                showConfirmButton: false,
+                showCloseButton: true,
+                background: 'var(--bg-card)',
+                color: 'var(--text-main)'
+            });
+        }
+
         function renderScheduleItems(items) {
             const timelineList = document.getElementById('timelineList');
             const t = dict[currentLang];
@@ -587,17 +599,31 @@
                 return;
             }
 
-            timelineList.innerHTML = items.map((item, idx) => `
+            timelineList.innerHTML = items.map((item, idx) => {
+                const safeTitle = (item.title || '').replace(/'/g, "\\'");
+                const photoHtml = item.image ? `
+                    <img src="${item.image}" alt="${safeTitle}" 
+                         onclick="previewArtistPhoto('${item.image}', '${safeTitle}')"
+                         style="width: 56px; height: 56px; object-fit: cover; border-radius: 14px; border: 2px solid var(--primary); cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"
+                         title="Klik untuk memperbesar foto">
+                ` : '';
+
+                return `
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
                         <span class="time-badge"><i class="bi bi-clock-fill"></i> ${item.time}</span>
                         ${item.stage ? `<span class="stage-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${item.stage}</span>` : `<span class="session-number">${t.lbl_session_num}${idx + 1}</span>`}
                     </div>
-                    <h5 class="fw-bold mb-1" style="color: var(--text-main);">${item.title}</h5>
-                    ${item.description ? `<p class="small mb-0 mt-1" style="color: var(--text-muted);">${item.description}</p>` : ''}
+                    <div class="d-flex align-items-center gap-3 mt-2">
+                        ${photoHtml}
+                        <div>
+                            <h5 class="fw-bold mb-0" style="color: var(--text-main);">${item.title}</h5>
+                            ${item.description ? `<p class="small mb-0 mt-1" style="color: var(--text-muted);">${item.description}</p>` : ''}
+                        </div>
+                    </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function filterScheduleItems() {
