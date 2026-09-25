@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Official Rundown | RCELLFEST Tix</title>
+    
+    <!-- 👇 PENGATURAN PWA & KHUSUS APPLE iOS 👇 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RCELLFEST">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png">
+    <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
+
+    <!-- Registrasi Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('PWA Siap!'))
+                    .catch(err => console.log('PWA Gagal:', err));
+            });
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --bg-body: #09090b;
+            --bg-card: #18181b;
+            --bg-input: #27272a;
+            --text-main: #f8fafc;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.25);
+            --hero-grad: linear-gradient(135deg, rgba(37, 99, 235, 0.22) 0%, rgba(9, 9, 11, 0.98) 100%);
+        }
+
+        /* 👇 MODE TERANG YANG ADEM (TIDAK SILAU) 👇 */
+        [data-theme="light"] {
+            --bg-body: #f0f4f8;
+            --bg-card: #f8fafc;
+            --bg-input: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.12);
+            --hero-grad: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(240, 244, 248, 0.98) 100%);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.25s, color 0.25s;
+            padding-bottom: 60px;
+        }
+
+        /* TOMBOL KACA POJOK KANAN ATAS */
+        .nav-glass-btn {
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-main) !important;
+            transition: all 0.25s ease;
+        }
+        .nav-glass-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary) !important;
+        }
+
+        /* HEADER HERO */
+        .hero-box {
+            background: var(--hero-grad);
+            border-bottom: 1px solid var(--border-color);
+            padding: 65px 20px 35px;
+            text-align: center;
+            position: relative;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 50px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: 0.2s;
+        }
+        .brand-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* KARTU PILIHAN EVENT */
+        .event-select-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .event-select-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px var(--primary-glow);
+            color: var(--text-main);
+        }
+
+        /* KOTak PENCARIAN */
+        .search-wrapper {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 28px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .search-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 16px 12px 44px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        /* TIMELINE RUNDOWN */
+        .timeline-wrapper {
+            max-width: 680px;
+            margin: 10px auto 0;
+        }
+        .timeline {
+            position: relative;
+            padding: 10px 10px 10px 32px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 15px;
+            bottom: 15px;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--border-color));
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .timeline-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -24px;
+            top: 24px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--bg-body);
+            box-shadow: 0 0 10px var(--primary);
+        }
+        .time-badge {
+            background: var(--primary-glow);
+            color: var(--primary);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 5px 12px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        [data-theme="dark"] .time-badge {
+            color: #60a5fa;
+        }
+        .stage-badge {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.78rem;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .session-number {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 👇 TOMBOL TEMA & BAHASA DI POJOK KANAN ATAS 👇 -->
+    <div class="position-fixed top-0 end-0 p-3 d-flex gap-2" style="z-index: 9999;">
+        <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
+            <i class="bi bi-sun-fill" id="theme-icon" style="color: #FFD700;"></i>
+        </button>
+
+        <div class="dropdown">
+            <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px;">
+                <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
+                <span class="fw-bold small" id="langText">ID</span>
+                <i class="bi bi-chevron-down small" style="font-size: 0.7rem; color: var(--text-muted);"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('id')">
+                        <img src="https://flagcdn.com/w20/id.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> Indonesia
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('en')">
+                        <img src="https://flagcdn.com/w20/gb.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> English
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 👇 HEADER UTAMA 👇 -->
+    <div class="hero-box">
+        <a href="https://rcellfest.my.id" class="brand-pill">
+            <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" width="22" height="22" alt="Logo"> RCELLFEST
+        </a>
+        <h1 class="fw-bolder mb-2" id="eventTitle" style="letter-spacing: -0.5px;">Official Rundown</h1>
+        <p class="mb-0" id="eventDate" style="color: var(--text-muted);" data-i18n="sub_select">Pilih event di bawah untuk melihat susunan jadwal acara</p>
+
+        <!-- Tombol Aksi Saat Melihat Detail 1 Event -->
+        <div id="switchEventBox" class="mt-3 d-none d-flex justify-content-center gap-2 flex-wrap">
+            <a href="/" class="btn nav-glass-btn btn-sm rounded-pill px-3 fw-semibold">
+                <i class="bi bi-grid-fill me-1 text-primary"></i> <span data-i18n="btn_other_event">Pilih Event Lain</span>
+            </a>
+            <button onclick="shareRundownLink()" class="btn nav-glass-btn btn-sm rounded-pill px-3 fw-semibold">
+                <i class="bi bi-share-fill me-1 text-info"></i> <span data-i18n="btn_share">Bagikan Link</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 👇 ISI KONTEN UTAMA 👇 -->
+    <div class="container py-4">
+        
+        <!-- WADAH 1: DAFTAR PILIHAN EVENT (Muncul jika buka rundown.rcellfest.my.id) -->
+        <div id="eventListView" class="d-none">
+            <div class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchRundownEvent" class="search-input" placeholder="Cari nama event..." oninput="filterEventCards()">
+            </div>
+            <div id="eventCardsContainer" class="row g-3 justify-content-center"></div>
+        </div>
+
+        <!-- WADAH 2: TIMELINE RUNDOWN (Muncul jika buka rundown.rcellfest.my.id/namaevent) -->
+        <div id="rundownTimelineView" class="timeline-wrapper d-none">
+            <div class="search-wrapper mb-3">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchScheduleItem" class="search-input" placeholder="Cari nama artis, kegiatan, atau panggung..." oninput="filterScheduleItems()">
+            </div>
+            <div id="timelineList" class="timeline"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let allRundowns = [];
+        let currentSchedules = [];
+        let currentLang = localStorage.getItem('lang') || 'id';
+
+        // KAMUS MULTI-BAHASA
+        const dict = {
+            id: {
+                sub_select: "Pilih event di bawah untuk melihat susunan jadwal acara",
+                btn_other_event: "Pilih Event Lain",
+                btn_share: "Bagikan Link",
+                ph_search_event: "Cari nama event...",
+                ph_search_schedule: "Cari nama artis, kegiatan, atau panggung...",
+                lbl_sessions: "Sesi Acara",
+                lbl_session_num: "SESI",
+                empty_events: "Belum ada rundown event yang dirilis saat ini.",
+                empty_search: "Data yang kamu cari tidak ditemukan.",
+                not_found_title: "Rundown Belum Tersedia",
+                not_found_desc: "Jadwal untuk event ini belum dirilis atau link tidak ditemukan.",
+                copied_msg: "Link rundown berhasil disalin!"
+            },
+            en: {
+                sub_select: "Select an event below to view the full schedule",
+                btn_other_event: "Switch Event",
+                btn_share: "Share Link",
+                ph_search_event: "Search event name...",
+                ph_search_schedule: "Search artist, activity, or stage...",
+                lbl_sessions: "Sessions",
+                lbl_session_num: "SESSION",
+                empty_events: "No event rundowns have been released yet.",
+                empty_search: "No matching results found.",
+                not_found_title: "Rundown Unavailable",
+                not_found_desc: "The schedule for this event has not been released yet.",
+                copied_msg: "Rundown link copied to clipboard!"
+            }
+        };
+
+        // PENGATURAN TEMA DARK/LIGHT
+        function toggleTheme() {
+            const htmlTag = document.documentElement;
+            const currentTheme = htmlTag.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlTag.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            if (theme === 'dark') {
+                icon.className = 'bi bi-sun-fill';
+                icon.style.color = '#FFD700';
+            } else {
+                icon.className = 'bi bi-moon-stars-fill';
+                icon.style.color = '#1e293b';
+            }
+        }
+
+        // PENGATURAN BAHASA
+        function changeLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            applyLanguage();
+            if (allRundowns.length > 0) renderEventCards(allRundowns);
+            if (currentSchedules.length > 0) renderScheduleItems(currentSchedules);
+        }
+
+        function applyLanguage() {
+            const t = dict[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+            document.getElementById('langText').innerText = currentLang.toUpperCase();
+            document.getElementById('langFlag').src = currentLang === 'id' ? 'https://flagcdn.com/w20/id.png' : 'https://flagcdn.com/w20/gb.png';
+
+            const sEvent = document.getElementById('searchRundownEvent');
+            if (sEvent) sEvent.placeholder = t.ph_search_event;
+
+            const sSched = document.getElementById('searchScheduleItem');
+            if (sSched) sSched.placeholder = t.ph_search_schedule;
+        }
+
+        // DETEKSI URL SAAT PERTAMA DIBUKA
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            applyLanguage();
+
+            // Ambil slug dari URL path (/namaevent) atau dari query (?event=namaevent)
+            const urlParams = new URLSearchParams(window.location.search);
+            let pathSlug = window.location.pathname.replace(/^\/+|\/+$/g, '');
+            if (pathSlug === 'rundown' || pathSlug === 'rundown.html') {
+                pathSlug = urlParams.get('event') || '';
+            }
+
+            if (!pathSlug) {
+                loadAllEventsList();
+            } else {
+                loadSingleRundown(pathSlug);
+            }
+        });
+
+        // ==========================================
+        // 1. MODE DAFTAR PILIHAN EVENT
+        // ==========================================
+        async function loadAllEventsList() {
+            const listView = document.getElementById('eventListView');
+            const container = document.getElementById('eventCardsContainer');
+            listView.classList.remove('d-none');
+            container.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>`;
+
+            try {
+                const res = await fetch('/api/rundowns');
+                const result = await res.json();
+
+                if (!result.success || !result.data || result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5" style="color: var(--text-muted);">
+                            <i class="bi bi-calendar2-x display-4 d-block mb-3 opacity-50"></i>
+                            ${dict[currentLang].empty_events}
+                        </div>`;
+                    return;
+                }
+
+                allRundowns = result.data;
+                renderEventCards(allRundowns);
+            } catch (err) {
+                container.innerHTML = `<div class="col-12 text-center text-danger py-5">Gagal memuat daftar event dari server.</div>`;
+            }
+        }
+
+        function renderEventCards(list) {
+            const container = document.getElementById('eventCardsContainer');
+            const t = dict[currentLang];
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center py-4" style="color: var(--text-muted);">${t.empty_search}</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(rd => {
+                const targetHref = window.location.pathname.includes('rundown') ? `?event=${rd.slug}` : `/${rd.slug}`;
+                return `
+                <div class="col-md-6 col-lg-4">
+                    <a href="${targetHref}" class="event-select-card">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1">
+                                    <i class="bi bi-list-check me-1"></i> ${rd.schedules ? rd.schedules.length : 0} ${t.lbl_sessions}
+                                </span>
+                                <i class="bi bi-arrow-up-right-circle fs-5" style="color: var(--text-muted);"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">${rd.eventName}</h5>
+                        </div>
+                        <div class="pt-3 mt-2 border-top" style="border-color: var(--border-color) !important;">
+                            <small style="color: var(--text-muted);">
+                                <i class="bi bi-calendar-event me-1 text-primary"></i> ${rd.eventDate || 'TBA'}
+                            </small>
+                        </div>
+                    </a>
+                </div>
+            `}).join('');
+        }
+
+        function filterEventCards() {
+            const q = document.getElementById('searchRundownEvent').value.toLowerCase();
+            const filtered = allRundowns.filter(r => 
+                r.eventName.toLowerCase().includes(q) || 
+                (r.eventDate && r.eventDate.toLowerCase().includes(q)) ||
+                r.slug.toLowerCase().includes(q)
+            );
+            renderEventCards(filtered);
+        }
+
+        // ==========================================
+        // 2. MODE TIMELINE 1 EVENT (/namaevent)
+        // ==========================================
+        async function loadSingleRundown(slug) {
+            const timelineView = document.getElementById('rundownTimelineView');
+            const timelineList = document.getElementById('timelineList');
+            const switchBox = document.getElementById('switchEventBox');
+
+            timelineView.classList.remove('d-none');
+            switchBox.classList.remove('d-none');
+            timelineList.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>`;
+
+            try {
+                const res = await fetch(`/api/rundown/${slug}`);
+                const result = await res.json();
+                const t = dict[currentLang];
+
+                if (!res.ok || !result.success || !result.data) {
+                    document.getElementById('eventTitle').innerText = t.not_found_title;
+                    document.getElementById('eventDate').innerText = t.not_found_desc;
+                    document.querySelector('#rundownTimelineView .search-wrapper').classList.add('d-none');
+                    timelineList.innerHTML = `
+                        <div class="text-center py-4">
+                            <a href="/" class="btn btn-primary rounded-pill px-4 fw-bold">
+                                <i class="bi bi-arrow-left me-1"></i> ${t.btn_other_event}
+                            </a>
+                        </div>`;
+                    return;
+                }
+
+                const { eventName, eventDate, schedules } = result.data;
+                document.title = `Rundown ${eventName} | RCELLFEST`;
+                document.getElementById('eventTitle').innerText = eventName;
+                document.getElementById('eventDate').innerHTML = `<i class="bi bi-calendar-event me-1 text-primary"></i> <b>${eventDate || 'TBA'}</b>`;
+                document.getElementById('eventDate').removeAttribute('data-i18n');
+
+                currentSchedules = schedules || [];
+                renderScheduleItems(currentSchedules);
+
+            } catch (err) {
+                timelineList.innerHTML = `<div class="text-center text-danger py-5">Gagal memuat jadwal dari server.</div>`;
+            }
+        }
+
+        function renderScheduleItems(items) {
+            const timelineList = document.getElementById('timelineList');
+            const t = dict[currentLang];
+
+            if (!items || items.length === 0) {
+                timelineList.innerHTML = `<div class="text-center py-4" style="color: var(--text-muted);">${t.empty_search}</div>`;
+                return;
+            }
+
+            timelineList.innerHTML = items.map((item, idx) => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <span class="time-badge"><i class="bi bi-clock-fill"></i> ${item.time}</span>
+                        ${item.stage ? `<span class="stage-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${item.stage}</span>` : `<span class="session-number">${t.lbl_session_num}${idx + 1}</span>`}
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color: var(--text-main);">${item.title}</h5>
+                    ${item.description ? `<p class="small mb-0 mt-1" style="color: var(--text-muted);">${item.description}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function filterScheduleItems() {
+            const q = document.getElementById('searchScheduleItem').value.toLowerCase();
+            const filtered = currentSchedules.filter(item => 
+                (item.title && item.title.toLowerCase().includes(q)) ||
+                (item.time && item.time.toLowerCase().includes(q)) ||
+                (item.stage && item.stage.toLowerCase().includes(q)) ||
+                (item.description && item.description.toLowerCase().includes(q))
+            );
+            renderScheduleItems(filtered);
+        }
+
+        // FUNGSI SHARE / SALIN LINK RUNDOWN
+        function shareRundownLink() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    url: url
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url);
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: dict[currentLang].copied_msg,
+                    showConfirmButton: false,
+                    timer: 2000,
+                    background: '#18181b',
+                    color: '#fff'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
