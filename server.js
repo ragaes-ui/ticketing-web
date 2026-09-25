@@ -920,6 +920,9 @@ app.post('/api/send-otp', proteksiApiInternal, async (req, res) => {
 // ==========================================
 // 🔐 2. API REGISTER (WAJIB LOLOS OTP)
 // ==========================================
+// ==========================================
+// 🔐 2. API REGISTER (WAJIB LOLOS OTP + EMAIL SAMBUTAN)
+// ==========================================
 app.post('/api/register', proteksiApiInternal, async (req, res) => {
     try {
         const { username, email, password, role, fullName, phone, otp } = req.body;
@@ -962,6 +965,50 @@ app.post('/api/register', proteksiApiInternal, async (req, res) => {
 
         // Hapus OTP karena sudah terpakai
         await Otp.deleteOne({ _id: validOtp._id });
+
+        // 👇 KIRIM EMAIL SAMBUTAN MEMBER BARU 👇
+        const sapaanNama = fullName || username;
+        const welcomeMailOptions = {
+            from: '"No-Reply - RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
+            to: email,
+            subject: '🎉 Selamat Datang di RCELLFEST! Akun Kamu Sudah Aktif',
+            html: `
+                <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="background: linear-gradient(135deg, #0049CC, #2563eb); padding: 30px 20px; text-align: center; color: white;">
+                        <h1 style="margin: 0; font-size: 24px; letter-spacing: 1.5px;">SELAMAT DATANG DI RCELLFEST!</h1>
+                        <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Platform Tiket Event & Hiburan Digital</p>
+                    </div>
+                    <div style="padding: 30px; background: #ffffff; color: #1e293b; line-height: 1.6;">
+                        <p style="margin-top: 0; font-size: 16px;">Halo <b>${sapaanNama}</b> 👋,</p>
+                        <p>Terima kasih telah bergabung! Email kamu telah berhasil diverifikasi dan akun <b>RCELLFEST</b> kamu kini sudah aktif sepenuhnya.</p>
+                        
+                        <div style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                            <p style="margin: 4px 0; font-size: 14px;"><b>Username:</b> ${username}</p>
+                            <p style="margin: 4px 0; font-size: 14px;"><b>Email Terdaftar:</b> ${email.toLowerCase()}</p>
+                            <p style="margin: 4px 0; font-size: 14px;"><b>Status Akun:</b> <span style="color: #16a34a; font-weight: bold;">Terverifikasi ✅</span></p>
+                        </div>
+
+                        <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 13px; color: #92400e;">
+                            <b>💡 Tips Keamanan:</b> Jangan lupa untuk mengatur <b>6 angka PIN Keamanan</b> di menu Profil setelah login. PIN ini digunakan untuk mengamankan transaksi Saldo RCPAY, Transfer Tiket ke teman, dan pemulihan kata sandi.
+                        </div>
+
+                        <div style="text-align: center; margin: 30px 0 10px 0;">
+                            <a href="https://rcellfest.my.id/user-login.html" style="background: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">Mulai Jelajahi Event 🚀</a>
+                        </div>
+                    </div>
+                    <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 11px; color: #64748b;">
+                        &copy; ${new Date().getFullYear()} RCELLTECH ID. Digital Payment & Ticketing Solution.
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            await transporter.sendMail(welcomeMailOptions);
+        } catch (mailErr) {
+            console.error("Gagal kirim email sambutan:", mailErr);
+        }
+        // 👆 ----------------------------------- 👆
 
         res.json({ success: true, message: "Registrasi Berhasil!" });
     } catch (error) { 
