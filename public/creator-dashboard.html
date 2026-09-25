@@ -435,6 +435,7 @@
         </div>
 
         <!-- ============================================== -->
+ <!-- ============================================== -->
         <!-- AREA 6: KELOLA RUNDOWN EVENT -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="rundownArea">
@@ -442,7 +443,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-info m-0"><i class="bi bi-calendar2-range me-2"></i>Kelola Rundown Event</h5>
-                        <small class="text-muted">Buat susunan jadwal acara live untuk penonton event Anda.</small>
+                        <small class="text-muted">Buat susunan jadwal acara live (Multi-Hari & Jam Otomatis) untuk penonton event Anda.</small>
                     </div>
                     <a href="https://rundown.rcellfest.my.id" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
                         <i class="bi bi-box-arrow-up-right me-1"></i> Buka Web Rundown
@@ -457,28 +458,34 @@
                         </select>
                     </div>
 
+                    <!-- 👇 INI YANG DIUBAH JADI 4 KOLOM DENGAN KALENDER 👇 -->
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Slug Link (Tanpa Spasi)</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-dark border-secondary text-muted small">rundown.../</span>
                                 <input type="text" id="eoRdSlug" class="form-control" placeholder="nama-event-anda">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Nama Event</label>
                             <input type="text" id="eoRdEventName" class="form-control" placeholder="Nama Konser / Acara">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Hari & Tanggal Acara</label>
-                            <input type="text" id="eoRdEventDate" class="form-control" placeholder="Sabtu, 15 Agustus 2026">
+                        <div class="col-md-3">
+                            <label class="form-label">Tgl Mulai Acara</label>
+                            <input type="date" id="eoRdStartDate" class="form-control" style="color-scheme: dark;" onchange="syncEoDefaultDates()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tgl Selesai (Jika > 1 Hari)</label>
+                            <input type="date" id="eoRdEndDate" class="form-control" style="color-scheme: dark;">
                         </div>
                     </div>
+                    <!-- 👆 -------------------------------------------- 👆 -->
 
-                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
-                        <label class="form-label text-info m-0"><i class="bi bi-clock-history me-1"></i> Susunan Jam & Artis (Timeline)</label>
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 flex-wrap gap-2">
+                        <label class="form-label text-info m-0"><i class="bi bi-clock-history me-1"></i> Susunan Tanggal & Jam Artis (Timeline)</label>
                         <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="addEoRundownRow()">
-                            <i class="bi bi-plus-circle me-1"></i> Tambah Baris Jam
+                            <i class="bi bi-plus-circle me-1"></i> Tambah Baris Sesi
                         </button>
                     </div>
 
