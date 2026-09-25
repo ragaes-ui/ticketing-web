@@ -66,15 +66,18 @@ const transferSchema = new mongoose.Schema({
 const TransferHistory = mongoose.models.TransferHistory || mongoose.model('TransferHistory', transferSchema);
 // --- MODEL BARU: RUNDOWN EVENT ---
 const rundownSchema = new mongoose.Schema({
-    slug: { type: String, required: true, unique: true, lowercase: true }, // contoh: rcellfest-vol-3
+    slug: { type: String, required: true, unique: true, lowercase: true },
     eventName: { type: String, required: true },
     eventDate: { type: String, default: '' },
+    startDate: { type: String, default: '' }, // 👈 Tanggal Mulai (YYYY-MM-DD)
+    endDate: { type: String, default: '' },   // 👈 Tanggal Selesai (YYYY-MM-DD)
     creatorId: { type: String, default: 'admin-pusat' },
     schedules: [{
-        time: String,       // contoh: "19:00 - 20:00"
-        title: String,      // contoh: "Neck Deep / Open Gate"
-        stage: String,      // contoh: "Main Stage"
-        description: String // catatan tambahan
+        date: String,       // 👈 Tanggal tampil sesi ini (YYYY-MM-DD)
+        time: String,       // 👈 Otomatis berformat "18:30 - 19:30 WIB"
+        title: String,
+        stage: String,
+        description: String
     }],
     updatedAt: { type: Date, default: Date.now }
 });
@@ -2033,16 +2036,23 @@ app.get('/api/rundowns', proteksiApiInternal, async (req, res) => {
 // 3. Simpan / Update Rundown (Dari Admin maupun EO)
 app.post('/api/rundowns', proteksiApiInternal, async (req, res) => {
     try {
-        const { slug, eventName, eventDate, schedules, creatorId } = req.body;
+        const { slug, eventName, eventDate, startDate, endDate, schedules, creatorId } = req.body;
         const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
 
-        // Cek apakah slug sudah dipakai oleh EO lain
         const existing = await Rundown.findOne({ slug: cleanSlug });
         if (existing && creatorId && existing.creatorId !== creatorId && existing.creatorId !== 'admin-pusat') {
             return res.status(400).json({ success: false, message: "Nama link (slug) ini sudah dipakai event lain. Gunakan nama unik!" });
         }
 
-        const updateData = { slug: cleanSlug, eventName, eventDate, schedules, updatedAt: Date.now() };
+        const updateData = { 
+            slug: cleanSlug, 
+            eventName, 
+            eventDate, 
+            startDate: startDate || '', 
+            endDate: endDate || '', 
+            schedules, 
+            updatedAt: Date.now() 
+        };
         if (creatorId) updateData.creatorId = creatorId;
 
         const updated = await Rundown.findOneAndUpdate(
