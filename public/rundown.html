@@ -300,8 +300,11 @@
             <div id="eventCardsContainer" class="row g-3 justify-content-center"></div>
         </div>
 
-        <!-- WADAH 2: TIMELINE RUNDOWN (Muncul jika buka rundown.rcellfest.my.id/namaevent) -->
+<!-- WADAH 2: TIMELINE RUNDOWN (Muncul jika buka rundown.rcellfest.my.id/namaevent) -->
         <div id="rundownTimelineView" class="timeline-wrapper d-none">
+            <!-- 👇 TOMBOL TAB PILIHAN HARI (DAY 1, DAY 2, DST) 👇 -->
+            <div id="dayTabsContainer" class="d-flex justify-content-center gap-2 flex-wrap mb-3"></div>
+
             <div class="search-wrapper mb-3">
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchScheduleItem" class="search-input" placeholder="Cari nama artis, kegiatan, atau panggung..." oninput="filterScheduleItems()">
@@ -491,6 +494,12 @@
         // ==========================================
         // 2. MODE TIMELINE 1 EVENT (/namaevent)
         // ==========================================
+// ==========================================
+        // 2. MODE TIMELINE 1 EVENT (/namaevent + MULTI-DAY TABS)
+        // ==========================================
+        let selectedDayDate = 'ALL';
+        let uniqueDates = [];
+
         async function loadSingleRundown(slug) {
             const timelineView = document.getElementById('rundownTimelineView');
             const timelineList = document.getElementById('timelineList');
@@ -525,11 +534,48 @@
                 document.getElementById('eventDate').removeAttribute('data-i18n');
 
                 currentSchedules = schedules || [];
-                renderScheduleItems(currentSchedules);
+
+                // Deteksi tanggal unik dari semua sesi acara
+                uniqueDates = [...new Set(currentSchedules.map(s => s.date).filter(Boolean))].sort();
+                
+                if (uniqueDates.length > 1) {
+                    selectedDayDate = uniqueDates[0]; // Otomatis buka Day 1
+                    renderDayTabs();
+                } else {
+                    selectedDayDate = 'ALL';
+                    document.getElementById('dayTabsContainer').innerHTML = '';
+                }
+
+                filterScheduleItems();
 
             } catch (err) {
                 timelineList.innerHTML = `<div class="text-center text-danger py-5">Gagal memuat jadwal dari server.</div>`;
             }
+        }
+
+        function renderDayTabs() {
+            const tabBox = document.getElementById('dayTabsContainer');
+            if (uniqueDates.length <= 1) {
+                tabBox.innerHTML = '';
+                return;
+            }
+
+            const locale = currentLang === 'id' ? 'id-ID' : 'en-US';
+            tabBox.innerHTML = uniqueDates.map((dStr, idx) => {
+                const isActive = selectedDayDate === dStr;
+                const labelDate = new Date(dStr).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+                return `
+                    <button onclick="selectDayTab('${dStr}')" class="btn btn-sm rounded-pill px-3 py-2 fw-bold ${isActive ? 'btn-primary shadow' : 'nav-glass-btn'}">
+                        DAY ${idx + 1} <span class="fw-normal opacity-75 ms-1">(${labelDate})</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectDayTab(dateStr) {
+            selectedDayDate = dateStr;
+            renderDayTabs();
+            filterScheduleItems();
         }
 
         function renderScheduleItems(items) {
@@ -556,34 +602,28 @@
 
         function filterScheduleItems() {
             const q = document.getElementById('searchScheduleItem').value.toLowerCase();
-            const filtered = currentSchedules.filter(item => 
-                (item.title && item.title.toLowerCase().includes(q)) ||
-                (item.time && item.time.toLowerCase().includes(q)) ||
-                (item.stage && item.stage.toLowerCase().includes(q)) ||
-                (item.description && item.description.toLowerCase().includes(q))
-            );
+            const filtered = currentSchedules.filter(item => {
+                const matchDay = (selectedDayDate === 'ALL' || !item.date || item.date === selectedDayDate);
+                const matchSearch = !q || 
+                    (item.title && item.title.toLowerCase().includes(q)) ||
+                    (item.time && item.time.toLowerCase().includes(q)) ||
+                    (item.stage && item.stage.toLowerCase().includes(q)) ||
+                    (item.description && item.description.toLowerCase().includes(q));
+                return matchDay && matchSearch;
+            });
             renderScheduleItems(filtered);
         }
 
-        // FUNGSI SHARE / SALIN LINK RUNDOWN
         function shareRundownLink() {
             const url = window.location.href;
             if (navigator.share) {
-                navigator.share({
-                    title: document.title,
-                    url: url
-                }).catch(() => {});
+                navigator.share({ title: document.title, url: url }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(url);
                 Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: dict[currentLang].copied_msg,
-                    showConfirmButton: false,
-                    timer: 2000,
-                    background: '#18181b',
-                    color: '#fff'
+                    toast: true, position: 'top-end', icon: 'success',
+                    title: dict[currentLang].copied_msg, showConfirmButton: false, timer: 2000,
+                    background: '#18181b', color: '#fff'
                 });
             }
         }
