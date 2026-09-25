@@ -217,6 +217,7 @@
             <li class="nav-item-side" onclick="switchMenu('buyers')"><i class="bi bi-receipt fs-5"></i> <span data-i18n="menu_buyers">Pesanan & Tiket</span></li>
             <li class="nav-item-side" onclick="switchMenu('promo')"><i class="bi bi-ticket-perforated fs-5"></i> <span data-i18n="menu_promo">Kelola Promo</span></li>
             <li class="nav-item-side" onclick="switchMenu('scanner')"><i class="bi bi-qr-code-scan fs-5"></i> <span data-i18n="menu_scan">Scan Tiket</span></li>
+            <li class="nav-item-side" onclick="switchMenu('rundown')"><i class="bi bi-calendar2-range fs-5"></i> <span data-i18n="menu_rundown">Kelola Rundown</span></li>
         </ul>
 
         <!-- BAGIAN TOMBOL BAWAH -->
@@ -416,7 +417,7 @@
             </div>
         </div>
 
-        <!-- ============================================== -->
+<!-- ============================================== -->
         <!-- AREA 5: SCANNER TIKET -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="scannerArea">
@@ -432,7 +433,67 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- ============================================== -->
+        <!-- AREA 6: KELOLA RUNDOWN EVENT -->
+        <!-- ============================================== -->
+        <div class="content-area d-none" id="rundownArea">
+            <div class="card-custom">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h5 class="fw-bold text-info m-0"><i class="bi bi-calendar2-range me-2"></i>Kelola Rundown Event</h5>
+                        <small class="text-muted">Buat susunan jadwal acara live untuk penonton event Anda.</small>
+                    </div>
+                    <a href="https://rundown.rcellfest.my.id" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Buka Web Rundown
+                    </a>
+                </div>
+
+                <div class="p-4 rounded-4 mb-4" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.35);">
+                    <div class="mb-3">
+                        <label class="form-label text-warning"><i class="bi bi-lightning-charge-fill"></i> Pilih dari Event Saya (Isi Otomatis)</label>
+                        <select id="eoRdSelectEvent" class="form-select" onchange="autoFillEoRundown(this)">
+                            <option value="">-- Pilih Event Anda --</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Slug Link (Tanpa Spasi)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted small">rundown.../</span>
+                                <input type="text" id="eoRdSlug" class="form-control" placeholder="nama-event-anda">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nama Event</label>
+                            <input type="text" id="eoRdEventName" class="form-control" placeholder="Nama Konser / Acara">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Hari & Tanggal Acara</label>
+                            <input type="text" id="eoRdEventDate" class="form-control" placeholder="Sabtu, 15 Agustus 2026">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                        <label class="form-label text-info m-0"><i class="bi bi-clock-history me-1"></i> Susunan Jam & Artis (Timeline)</label>
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="addEoRundownRow()">
+                            <i class="bi bi-plus-circle me-1"></i> Tambah Baris Jam
+                        </button>
+                    </div>
+
+                    <div id="eoRdRowsContainer" class="mb-3"></div>
+
+                    <button type="button" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" onclick="saveEoRundown()">
+                        <i class="bi bi-save me-1"></i> Simpan & Publish Rundown
+                    </button>
+                </div>
+
+                <h6 class="fw-bold text-muted mb-3">Daftar Rundown Event Anda</h6>
+                <div id="eoActiveRundownsList" class="row g-3"></div>
+            </div>
+        </div>
+    </div> <!-- ✅ PENUTUP .main-content YANG BENAR ADA DI SINI -->
 
     <!-- 🔥 AREA INVISIBLE UNTUK CETAK GELANG 🔥 -->
     <div id="printGelangArea"></div>
@@ -521,6 +582,7 @@
         // ==========================================
         const translations = {
             id: {
+                menu_rundown: "Kelola Rundown",
                 menu_dash: "Ringkasan Dasbor", menu_create: "Buat Event Baru", menu_events: "Event Saya", menu_promo: "Kelola Promo", menu_scan: "Scan Tiket", menu_buyers: "Pesanan & Tiket",
                 btn_settings: "Pengaturan", btn_logout: "Keluar", txt_verified: "Verified Organizer", dash_hello: "Halo,", dash_desc: "Selamat datang di pusat kendali penjualan event Anda.",
                 stat_rev: "TOTAL PENDAPATAN", stat_sold: "TIKET TERJUAL", stat_total: "TOTAL EVENT ANDA", chart_title: "Grafik Pendapatan (7 Hari)", recent_trx: "Transaksi Terakhir", txt_no_trx: "Belum ada transaksi",
@@ -531,9 +593,11 @@
                 lbl_promo_disc: "Potongan Harga (Rp)", lbl_promo_quota: "Batas Kuota", lbl_promo_days: "Masa Aktif (Hari)", btn_create_promo: "Buat Kode Promo", txt_promo_list: "Daftar Promo Event Anda",
                 scan_desc: "Pastikan kursor berada di dalam kotak di bawah ini sebelum memindai QR Code.", btn_verify: "Verifikasi Tiket", lbl_org_name: "Nama Organizer", btn_update: "Update", lbl_change_pass: "Ganti Password", btn_save_pass: "Simpan Password",
                 modal_edit: "Edit Event", btn_save_changes: "Simpan Perubahan", lbl_filter_day: "Filter Harian", lbl_filter_month: "Filter Bulanan", lbl_filter_search: "Cari Data", btn_reset: "Reset",
-                th_date_buy: "Tgl. Pembelian", th_buyer: "Pembeli", th_event_ticket: "Event & Tiket", th_total: "Total Bayar", th_status_act: "Status / Aksi", txt_empty_buyer: "Tidak ada data transaksi.", lbl_total_trx: "Total Transaksi"
+                th_date_buy: "Tgl. Pembelian", th_buyer: "Pembeli", th_event_ticket: "Event & Tiket", th_total: "Total Bayar", th_status_act: "Status / Aksi", txt_empty_buyer: "Tidak ada data transaksi.", lbl_total_trx: "Total Transaksi",
+                
             },
             en: {
+                menu_rundown: "Manage Rundown",
                 menu_dash: "Dashboard Overview", menu_create: "Create New Event", menu_events: "My Events", menu_promo: "Manage Promo", menu_scan: "Scan Tickets", menu_buyers: "Orders & Tickets",
                 btn_settings: "Settings", btn_logout: "Logout", txt_verified: "Verified Organizer", dash_hello: "Hello,", dash_desc: "Welcome to your event sales control center.",
                 stat_rev: "TOTAL REVENUE", stat_sold: "TICKETS SOLD", stat_total: "YOUR TOTAL EVENTS", chart_title: "Revenue Chart (7 Days)", recent_trx: "Recent Transactions", txt_no_trx: "No transactions yet",
@@ -544,7 +608,8 @@
                 lbl_promo_disc: "Discount (Rp)", lbl_promo_quota: "Quota Limit", lbl_promo_days: "Active Days", btn_create_promo: "Create Promo Code", txt_promo_list: "Your Event Promos",
                 scan_desc: "Ensure your cursor is inside the box below before scanning the QR Code.", btn_verify: "Verify Ticket", lbl_org_name: "Organizer Name", btn_update: "Update", lbl_change_pass: "Change Password", btn_save_pass: "Save Password",
                 modal_edit: "Edit Event", btn_save_changes: "Save Changes", lbl_filter_day: "Daily Filter", lbl_filter_month: "Monthly Filter", lbl_filter_search: "Search Data", btn_reset: "Reset",
-                th_date_buy: "Purchase Date", th_buyer: "Buyer", th_event_ticket: "Event & Ticket", th_total: "Total Paid", th_status_act: "Status / Action", txt_empty_buyer: "No transaction data.", lbl_total_trx: "Total Transactions"
+                th_date_buy: "Purchase Date", th_buyer: "Buyer", th_event_ticket: "Event & Ticket", th_total: "Total Paid", th_status_act: "Status / Action", txt_empty_buyer: "No transaction data.", lbl_total_trx: "Total Transactions",
+                
             }
         };
 
@@ -618,16 +683,17 @@
 // ==========================================
         // NAVIGASI MENU KIRI (DENGAN EFEK LOADING)
         // ==========================================
-        function switchMenu(menuName) {
-            // 1. Tampilkan layar loading
+function switchMenu(menuName) {
             const loader = document.getElementById('menuLoader');
             loader.classList.add('show');
 
-            // 2. Beri jeda 300ms agar animasinya terasa mulus
             setTimeout(() => {
                 localStorage.setItem('lastCreatorMenu', menuName);
                 document.querySelectorAll('.nav-item-side').forEach(el => el.classList.remove('active'));
-                ['dashboardArea', 'createEventArea', 'myEventsArea', 'buyersArea', 'promoArea', 'scannerArea'].forEach(id => document.getElementById(id).classList.add('d-none'));
+                ['dashboardArea', 'createEventArea', 'myEventsArea', 'buyersArea', 'promoArea', 'scannerArea', 'rundownArea'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('d-none');
+                });
                 const t = translations[localStorage.getItem('creatorLang') || 'id'];
                 
                 if (menuName === 'dashboard') { document.querySelectorAll('.nav-item-side')[0].classList.add('active'); document.getElementById('dashboardArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_dash; loadDashboardStats(); } 
@@ -636,10 +702,10 @@
                 else if (menuName === 'buyers') { document.querySelectorAll('.nav-item-side')[3].classList.add('active'); document.getElementById('buyersArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_buyers; loadBuyers(); } 
                 else if (menuName === 'promo') { document.querySelectorAll('.nav-item-side')[4].classList.add('active'); document.getElementById('promoArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_promo; loadPromos(); } 
                 else if (menuName === 'scanner') { document.querySelectorAll('.nav-item-side')[5].classList.add('active'); document.getElementById('scannerArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = t.menu_scan; setTimeout(() => document.getElementById('scanInputData').focus(), 500); }
+                else if (menuName === 'rundown') { document.querySelectorAll('.nav-item-side')[6].classList.add('active'); document.getElementById('rundownArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = "Kelola Rundown"; loadCreatorRundowns(); }
                 
                 if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
 
-                // 3. Matikan layar loading setelah menu selesai diganti
                 loader.classList.remove('show');
             }, 300);
         }
@@ -984,6 +1050,164 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
         function formatRupiah(input) {
             let angka = input.value.replace(/[^0-9]/g, '');
             input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
+        }
+        // ==========================================
+        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR
+        // ==========================================
+        let eoRundownsList = [];
+
+        function addEoRundownRow(time = '', title = '', stage = '', desc = '') {
+            const container = document.getElementById('eoRdRowsContainer');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'row g-2 mb-2 align-items-center eo-rd-row p-2 rounded-3';
+            row.style.background = 'var(--input-bg)';
+            row.style.border = '1px solid var(--border-color)';
+            row.innerHTML = `
+                <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm rd-time" placeholder="18:30 - 19:30 WIB" value="${time}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-sm rd-title fw-bold" placeholder="Nama Artis / Kegiatan" value="${title}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm rd-stage" placeholder="Main Stage" value="${stage}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm rd-desc" placeholder="Catatan (Opsional)" value="${desc}">
+                </div>
+                <div class="col-md-1 text-end">
+                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.eo-rd-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function autoFillEoRundown(selectEl) {
+            const ev = myEventsData.find(e => e._id === selectEl.value);
+            if (!ev) return;
+            const autoSlug = ev.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            document.getElementById('eoRdSlug').value = autoSlug;
+            document.getElementById('eoRdEventName').value = ev.name;
+            if (ev.date) {
+                document.getElementById('eoRdEventDate').value = new Date(ev.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+        }
+
+        async function loadCreatorRundowns() {
+            if (!organizerInfo || !organizerInfo.id) return;
+
+            // 1. Pastikan daftar event EO sudah dimuat ke dropdown
+            if (myEventsData.length === 0) await loadMyEvents();
+            const selectEl = document.getElementById('eoRdSelectEvent');
+            if (selectEl) {
+                let opts = '<option value="">-- Pilih Event Anda untuk Isi Otomatis --</option>';
+                myEventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
+                selectEl.innerHTML = opts;
+            }
+
+            const rowContainer = document.getElementById('eoRdRowsContainer');
+            if (rowContainer && rowContainer.children.length === 0) addEoRundownRow();
+
+            // 2. Muat daftar rundown khusus milik EO ini
+            const listEl = document.getElementById('eoActiveRundownsList');
+            if (!listEl) return;
+            try {
+                const res = await fetch(`/api/rundowns?creatorId=${organizerInfo.id}`);
+                const result = await res.json();
+                if (!result.success || result.data.length === 0) {
+                    listEl.innerHTML = `<div class="col-12 text-muted small">Belum ada rundown untuk event Anda.</div>`;
+                    return;
+                }
+                eoRundownsList = result.data;
+                listEl.innerHTML = eoRundownsList.map(rd => `
+                    <div class="col-md-6">
+                        <div class="promo-ticket m-0 h-100" style="border-color: var(--primary); background: rgba(59, 130, 246, 0.05);">
+                            <div>
+                                <b class="text-info fs-6">${rd.eventName}</b>
+                                <span class="badge bg-primary ms-2">${rd.schedules ? rd.schedules.length : 0} Sesi</span><br>
+                                <small class="text-muted d-block mb-1"><i class="bi bi-calendar3 me-1"></i> ${rd.eventDate || 'TBA'}</small>
+                                <a href="https://rundown.rcellfest.my.id/${rd.slug}" target="_blank" class="small text-warning text-decoration-underline">
+                                    rundown.rcellfest.my.id/${rd.slug}
+                                </a>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button onclick="editEoRundown('${rd._id}')" class="btn btn-sm btn-outline-info"><i class="bi bi-pencil"></i></button>
+                                <button onclick="deleteEoRundown('${rd._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {}
+        }
+
+        function editEoRundown(id) {
+            const rd = eoRundownsList.find(r => r._id === id);
+            if (!rd) return;
+            document.getElementById('eoRdSlug').value = rd.slug;
+            document.getElementById('eoRdEventName').value = rd.eventName;
+            document.getElementById('eoRdEventDate').value = rd.eventDate || '';
+
+            const container = document.getElementById('eoRdRowsContainer');
+            container.innerHTML = '';
+            if (rd.schedules && rd.schedules.length > 0) {
+                rd.schedules.forEach(s => addEoRundownRow(s.time, s.title, s.stage, s.description));
+            } else {
+                addEoRundownRow();
+            }
+            document.getElementById('rundownArea').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function saveEoRundown() {
+            const slug = document.getElementById('eoRdSlug').value.trim();
+            const eventName = document.getElementById('eoRdEventName').value.trim();
+            const eventDate = document.getElementById('eoRdEventDate').value.trim();
+
+            if (!slug || !eventName) return Swal.fire('Data Kurang', 'Slug Link dan Nama Event wajib diisi!', 'warning');
+
+            const schedules = [];
+            document.querySelectorAll('.eo-rd-row').forEach(row => {
+                const time = row.querySelector('.rd-time').value.trim();
+                const title = row.querySelector('.rd-title').value.trim();
+                const stage = row.querySelector('.rd-stage').value.trim();
+                const description = row.querySelector('.rd-desc').value.trim();
+                if (time && title) schedules.push({ time, title, stage, description });
+            });
+
+            if (schedules.length === 0) return Swal.fire('Jadwal Kosong', 'Tambahkan minimal 1 baris jam & kegiatan!', 'warning');
+
+            try {
+                const res = await fetch('/api/rundowns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slug, eventName, eventDate, schedules, creatorId: organizerInfo.id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rundown Disimpan!',
+                        html: `Link aktif:<br><a href="https://rundown.rcellfest.my.id/${data.data.slug}" target="_blank" class="text-info fw-bold">rundown.rcellfest.my.id/${data.data.slug}</a>`,
+                        background: 'var(--bg-card)', color: 'var(--text-main)'
+                    });
+                    document.getElementById('eoRdSlug').value = '';
+                    document.getElementById('eoRdEventName').value = '';
+                    document.getElementById('eoRdEventDate').value = '';
+                    document.getElementById('eoRdRowsContainer').innerHTML = '';
+                    addEoRundownRow();
+                    loadCreatorRundowns();
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+            }
+        }
+
+        async function deleteEoRundown(id) {
+            if (!confirm('Hapus rundown event ini?')) return;
+            await fetch(`/api/rundowns/${id}`, { method: 'DELETE' });
+            loadCreatorRundowns();
         }
     </script>
 </body>
