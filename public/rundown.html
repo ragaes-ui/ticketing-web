@@ -613,7 +613,7 @@ function previewArtistPhoto(imgUrl, title) {
                     <div class="timeline-dot"></div>
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
                         <span class="time-badge"><i class="bi bi-clock-fill"></i> ${item.time}</span>
-                        ${item.stage ? `<span class="stage-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${item.stage}</span>` : `<span class="session-number">${t.lbl_session_num}${idx + 1}</span>`}
+                        <span class="stage-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${item.stage || 'Main Stage'}</span>
                     </div>
                     <div class="d-flex align-items-center gap-3 mt-2">
                         ${photoHtml}
