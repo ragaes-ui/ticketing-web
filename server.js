@@ -1731,47 +1731,50 @@ app.post('/api/maintenance', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/check-promo', async (req, res) => {
+// --- 1. CEK KODE PROMO SAAT CHECKOUT (Dilindungi Satpam) ---
+app.post('/api/check-promo', proteksiApiInternal, async (req, res) => {
     try {
         const { code } = req.body;
         const promo = await Promo.findOne({ code: code.toUpperCase() });
 
         if (!promo) return res.json({ valid: false, message: "Kode promo tidak ditemukan." });
         if (promo.quota <= 0) return res.json({ valid: false, message: "Kuota promo habis." });
-        // 👇 PENGECEKAN KETAT PROMO SPESIFIK EVENT 👇
+        
+        // Pengecekan ketat promo spesifik event
         if (promo.eventId && promo.eventId !== 'ALL' && promo.eventId !== req.body.eventId) {
-            return res.status(400).json({ message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
+            return res.status(400).json({ valid: false, message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
         }
-        // 👆 -------------------------------------- 👆
+        
         if (new Date() > promo.expiresAt) return res.json({ valid: false, message: "Kode promo sudah kadaluarsa." });
 
         res.json({ valid: true, discount: promo.discount, message: `Diskon Rp ${promo.discount.toLocaleString('id-ID')}!` });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.get('/api/promos', async (req, res) => {
-    try { const promos = await Promo.find().sort({ _id: -1 }); res.json(promos); } 
+// --- 2. AMBIL DAFTAR PROMO UNTUK ADMIN (Dilindungi Satpam Anti-Intip) ---
+app.get('/api/promos', proteksiApiInternal, async (req, res) => {
+    try { 
+        const promos = await Promo.find().sort({ _id: -1 }); 
+        res.json(promos); 
+    } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- JALUR API BUAT SIMPAN PROMO BARU ---
-app.post('/api/promos', async (req, res) => {
+// --- 3. SIMPAN PROMO BARU (Dilindungi Satpam) ---
+app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
-        // 👇 TAMBAHKAN eventId DAN eventName DI SINI 👇
         const { code, discount, quota, daysActive, eventId, eventName } = req.body;
         
-        // Atur tanggal kedaluwarsa
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
 
-        // 👇 PASTIKAN KEDUANYA IKUT DIMASUKKAN KE DALAM DATABASE 👇
         const newPromo = new Promo({ 
             code: code, 
             discount: discount, 
             quota: quota, 
             expiresAt: expiresAt,
-            eventId: eventId,      // Kunci rahasianya!
-            eventName: eventName   // Kunci rahasianya!
+            eventId: eventId,      
+            eventName: eventName   
         });
 
         await newPromo.save();
@@ -1781,8 +1784,12 @@ app.post('/api/promos', async (req, res) => {
     }
 });
 
-app.delete('/api/promos/:id', async (req, res) => {
-    try { await Promo.findByIdAndDelete(req.params.id); res.json({ success: true, message: "Promo dihapus!" }); } 
+// --- 4. HAPUS PROMO (Dilindungi Satpam) ---
+app.delete('/api/promos/:id', proteksiApiInternal, async (req, res) => {
+    try { 
+        await Promo.findByIdAndDelete(req.params.id); 
+        res.json({ success: true, message: "Promo dihapus!" }); 
+    } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
 
