@@ -77,7 +77,8 @@ const rundownSchema = new mongoose.Schema({
         time: String,       // 👈 Otomatis berformat "18:30 - 19:30 WIB"
         title: String,
         stage: String,
-        description: String
+        description: String,
+        image: { type: String, default: '' } // 👈 Tambahan foto kecil artis
     }],
     updatedAt: { type: Date, default: Date.now }
 });
@@ -2066,11 +2067,21 @@ app.post('/api/rundowns', proteksiApiInternal, async (req, res) => {
     }
 });
 
-// 4. Hapus Rundown
+// 4. Hapus Rundown + Bersihkan Foto Artis di Supabase
 app.delete('/api/rundowns/:id', proteksiApiInternal, async (req, res) => {
     try {
+        const rd = await Rundown.findById(req.params.id);
+        if (rd && rd.schedules && rd.schedules.length > 0) {
+            const filesToRemove = rd.schedules
+                .filter(s => s.image && s.image.includes('supabase.co'))
+                .map(s => s.image.split('?')[0].split('/').pop());
+            
+            if (filesToRemove.length > 0) {
+                await supabase.storage.from('rcell-images').remove(filesToRemove);
+            }
+        }
         await Rundown.findByIdAndDelete(req.params.id);
-        res.json({ success: true, message: "Rundown dihapus!" });
+        res.json({ success: true, message: "Rundown beserta foto artis berhasil dihapus!" });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
