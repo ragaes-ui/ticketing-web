@@ -1209,6 +1209,9 @@ document.getElementById('editTiers').innerHTML = '';
 // ==========================================
         // ⏳ MANAJEMEN RUNDOWN EVENT (KALENDER & TIME PICKER)
         // ==========================================
+// ==========================================
+        // ⏳ MANAJEMEN RUNDOWN EVENT (ADMIN + FOTO ARTIS SUPABASE)
+        // ==========================================
         let allRundownsAdmin = [];
 
         function formatRangeDateText(startStr, endStr) {
@@ -1229,11 +1232,64 @@ document.getElementById('editTiers').innerHTML = '';
             });
         }
 
-        function addRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '') {
+        // Fungsi Upload Foto Artis ke Supabase di Admin
+        async function uploadAdminRowPhoto(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                input.value = '';
+                return Swal.fire('Terlalu Besar', 'Maksimal foto 5MB!', 'warning');
+            }
+
+            const row = input.closest('.rd-item-row');
+            const previewImg = row.querySelector('.rd-img-preview');
+            const hiddenUrl = row.querySelector('.rd-img-url');
+            const removeBtn = row.querySelector('.rd-remove-img-btn');
+            previewImg.style.opacity = '0.3';
+
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = e => reject(e);
+                });
+
+                const res = await fetch('/api/upload-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageBase64: base64, fileName: file.name, mimeType: file.type })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message);
+
+                hiddenUrl.value = data.imageUrl;
+                previewImg.src = data.imageUrl;
+                if (removeBtn) removeBtn.classList.remove('d-none');
+            } catch (err) {
+                Swal.fire('Gagal Upload', err.message || 'Gagal upload gambar', 'error');
+            } finally {
+                previewImg.style.opacity = '1';
+                input.value = '';
+            }
+        }
+
+        // Fungsi Hapus Foto Artis Manual (Tombol X Merah)
+        function removeAdminRowPhoto(btn) {
+            const row = btn.closest('.rd-item-row');
+            const previewImg = row.querySelector('.rd-img-preview');
+            const hiddenUrl = row.querySelector('.rd-img-url');
+            
+            hiddenUrl.value = '';
+            previewImg.src = 'https://placehold.co/80x80/1e293b/ffffff?text=Foto';
+            btn.classList.add('d-none');
+        }
+
+        // Fungsi Tambah Baris Input Sesi Acara di Admin
+        function addRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '', imgUrl = '') {
             const container = document.getElementById('rdRowsContainer');
             if (!container) return;
 
-            // Pecah "18:30 - 19:30 WIB" menjadi jam mulai & selesai untuk input type="time"
             let startT = '', endT = '';
             if (time && time.includes('-')) {
                 const parts = time.replace('WIB', '').split('-');
@@ -1241,13 +1297,26 @@ document.getElementById('editTiers').innerHTML = '';
                 endT = parts[1] ? parts[1].trim() : '';
             }
             const defaultDate = dateVal || document.getElementById('rdStartDate')?.value || '';
+            const defaultAvatar = 'https://placehold.co/80x80/1e293b/ffffff?text=Foto';
 
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 align-items-center rd-item-row p-2 rounded-3';
             row.style.background = 'rgba(0,0,0,0.25)';
             row.innerHTML = `
+                <div class="col-auto text-center position-relative">
+                    <label style="cursor: pointer; position: relative; display: inline-block;" title="Klik untuk Upload Foto Artis">
+                        <img src="${imgUrl || defaultAvatar}" class="rd-img-preview rounded-3 border border-secondary" style="width: 42px; height: 42px; object-fit: cover; transition: 0.2s;">
+                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-info text-dark p-1" style="font-size: 0.55rem; transform: translate(20%, 20%);">
+                            <i class="bi bi-camera-fill"></i>
+                        </span>
+                        <input type="file" class="d-none" accept="image/*" onchange="uploadAdminRowPhoto(this)">
+                        <input type="hidden" class="rd-img-url" value="${imgUrl}">
+                    </label>
+                    <button type="button" onclick="removeAdminRowPhoto(this)" class="btn btn-danger p-0 rounded-circle position-absolute rd-remove-img-btn ${imgUrl ? '' : 'd-none'}" style="width: 18px; height: 18px; top: -5px; right: 2px; font-size: 0.65rem; line-height: 1; z-index: 3;" title="Hapus Foto Artis">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
                 <div class="col-md-2">
-                    <small class="text-white-50 d-block d-md-none">Tanggal Tampil:</small>
                     <input type="date" class="form-control form-control-sm rd-date" style="color-scheme: dark;" value="${defaultDate}" title="Pilih Tanggal Hari Tampil">
                 </div>
                 <div class="col-md-3">
@@ -1263,11 +1332,11 @@ document.getElementById('editTiers').innerHTML = '';
                 <div class="col-md-2">
                     <input type="text" class="form-control form-control-sm rd-stage" placeholder="Stage / Panggung" value="${stage}">
                 </div>
-                <div class="col-md-1">
+                <div class="col-md">
                     <input type="text" class="form-control form-control-sm rd-desc" placeholder="Info" value="${desc}">
                 </div>
-                <div class="col-md-1 text-end">
-                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.rd-item-row').remove()"><i class="bi bi-trash"></i></button>
+                <div class="col-auto text-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.rd-item-row').remove()"><i class="bi bi-trash"></i></button>
                 </div>
             `;
             container.appendChild(row);
@@ -1344,7 +1413,7 @@ document.getElementById('editTiers').innerHTML = '';
             const container = document.getElementById('rdRowsContainer');
             container.innerHTML = '';
             if (rd.schedules && rd.schedules.length > 0) {
-                rd.schedules.forEach(s => addRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description));
+                rd.schedules.forEach(s => addRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description, s.image || ''));
             } else {
                 addRundownRow();
             }
@@ -1370,10 +1439,11 @@ document.getElementById('editTiers').innerHTML = '';
                 const title = row.querySelector('.rd-title').value.trim();
                 const stage = row.querySelector('.rd-stage').value.trim();
                 const description = row.querySelector('.rd-desc').value.trim();
+                const image = row.querySelector('.rd-img-url').value || '';
 
                 if (startT && title) {
                     const time = endT ? `${startT} - ${endT} WIB` : `${startT} WIB`;
-                    schedules.push({ date, time, title, stage, description });
+                    schedules.push({ date, time, title, stage, description, image });
                 }
             });
 
@@ -1381,7 +1451,6 @@ document.getElementById('editTiers').innerHTML = '';
                 return Swal.fire({ icon: 'warning', title: 'Jadwal Kosong', text: 'Pilih Jam Mulai dan isi Nama Artis minimal 1 baris!', background: '#1c1c2d', color: '#fff' });
             }
 
-            // Urutkan otomatis berdasarkan Tanggal lalu Jam Mulai
             schedules.sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
             try {
