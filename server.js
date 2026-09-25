@@ -47,7 +47,13 @@ const promoSchema = new mongoose.Schema({
     // 👆 ---------------------------------------------- 👆
 });
 const Promo = mongoose.models.Promo || mongoose.model('Promo', promoSchema);
-
+// --- MODEL BARU: PENAMPUNG KODE OTP ---
+const otpSchema = new mongoose.Schema({
+    email: { type: String, required: true },
+    otp: { type: String, required: true },
+    expiresAt: { type: Date, required: true }
+});
+const Otp = mongoose.models.Otp || mongoose.model('Otp', otpSchema);
 // --- MODEL BARU: RIWAYAT TRANSFER TIKET ---
 const transferSchema = new mongoose.Schema({
     senderId: String,
@@ -104,26 +110,42 @@ app.use((req, res, next) => {
 // 🛠️ KONEKSI DATABASE (Global Cache Anti-Bocor)
 // ==========================================
 // Kita pindah ke atas agar bisa dipakai bersama oleh Sesi & API
+// ==========================================
+// 🛠️ KONEKSI DATABASE (Global Cache Anti-Zombie Vercel)
+// ==========================================
 let cached = global.mongoose;
 if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
 
 async function connectDB() {
-  if (cached.conn) return cached.conn;
+  // 1. Cek apakah koneksi masih hidup (readyState === 1)
+  if (cached.conn) {
+      if (mongoose.connection.readyState === 1) {
+          return cached.conn;
+      } else {
+          // Putuskan paksa jika terdeteksi koneksi mati suri (Zombie)
+          try { await mongoose.disconnect(); } catch (err) {}
+          cached.conn = null;
+          cached.promise = null;
+      }
+  }
+
   if (!cached.promise) {
     const opts = { 
         bufferCommands: false, 
-        serverSelectionTimeoutMS: 15000, // 👈 5 detik saja, biar tidak digantung Vercel
-        maxPoolSize: 10, // 👈 KUNCI: Batasi maksimal 10 koneksi per mesin Vercel
-        minPoolSize: 1,
-        family:4
+        serverSelectionTimeoutMS: 8000, // 8 detik (Aman dari batas 10 detik Vercel)
+        maxPoolSize: 10,
+        minPoolSize: 1
     };
     const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+    
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       console.log('✅ DATABASE TERHUBUNG!');
       return mongoose;
     });
   }
-  try { cached.conn = await cached.promise; } catch (e) { cached.promise = null; throw e; }
+  
+  try { cached.conn = await cached.promise; } 
+  catch (e) { cached.promise = null; throw e; }
   return cached.conn;
 }
 
@@ -132,14 +154,15 @@ async function connectDB() {
 // ==========================================
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
-
-// 1. Buat penyimpanan sesi login di MONGODB (Nebeng jalur Mongoose!)
-// 1. Buat penyimpanan sesi login di MONGODB (Jalur Mandiri Anti-Crash)
-// 1. Buat penyimpanan sesi login di MONGODB (Nebeng Mongoose Anti-Zombie)
 const MongoStore = require('connect-mongo');
+
+const MONGO_URI_SESSION = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+
 const sessionStore = MongoStore.create({ 
-    // 👇 KUNCI SAKTI VERCEL: Paksa connect-mongo nebeng ke fungsi connectDB()
-    clientPromise: connectDB().then(m => m.connection.getClient()),
+    mongoUrl: MONGO_URI_SESSION,
+    mongoOptions: {
+        serverSelectionTimeoutMS: 8000
+    },
     stringify: false,
     autoRemove: 'interval',
     autoRemoveInterval: 10
@@ -833,16 +856,117 @@ app.post('/api/creator/buyers', async (req, res) => {
     }
 });
 // ==========================================
-app.post('/api/register', async (req, res) => {
+// 📧 1. API KIRIM OTP PENDAFTARAN
+// ==========================================
+app.post('/api/send-otp', proteksiApiInternal, async (req, res) => {
     try {
-        const { username, email, password, role, fullName, phone } = req.body;
-        const cekEmail = await User.findOne({ email });
-        if(cekEmail) return res.status(400).json({ message: "Email sudah terdaftar!" });
+        const { email, username } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: "Email wajib diisi!" });
+
+        // Cek apakah Email atau Username sudah pernah dipakai
+        const cekUser = await User.findOne({ 
+            $or: [
+                { email: new RegExp('^' + email + '$', 'i') },
+                { username: new RegExp('^' + (username || '') + '$', 'i') }
+            ] 
+        });
+        
+        if (cekUser) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Email atau Username sudah terdaftar! Silakan gunakan yang lain." 
+            });
+        }
+
+        // Buat 6 angka acak untuk OTP
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Berlaku 5 menit
+
+        // Hapus OTP lama (jika ada) untuk email ini, lalu simpan OTP baru
+        await Otp.deleteMany({ email: email.toLowerCase() });
+        await Otp.create({ email: email.toLowerCase(), otp: otpCode, expiresAt });
+
+        // Kirim Email OTP
+        const mailOptions = {
+            from: '"RCELLFEST Security" <' + process.env.EMAIL_USER + '>',
+            to: email,
+            subject: `${otpCode} adalah Kode Verifikasi RCELLFEST Anda`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #0049CC, #2563eb); padding: 20px; text-align: center; color: white;">
+                        <h2 style="margin: 0; letter-spacing: 1px;">VERIFIKASI EMAIL</h2>
+                    </div>
+                    <div style="padding: 25px; text-align: center; color: #1e293b;">
+                        <p style="margin-top: 0;">Halo Calon Member <b>RCELLFEST</b>,</p>
+                        <p>Masukkan 6 angka kode OTP di bawah ini untuk menyelesaikan pendaftaran akun Anda:</p>
+                        <div style="margin: 25px auto; padding: 15px; background: #f1f5f9; border: 2px dashed #2563eb; border-radius: 10px; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0049CC; width: fit-content;">
+                            ${otpCode}
+                        </div>
+                        <p style="font-size: 12px; color: #64748b;">*Kode ini hanya berlaku selama <b>5 menit</b>. Jangan berikan kode ini kepada siapa pun.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: "Kode OTP berhasil dikirim ke email!" });
+
+    } catch (error) {
+        console.error("Gagal kirim OTP:", error);
+        res.status(500).json({ success: false, message: "Gagal mengirim email OTP." });
+    }
+});
+
+// ==========================================
+// 🔐 2. API REGISTER (WAJIB LOLOS OTP)
+// ==========================================
+app.post('/api/register', proteksiApiInternal, async (req, res) => {
+    try {
+        const { username, email, password, role, fullName, phone, otp } = req.body;
+
+        if (!otp) {
+            return res.status(400).json({ success: false, message: "Kode OTP wajib dimasukkan!" });
+        }
+
+        // Cari OTP di database
+        const validOtp = await Otp.findOne({ 
+            email: email.toLowerCase(), 
+            otp: otp.trim() 
+        });
+
+        if (!validOtp) {
+            return res.status(400).json({ success: false, message: "Kode OTP salah!" });
+        }
+
+        if (new Date() > validOtp.expiresAt) {
+            await Otp.deleteOne({ _id: validOtp._id });
+            return res.status(400).json({ success: false, message: "Kode OTP sudah kadaluarsa! Silakan minta ulang." });
+        }
+
+        // Cek ulang email biar super aman
+        const cekEmail = await User.findOne({ email: new RegExp('^' + email + '$', 'i') });
+        if (cekEmail) return res.status(400).json({ success: false, message: "Email sudah terdaftar!" });
+
+        // Simpan User Baru
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user', fullName, phone, saldo: 0 });
+        const newUser = new User({ 
+            username, 
+            email: email.toLowerCase(), 
+            password: hashedPassword, 
+            role: role || 'user', 
+            fullName, 
+            phone, 
+            saldo: 0 
+        });
         await newUser.save();
+
+        // Hapus OTP karena sudah terpakai
+        await Otp.deleteOne({ _id: validOtp._id });
+
         res.json({ success: true, message: "Registrasi Berhasil!" });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        res.status(500).json({ success: false, message: error.message }); 
+    }
 });
 
 app.post('/api/login', async (req, res) => {
