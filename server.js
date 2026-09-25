@@ -433,20 +433,49 @@ app.get('/api/ping', (req, res) => {
     res.status(200).send('pong');
 });
 
-app.get('/api/events', async (req, res) => {
+// 👇 SATPAM ANTI-PASTE DI BROWSER / INCOGNITO 👇
+const proteksiApiInternal = (req, res, next) => {
+    const fetchMode = req.headers['sec-fetch-mode'];
+    const referer = req.headers['referer'] || '';
+
+    // 1. Tolak jika dibuka langsung di tab browser (Address Bar)
+    if (fetchMode === 'navigate' || req.headers['sec-fetch-dest'] === 'document') {
+        return res.status(403).json({ 
+            error: "Akses Ditolak!", 
+            message: "Endpoint ini tidak bisa dibuka langsung melalui browser." 
+        });
+    }
+
+    // 2. Tolak jika dipanggil dari luar website (tidak ada referer dari web kita)
+    if (!referer) {
+        return res.status(403).json({ 
+            error: "Akses Ilegal!", 
+            message: "Permintaan harus berasal dari dalam sistem RCELLFEST." 
+        });
+    }
+
+    next(); // Jika aman (dipanggil oleh fetch HTML kita), silakan lanjut!
+};
+
+// --- API BACA SEMUA EVENT (Dilindungi Satpam) ---
+app.get('/api/events', proteksiApiInternal, async (req, res) => {
     try { 
         const events = await Event.find(); 
         const publicEvents = events.map(ev => {
             const eventObj = ev.toObject();
+            
+            // 🚨 WAJIB: Hapus secretData agar tidak bocor saat di-Inspect Element!
+            delete eventObj.secretData;
+
             if (eventObj.category === 'Streaming') {
                 eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
             }
-            // 👇 LOGIKA UNTUK MENYEMBUNYIKAN KODE RAHASIA TAPI MENGIRIM STATUS GEMBOK 👇
+            
             if (eventObj.tickets && eventObj.tickets.length > 0) {
                 eventObj.tickets = eventObj.tickets.map(t => ({
                     ...t,
-                    isLocked: !!t.accessCode, // Menjadi true jika ada kode rahasia
-                    accessCode: t.accessCode ? '***TERKUNCI***' : ''     // Hapus kode aslinya biar ga bisa di-inspect elemen!
+                    isLocked: !!t.accessCode,
+                    accessCode: t.accessCode ? '***TERKUNCI***' : ''
                 }));
             }
             return eventObj;
@@ -456,8 +485,8 @@ app.get('/api/events', async (req, res) => {
     catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- API BACA 1 EVENT DETAIL ---
-app.get('/api/events/:id', async (req, res) => {
+// --- API BACA 1 EVENT DETAIL (Dilindungi Satpam) ---
+app.get('/api/events/:id', proteksiApiInternal, async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(404).json({ message: "ID Event tidak valid" });
@@ -466,10 +495,14 @@ app.get('/api/events/:id', async (req, res) => {
         if (!event) return res.status(404).json({ message: "Event tidak ditemukan" });
         
         const eventObj = event.toObject();
+
+        // 🚨 WAJIB: Hapus secretData agar tidak bocor saat di-Inspect Element!
+        delete eventObj.secretData;
+
         if (eventObj.category === 'Streaming') {
             eventObj.description = "🔒 Detail akun (Email/Pass) akan muncul otomatis di menu Tiket Saya setelah pembayaran sukses.";
         }
-        // 👇 TAMBAHKAN BLOK INI BIAR KODE GA BOCOR 👇
+        
         if (eventObj.tickets && eventObj.tickets.length > 0) {
             eventObj.tickets = eventObj.tickets.map(t => ({
                 ...t,
@@ -477,7 +510,6 @@ app.get('/api/events/:id', async (req, res) => {
                 accessCode: t.accessCode ? '***TERKUNCI***' : ''
             }));
         }
-        // 👆 ------------------------------------ 👆
         res.json(eventObj);
     } catch (err) {
         res.status(500).json({ error: err.message });
