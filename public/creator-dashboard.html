@@ -1054,27 +1054,64 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
         // ==========================================
         // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR
         // ==========================================
+// ==========================================
+        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR (KALENDER & JAM)
+        // ==========================================
         let eoRundownsList = [];
 
-        function addEoRundownRow(time = '', title = '', stage = '', desc = '') {
+        function formatEoRangeDate(startStr, endStr) {
+            if (!startStr) return 'TBA';
+            const opt = { day: 'numeric', month: 'long', year: 'numeric' };
+            const d1 = new Date(startStr).toLocaleDateString('id-ID', { weekday: 'long', ...opt });
+            if (!endStr || endStr === startStr) return d1;
+            const dStartShort = new Date(startStr).toLocaleDateString('id-ID', opt);
+            const dEndShort = new Date(endStr).toLocaleDateString('id-ID', opt);
+            return `${dStartShort} - ${dEndShort}`;
+        }
+
+        function syncEoDefaultDates() {
+            const startVal = document.getElementById('eoRdStartDate').value;
+            document.querySelectorAll('#eoRdRowsContainer .rd-date').forEach(inp => {
+                if (!inp.value) inp.value = startVal;
+            });
+        }
+
+        function addEoRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '') {
             const container = document.getElementById('eoRdRowsContainer');
             if (!container) return;
+
+            let startT = '', endT = '';
+            if (time && time.includes('-')) {
+                const parts = time.replace('WIB', '').split('-');
+                startT = parts[0] ? parts[0].trim() : '';
+                endT = parts[1] ? parts[1].trim() : '';
+            }
+            const defaultDate = dateVal || document.getElementById('eoRdStartDate')?.value || '';
+
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 align-items-center eo-rd-row p-2 rounded-3';
             row.style.background = 'var(--input-bg)';
             row.style.border = '1px solid var(--border-color)';
             row.innerHTML = `
-                <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm rd-time" placeholder="18:30 - 19:30 WIB" value="${time}">
+                <div class="col-md-2">
+                    <small class="text-muted d-block d-md-none">Tanggal Tampil:</small>
+                    <input type="date" class="form-control form-control-sm rd-date" style="color-scheme: dark;" value="${defaultDate}" title="Pilih Tanggal Hari Tampil">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                        <input type="time" class="form-control rd-start" style="color-scheme: dark;" value="${startT}" title="Jam Mulai">
+                        <span class="input-group-text bg-dark border-secondary text-muted">-</span>
+                        <input type="time" class="form-control rd-end" style="color-scheme: dark;" value="${endT}" title="Jam Selesai">
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <input type="text" class="form-control form-control-sm rd-title fw-bold" placeholder="Nama Artis / Kegiatan" value="${title}">
                 </div>
                 <div class="col-md-2">
                     <input type="text" class="form-control form-control-sm rd-stage" placeholder="Main Stage" value="${stage}">
                 </div>
-                <div class="col-md-2">
-                    <input type="text" class="form-control form-control-sm rd-desc" placeholder="Catatan (Opsional)" value="${desc}">
+                <div class="col-md-1">
+                    <input type="text" class="form-control form-control-sm rd-desc" placeholder="Info" value="${desc}">
                 </div>
                 <div class="col-md-1 text-end">
                     <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.eo-rd-row').remove()"><i class="bi bi-trash"></i></button>
@@ -1090,14 +1127,19 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             document.getElementById('eoRdSlug').value = autoSlug;
             document.getElementById('eoRdEventName').value = ev.name;
             if (ev.date) {
-                document.getElementById('eoRdEventDate').value = new Date(ev.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                document.getElementById('eoRdStartDate').value = ev.date.split('T')[0];
+                syncEoDefaultDates();
+            }
+            if (ev.endDate) {
+                document.getElementById('eoRdEndDate').value = ev.endDate.split('T')[0];
+            } else {
+                document.getElementById('eoRdEndDate').value = '';
             }
         }
 
         async function loadCreatorRundowns() {
             if (!organizerInfo || !organizerInfo.id) return;
 
-            // 1. Pastikan daftar event EO sudah dimuat ke dropdown
             if (myEventsData.length === 0) await loadMyEvents();
             const selectEl = document.getElementById('eoRdSelectEvent');
             if (selectEl) {
@@ -1109,7 +1151,6 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             const rowContainer = document.getElementById('eoRdRowsContainer');
             if (rowContainer && rowContainer.children.length === 0) addEoRundownRow();
 
-            // 2. Muat daftar rundown khusus milik EO ini
             const listEl = document.getElementById('eoActiveRundownsList');
             if (!listEl) return;
             try {
@@ -1146,12 +1187,13 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             if (!rd) return;
             document.getElementById('eoRdSlug').value = rd.slug;
             document.getElementById('eoRdEventName').value = rd.eventName;
-            document.getElementById('eoRdEventDate').value = rd.eventDate || '';
+            document.getElementById('eoRdStartDate').value = rd.startDate || '';
+            document.getElementById('eoRdEndDate').value = rd.endDate || '';
 
             const container = document.getElementById('eoRdRowsContainer');
             container.innerHTML = '';
             if (rd.schedules && rd.schedules.length > 0) {
-                rd.schedules.forEach(s => addEoRundownRow(s.time, s.title, s.stage, s.description));
+                rd.schedules.forEach(s => addEoRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description));
             } else {
                 addEoRundownRow();
             }
@@ -1161,26 +1203,36 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
         async function saveEoRundown() {
             const slug = document.getElementById('eoRdSlug').value.trim();
             const eventName = document.getElementById('eoRdEventName').value.trim();
-            const eventDate = document.getElementById('eoRdEventDate').value.trim();
+            const startDate = document.getElementById('eoRdStartDate').value;
+            const endDate = document.getElementById('eoRdEndDate').value;
+            const eventDate = formatEoRangeDate(startDate, endDate);
 
-            if (!slug || !eventName) return Swal.fire('Data Kurang', 'Slug Link dan Nama Event wajib diisi!', 'warning');
+            if (!slug || !eventName || !startDate) return Swal.fire('Data Kurang', 'Slug, Nama Event, dan Tanggal Mulai wajib dipilih!', 'warning');
 
             const schedules = [];
             document.querySelectorAll('.eo-rd-row').forEach(row => {
-                const time = row.querySelector('.rd-time').value.trim();
+                const date = row.querySelector('.rd-date').value || startDate;
+                const startT = row.querySelector('.rd-start').value;
+                const endT = row.querySelector('.rd-end').value;
                 const title = row.querySelector('.rd-title').value.trim();
                 const stage = row.querySelector('.rd-stage').value.trim();
                 const description = row.querySelector('.rd-desc').value.trim();
-                if (time && title) schedules.push({ time, title, stage, description });
+
+                if (startT && title) {
+                    const time = endT ? `${startT} - ${endT} WIB` : `${startT} WIB`;
+                    schedules.push({ date, time, title, stage, description });
+                }
             });
 
-            if (schedules.length === 0) return Swal.fire('Jadwal Kosong', 'Tambahkan minimal 1 baris jam & kegiatan!', 'warning');
+            if (schedules.length === 0) return Swal.fire('Jadwal Kosong', 'Pilih Jam Mulai dan Nama Artis minimal 1 baris!', 'warning');
+
+            schedules.sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
             try {
                 const res = await fetch('/api/rundowns', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slug, eventName, eventDate, schedules, creatorId: organizerInfo.id })
+                    body: JSON.stringify({ slug, eventName, eventDate, startDate, endDate, schedules, creatorId: organizerInfo.id })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -1192,7 +1244,8 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
                     });
                     document.getElementById('eoRdSlug').value = '';
                     document.getElementById('eoRdEventName').value = '';
-                    document.getElementById('eoRdEventDate').value = '';
+                    document.getElementById('eoRdStartDate').value = '';
+                    document.getElementById('eoRdEndDate').value = '';
                     document.getElementById('eoRdRowsContainer').innerHTML = '';
                     addEoRundownRow();
                     loadCreatorRundowns();
