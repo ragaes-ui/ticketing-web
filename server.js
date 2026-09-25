@@ -1056,7 +1056,8 @@ app.post('/api/login', async (req, res) => {
             user: { 
                 id: user._id, username: user.username, email: user.email, 
                 role: user.role, fullName: user.fullName, phone: user.phone, 
-                saldo: user.saldo || 0, hasPin: !!user.pin 
+                saldo: user.saldo || 0, hasPin: !!user.pin,
+                avatar: user.avatar || "" // 👈 TAMBAHKAN INI
             } 
         });
     } catch (error) { res.status(500).json({ error: error.message }); }
@@ -1188,7 +1189,8 @@ app.get('/api/user/profile/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if(!user) return res.status(404).json({ message: "User tidak ditemukan" });
-        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin, role: user.role });
+        res.json({ id: user._id, username: user.username, email: user.email, fullName: user.fullName, saldo: user.saldo || 0, hasPin: !!user.pin, role: user.role,
+            avatar: user.avatar || "" // 👈 TAMBAHKAN INI });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
@@ -1855,27 +1857,34 @@ app.put('/api/user/change-password', async (req, res) => {
 // ==========================================
 // 🔥 ENDPOINT UPDATE AVATAR USER 🔥
 // ==========================================
-app.put('/api/user/update-avatar', async (req, res) => {
+// ==========================================
+// 🔥 ENDPOINT UPDATE AVATAR USER (AUTO-CLEAN SUPABASE) 🔥
+// ==========================================
+app.put('/api/user/update-avatar', proteksiApiInternal, async (req, res) => {
     try {
         const { userId, avatar } = req.body;
 
-        // Validasi input
         if (!userId || !avatar) {
             return res.status(400).json({ success: false, message: "User ID dan Avatar URL wajib dikirim!" });
         }
 
-        // Cari user di database dan update kolom avatar-nya
-        const updatedUser = await User.findByIdAndUpdate(
-            userId, 
-            { avatar: avatar }, 
-            { new: true } 
-        );
-
-        if (!updatedUser) {
+        // 1. Cari data user lama untuk mengecek apakah ada foto lama di Supabase
+        const oldUser = await User.findById(userId);
+        if (!oldUser) {
             return res.status(404).json({ success: false, message: "User tidak ditemukan." });
         }
 
-        res.json({ success: true, message: "Avatar berhasil diupdate!", data: updatedUser });
+        // 2. Jika foto lama berasal dari Supabase, hapus file lamanya agar hemat kuota
+        if (oldUser.avatar && oldUser.avatar.includes('supabase.co')) {
+            const oldFileName = oldUser.avatar.split('?')[0].split('/').pop();
+            await supabase.storage.from('rcell-images').remove([oldFileName]);
+        }
+
+        // 3. Simpan URL foto baru dari Supabase ke MongoDB
+        oldUser.avatar = avatar;
+        await oldUser.save();
+
+        res.json({ success: true, message: "Foto profil berhasil diperbarui!", data: oldUser });
 
     } catch (error) {
         console.error("Error update avatar:", error);
