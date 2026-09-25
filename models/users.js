@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     fullName: { type: String, default: '' },
     phone: { type: String, default: '' },
     saldo: { type: Number, default: 0 },
-    pin: { type: String }
+    pin: { type: String },
+    avatar: { type: String, default: "" }
 });
 
 module.exports = mongoose.model('User', userSchema);
