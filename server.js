@@ -64,7 +64,20 @@ const transferSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 const TransferHistory = mongoose.models.TransferHistory || mongoose.model('TransferHistory', transferSchema);
-
+// --- MODEL BARU: RUNDOWN EVENT ---
+const rundownSchema = new mongoose.Schema({
+    slug: { type: String, required: true, unique: true, lowercase: true }, // contoh: rcellfest-vol-3
+    eventName: { type: String, required: true },
+    eventDate: { type: String, default: '' },
+    schedules: [{
+        time: String,       // contoh: "19:00 - 20:00"
+        title: String,      // contoh: "Neck Deep / Open Gate"
+        stage: String,      // contoh: "Main Stage"
+        description: String // catatan tambahan
+    }],
+    updatedAt: { type: Date, default: Date.now }
+});
+const Rundown = mongoose.models.Rundown || mongoose.model('Rundown', rundownSchema);
 const app = express();
 app.set('trust proxy', true);
 app.use(cors());
@@ -100,7 +113,13 @@ app.use((req, res, next) => {
             return res.sendFile(path.join(process.cwd(), 'public', 'creator-dashboard.html'));
         }
     }
-    
+   // 👇 2. SUBDOMAIN RUNDOWN (rundown.rcellfest.my.id/namaevent) 👇
+    if (host && host.includes('rundown.rcellfest.my.id')) {
+        // Biarkan lewat jika sedang memanggil API atau file gambar/css
+        if (!req.path.startsWith('/api') && !req.path.includes('.')) {
+            return res.sendFile(path.join(process.cwd(), 'public', 'rundown.html'));
+        }
+    } 
     next();
 });
 // ==========================================
@@ -1982,7 +2001,59 @@ app.delete('/api/promos/:id', proteksiApiInternal, async (req, res) => {
     } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
+// ==========================================
+// ⏳ API MANAJEMEN RUNDOWN EVENT
+// ==========================================
 
+// 1. Ambil 1 Rundown berdasarkan nama link/slug (Publik)
+app.get('/api/rundown/:slug', proteksiApiInternal, async (req, res) => {
+    try {
+        const slug = req.params.slug.toLowerCase();
+        const data = await Rundown.findOne({ slug });
+        if (!data) return res.status(404).json({ success: false, message: "Rundown event tidak ditemukan!" });
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 2. Ambil Semua Daftar Rundown (Untuk Tabel Admin)
+app.get('/api/rundowns', proteksiApiInternal, async (req, res) => {
+    try {
+        const list = await Rundown.find().sort({ updatedAt: -1 });
+        res.json({ success: true, data: list });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 3. Simpan / Update Rundown dari Admin
+app.post('/api/rundowns', proteksiApiInternal, async (req, res) => {
+    try {
+        const { slug, eventName, eventDate, schedules } = req.body;
+        // Bersihkan spasi & karakter aneh pada slug (contoh: "Konser Akbar!" -> "konser-akbar")
+        const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+
+        const updated = await Rundown.findOneAndUpdate(
+            { slug: cleanSlug },
+            { slug: cleanSlug, eventName, eventDate, schedules, updatedAt: Date.now() },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, message: "Rundown berhasil disimpan!", data: updated });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 4. Hapus Rundown
+app.delete('/api/rundowns/:id', proteksiApiInternal, async (req, res) => {
+    try {
+        await Rundown.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Rundown dihapus!" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
