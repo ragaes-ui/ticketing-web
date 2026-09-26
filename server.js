@@ -137,71 +137,63 @@ app.use((req, res, next) => {
 // ==========================================
 // 🛠️ KONEKSI DATABASE (Global Cache Anti-Zombie Vercel)
 // ==========================================
+// ==========================================
+// 🛠️ KONEKSI DATABASE (Global Cache Anti-Zombie Vercel)
+// ==========================================
 let cached = global.mongoose;
 if (!cached) { cached = global.mongoose = { conn: null, promise: null }; }
 
 async function connectDB() {
-  // 1. Cek apakah koneksi masih hidup (readyState === 1)
-  if (cached.conn) {
-      if (mongoose.connection.readyState === 1) {
-          return cached.conn;
-      } else {
-          // Putuskan paksa jika terdeteksi koneksi mati suri (Zombie)
-          try { await mongoose.disconnect(); } catch (err) {}
-          cached.conn = null;
-          cached.promise = null;
-      }
-  }
+    if (cached.conn && mongoose.connection.readyState === 1) {
+        return cached.conn;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        cached.conn = null;
+        cached.promise = null;
+    }
 
-  if (!cached.promise) {
-    const opts = { 
-        bufferCommands: false, 
-        serverSelectionTimeoutMS: 8000, // 8 detik (Aman dari batas 10 detik Vercel)
-        maxPoolSize: 10,
-        minPoolSize: 1
-    };
-    const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+    if (!cached.promise) {
+        const opts = { 
+            bufferCommands: false, 
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+            maxPoolSize: 10,
+            minPoolSize: 1,
+            family: 4 // 👈 Paksa jalur IPv4 agar DNS Vercel ke Atlas langsung tembus
+        };
+        const MONGO_URI = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
+        
+        cached.promise = mongoose.connect(MONGO_URI, opts).then((m) => {
+            console.log('✅ DATABASE TERHUBUNG!');
+            return m;
+        });
+    }
     
-    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
-      console.log('✅ DATABASE TERHUBUNG!');
-      return mongoose;
-    });
-  }
-  
-  try { cached.conn = await cached.promise; } 
-  catch (e) { cached.promise = null; throw e; }
-  return cached.conn;
+    try { 
+        cached.conn = await cached.promise; 
+    } catch (e) { 
+        cached.promise = null; 
+        throw e; 
+    }
+    return cached.conn;
 }
 
 // ==========================================
-// 🛡️ KONFIGURASI KEYCLOAK SSO (SINGLE SIGN-ON)
+// 🛡️ KONFIGURASI KEYCLOAK SSO (TANPA CONNECT-MONGO)
 // ==========================================
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
-const MongoStore = require('connect-mongo');
 
-const MONGO_URI_SESSION = "mongodb+srv://konser_db:raga151204@cluster0.rutgg.mongodb.net/konser_db?retryWrites=true&w=majority";
-
-const sessionStore = MongoStore.create({ 
-    mongoUrl: MONGO_URI_SESSION,
-    mongoOptions: {
-        serverSelectionTimeoutMS: 8000
-    },
-    stringify: false,
-    autoRemove: 'interval',
-    autoRemoveInterval: 10
-});
-
-
+// Gunakan MemoryStore bawaan Express (Anti-Timeout & Tidak Membebani MongoDB)
+const memoryStore = new session.MemoryStore();
 
 app.use(session({
     secret: 'rcellfest-rahasia-super-aman', 
     resave: false,
-    saveUninitialized: true,
-    store: sessionStore
+    saveUninitialized: false,
+    store: memoryStore
 }));
 
-// 2. Data sambungan ke Cloud-IAM Kakak
 const keycloakConfig = {
     "realm": "auth-rcellpublic", 
     "auth-server-url": "https://lemur-7.cloud-iam.com/auth/", 
@@ -213,8 +205,7 @@ const keycloakConfig = {
     "confidential-port": 0
 };
 
-// 3. Nyalakan mesin Keycloak
-const keycloak = new Keycloak({ store: sessionStore }, keycloakConfig);
+const keycloak = new Keycloak({ store: memoryStore }, keycloakConfig);
 app.use(keycloak.middleware());
 
 // ==========================================
@@ -231,7 +222,7 @@ app.get(['/kiosk', '/kiosk.html'], (req, res) => {
 app.get('/logout', (req, res) => {
     if (req.session) {
         req.session.destroy((err) => {
-            if (err) console.error("Gagal menghapus session di DB:", err);
+            if (err) console.error("Gagal menghapus session:", err);
             const logoutUrl = keycloak.logoutUrl('https://rcellfest.vercel.app/index.html');
             res.redirect(logoutUrl); 
         });
@@ -245,11 +236,15 @@ app.use(express.static(path.join(process.cwd(), 'public'), {
     extensions: ['html']
 }));
 
-// Middleware koneksi DB di semua rute API
+// Middleware koneksi DB hanya untuk rute /api (kecuali /api/ping)
 app.use(async (req, res, next) => {
-    if (req.path.includes('.') && !req.path.startsWith('/api')) return next();
-    try { await connectDB(); next(); } 
-    catch (error) { res.status(500).json({ error: "Database Connection Failed", detail: error.message }); }
+    if (req.path === '/api/ping' || !req.path.startsWith('/api')) return next();
+    try { 
+        await connectDB(); 
+        next(); 
+    } catch (error) { 
+        res.status(500).json({ error: "Database Connection Failed", detail: error.message }); 
+    }
 });
 
 // ==========================================
