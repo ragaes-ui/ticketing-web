@@ -1731,7 +1731,29 @@ app.post('/api/validate', async (req, res) => {
                 });
             }
         }
+// 👇 PENCEGAT BATAS JAM TIKET EARLY ENTRY 👇
+        // Otomatis membaca batas jam yang diatur (contoh: "Early Entry (Max 15:00)")
+        const earlyTimeMatch = tierNameLower.match(/\(max\s*([0-2]?[0-9])[:.]([0-5][0-9])\)/i);
+        if (earlyTimeMatch) {
+            const maxHour = parseInt(earlyTimeMatch[1]);
+            const maxMinute = parseInt(earlyTimeMatch[2]);
 
+            // Ambil jam saat ini dalam WIB (Asia/Jakarta)
+            const wibNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+            const currentTotalMinutes = (wibNow.getHours() * 60) + wibNow.getMinutes();
+            const maxTotalMinutes = (maxHour * 60) + maxMinute;
+
+            // Tolak jika waktu scan sekarang melewati batas jam yang diatur!
+            if (currentTotalMinutes > maxTotalMinutes) {
+                const jamBatas = `${String(maxHour).padStart(2, '0')}:${String(maxMinute).padStart(2, '0')}`;
+                return res.json({
+                    valid: false,
+                    message: "BATAS WAKTU LEWAT!",
+                    detail: `Tiket "${ticket.tierName}" hanya berlaku untuk masuk sebelum pukul ${jamBatas} WIB.`
+                });
+            }
+        }
+        // 👆 ------------------------------------- 👆
         // JIKA TIKET TERUSAN (MULTI-DAY)
         if (multiDayMatch) {
             const maxDays = parseInt(multiDayMatch[1]);
