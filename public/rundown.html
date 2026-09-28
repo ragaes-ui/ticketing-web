@@ -374,12 +374,16 @@
         }
 
         // PENGATURAN BAHASA
+// PENGATURAN BAHASA
         function changeLang(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             applyLanguage();
-            if (allRundowns.length > 0) renderEventCards(allRundowns);
-            if (currentSchedules.length > 0) renderScheduleItems(currentSchedules);
+            if (allRundowns.length > 0) filterEventCards();
+            if (currentSchedules.length > 0) {
+                renderDayTabs();       // 👈 Ubah juga bahasa tanggal di tombol DAY 1, DAY 2, DAY 3 (Sel -> Tue)
+                filterScheduleItems(); // 👈 Tetap pisahkan jadwal sesuai tab Hari yang sedang aktif!
+            }
         }
 
         function applyLanguage() {
