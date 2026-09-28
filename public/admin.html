@@ -782,25 +782,47 @@
 
 function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
             let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : '';
+            
+            // Cek apakah tiket ini punya batas jam Early Entry (saat di-edit)
+            const eeMatch = n.match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
+            const isEarly = !!eeMatch;
+            const eeTime = eeMatch ? eeMatch[1] : '';
+            const cleanName = n.replace(/\s*\(Max\s*[0-2][0-9]:[0-5][0-9]\)/ig, '').trim();
+
             document.getElementById(id).insertAdjacentHTML('beforeend', `
                 <div class="tier-row">
                     <button type="button" class="btn btn-danger btn-remove-tier shadow-sm" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
-                    <!-- 👇 TAMBAHAN INPUT WAKTU BUKA DI SEBELAH NAMA TIKET 👇 -->
                     <div class="row g-2 mb-2">
                         <div class="col-7">
-                            <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${n}" placeholder="Nama Tiket (cth: VIP)" required>
+                            <input type="text" class="form-control form-control-sm mb-2 tier-name" value="${cleanName}" placeholder="Nama Tiket (cth: Early Entry / VIP)" required>
                         </div>
                         <div class="col-5">
                             <input type="datetime-local" class="form-control form-control-sm mb-2 tier-open" value="${o}" title="Waktu Penjualan Dibuka (Kosongkan jika langsung dijual)">
                         </div>
                     </div>
                     <div class="row g-2">
-                        <!-- 👇 INI UBAH JADI TYPE TEXT & DITAMBAH FORMAT RUPIAH 👇 -->
                         <div class="col-4"><input type="text" class="form-control form-control-sm tier-price fw-bold" value="${formatP}" placeholder="Harga (Rp)" required oninput="formatRupiah(this)"></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
                     </div>
-<!-- 👇 FITUR TIKET GEMBOK 👇 -->
+
+                    <!-- 👇 PENGATUR BATAS JAM EARLY ENTRY 👇 -->
+                    <div class="row g-2 mt-2 pt-2 border-top border-secondary border-opacity-50">
+                        <div class="col-12 col-md-5 d-flex align-items-center">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input tier-is-early" type="checkbox" role="switch" ${isEarly ? 'checked' : ''} onchange="toggleEarlyTime(this)">
+                                <label class="form-check-label small fw-bold text-info ms-1"><i class="bi bi-alarm-fill"></i> Early Entry?</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <div class="input-group input-group-sm tier-early-box" style="${isEarly ? 'display: flex;' : 'display: none;'}">
+                                <span class="input-group-text bg-dark border-secondary text-white-50">Batas Jam:</span>
+                                <input type="time" class="form-control form-control-sm tier-early-time" style="color-scheme: dark;" value="${eeTime}" ${isEarly ? 'required' : ''}>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 👇 FITUR TIKET GEMBOK 👇 -->
                     <div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50">
                         <div class="col-12 col-md-5 d-flex align-items-center">
                             <div class="form-check form-switch m-0">
@@ -812,8 +834,25 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                             <input type="text" class="form-control form-control-sm tier-access-code" value="${accessCode}" placeholder="Kode Rahasia (Misal: CREW26)" style="${isLocked ? '' : 'display: none;'}">
                         </div>
                     </div>
-                    <!-- 👆 ------------------ 👆 -->
                 </div>`);
+        }
+
+        // Fungsi memunculkan input jam saat switch Early Entry dinyalakan
+        function toggleEarlyTime(checkbox) {
+            const row = checkbox.closest('.tier-row');
+            const box = row.querySelector('.tier-early-box');
+            const timeInput = row.querySelector('.tier-early-time');
+            const nameInput = row.querySelector('.tier-name');
+
+            if (checkbox.checked) {
+                box.style.display = 'flex';
+                timeInput.setAttribute('required', 'true');
+                if (!nameInput.value.trim()) nameInput.value = 'Early Entry';
+            } else {
+                box.style.display = 'none';
+                timeInput.removeAttribute('required');
+                timeInput.value = '';
+            }
         }
 
         // Fungsi animasi untuk memunculkan kolom input kode
@@ -841,17 +880,28 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
         }
 
         // 👇 TARIK DATA DENGAN MENGHAPUS TITIK DI HARGANYA 👇
-        function getTiers(id) {
-            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => ({
-                tierName: r.querySelector('.tier-name').value, 
-                price: parseInt(r.querySelector('.tier-price').value.replace(/\./g, '')) || 0,
-                availableSeats: parseInt(r.querySelector('.tier-stock').value), 
-                totalSeats: parseInt(r.querySelector('.tier-stock').value),
-                minQty: parseInt(r.querySelector('.tier-min').value) || 1,
-                salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null,
-                isLocked: r.querySelector('.tier-is-locked').checked,
-                accessCode: r.querySelector('.tier-access-code').value
-            }));
+function getTiers(id) {
+            return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => {
+                let nameVal = r.querySelector('.tier-name').value.replace(/\s*\(Max\s*[0-2][0-9]:[0-5][0-9]\)/ig, '').trim();
+                const isEarly = r.querySelector('.tier-is-early')?.checked;
+                const earlyTime = r.querySelector('.tier-early-time')?.value;
+
+                // Jika Early Entry aktif, tempelkan batas jamnya ke nama tiket
+                if (isEarly && earlyTime) {
+                    nameVal = `${nameVal} (Max ${earlyTime})`;
+                }
+
+                return {
+                    tierName: nameVal, 
+                    price: parseInt(r.querySelector('.tier-price').value.replace(/\./g, '')) || 0,
+                    availableSeats: parseInt(r.querySelector('.tier-stock').value), 
+                    totalSeats: parseInt(r.querySelector('.tier-stock').value),
+                    minQty: parseInt(r.querySelector('.tier-min').value) || 1,
+                    salesOpenDate: r.querySelector('.tier-open').value ? r.querySelector('.tier-open').value + ':00+07:00' : null,
+                    isLocked: r.querySelector('.tier-is-locked').checked,
+                    accessCode: r.querySelector('.tier-access-code').value
+                };
+            });
         }
 
         document.getElementById('category').addEventListener('change', function() {
