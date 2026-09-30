@@ -164,9 +164,32 @@
         }
 
         /* TIMELINE RUNDOWN */
+/* TIMELINE RUNDOWN & KOLOM MULTI-STAGE */
         .timeline-wrapper {
-            max-width: 680px;
+            max-width: 1140px;
             margin: 10px auto 0;
+        }
+        .stage-column-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px 18px 10px;
+            height: 100%;
+        }
+        [data-theme="light"] .stage-column-box {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        .stage-column-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
         .timeline {
             position: relative;
@@ -301,15 +324,21 @@
         </div>
 
 <!-- WADAH 2: TIMELINE RUNDOWN (Muncul jika buka rundown.rcellfest.my.id/namaevent) -->
+<!-- WADAH 2: TIMELINE RUNDOWN (Muncul jika buka rundown.rcellfest.my.id/namaevent) -->
         <div id="rundownTimelineView" class="timeline-wrapper d-none">
             <!-- 👇 TOMBOL TAB PILIHAN HARI (DAY 1, DAY 2, DST) 👇 -->
             <div id="dayTabsContainer" class="d-flex justify-content-center gap-2 flex-wrap mb-3"></div>
 
-            <div class="search-wrapper mb-3">
+            <!-- 👇 TOMBOL FILTER STAGE (MUNCUL OTOMATIS JIKA > 1 PANGGUNG) 👇 -->
+            <div id="stageTabsContainer" class="d-flex justify-content-center gap-2 flex-wrap mb-3"></div>
+
+            <div class="search-wrapper mb-4">
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchScheduleItem" class="search-input" placeholder="Cari nama artis, kegiatan, atau panggung..." oninput="filterScheduleItems()">
             </div>
-            <div id="timelineList" class="timeline"></div>
+
+            <!-- 👇 WADAH KOLOM PANGGUNG (OTOMATIS PISAH KOLOM JIKA BEDA STAGE) 👇 -->
+            <div id="timelineList" class="row g-4 justify-content-center"></div>
         </div>
 
     </div>
@@ -576,13 +605,51 @@
             }).join('');
         }
 
+let selectedStage = 'ALL';
+
         function selectDayTab(dateStr) {
             selectedDayDate = dateStr;
+            selectedStage = 'ALL'; // Reset pilihan stage saat pindah hari
             renderDayTabs();
             filterScheduleItems();
         }
 
-function previewArtistPhoto(imgUrl, title) {
+        function selectStageTab(stageName) {
+            selectedStage = stageName;
+            filterScheduleItems();
+        }
+
+        function renderStageTabs(stagesInCurrentDay) {
+            const stageTabBox = document.getElementById('stageTabsContainer');
+            if (!stageTabBox) return;
+
+            // Kalau cuma ada 1 stage di hari tersebut, sembunyikan tombol filter stage
+            if (stagesInCurrentDay.length <= 1) {
+                stageTabBox.innerHTML = '';
+                return;
+            }
+
+            const allLabel = currentLang === 'id' ? 'Semua Panggung' : 'All Stages';
+            let html = `
+                <button onclick="selectStageTab('ALL')" class="btn btn-sm rounded-pill px-3 py-1 fw-semibold ${selectedStage === 'ALL' ? 'btn-info text-dark fw-bold' : 'nav-glass-btn'}" style="font-size: 0.8rem;">
+                    <i class="bi bi-columns-gap me-1"></i> ${allLabel}
+                </button>
+            `;
+
+            stagesInCurrentDay.forEach(stg => {
+                const safeStg = stg.replace(/'/g, "\\'");
+                const isActive = selectedStage === stg;
+                html += `
+                    <button onclick="selectStageTab('${safeStg}')" class="btn btn-sm rounded-pill px-3 py-1 fw-semibold ${isActive ? 'btn-info text-dark fw-bold' : 'nav-glass-btn'}" style="font-size: 0.8rem;">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${stg}
+                    </button>
+                `;
+            });
+
+            stageTabBox.innerHTML = html;
+        }
+
+        function previewArtistPhoto(imgUrl, title) {
             Swal.fire({
                 imageUrl: imgUrl,
                 imageAlt: title,
@@ -599,49 +666,101 @@ function previewArtistPhoto(imgUrl, title) {
             const t = dict[currentLang];
 
             if (!items || items.length === 0) {
-                timelineList.innerHTML = `<div class="text-center py-4" style="color: var(--text-muted);">${t.empty_search}</div>`;
+                timelineList.innerHTML = `<div class="col-12 text-center py-4" style="color: var(--text-muted);">${t.empty_search}</div>`;
                 return;
             }
 
-            timelineList.innerHTML = items.map((item, idx) => {
-                const safeTitle = (item.title || '').replace(/'/g, "\\'");
-                const photoHtml = item.image ? `
-                    <img src="${item.image}" alt="${safeTitle}" 
-                         onclick="previewArtistPhoto('${item.image}', '${safeTitle}')"
-                         style="width: 56px; height: 56px; object-fit: cover; border-radius: 14px; border: 2px solid var(--primary); cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"
-                         title="Klik untuk memperbesar foto">
-                ` : '';
+            // 1. Kelompokkan jadwal berdasarkan nama Stage
+            const groupedByStage = {};
+            items.forEach(item => {
+                const stgName = (item.stage || 'Main Stage').trim();
+                if (!groupedByStage[stgName]) groupedByStage[stgName] = [];
+                groupedByStage[stgName].push(item);
+            });
+
+            const stageNames = Object.keys(groupedByStage);
+
+            // 2. Tentukan lebar kolom otomatis (1 stage = tengah, 2 stage = bagi 2 kolom, 3+ stage = bagi 3 kolom)
+            let colClass = 'col-12 col-lg-8';
+            if (stageNames.length === 2) colClass = 'col-12 col-lg-6';
+            else if (stageNames.length >= 3) colClass = 'col-12 col-md-6 col-xl-4';
+
+            // 3. Render masing-masing kolom Stage
+            timelineList.innerHTML = stageNames.map(stgName => {
+                const stageItems = groupedByStage[stgName];
+
+                const itemsHtml = stageItems.map((item, idx) => {
+                    const safeTitle = (item.title || '').replace(/'/g, "\\'");
+                    const photoHtml = item.image ? `
+                        <img src="${item.image}" alt="${safeTitle}" 
+                             onclick="previewArtistPhoto('${item.image}', '${safeTitle}')"
+                             style="width: 56px; height: 56px; object-fit: cover; border-radius: 14px; border: 2px solid var(--primary); cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"
+                             title="Klik untuk memperbesar foto">
+                    ` : '';
+
+                    return `
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                <span class="time-badge"><i class="bi bi-clock-fill"></i> ${item.time}</span>
+                                <span class="session-number">${t.lbl_session_num} ${idx + 1}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 mt-2">
+                                ${photoHtml}
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color: var(--text-main);">${item.title}</h5>
+                                    ${item.description ? `<p class="small mb-0 mt-1" style="color: var(--text-muted);">${item.description}</p>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
 
                 return `
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                        <span class="time-badge"><i class="bi bi-clock-fill"></i> ${item.time}</span>
-                        <span class="stage-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i>${item.stage || 'Main Stage'}</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 mt-2">
-                        ${photoHtml}
-                        <div>
-                            <h5 class="fw-bold mb-0" style="color: var(--text-main);">${item.title}</h5>
-                            ${item.description ? `<p class="small mb-0 mt-1" style="color: var(--text-muted);">${item.description}</p>` : ''}
+                    <div class="${colClass}">
+                        <div class="stage-column-box">
+                            <div class="stage-column-header">
+                                <div class="fw-bolder fs-6 d-flex align-items-center gap-2">
+                                    <i class="bi bi-geo-alt-fill text-danger"></i>
+                                    <span>${stgName.toUpperCase()}</span>
+                                </div>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill">
+                                    ${stageItems.length} ${t.lbl_sessions}
+                                </span>
+                            </div>
+                            <div class="timeline">
+                                ${itemsHtml}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `}).join('');
+                `;
+            }).join('');
         }
-
-        function filterScheduleItems() {
+function filterScheduleItems() {
             const q = document.getElementById('searchScheduleItem').value.toLowerCase();
-            const filtered = currentSchedules.filter(item => {
-                const matchDay = (selectedDayDate === 'ALL' || !item.date || item.date === selectedDayDate);
+
+            // 1. Saring berdasarkan Hari yang aktif dulu
+            const itemsInDay = currentSchedules.filter(item => 
+                selectedDayDate === 'ALL' || !item.date || item.date === selectedDayDate
+            );
+
+            // 2. Ambil daftar nama Stage unik yang ada di hari tersebut untuk tombol filter atas
+            const stagesInDay = [...new Set(itemsInDay.map(i => (i.stage || 'Main Stage').trim()))];
+            renderStageTabs(stagesInDay);
+
+            // 3. Saring berdasarkan Stage (jika dipilih salah satu) & kata kunci pencarian
+            const finalFiltered = itemsInDay.filter(item => {
+                const stgName = (item.stage || 'Main Stage').trim();
+                const matchStage = (selectedStage === 'ALL' || stgName === selectedStage);
                 const matchSearch = !q || 
                     (item.title && item.title.toLowerCase().includes(q)) ||
                     (item.time && item.time.toLowerCase().includes(q)) ||
-                    (item.stage && item.stage.toLowerCase().includes(q)) ||
+                    stgName.toLowerCase().includes(q) ||
                     (item.description && item.description.toLowerCase().includes(q));
-                return matchDay && matchSearch;
+                return matchStage && matchSearch;
             });
-            renderScheduleItems(filtered);
+
+            renderScheduleItems(finalFiltered);
         }
 
         function shareRundownLink() {
