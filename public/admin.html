@@ -421,13 +421,19 @@
             </div>
 
             <!-- ===================== TAB 5: KELOLA PROMO ===================== -->
-<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
+<!-- ===================== TAB 5: KELOLA PROMO ===================== -->
+            <div class="tab-pane fade" id="promo-pane" role="tabpanel">
+                <div class="glass-card">
+                    <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i>Kelola Kode Promo</h5>
+                    
+                    <form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
                         <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Target Event Promo</label>
                             <select id="promoEventId" class="form-select text-white" onchange="updatePromoTierDropdown()" required></select>
                         </div>
                         <div class="col-md-4">
                             <label class="small text-info fw-bold mb-1">Target Tipe Tiket</label>
+                            <!-- 👇 INI UBAHANNYA: JADI DROPDOWN 👇 -->
                             <select id="promoTierName" class="form-select text-white">
                                 <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
                             </select>
@@ -1013,6 +1019,9 @@ document.getElementById('editTiers').innerHTML = '';
 
 // --- MANAJEMEN PROMO ---
 // Fungsi otomatis menarik daftar nama tiket berdasarkan Event yang dipilih
+// --- MANAJEMEN PROMO ---
+        
+        // 👇 FUNGSI BARU: Tarik data tier tiket berdasarkan event yang dipilih
         function updatePromoTierDropdown() {
             const eventId = document.getElementById('promoEventId').value;
             const tierSelect = document.getElementById('promoTierName');
@@ -1040,7 +1049,7 @@ document.getElementById('editTiers').innerHTML = '';
                 eventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
                 promoSelect.innerHTML = opts;
                 
-                updatePromoTierDropdown(); // 👈 Panggil fungsi update dropdown
+                updatePromoTierDropdown(); // 👈 Panggil agar dropdown tiket ikut terisi
             }
 
             // 2. RENDER KARTU PROMO
@@ -1067,7 +1076,7 @@ document.getElementById('editTiers').innerHTML = '';
             // Tangkap Event ID dan Nama Event dari Dropdown
             const promoSelect = document.getElementById('promoEventId');
             const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
-            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
+            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL'; // 👈 Ambil nilai dropdown tiket
 
             const data = { 
                 code: document.getElementById('promoCode').value, 
