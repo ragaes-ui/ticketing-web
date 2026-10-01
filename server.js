@@ -44,6 +44,7 @@ const promoSchema = new mongoose.Schema({
     // 👇 TAMBAHKAN 2 BARIS INI BIAR DATANYA NGGAK DIBUANG 👇
     eventId: { type: String, default: 'ALL' },
     eventName: { type: String, default: 'SEMUA EVENT' },
+    tierName: { type: String, default: 'ALL' } // 👈 TAMBAHAN TARGET TIPE TIKET
     // 👆 ---------------------------------------------- 👆
 });
 const Promo = mongoose.models.Promo || mongoose.model('Promo', promoSchema);
@@ -1963,17 +1964,24 @@ app.post('/api/maintenance', async (req, res) => {
 });
 
 // --- 1. CEK KODE PROMO SAAT CHECKOUT (Dilindungi Satpam) ---
+// --- 1. CEK KODE PROMO SAAT CHECKOUT ---
 app.post('/api/check-promo', proteksiApiInternal, async (req, res) => {
     try {
-        const { code } = req.body;
+        // 👇 Tangkap juga tierName dari halaman checkout
+        const { code, eventId, tierName } = req.body; 
         const promo = await Promo.findOne({ code: code.toUpperCase() });
 
         if (!promo) return res.json({ valid: false, message: "Kode promo tidak ditemukan." });
         if (promo.quota <= 0) return res.json({ valid: false, message: "Kuota promo habis." });
         
-        // Pengecekan ketat promo spesifik event
-        if (promo.eventId && promo.eventId !== 'ALL' && promo.eventId !== req.body.eventId) {
-            return res.status(400).json({ valid: false, message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
+        // Pengecekan ketat event
+        if (promo.eventId && promo.eventId !== 'ALL' && promo.eventId !== eventId) {
+            return res.json({ valid: false, message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
+        }
+        
+        // 👇 PENGECEKAN KETAT TIPE TIKET (TIER) 👇
+        if (promo.tierName && promo.tierName !== 'ALL' && tierName && promo.tierName.toLowerCase() !== tierName.toLowerCase()) {
+            return res.json({ valid: false, message: `Ups! Kode promo ini khusus untuk pembelian tiket tipe: ${promo.tierName}.` });
         }
         
         if (new Date() > promo.expiresAt) return res.json({ valid: false, message: "Kode promo sudah kadaluarsa." });
@@ -1992,9 +2000,11 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 });
 
 // --- 3. SIMPAN PROMO BARU (Dilindungi Satpam) ---
+// --- 3. SIMPAN PROMO BARU ---
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
-        const { code, discount, quota, daysActive, eventId, eventName } = req.body;
+        // 👇 Tangkap tierName dari Form Admin/EO
+        const { code, discount, quota, daysActive, eventId, eventName, tierName } = req.body;
         
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
@@ -2005,7 +2015,8 @@ app.post('/api/promos', proteksiApiInternal, async (req, res) => {
             quota: quota, 
             expiresAt: expiresAt,
             eventId: eventId,      
-            eventName: eventName   
+            eventName: eventName,
+            tierName: tierName || 'ALL' // 👈 Simpan target tiket
         });
 
         await newPromo.save();
