@@ -405,9 +405,20 @@
         <div class="content-area d-none" id="promoArea">
             <div class="card-custom">
                 <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i><span data-i18n="menu_promo">Kelola Kode Promo</span></h5>
-                <form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
-                    <div class="col-md-6"><label class="form-label" data-i18n="lbl_promo_target">Target Event</label><select id="promoEventId" class="form-select" required></select></div>
-                    <div class="col-md-6"><label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label><input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required></div>
+<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
+<div class="col-md-4">
+    <label class="form-label" data-i18n="lbl_promo_target">Target Event</label>
+    <select id="promoEventId" class="form-select" onchange="updatePromoTierDropdown()" required></select>
+</div>
+<!-- 👇 UBAH JADI DROPDOWN OTOMATIS 👇 -->
+<div class="col-md-4">
+    <label class="form-label text-info">Target Tipe Tiket</label>
+    <select id="promoTierName" class="form-select">
+        <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
+    </select>
+</div>
+    <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label><input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required></div>
+    <!-- (Kolom diskon, kuota, hari biarkan saja sama) -->
                     <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_disc">Potongan (Rp)</label><input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)"></div>
                     <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label><input type="number" id="promoQuota" class="form-control" placeholder="100" required></div>
                     <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_days">Masa Aktif (Hari)</label><input type="number" id="promoDays" class="form-control" placeholder="7" required></div>
@@ -620,7 +631,7 @@
             }
         };
 
-        let organizerInfo = null; let myEventsData = []; let myChart = null; 
+let organizerInfo = null; let myEventsData = []; let myChart = null; 
         let myBuyersData = []; let currentFilteredBuyers = [];
         
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -636,7 +647,6 @@
             
             const savedTheme = localStorage.getItem('creatorTheme') || 'dark'; document.documentElement.setAttribute('data-theme', savedTheme); updateThemeIcon(savedTheme);
             const savedLang = localStorage.getItem('creatorLang') || 'id'; updateLanguage(savedLang);
-            // 👇 TAMBAHKAN 2 BARIS INI UNTUK MEMBUKA MENU TERAKHIR 👇
             const lastMenu = localStorage.getItem('lastCreatorMenu') || 'dashboard';
             switchMenu(lastMenu);
             
@@ -646,15 +656,11 @@
             const scanInput = document.getElementById('scanInputData');
             if (scanInput) scanInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); prosesScanManual(); } });
             
-            // Listeners Filter Buyers
-// Listeners Filter Buyers
-// Listeners Filter Buyers
             document.getElementById('filterDay').addEventListener('change', () => { document.getElementById('filterMonth').value = ''; document.getElementById('filterYear').value = ''; filterBuyers(); }); 
             document.getElementById('filterMonth').addEventListener('change', () => { document.getElementById('filterDay').value = ''; document.getElementById('filterYear').value = ''; filterBuyers(); }); 
             document.getElementById('filterYear').addEventListener('change', () => { document.getElementById('filterDay').value = ''; document.getElementById('filterMonth').value = ''; filterBuyers(); }); 
             document.getElementById('searchBuyer').addEventListener('keyup', filterBuyers);
 
-            // 👇 SAPU PEMBERSIH ANTI-NYANGKUT UNTUK SEMUA MODAL DI HP 👇
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('hidden.bs.modal', function () {
                     document.body.classList.remove('modal-open');
@@ -663,10 +669,8 @@
                     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
                 });
             });
-            // 👆 -------------------------------------------------- 👆
-
         });
-        // 👇 FUNGSI OTOMATIS KASIH TITIK RUPIAH 👇
+
         function formatRupiah(input) {
             let angka = input.value.replace(/[^0-9]/g, '');
             input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
@@ -676,21 +680,12 @@
         function toggleLanguage() { const newLang = (localStorage.getItem('creatorLang') || 'id') === 'id' ? 'en' : 'id'; localStorage.setItem('creatorLang', newLang); updateLanguage(newLang); }
         function updateLanguage(lang) { const t = translations[lang]; document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(t[key]) el.innerHTML = t[key]; }); document.getElementById('lang-btn').innerText = lang.toUpperCase(); }
         function logoutCreator() { 
-            // Hapus data sesi
             localStorage.removeItem('organizerToken'); 
             localStorage.removeItem('organizerData'); 
-            
-            // Gunakan 'replace' agar halaman dasbor dihapus dari riwayat browser
             window.location.replace('/creator-auth'); 
         }
 
-        // ==========================================
-        // NAVIGASI MENU KIRI
-        // ==========================================
-// ==========================================
-        // NAVIGASI MENU KIRI (DENGAN EFEK LOADING)
-        // ==========================================
-function switchMenu(menuName) {
+        function switchMenu(menuName) {
             const loader = document.getElementById('menuLoader');
             loader.classList.add('show');
 
@@ -712,23 +707,16 @@ function switchMenu(menuName) {
                 else if (menuName === 'rundown') { document.querySelectorAll('.nav-item-side')[6].classList.add('active'); document.getElementById('rundownArea').classList.remove('d-none'); document.getElementById('pageTitle').innerText = "Kelola Rundown"; loadCreatorRundowns(); }
                 
                 if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
-
                 loader.classList.remove('show');
             }, 300);
         }
 
-        // ==========================================
-        // STATISTIK DASHBOARD & PDF
-        // ==========================================
         async function loadDashboardStats() {
             try { const res = await fetch('/api/creator/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId: organizerInfo.id }) }); if (res.ok) { const data = await res.json(); document.getElementById('statPendapatan').innerText = `Rp ${data.totalPendapatan.toLocaleString('id-ID')}`; document.getElementById('statTiket').innerText = data.totalTiket; document.getElementById('statTotalEvents').innerText = data.totalEvent; const tbody = document.getElementById('tabelLaporanEO'); if(data.transaksiTerbaru.length === 0) { tbody.innerHTML = `<tr><td class="text-center py-4 text-muted">${translations[localStorage.getItem('creatorLang') || 'id'].txt_no_trx}</td></tr>`; } else { tbody.innerHTML = data.transaksiTerbaru.map(trx => `<tr><td><div class="fw-bold">${trx.customerName}</div><div class="text-muted" style="font-size:0.7rem;">${trx.eventName}</div></td><td class="text-end"><span class="text-success fw-bold">+Rp ${trx.price.toLocaleString('id-ID')}</span><br><span class="badge bg-primary" style="font-size: 0.6rem;">${trx.paymentMethod}</span></td></tr>`).join(''); } renderChart(data.chartLabels, data.chartValues); } } catch (e) {}
         }
         function renderChart(labels, values) { const ctx = document.getElementById('revenueChart'); if (myChart) myChart.destroy(); const theme = document.documentElement.getAttribute('data-theme'); const tickColor = theme === 'dark' ? 'rgba(255,255,255,0.6)' : '#64748b'; const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'; myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: values, borderColor: '#00c6ff', backgroundColor: 'rgba(0,198,255,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#0072ff', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: gridColor }, ticks: { color: tickColor } }, x: { grid: { display: false }, ticks: { color: tickColor } } } } }); }
         function cetakLaporanEO() { const area = document.getElementById('dashboardArea'); const theme = document.documentElement.getAttribute('data-theme'); const bgColor = theme === 'dark' ? '#0f172a' : '#f1f5f9'; html2pdf().set({ margin: 0.5, filename: `Laporan_${organizerInfo.organizerName}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: bgColor }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(area).save(); }
 
-        // ==========================================
-        // 🔥 FITUR DATA PEMBELI & CETAK TIKET GELANG 🔥
-        // ==========================================
         async function loadBuyers() {
             const tbody = document.getElementById('tableBuyerList'); const t = translations[localStorage.getItem('creatorLang') || 'id'];
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-info spinner-border-sm me-2"></div> ${t.txt_loading}</td></tr>`;
@@ -738,23 +726,17 @@ function switchMenu(menuName) {
                     myBuyersData = responseData.data || []; 
                     currentFilteredBuyers = myBuyersData; 
                     
-                    // 👇 LOGIKA DETEKSI TAHUN OTOMATIS DARI DATA TRANSAKSI 👇
                     const uniqueYears = [...new Set(myBuyersData.map(b => new Date(b.date).getFullYear()))].sort((a, b) => b - a);
                     const yearSelect = document.getElementById('filterYear');
-                    const selectedBefore = yearSelect.value; // Ingat pilihan sebelumnya
+                    const selectedBefore = yearSelect.value;
                     
                     let optHtml = '<option value="">Semua Tahun</option>';
-                    uniqueYears.forEach(y => { 
-                        if (!isNaN(y)) optHtml += `<option value="${y}">${y}</option>`; 
-                    });
+                    uniqueYears.forEach(y => { if (!isNaN(y)) optHtml += `<option value="${y}">${y}</option>`; });
                     
                     yearSelect.innerHTML = optHtml;
-                    yearSelect.value = selectedBefore; // Kembalikan ke pilihan user (kalau ada)
-                    // 👆 ------------------------------------------------ 👆
-
+                    yearSelect.value = selectedBefore;
                     renderBuyerTable(myBuyersData); 
-                }
-                else { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat.</td></tr>`; } }
+                } else { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat.</td></tr>`; } }
             } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Koneksi terputus.</td></tr>`; }
         }
 
@@ -795,18 +777,84 @@ function switchMenu(menuName) {
         }
 
         // ==========================================
-        // KELOLA PROMO, SETTINGS, SCAN, DLL (TETAP SAMA)
+        // MANAJEMEN PROMO
         // ==========================================
-        async function loadPromos() { const promoSelect = document.getElementById('promoEventId'); if (myEventsData.length > 0) { let opts = myEventsData.length > 1 ? '<option value="ALL">-- Berlaku Untuk Semua Event Saya --</option>' : ''; myEventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; }); promoSelect.innerHTML = opts; } else { promoSelect.innerHTML = '<option value="">Buat event terlebih dahulu</option>'; } try { const res = await fetch('/api/promos'); const allPromos = await res.json(); const myEventIds = myEventsData.map(e => e._id.toString()); const myPromos = allPromos.filter(p => p.eventId === 'ALL' || myEventIds.includes(p.eventId)); const promoListHTML = document.getElementById('promoList'); if(myPromos.length === 0) { promoListHTML.innerHTML = `<div class="text-muted col-12">Belum ada promo.</div>`; } else { promoListHTML.innerHTML = myPromos.map(p => `<div class="col-md-6 col-lg-4"><div class="promo-ticket m-0 h-100"><div><b class="text-warning fs-5">${p.code}</b><br><span class="badge bg-success text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT SAYA'}</span><br><small class="text-muted">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="fw-bold">${p.quota}</span></small></div><button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></div></div>`).join(''); } } catch(e) { } }
-        document.getElementById('formPromo').addEventListener('submit', async (e) => { e.preventDefault(); const promoSelect = document.getElementById('promoEventId'); if(!promoSelect.value) return Swal.fire('Error', 'Buat event dulu!', 'warning'); const data = { code: document.getElementById('promoCode').value, discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, quota: document.getElementById('promoQuota').value, daysActive: document.getElementById('promoDays').value, eventId: promoSelect.value, eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text }; await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); e.target.reset(); loadPromos(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' }); });
+        function updatePromoTierDropdown() {
+            const eventId = document.getElementById('promoEventId').value;
+            const tierSelect = document.getElementById('promoTierName');
+            let html = '<option value="ALL">-- Berlaku Untuk Semua Tiket --</option>';
+
+            if (eventId !== 'ALL') {
+                const ev = myEventsData.find(e => e._id === eventId);
+                if (ev && ev.tickets && ev.tickets.length > 0) {
+                    ev.tickets.forEach(t => {
+                        html += `<option value="${t.tierName}">${t.tierName}</option>`;
+                    });
+                }
+            }
+            tierSelect.innerHTML = html;
+        }
+
+        async function loadPromos() { 
+            const promoSelect = document.getElementById('promoEventId'); 
+            if (myEventsData.length > 0) { 
+                let opts = myEventsData.length > 1 ? '<option value="ALL">-- Berlaku Untuk Semua Event Saya --</option>' : ''; 
+                myEventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; }); 
+                promoSelect.innerHTML = opts; 
+                updatePromoTierDropdown();
+            } else { 
+                promoSelect.innerHTML = '<option value="">Buat event terlebih dahulu</option>'; 
+            } 
+            try { 
+                const res = await fetch('/api/promos'); 
+                const allPromos = await res.json(); 
+                const myEventIds = myEventsData.map(e => e._id.toString()); 
+                const myPromos = allPromos.filter(p => p.eventId === 'ALL' || myEventIds.includes(p.eventId)); 
+                const promoListHTML = document.getElementById('promoList'); 
+                if(myPromos.length === 0) { 
+                    promoListHTML.innerHTML = `<div class="text-muted col-12">Belum ada promo.</div>`; 
+                } else { 
+                    promoListHTML.innerHTML = myPromos.map(p => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="promo-ticket m-0 h-100">
+                            <div>
+                                <b class="text-warning fs-5">${p.code}</b><br>
+                                <span class="badge bg-success text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT SAYA'}</span><br>
+                                <span class="badge bg-secondary text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-ticket-detailed"></i> ${p.tierName === 'ALL' ? 'SEMUA TIKET' : p.tierName}</span><br>
+                                <small class="text-muted">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="fw-bold">${p.quota}</span></small>
+                            </div>
+                            <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>`).join(''); 
+                } 
+            } catch(e) { } 
+        }
+
+        document.getElementById('formPromo').addEventListener('submit', async (e) => { 
+            e.preventDefault(); 
+            const promoSelect = document.getElementById('promoEventId'); 
+            if(!promoSelect.value) return Swal.fire('Error', 'Buat event dulu!', 'warning'); 
+            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
+            const data = { 
+                code: document.getElementById('promoCode').value, 
+                discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
+                quota: document.getElementById('promoQuota').value, 
+                daysActive: document.getElementById('promoDays').value, 
+                eventId: promoSelect.value, 
+                eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text, 
+                tierName: tierVal 
+            }; 
+            await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+            e.target.reset(); 
+            loadPromos(); 
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
+        });
+
         async function hapusPromo(id) { await fetch(`/api/promos/${id}`, { method: 'DELETE' }); loadPromos(); }
 
+        // SETTINGS & LOGIC LAIN
         function openSettingsModal() { 
-            // 1. Tutup sidebar otomatis di HP biar tidak nyangkut di belakang
-            if (window.innerWidth <= 768) { 
-                document.getElementById('sidebar').classList.remove('show'); 
-            }
-            // 2. Baru tampilkan modalnya
+            if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); }
             settingsModal.show(); 
         }
         async function saveEoName() { const newName = document.getElementById('settingName').value.trim(); if (!newName) return Swal.fire('Error', 'Nama kosong', 'warning'); try { const res = await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, newName: newName }) }); if (res.ok) { organizerInfo.organizerName = newName; localStorage.setItem('organizerData', JSON.stringify(organizerInfo)); document.getElementById('eoNameDisplay').innerText = newName; document.getElementById('dashEoName').innerText = newName; Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Nama diubah', showConfirmButton:false, timer:2000, background: 'var(--bg-card)', color: 'var(--text-main)' }); } } catch (err) {} }
@@ -814,23 +862,11 @@ function switchMenu(menuName) {
         async function saveEoPin() {
             const oldPin = document.getElementById('settingOldPin').value;
             const newPin = document.getElementById('settingNewPin').value;
-            
-            // Validasi PIN (Harus 6 angka bulat)
-            if (!newPin || newPin.length !== 6 || isNaN(newPin)) {
-                return Swal.fire('Peringatan', 'PIN Baru harus terdiri dari 6 angka!', 'warning');
-            }
-
+            if (!newPin || newPin.length !== 6 || isNaN(newPin)) { return Swal.fire('Peringatan', 'PIN Baru harus terdiri dari 6 angka!', 'warning'); }
             try {
-                // Tembak API set-pin yang sudah ada di server.js
-                const res = await fetch('/api/user/set-pin', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ userId: organizerInfo.id, oldPin: oldPin, newPin: newPin }) 
-                });
-                
+                const res = await fetch('/api/user/set-pin', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: organizerInfo.id, oldPin: oldPin, newPin: newPin }) });
                 const data = await res.json();
-
-                if (res.ok && data.success !== false) { // Beberapa API mengembalikan success: true atau sekadar pesan
+                if (res.ok && data.success !== false) { 
                     Swal.fire({ icon:'success', title:'Berhasil', text: data.message || 'PIN Keamanan berhasil disimpan!', background: 'var(--bg-card)', color: 'var(--text-main)' });
                     document.getElementById('settingOldPin').value = ''; 
                     document.getElementById('settingNewPin').value = ''; 
@@ -838,77 +874,50 @@ function switchMenu(menuName) {
                 } else {
                     Swal.fire({ icon:'error', title:'Gagal', text: data.message || 'PIN Lama salah. Gagal menyimpan.', background: 'var(--bg-card)', color: 'var(--text-main)' });
                 }
-            } catch (err) {
-                Swal.fire('Error', 'Koneksi ke server terputus', 'error');
-            }
+            } catch (err) { Swal.fire('Error', 'Koneksi ke server terputus', 'error'); }
         }
         async function prosesScanManual() { const input = document.getElementById('scanInputData'); const code = input.value.trim(); const alertBox = document.getElementById('scanResultAlert'); if (!code) return; const btn = document.getElementById('btnScanManual'); btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`; btn.disabled = true; try { const response = await fetch('/api/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticketCode: code }) }); const data = await response.json(); alertBox.style.display = 'block'; if (data.valid) { alertBox.className = 'alert alert-success border-success text-start text-dark'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-check-circle-fill me-2"></i> TIKET VALID!</h4><hr><p class="mb-1"><b>Nama:</b> ${data.data.name}</p><p class="mb-1"><b>Event:</b> ${data.data.event}</p><p class="mb-0 text-success fw-bold">${data.data.info || 'Akses Masuk Diizinkan.'}</p>`; input.value = ''; } else { alertBox.className = 'alert alert-danger border-danger text-start text-dark'; alertBox.innerHTML = `<h4 class="alert-heading fw-bold"><i class="bi bi-x-octagon-fill me-2"></i> ${data.message}</h4><hr><p class="mb-0">${data.detail}</p>`; input.select(); } } catch (error) { alertBox.style.display = 'block'; alertBox.className = 'alert alert-warning border-warning'; alertBox.innerHTML = `<i class="bi bi-wifi-off me-2"></i> Sinyal terputus.`; } finally { btn.innerHTML = `<i class="bi bi-upc-scan me-2"></i> Verifikasi Tiket`; btn.disabled = false; input.focus(); } }
-function previewImage(u, i) { const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u; if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; } if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; } }
-        // 👇 Fungsi pratinjau file lokal 👇
-function previewLocalImage(input, imgId, txtId) {
-    const img = document.getElementById(imgId);
-    const txt = txtId ? document.getElementById(txtId) : null;
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            img.src = e.target.result;
-            img.style.display = 'block';
-            if (txt) txt.style.display = 'none';
+        function previewImage(u, i) { const img = document.getElementById(i); const txt = document.getElementById(i === 'addPreview' ? 'addTxt' : ''); let fUrl = u; if (u && u.includes('drive.google.com')) { const m = u.match(/[-\w]{25,}/); if (m) fUrl = `https://lh3.googleusercontent.com/d/${m[0]}`; } if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; } }
+        function previewLocalImage(input, imgId, txtId) {
+            const img = document.getElementById(imgId);
+            const txt = txtId ? document.getElementById(txtId) : null;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { img.src = e.target.result; img.style.display = 'block'; if (txt) txt.style.display = 'none'; }
+                reader.readAsDataURL(input.files[0]);
+            } else { img.style.display = 'none'; if (txt) txt.style.display = 'block'; }
         }
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        img.style.display = 'none';
-        if (txt) txt.style.display = 'block';
-    }
-}
 
-// 👇 Alat bantu lempar gambar ke Supabase 👇
-// 👇 Fungsi pengubah file jadi teks Base64 (Anti-Nyangkut di Vercel) 👇
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-
-// 👇 Alat bantu lempar gambar ke Supabase 👇
-async function uploadToSupabase(file) {
-    // Ubah gambar jadi teks panjang dulu
-    const base64 = await fileToBase64(file);
-    
-    // Kirim sebagai JSON agar tidak dihadang oleh Vercel
-    const res = await fetch('/api/upload-image', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            imageBase64: base64, 
-            fileName: file.name, 
-            mimeType: file.type 
-        }) 
-    });
-    
-    const data = await res.json();
-    if (!data.success) throw new Error(data.message);
-    return data.imageUrl;
-}
+        // SUPABASE UPLOAD LOGIC
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); });
+        }
+        async function uploadToSupabase(file) {
+            const base64 = await fileToBase64(file);
+            const res = await fetch('/api/upload-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ imageBase64: base64, fileName: file.name, mimeType: file.type }) });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+            return data.imageUrl;
+        }
 
         function addLineupRow(containerId, existingUrl = '') { 
-    const isEdit = existingUrl !== '';
-    const html = `
-        <div class="mb-2 lineup-row p-2 border border-secondary rounded" style="background: var(--input-bg);">
-            <div class="d-flex gap-2 align-items-center">
-                <input type="file" class="form-control form-control-sm lineup-file border-secondary" accept="image/*">
-                <input type="hidden" class="lineup-existing-url" value="${existingUrl}">
-                <button class="btn btn-sm btn-danger border-secondary" type="button" onclick="this.closest('.lineup-row').remove()"><i class="bi bi-trash"></i></button>
-            </div>
-            ${isEdit ? `<div class="mt-1 small text-info"><i class="bi bi-link-45deg"></i> File lama: <a href="${existingUrl}" target="_blank" class="text-info">Lihat Gambar</a> (Abaikan jika tak diganti)</div>` : ''}
-        </div>
-    `;
-    document.getElementById(containerId).insertAdjacentHTML('beforeend', html); 
-}
-function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') { 
+            const isEdit = existingUrl !== '';
+            const html = `
+                <div class="mb-2 lineup-row p-2 border border-secondary rounded" style="background: var(--input-bg);">
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="file" class="form-control form-control-sm lineup-file border-secondary" accept="image/*">
+                        <input type="hidden" class="lineup-existing-url" value="${existingUrl}">
+                        <button class="btn btn-sm btn-danger border-secondary" type="button" onclick="this.closest('.lineup-row').remove()"><i class="bi bi-trash"></i></button>
+                    </div>
+                    ${isEdit ? `<div class="mt-1 small text-info"><i class="bi bi-link-45deg"></i> File lama: <a href="${existingUrl}" target="_blank" class="text-info">Lihat Gambar</a> (Abaikan jika tak diganti)</div>` : ''}
+                </div>`;
+            document.getElementById(containerId).insertAdjacentHTML('beforeend', html); 
+        }
+
+        // ==========================================
+        // PENGATURAN TIKET & EARLY ENTRY
+        // ==========================================
+        function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') { 
             let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : ''; 
             const eeMatch = n.match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
             const isEarly = !!eeMatch;
@@ -927,7 +936,6 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-stock" value="${s}" placeholder="Stok" required></div>
                         <div class="col-4"><input type="number" class="form-control form-control-sm tier-min" value="${m}" placeholder="Min. Beli" required></div>
                     </div>
-                    <!-- 👇 PENGATUR BATAS JAM EARLY ENTRY 👇 -->
                     <div class="row g-2 mt-2 pt-2 border-top border-secondary border-opacity-50">
                         <div class="col-12 col-md-5 d-flex align-items-center">
                             <div class="form-check form-switch m-0">
@@ -942,7 +950,6 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
                             </div>
                         </div>
                     </div>
-                    <!-- 👇 FITUR TIKET GEMBOK 👇 -->
                     <div class="row g-2 mt-1 pt-2 border-top border-secondary border-opacity-50">
                         <div class="col-12 col-md-5 d-flex align-items-center">
                             <div class="form-check form-switch m-0">
@@ -973,16 +980,12 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
             }
         }
         function toggleAccessCode(checkbox) { const input = checkbox.closest('.tier-row').querySelector('.tier-access-code'); if (checkbox.checked) { input.style.display = 'block'; input.setAttribute('required', 'true'); } else { input.style.display = 'none'; input.removeAttribute('required'); input.value = ''; } }
-function getTiers(id) { 
+        function getTiers(id) { 
             return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => {
                 let nameVal = r.querySelector('.tier-name').value.replace(/\s*\(Max\s*[0-2][0-9]:[0-5][0-9]\)/ig, '').trim();
                 const isEarly = r.querySelector('.tier-is-early')?.checked;
                 const earlyTime = r.querySelector('.tier-early-time')?.value;
-
-                if (isEarly && earlyTime) {
-                    nameVal = `${nameVal} (Max ${earlyTime})`;
-                }
-
+                if (isEarly && earlyTime) { nameVal = `${nameVal} (Max ${earlyTime})`; }
                 return { 
                     tierName: nameVal, 
                     price: parseInt(r.querySelector('.tier-price').value.replace(/\./g, '')) || 0, 
@@ -995,160 +998,148 @@ function getTiers(id) {
                 };
             }); 
         }
+
         document.getElementById('category').addEventListener('change', function() { const box = document.getElementById('streamingAccountBox'); if(this.value === 'Streaming') { box.style.display = 'block'; } else { box.style.display = 'none'; document.getElementById('secretData').value = ''; } });
         document.getElementById('editCategory').addEventListener('change', function() { const box = document.getElementById('editSecretData'); box.style.display = this.value === 'Streaming' ? 'block' : 'none'; if (this.value !== 'Streaming') box.value = ''; });
 
         document.getElementById('formEvent').addEventListener('submit', async (e) => { 
-    e.preventDefault(); 
-    const tiers = getTiers('addTiers'); 
-    if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error'); 
+            e.preventDefault(); 
+            const tiers = getTiers('addTiers'); 
+            if(tiers.length === 0) return Swal.fire('Error', 'Tambahkan minimal 1 tipe tiket', 'error'); 
 
-    const btn = document.getElementById('btnSubmitEvent'); 
-    const originalText = btn.innerHTML; 
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Mengupload...`; 
-    btn.disabled = true; 
+            const btn = document.getElementById('btnSubmitEvent'); 
+            const originalText = btn.innerHTML; 
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Mengupload...`; 
+            btn.disabled = true; 
 
-    try {
-        // 1. Upload Banner ke Supabase
-        let bannerUrl = "";
-        const bannerFile = document.getElementById('eventImageFile').files[0];
-        if (bannerFile) bannerUrl = await uploadToSupabase(bannerFile);
+            try {
+                let bannerUrl = "";
+                const bannerFile = document.getElementById('eventImageFile').files[0];
+                if (bannerFile) bannerUrl = await uploadToSupabase(bannerFile);
 
-        // 2. Upload Semua Line Up Poster
-        let lineupUrls = [];
-        const lineupRows = document.querySelectorAll('#addLineups .lineup-row');
-        for (let row of lineupRows) {
-            const fileInput = row.querySelector('.lineup-file');
-            if (fileInput && fileInput.files[0]) {
-                const url = await uploadToSupabase(fileInput.files[0]);
-                lineupUrls.push(url);
-            }
-        }
+                let lineupUrls = [];
+                const lineupRows = document.querySelectorAll('#addLineups .lineup-row');
+                for (let row of lineupRows) {
+                    const fileInput = row.querySelector('.lineup-file');
+                    if (fileInput && fileInput.files[0]) {
+                        const url = await uploadToSupabase(fileInput.files[0]);
+                        lineupUrls.push(url);
+                    }
+                }
 
-        const data = { 
-            name: document.getElementById('name').value, category: document.getElementById('category').value, 
-            organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, 
-            date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, 
-            startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, 
-            salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', 
-            mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, 
-            image: bannerUrl, secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', 
-            price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
-            tickets: tiers, lineupImages: lineupUrls, 
-            taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 
-        }; 
+                const data = { 
+                    name: document.getElementById('name').value, category: document.getElementById('category').value, 
+                    organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, 
+                    date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, 
+                    startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, 
+                    salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', 
+                    mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, 
+                    image: bannerUrl, secretData: document.getElementById('secretData') ? document.getElementById('secretData').value : '', 
+                    price: tiers[0]?.price || 0, capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), 
+                    tickets: tiers, lineupImages: lineupUrls, 
+                    taxRate: document.getElementById('taxRate') ? (parseInt(document.getElementById('taxRate').value) || 0) : 0 
+                }; 
 
-        const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
-        if (res.ok) { 
-            Swal.fire({ 
-    html: `
-        <div class="mt-2">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-            <h3 class="fw-bolder mt-3 mb-2">Event Berhasil Dibuat</h3>
-            <p class="text-muted" style="font-size: 0.95rem;">Event baru Anda telah berhasil dipublikasikan ke dalam sistem dan tiket sudah dapat diakses.</p>
-        </div>
-    `,
-    background: 'var(--bg-card)', color: 'var(--text-main)',
-    showConfirmButton: true, confirmButtonText: 'Selesai',
-    buttonsStyling: false,
-    customClass: {
-        popup: 'rounded-4 swal-custom-popup',
-        confirmButton: 'btn btn-primary rounded-pill px-5 py-2 fw-bold mt-2',
-        backdrop: 'swal-blur-backdrop'
-    }
-}); 
-            e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
-            document.getElementById('addLineups').innerHTML = '';
-            previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt'); 
-            await loadMyEvents(); switchMenu('myevents'); 
-        } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } 
-    } catch (err) { Swal.fire('Error', err.message || 'Gagal mengupload gambar.', 'error'); } 
-    finally { btn.innerHTML = originalText; btn.disabled = false; } 
-});
+                const res = await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+                if (res.ok) { 
+                    Swal.fire({ html: `<div class="mt-2"><i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i><h3 class="fw-bolder mt-3 mb-2">Event Berhasil Dibuat</h3><p class="text-muted" style="font-size: 0.95rem;">Event baru Anda telah berhasil dipublikasikan.</p></div>`, background: 'var(--bg-card)', color: 'var(--text-main)', showConfirmButton: true, confirmButtonText: 'Selesai', buttonsStyling: false, customClass: { popup: 'rounded-4 swal-custom-popup', confirmButton: 'btn btn-primary rounded-pill px-5 py-2 fw-bold mt-2', backdrop: 'swal-blur-backdrop' } }); 
+                    e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
+                    document.getElementById('addLineups').innerHTML = ''; previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt'); 
+                    await loadMyEvents(); switchMenu('myevents'); 
+                } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } 
+            } catch (err) { Swal.fire('Error', err.message || 'Gagal mengupload gambar.', 'error'); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; } 
+        });
+
         async function loadMyEvents() { const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; try { const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; } tbody.innerHTML = myEventsData.map(event => { const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')"><i class="bi bi-trash"></i></button></td></tr>`; }).join(''); } catch (err) {} }
         async function hapusEvent(id) { Swal.fire({ title: 'Hapus Event?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya', background: 'var(--bg-card)', color: 'var(--text-main)' }).then(async (result) => { if (result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); await loadMyEvents(); loadDashboardStats(); } }); }
+        
         function bukaModalEdit(id) { const ev = myEventsData.find(e => e._id === id); if(ev) { document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name; document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || ''; document.getElementById('editCategory').value = ev.category || 'General'; document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; document.getElementById('editSecretData').value = ev.secretData || ''; document.getElementById('editTaxRate').value = ev.taxRate || 0; if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImageUrl').value = ev.image || ''; 
-document.getElementById('editImageUrl').value = ev.image || ''; 
-document.getElementById('editImageFile').value = ''; 
-previewImage(ev.image, 'editPreview'); 
-if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } editModal.show(); } }
+            document.getElementById('editImageFile').value = ''; previewImage(ev.image, 'editPreview'); 
+            if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } editModal.show(); } }
+        
         async function saveEditEvent() { 
-    const id = document.getElementById('editId').value; 
-    const tiers = getTiers('editTiers'); 
-    if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error'); 
-    
-    const btn = document.getElementById('btnSaveEdit');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; 
-    btn.disabled = true;
+            const id = document.getElementById('editId').value; 
+            const tiers = getTiers('editTiers'); 
+            if(tiers.length === 0) return Swal.fire('Error', 'Minimal 1 tipe tiket', 'error'); 
+            
+            const btn = document.getElementById('btnSaveEdit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...`; 
+            btn.disabled = true;
 
-    try {
-        // 1. Cek Banner (Timpa kalau ada file baru)
-        let finalBannerUrl = document.getElementById('editImageUrl').value;
-        const bannerFile = document.getElementById('editImageFile').files[0];
-        if (bannerFile) finalBannerUrl = await uploadToSupabase(bannerFile);
+            try {
+                let finalBannerUrl = document.getElementById('editImageUrl').value;
+                const bannerFile = document.getElementById('editImageFile').files[0];
+                if (bannerFile) finalBannerUrl = await uploadToSupabase(bannerFile);
 
-        // 2. Cek Line Up (Upload yang baru, pertahankan yang lama)
-        let finalLineupUrls = [];
-        const lineupRows = document.querySelectorAll('#editLineups .lineup-row');
-        for (let row of lineupRows) {
-            const fileInput = row.querySelector('.lineup-file');
-            const hiddenUrl = row.querySelector('.lineup-existing-url').value;
+                let finalLineupUrls = [];
+                const lineupRows = document.querySelectorAll('#editLineups .lineup-row');
+                for (let row of lineupRows) {
+                    const fileInput = row.querySelector('.lineup-file');
+                    const hiddenUrl = row.querySelector('.lineup-existing-url').value;
+                    if (fileInput && fileInput.files[0]) {
+                        const url = await uploadToSupabase(fileInput.files[0]);
+                        finalLineupUrls.push(url);
+                    } else if (hiddenUrl) {
+                        finalLineupUrls.push(hiddenUrl);
+                    }
+                }
 
-            if (fileInput && fileInput.files[0]) {
-                const url = await uploadToSupabase(fileInput.files[0]);
-                finalLineupUrls.push(url);
-            } else if (hiddenUrl) {
-                finalLineupUrls.push(hiddenUrl); // Pakai URL lama
-            }
+                const data = { 
+                    name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, 
+                    startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', 
+                    location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, 
+                    image: finalBannerUrl, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, 
+                    lineupImages: finalLineupUrls, taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, 
+                    creatorId: organizerInfo.id, organizer: organizerInfo.organizerName 
+                }; 
+
+                await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
+                editModal.hide(); await loadMyEvents(); 
+                Swal.fire({ html: `<div class="mt-2 pb-2"><i class="bi bi-check2-circle text-success" style="font-size: 3.5rem;"></i><h4 class="fw-bolder mt-2 mb-1">Pembaruan Berhasil</h4><p class="text-muted small mb-0">Perubahan data event telah disimpan.</p></div>`, background: 'var(--bg-card)', color: 'var(--text-main)', showConfirmButton: false, timer: 2500, customClass: { popup: 'rounded-4 swal-custom-popup', backdrop: 'swal-blur-backdrop' } }); 
+            } catch(err) { Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error'); } finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
 
-        const data = { 
-            name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, 
-            startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', 
-            location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, 
-            image: finalBannerUrl, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, 
-            lineupImages: finalLineupUrls, taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, 
-            creatorId: organizerInfo.id, organizer: organizerInfo.organizerName 
-        }; 
-
-        await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
-        editModal.hide(); await loadMyEvents(); 
-        Swal.fire({ 
-    html: `
-        <div class="mt-2 pb-2">
-            <i class="bi bi-check2-circle text-success" style="font-size: 3.5rem;"></i>
-            <h4 class="fw-bolder mt-2 mb-1">Pembaruan Berhasil</h4>
-            <p class="text-muted small mb-0">Perubahan data event telah disimpan.</p>
-        </div>
-    `,
-    background: 'var(--bg-card)', color: 'var(--text-main)',
-    showConfirmButton: false, timer: 2500,
-    customClass: {
-        popup: 'rounded-4 swal-custom-popup',
-        backdrop: 'swal-blur-backdrop'
-    }
-}); 
-    } catch(err) {
-        Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error');
-    } finally {
-        btn.innerHTML = originalText; btn.disabled = false;
-    }
-}
-        function formatRupiah(input) {
-            let angka = input.value.replace(/[^0-9]/g, '');
-            input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
-        }
         // ==========================================
-        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR
-        // ==========================================
-// ==========================================
-        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR (KALENDER & JAM)
-        // ==========================================
-// ==========================================
-        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO / CREATOR (LENGKAP + FOTO ARTIS)
+        // ⏳ MANAJEMEN RUNDOWN KHUSUS EO
         // ==========================================
         let eoRundownsList = [];
+        let eoRdLineups = [];
+
+        function renderEoRdLineups() {
+            const box = document.getElementById('eoRdLineupPreview');
+            if (!box) return;
+            if (eoRdLineups.length === 0) {
+                box.innerHTML = `<small class="text-muted">Belum ada poster lineup (Otomatis terisi jika pilih event yang punya lineup, atau klik Upload Poster).</small>`;
+                return;
+            }
+            box.innerHTML = eoRdLineups.map((url, idx) => `
+                <div class="position-relative d-inline-block">
+                    <img src="${url}" class="rounded-3 border border-secondary" style="width: 75px; height: 75px; object-fit: cover;">
+                    <button type="button" onclick="eoRdLineups.splice(${idx}, 1); renderEoRdLineups();" class="btn btn-danger p-0 rounded-circle position-absolute" style="width: 20px; height: 20px; top: -6px; right: -6px; font-size: 0.7rem; line-height: 1;">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function uploadEoRdLineup(input) {
+            if (!input.files || input.files.length === 0) return;
+            Swal.fire({ title: 'Mengunggah Poster...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
+            try {
+                for (let file of input.files) {
+                    const url = await uploadToSupabase(file);
+                    eoRdLineups.push(url);
+                }
+                renderEoRdLineups();
+                Swal.close();
+            } catch (err) {
+                Swal.fire('Gagal', err.message || 'Gagal upload poster', 'error');
+            } finally {
+                input.value = '';
+            }
+        }
 
         function formatEoRangeDate(startStr, endStr) {
             if (!startStr) return 'TBA';
@@ -1167,7 +1158,6 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             });
         }
 
-        // Upload foto artis per baris ke Supabase
         async function uploadRowArtistPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -1196,7 +1186,6 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             }
         }
 
-        // Hapus foto artis manual (tombol X merah)
         function removeRowArtistPhoto(btn) {
             const row = btn.closest('.eo-rd-row');
             const previewImg = row.querySelector('.rd-img-preview');
@@ -1270,20 +1259,15 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             const autoSlug = ev.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
             document.getElementById('eoRdSlug').value = autoSlug;
             document.getElementById('eoRdEventName').value = ev.name;
-            if (ev.date) {
-                document.getElementById('eoRdStartDate').value = ev.date.split('T')[0];
-                syncEoDefaultDates();
-            }
-            if (ev.endDate) {
-                document.getElementById('eoRdEndDate').value = ev.endDate.split('T')[0];
-            } else {
-                document.getElementById('eoRdEndDate').value = '';
-            }
+            if (ev.date) { document.getElementById('eoRdStartDate').value = ev.date.split('T')[0]; syncEoDefaultDates(); }
+            if (ev.endDate) { document.getElementById('eoRdEndDate').value = ev.endDate.split('T')[0]; } else { document.getElementById('eoRdEndDate').value = ''; }
+            
+            eoRdLineups = ev.lineupImages ? [...ev.lineupImages] : [];
+            renderEoRdLineups();
         }
 
         async function loadCreatorRundowns() {
             if (!organizerInfo || !organizerInfo.id) return;
-
             if (myEventsData.length === 0) await loadMyEvents();
             const selectEl = document.getElementById('eoRdSelectEvent');
             if (selectEl) {
@@ -1312,9 +1296,7 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
                                 <b class="text-info fs-6">${rd.eventName}</b>
                                 <span class="badge bg-primary ms-2">${rd.schedules ? rd.schedules.length : 0} Sesi</span><br>
                                 <small class="text-muted d-block mb-1"><i class="bi bi-calendar3 me-1"></i> ${rd.eventDate || 'TBA'}</small>
-                                <a href="https://rundown.rcellfest.my.id/${rd.slug}" target="_blank" class="small text-warning text-decoration-underline">
-                                    rundown.rcellfest.my.id/${rd.slug}
-                                </a>
+                                <a href="https://rundown.rcellfest.my.id/${rd.slug}" target="_blank" class="small text-warning text-decoration-underline">rundown.rcellfest.my.id/${rd.slug}</a>
                             </div>
                             <div class="d-flex gap-1">
                                 <button onclick="editEoRundown('${rd._id}')" class="btn btn-sm btn-outline-info"><i class="bi bi-pencil"></i></button>
@@ -1334,13 +1316,14 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             document.getElementById('eoRdStartDate').value = rd.startDate || '';
             document.getElementById('eoRdEndDate').value = rd.endDate || '';
 
+            eoRdLineups = rd.lineupImages ? [...rd.lineupImages] : [];
+            renderEoRdLineups();
+
             const container = document.getElementById('eoRdRowsContainer');
             container.innerHTML = '';
             if (rd.schedules && rd.schedules.length > 0) {
                 rd.schedules.forEach(s => addEoRundownRow(s.date || rd.startDate || '', s.time, s.title, s.stage, s.description, s.image || ''));
-            } else {
-                addEoRundownRow();
-            }
+            } else { addEoRundownRow(); }
             document.getElementById('rundownArea').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1370,36 +1353,23 @@ if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElement
             });
 
             if (schedules.length === 0) return Swal.fire('Jadwal Kosong', 'Pilih Jam Mulai dan Nama Artis minimal 1 baris!', 'warning');
-
             schedules.sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
             try {
                 const res = await fetch('/api/rundowns', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slug, eventName, eventDate, startDate, endDate, schedules, creatorId: organizerInfo.id })
+                    body: JSON.stringify({ slug, eventName, eventDate, startDate, endDate, schedules, lineupImages: eoRdLineups, creatorId: organizerInfo.id })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Rundown Disimpan!',
-                        html: `Link aktif:<br><a href="https://rundown.rcellfest.my.id/${data.data.slug}" target="_blank" class="text-info fw-bold">rundown.rcellfest.my.id/${data.data.slug}</a>`,
-                        background: 'var(--bg-card)', color: 'var(--text-main)'
-                    });
-                    document.getElementById('eoRdSlug').value = '';
-                    document.getElementById('eoRdEventName').value = '';
-                    document.getElementById('eoRdStartDate').value = '';
-                    document.getElementById('eoRdEndDate').value = '';
-                    document.getElementById('eoRdRowsContainer').innerHTML = '';
-                    addEoRundownRow();
-                    loadCreatorRundowns();
-                } else {
-                    Swal.fire('Gagal', data.message, 'error');
-                }
-            } catch (err) {
-                Swal.fire('Error', 'Gagal terhubung ke server', 'error');
-            }
+                    Swal.fire({ icon: 'success', title: 'Rundown Disimpan!', html: `Link aktif:<br><a href="https://rundown.rcellfest.my.id/${data.data.slug}" target="_blank" class="text-info fw-bold">rundown.rcellfest.my.id/${data.data.slug}</a>`, background: 'var(--bg-card)', color: 'var(--text-main)' });
+                    document.getElementById('eoRdSlug').value = ''; document.getElementById('eoRdEventName').value = '';
+                    document.getElementById('eoRdStartDate').value = ''; document.getElementById('eoRdEndDate').value = '';
+                    document.getElementById('eoRdRowsContainer').innerHTML = ''; addEoRundownRow();
+                    eoRdLineups = []; renderEoRdLineups(); loadCreatorRundowns();
+                } else { Swal.fire('Gagal', data.message, 'error'); }
+            } catch (err) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
         }
 
         async function deleteEoRundown(id) {
