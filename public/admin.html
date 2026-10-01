@@ -421,18 +421,18 @@
             </div>
 
             <!-- ===================== TAB 5: KELOLA PROMO ===================== -->
-            <div class="tab-pane fade" id="promo-pane" role="tabpanel">
-                <div class="glass-card">
-                    <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i>Kelola Kode Promo</h5>
-<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(0, 255, 100, 0.05); border: 1px dashed rgba(0, 255, 100, 0.3);">
-                        <div class="col-md-6">
+<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
+                        <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Target Event Promo</label>
-                            <select id="promoEventId" class="form-select text-white" required>
-                                <option value="ALL">-- Berlaku Untuk Semua Event --</option>
-                                <!-- Nanti diisi otomatis oleh Javascript -->
+                            <select id="promoEventId" class="form-select text-white" onchange="updatePromoTierDropdown()" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-info fw-bold mb-1">Target Tipe Tiket</label>
+                            <select id="promoTierName" class="form-select text-white">
+                                <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="small text-white-50 fw-bold mb-1">Kode Promo</label>
                             <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
                         </div>
@@ -1012,6 +1012,24 @@ document.getElementById('editTiers').innerHTML = '';
         }
 
 // --- MANAJEMEN PROMO ---
+// Fungsi otomatis menarik daftar nama tiket berdasarkan Event yang dipilih
+        function updatePromoTierDropdown() {
+            const eventId = document.getElementById('promoEventId').value;
+            const tierSelect = document.getElementById('promoTierName');
+            
+            let html = '<option value="ALL">-- Berlaku Untuk Semua Tiket --</option>';
+
+            if (eventId !== 'ALL') {
+                const ev = eventsData.find(e => e._id === eventId);
+                if (ev && ev.tickets && ev.tickets.length > 0) {
+                    ev.tickets.forEach(t => {
+                        html += `<option value="${t.tierName}">${t.tierName}</option>`;
+                    });
+                }
+            }
+            tierSelect.innerHTML = html;
+        }
+
         async function loadPromos() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             
@@ -1021,6 +1039,8 @@ document.getElementById('editTiers').innerHTML = '';
                 let opts = '<option value="ALL">-- Berlaku Untuk Semua Event --</option>';
                 eventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
                 promoSelect.innerHTML = opts;
+                
+                updatePromoTierDropdown(); // 👈 Panggil fungsi update dropdown
             }
 
             // 2. RENDER KARTU PROMO
@@ -1032,6 +1052,7 @@ document.getElementById('editTiers').innerHTML = '';
                             <div>
                                 <b class="text-warning fs-5">${p.code}</b><br>
                                 <span class="badge bg-info text-dark mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT'}</span><br>
+                                <span class="badge bg-secondary text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-ticket-detailed"></i> ${p.tierName === 'ALL' || !p.tierName ? 'SEMUA TIKET' : p.tierName}</span><br>
                                 <small class="text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small>
                             </div>
                             <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
@@ -1046,14 +1067,16 @@ document.getElementById('editTiers').innerHTML = '';
             // Tangkap Event ID dan Nama Event dari Dropdown
             const promoSelect = document.getElementById('promoEventId');
             const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
+            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
 
             const data = { 
                 code: document.getElementById('promoCode').value, 
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
                 quota: document.getElementById('promoQuota').value, 
                 daysActive: document.getElementById('promoDays').value,
-                eventId: promoSelect.value, // Simpan ID Event-nya
-                eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT' : selectedEventName // Simpan Nama Event-nya
+                eventId: promoSelect.value, 
+                eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT' : selectedEventName,
+                tierName: tierVal // 👈 Kirim ke server
             };
 
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
