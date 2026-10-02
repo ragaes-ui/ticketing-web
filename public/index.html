@@ -287,6 +287,59 @@
         [data-theme="dark"] #theme-icon {
             color: #FFD700 !important; /* Kuning terang untuk Mode Gelap */
         }
+        /* --- MOBILE BOTTOM NAV BAR --- */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e3a8a; /* Warna biru gelap sesuai gambar referensi */
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    z-index: 1045;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.mobile-bottom-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+/* Background biru terang untuk menu yang aktif */
+.mobile-bottom-nav a.active {
+    background-color: #3b82f6; 
+}
+
+.mobile-bottom-nav a:hover {
+    background-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Penyesuaian jarak khusus untuk tampilan Mobile */
+@media (max-width: 991px) {
+    body {
+        padding-bottom: 100px; /* Memberi ruang di bawah agar konten tidak tertutup menu */
+    }
+    /* Menggeser tombol Chatbot ke atas agar tidak tertumpuk menu bawah */
+    .btn-chatbot {
+        bottom: 95px !important; 
+    }
+    .chat-widget {
+        bottom: 165px !important;
+    }
+    /* Pastikan menu asli bawaan navbar tidak bocor di HP */
+    .navbar-collapse {
+        display: none !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -565,7 +618,14 @@
             <button onclick="sendChatMessage()" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
         </div>
     </div>
-
+<!-- 👇 PASTE KODE KE-2 DI SINI 👇 -->
+    <div class="mobile-bottom-nav d-lg-none">
+        <a href="/" class="active">Beranda</a>
+        <a href="#" data-i18n="nav_explore">Jelajah</a>
+        <a href="/about" data-i18n="nav_about">Tentang</a>
+        <a href="/contact">Hubungi Kami</a>
+    </div>
+    <!-- 👆 ---------------------- 👆 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
