@@ -290,8 +290,37 @@
         /* ========================================= */
         /* 🔥 FLOATING BOTTOM NAVBAR (KHUSUS HP) 🔥 */
         /* ========================================= */
-        .mobile-bottom-nav { display: none; position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); border-radius: 50px; padding: 8px 12px; z-index: 9999; transition: background 0.3s, border-color 0.3s; }
-        [data-theme="dark"] .mobile-bottom-nav { background: #18181b; border-color: #27272a; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+/* ========================================= */
+        /* 🔥 FLOATING BOTTOM NAVBAR (LIQUID GLASS) 🔥 */
+        /* ========================================= */
+        .mobile-bottom-nav { 
+            display: none; 
+            position: fixed; 
+            bottom: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 400px; 
+            
+            /* 👇 Efek Kaca Transparan (Mode Terang) 👇 */
+            background: rgba(255, 255, 255, 0.4) !important; 
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6) !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+            
+            border-radius: 50px; 
+            padding: 8px 12px; 
+            z-index: 9999; 
+            transition: all 0.3s ease; 
+        }
+
+        [data-theme="dark"] .mobile-bottom-nav { 
+            /* 👇 Efek Kaca Transparan (Mode Gelap) 👇 */
+            background: rgba(24, 24, 27, 0.45) !important; 
+            border-color: rgba(255, 255, 255, 0.1) !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
+        }
         .mobile-bottom-nav ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .mobile-bottom-nav li { display: flex; justify-content: center; }
         .mobile-bottom-nav a { text-decoration: none; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 50px; font-size: 1.3rem; transition: all 0.3s ease; }
