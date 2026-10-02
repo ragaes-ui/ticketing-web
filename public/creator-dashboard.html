@@ -1154,7 +1154,8 @@ async function loadMyEvents() {
                     // 👇 Membuat link otomatis menuju halaman detail event publik 👇
                     const namaAman = event.name ? event.name : "event";
                     const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                    const linkPublic = `/detail?event=${eventSlug}&id=${event._id}`;
+                    // 👇 Kode yang sudah diperbaiki (URL Absolut)
+const linkPublic = `https://rcellfest.my.id/detail?event=${eventSlug}&id=${event._id}`;
 
                     return `<tr>
                         <td>
