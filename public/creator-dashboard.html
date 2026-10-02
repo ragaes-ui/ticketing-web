@@ -1134,7 +1134,52 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
                 Swal.fire({ html: `<div class="mt-2 pb-2"><i class="bi bi-check2-circle text-success" style="font-size: 3.5rem;"></i><h4 class="fw-bolder mt-2 mb-1">Pembaruan Berhasil</h4><p class="text-muted small mb-0">Perubahan data event telah disimpan.</p></div>`, background: 'var(--bg-card)', color: 'var(--text-main)', showConfirmButton: false, timer: 2500, customClass: { popup: 'rounded-4 swal-custom-popup', backdrop: 'swal-blur-backdrop' } }); 
             } catch(err) { Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error'); } finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
+async function loadMyEvents() { 
+            const tbody = document.getElementById('myEventsTableBody'); 
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; 
+            try { 
+                const res = await fetch('/api/events'); 
+                const allEvents = await res.json(); 
+                myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); 
+                
+                if (myEventsData.length === 0) { 
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; 
+                    return; 
+                } 
 
+                tbody.innerHTML = myEventsData.map(event => { 
+                    const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); 
+                    let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; 
+                    
+                    // 👇 Membuat link otomatis menuju halaman detail event publik 👇
+                    const namaAman = event.name ? event.name : "event";
+                    const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                    const linkPublic = `/detail?event=${eventSlug}&id=${event._id}`;
+
+                    return `<tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+                                <div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div>
+                            </div>
+                        </td>
+                        <td>${event.date ? event.date.split('T')[0] : '-'}</td>
+                        <td class="text-success fw-bold">Rp ${harga}</td>
+                        <td>${statusBadge}</td>
+                        <td class="text-end">
+                            <!-- 👇 INI TOMBOL BARU UNTUK KUNJUNGI HALAMAN TIKET 👇 -->
+                            <a href="${linkPublic}" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3 me-1" title="Lihat Halaman Tiket">
+                                <i class="bi bi-globe"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')" title="Edit Event"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')" title="Hapus Event"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>`; 
+                }).join(''); 
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal memuat event.</td></tr>';
+            } 
+        }
         // ==========================================
         // ⏳ MANAJEMEN RUNDOWN KHUSUS EO
         // ==========================================
