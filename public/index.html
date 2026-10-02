@@ -586,26 +586,28 @@
     <nav class="mobile-bottom-nav">
         <ul>
             <li>
-                <!-- Di index.html, Beranda menyala (active) -->
                 <a href="/" class="active">
                     <i class="bi bi-house-door-fill"></i>
                     <span class="nav-text">Beranda</span>
                 </a>
             </li>
             <li>
-                <a href="/explore">
+                <!-- Diarahkan ke #event-list supaya layarnya otomatis scroll ke bawah -->
+                <a href="#event-list">
                     <i class="bi bi-compass"></i>
                     <span class="nav-text">Eksplor</span>
                 </a>
             </li>
             <li>
-                <a href="/dashboard">
+                <!-- Diberi ID agar link-nya bisa diatur otomatis oleh Javascript -->
+                <a href="/user-login" id="bottomNavTicket">
                     <i class="bi bi-ticket-perforated"></i>
                     <span class="nav-text">Tiket</span>
                 </a>
             </li>
             <li>
-                <a href="/user-login">
+                <!-- Diberi ID agar link-nya bisa diatur otomatis oleh Javascript -->
+                <a href="/user-login" id="bottomNavProfile">
                     <i class="bi bi-person"></i>
                     <span class="nav-text">Profil</span>
                 </a>
@@ -825,7 +827,8 @@ function updateLanguage(lang) {
             const navArea = document.getElementById('navUserArea');
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-
+const btnBottomTicket = document.getElementById('bottomNavTicket');
+            const btnBottomProfile = document.getElementById('bottomNavProfile');
             if (userRaw) {
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
@@ -841,8 +844,15 @@ function updateLanguage(lang) {
                         </ul>
                     </div>
                 `;
+                // 👇 JIKA SUDAH LOGIN: Arahkan menu bawah ke halaman Dashboard Pembeli 👇
+                // (Sesuaikan "/dashboard" dengan nama file dashboard tiket pengguna Mas Raga)
+                if(btnBottomTicket) btnBottomTicket.href = "/dashboard"; 
+                if(btnBottomProfile) btnBottomProfile.href = "/dashboard";
             } else {
                 navArea.innerHTML = `<a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
+                // 👇 JIKA BELUM LOGIN: Arahkan menu bawah ke halaman Login 👇
+                if(btnBottomTicket) btnBottomTicket.href = "/user-login"; 
+                if(btnBottomProfile) btnBottomProfile.href = "/user-login";
             }
         }
 
