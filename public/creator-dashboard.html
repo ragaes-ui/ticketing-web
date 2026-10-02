@@ -630,6 +630,40 @@
                 
             }
         };
+        // 👇 FUNGSI SAPAAN WAKTU OTOMATIS 👇
+        function updateTimeGreeting() {
+            const hour = new Date().getHours();
+            let sapaanId = "Halo,";
+            let sapaanEn = "Hello,";
+
+            if (hour >= 4 && hour < 11) { 
+                sapaanId = "Halo, Selamat Pagi"; 
+                sapaanEn = "Good Morning,"; 
+            } else if (hour >= 11 && hour < 15) { 
+                sapaanId = "Halo, Selamat Siang,"; 
+                sapaanEn = "Good Afternoon,"; 
+            } else if (hour >= 15 && hour < 18) { 
+                sapaanId = "Halo, Selamat Sore,"; 
+                sapaanEn = "Good Evening,"; 
+            } else { 
+                sapaanId = "Halo, Selamat Malam,"; 
+                sapaanEn = "Good Evening,"; 
+            }
+
+            // Ubah kamus secara dinamis
+            translations.id.dash_hello = sapaanId;
+            translations.en.dash_hello = sapaanEn;
+
+            // Update langsung ke layar jika halaman sudah siap
+            const lang = localStorage.getItem('creatorLang') || 'id';
+            const helloEl = document.querySelector('[data-i18n="dash_hello"]');
+            if (helloEl) helloEl.innerHTML = lang === 'id' ? sapaanId : sapaanEn;
+        }
+        
+        // Panggil pertama kali dan cek perubahan waktu tiap 1 menit
+        updateTimeGreeting();
+        setInterval(updateTimeGreeting, 60000); 
+        // 👆 -------------------------------- 👆
 
 let organizerInfo = null; let myEventsData = []; let myChart = null; 
         let myBuyersData = []; let currentFilteredBuyers = [];
