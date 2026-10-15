@@ -454,6 +454,30 @@
                             <label class="small text-white-50 fw-bold mb-1">Masa Aktif (Hari)</label>
                             <input type="number" id="promoDays" class="form-control" placeholder="7" required>
                         </div>
+                        <!-- 👇 TAMBAHAN WAKTU SPESIFIK PROMO 👇 -->
+                        <div class="col-12 mt-3 pt-3 border-top border-secondary border-opacity-50">
+                            <label class="small text-info fw-bold mb-2"><i class="bi bi-clock-history me-1"></i> Pengaturan Waktu Spesifik (Opsional)</label>
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="small text-white-50 mb-1">Tgl Mulai</label>
+                                    <input type="date" id="promoValidFrom" class="form-control form-control-sm" style="color-scheme: dark;">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small text-white-50 mb-1">Tgl Selesai</label>
+                                    <input type="date" id="promoValidUntil" class="form-control form-control-sm" style="color-scheme: dark;">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small text-white-50 mb-1">Jam Mulai</label>
+                                    <input type="time" id="promoStartTime" class="form-control form-control-sm" style="color-scheme: dark;">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small text-white-50 mb-1">Jam Selesai</label>
+                                    <input type="time" id="promoEndTime" class="form-control form-control-sm" style="color-scheme: dark;">
+                                </div>
+                            </div>
+                            <small class="text-white-50 d-block mt-1" style="font-size: 0.7rem;">*Kosongkan jika promo berlaku setiap saat (hanya mengikuti batas kuota & hari).</small>
+                        </div>
+                        <!-- 👆 ---------------------------- 👆 -->
                         <div class="col-12 mt-2">
                             <button type="submit" class="btn btn-success w-100 rounded-pill py-2"><i class="bi bi-plus-lg"></i> Buat Kode Promo</button>
                         </div>
@@ -1070,14 +1094,15 @@ document.getElementById('editTiers').innerHTML = '';
             } catch(e) {}
         }
 
-        document.getElementById('formPromo').addEventListener('submit', async (e) => {
+document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault(); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             
             // Tangkap Event ID dan Nama Event dari Dropdown
             const promoSelect = document.getElementById('promoEventId');
             const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
-            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL'; // 👈 Ambil nilai dropdown tiket
+            const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
 
+            // 👇 UBAH BAGIAN INI UNTUK MENAMBAHKAN WAKTU 👇
             const data = { 
                 code: document.getElementById('promoCode').value, 
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
@@ -1085,8 +1110,15 @@ document.getElementById('editTiers').innerHTML = '';
                 daysActive: document.getElementById('promoDays').value,
                 eventId: promoSelect.value, 
                 eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT' : selectedEventName,
-                tierName: tierVal // 👈 Kirim ke server
+                tierName: tierVal,
+                
+                // Tambahan Payload Waktu
+                validFrom: document.getElementById('promoValidFrom').value || null,
+                validUntil: document.getElementById('promoValidUntil').value || null,
+                startTime: document.getElementById('promoStartTime').value || null,
+                endTime: document.getElementById('promoEndTime').value || null
             };
+            // 👆 ---------------------------------------- 👆
 
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
             e.target.reset(); 
