@@ -2006,28 +2006,29 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 // --- 3. SIMPAN PROMO BARU ---
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
-        const { code, discount, quota, eventId, eventName, tierName, startTime, endTime } = req.body;
-        // 👇 TAMBAHKAN SATPAM INI 👇
-        if (!endTime) {
+        // Ganti 'endTime' menjadi 'validUntil' untuk mengambil data tanggal dari frontend
+        const { code, discount, quota, eventId, eventName, tierName, validFrom, validUntil, startTime, endTime } = req.body;
+        
+        if (!validUntil) {
             return res.status(400).json({ 
                 success: false, 
-                message: "Gagal: Tanggal berakhir (endTime) belum terkirim dari Form HTML!" 
+                message: "Gagal: Tanggal berakhir belum terkirim dari Form HTML!" 
             });
         }
-        // 👆 -------------------- 👆
-        
-        // Atur expiresAt berdasarkan endTime dari frontend
-        // Tambahkan T23:59:59 agar promo otomatis hangus di TEPAT pukul 23:59 pada hari terakhir
-        const expiresAt = new Date(endTime + "T23:59:59");
+
+        // Gunakan validUntil untuk menentukan kapan promo hangus
+        const expiresAt = new Date(validUntil + "T23:59:59");
 
         const newPromo = new Promo({ 
             code: code, 
             discount: discount, 
             quota: quota, 
-            expiresAt: expiresAt, // <--- Ini yang bikin error 500 tadi kalau kosong
+            expiresAt: expiresAt, // Disimpan ke MongoDB pakai format tanggal yang benar
             eventId: eventId,      
             eventName: eventName,
             tierName: tierName || 'ALL',
+            validFrom: validFrom,
+            validUntil: validUntil,
             startTime: startTime || null,
             endTime: endTime || null
         });
