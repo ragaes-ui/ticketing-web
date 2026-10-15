@@ -421,7 +421,14 @@
     <!-- (Kolom diskon, kuota, hari biarkan saja sama) -->
                     <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_disc">Potongan (Rp)</label><input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)"></div>
                     <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label><input type="number" id="promoQuota" class="form-control" placeholder="100" required></div>
-                    <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_days">Masa Aktif (Hari)</label><input type="number" id="promoDays" class="form-control" placeholder="7" required></div>
+                    <div class="col-md-6 mt-3">
+    <label class="form-label text-warning"><i class="bi bi-calendar-event"></i> Dari Tanggal</label>
+    <input type="date" id="promoStartDate" class="form-control" style="color-scheme: dark;" required>
+</div>
+<div class="col-md-6 mt-3">
+    <label class="form-label text-warning"><i class="bi bi-calendar-check-fill"></i> Sampai Tanggal</label>
+    <input type="date" id="promoEndDate" class="form-control" style="color-scheme: dark;" required>
+</div>
                     <!-- 👇 TAMBAHKAN 2 BARIS INI (INPUT JAM FLASH SALE) 👇 -->
     <div class="col-md-6 mt-3">
         <label class="form-label text-warning"><i class="bi bi-clock"></i> Jam Mulai (Opsional)</label>
@@ -860,8 +867,11 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
                 } else { 
                     promoListHTML.innerHTML = myPromos.map(p => {
                         // 👇 Logika memunculkan teks jam aktif 👇
-                        const timeLimit = (p.startTime && p.endTime) ? `<br><span class="text-warning small fw-bold"><i class="bi bi-clock-history"></i> Berlaku Jam: ${p.startTime} - ${p.endTime} WIB</span>` : '';
-                        
+                        // 👇 Logika memunculkan teks tanggal & jam aktif 👇
+const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-block">
+    <i class="bi bi-calendar-range"></i> Tgl: ${p.validFrom} s/d ${p.validUntil} <br>
+    <i class="bi bi-clock-history"></i> Jam: ${p.startTime || '00:00'} - ${p.endTime || '23:59'} WIB
+</span>`;                        
                         return `
                     <div class="col-md-6 col-lg-4">
                         <div class="promo-ticket m-0 h-100">
@@ -887,17 +897,21 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
             if(!promoSelect.value) return Swal.fire('Error', 'Buat event dulu!', 'warning'); 
             const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
             
-            const data = { 
+const data = { 
                 code: document.getElementById('promoCode').value, 
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
                 quota: document.getElementById('promoQuota').value, 
-                daysActive: document.getElementById('promoDays').value, 
+                
+                // 👇 Data rentang tanggal yang dikirim 👇
+                validFrom: document.getElementById('promoStartDate').value, 
+                validUntil: document.getElementById('promoEndDate').value, 
+                
                 eventId: promoSelect.value, 
                 eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text, 
                 tierName: tierVal,
-                startTime: document.getElementById('promoStartTime').value || null, // 👈 Tambahan data jam
-                endTime: document.getElementById('promoEndTime').value || null      // 👈 Tambahan data jam
-            }; 
+                startTime: document.getElementById('promoStartTime').value || null, 
+                endTime: document.getElementById('promoEndTime').value || null
+            };
             
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
             e.target.reset(); 
