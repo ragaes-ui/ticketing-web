@@ -36,18 +36,23 @@ const topupSchema = new mongoose.Schema({
 const Topup = mongoose.models.Topup || mongoose.model('Topup', topupSchema);
 
 // --- MODEL BARU: KODE PROMO ---
+// --- MODEL BARU: KODE PROMO ---
 const promoSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true, uppercase: true }, 
     discount: { type: Number, required: true }, 
     quota: { type: Number, default: 100 }, 
     expiresAt: { type: Date, required: true },
-    // 👇 TAMBAHKAN 2 BARIS INI BIAR DATANYA NGGAK DIBUANG 👇
     eventId: { type: String, default: 'ALL' },
     eventName: { type: String, default: 'SEMUA EVENT' },
-    tierName: { type: String, default: 'ALL' }, // 👈 TAMBAHAN TARGET TIPE TIKET
+    tierName: { type: String, default: 'ALL' },
+    
+    // 👇 WAJIB DITAMBAHKAN AGAR TANGGAL TERSIMPAN 👇
+    validFrom: { type: String, default: null },
+    validUntil: { type: String, default: null },
+    // 👆 ---------------------------------------- 👆
+    
     startTime: { type: String, default: null }, 
     endTime: { type: String, default: null }
-    // 👆 ---------------------------------------------- 👆
 });
 const Promo = mongoose.models.Promo || mongoose.model('Promo', promoSchema);
 // --- MODEL BARU: PENAMPUNG KODE OTP ---
@@ -1967,29 +1972,71 @@ app.post('/api/maintenance', async (req, res) => {
 
 // --- 1. CEK KODE PROMO SAAT CHECKOUT (Dilindungi Satpam) ---
 // --- 1. CEK KODE PROMO SAAT CHECKOUT ---
-app.post('/api/check-promo', proteksiApiInternal, async (req, res) => {
+app.post('/api/check-promo', async (req, res) => {
     try {
-        // 👇 Tangkap juga tierName dari halaman checkout
-        const { code, eventId, tierName } = req.body; 
+        const { code, eventId, tierName } = req.body;
+        
+        // 1. Cari promo di database (jangan ubah logika pencarian bawaan Mas Raga jika ada yang berbeda)
         const promo = await Promo.findOne({ code: code.toUpperCase() });
 
-        if (!promo) return res.json({ valid: false, message: "Kode promo tidak ditemukan." });
-        if (promo.quota <= 0) return res.json({ valid: false, message: "Kuota promo habis." });
-        
-        // Pengecekan ketat event
-        if (promo.eventId && promo.eventId !== 'ALL' && promo.eventId !== eventId) {
-            return res.json({ valid: false, message: 'Ups! Kode promo ini tidak berlaku untuk event ini.' });
+        if (!promo) {
+            return res.status(400).json({ valid: false, message: "Kode promo tidak valid atau tidak ditemukan." });
         }
-        
-        // 👇 PENGECEKAN KETAT TIPE TIKET (TIER) 👇
-        if (promo.tierName && promo.tierName !== 'ALL' && tierName && promo.tierName.toLowerCase() !== tierName.toLowerCase()) {
-            return res.json({ valid: false, message: `Ups! Kode promo ini khusus untuk pembelian tiket tipe: ${promo.tierName}.` });
-        }
-        
-        if (new Date() > promo.expiresAt) return res.json({ valid: false, message: "Kode promo sudah kadaluarsa." });
 
-        res.json({ valid: true, discount: promo.discount, message: `Diskon Rp ${promo.discount.toLocaleString('id-ID')}!` });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        // Cek apakah kuota habis
+        if (promo.quota <= 0) {
+            return res.status(400).json({ valid: false, message: "Kuota promo sudah habis." });
+        }
+
+        // Cek kecocokan Event
+        if (promo.eventId !== 'ALL' && promo.eventId !== eventId) {
+            return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk event ini." });
+        }
+
+        // Cek kecocokan Tier/Tipe Tiket
+        if (promo.tierName !== 'ALL' && promo.tierName !== tierName) {
+            return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk tipe tiket ini." });
+        }
+
+        // 👇 TAMBAHKAN BLOK VALIDASI WAKTU INI 👇
+        
+        // Dapatkan waktu saat ini di WIB (Waktu Indonesia Barat / Asia/Jakarta)
+        const now = new Date();
+        const wibTime = new Date(now.getTime() + (7 * 60 * 60 * 1000)); 
+        
+        // Format YYYY-MM-DD dan HH:MM untuk dibandingkan
+        const hariIni = wibTime.toISOString().split('T')[0]; 
+        const jamIni = wibTime.toISOString().split('T')[1].substring(0, 5); 
+
+        // A. Validasi Tanggal (validFrom & validUntil)
+        if (promo.validFrom && hariIni < promo.validFrom) {
+            return res.status(400).json({ valid: false, message: `Promo baru bisa digunakan pada tanggal ${promo.validFrom}.` });
+        }
+        if (promo.validUntil && hariIni > promo.validUntil) {
+            return res.status(400).json({ valid: false, message: "Masa aktif promo sudah lewat/kadaluarsa." });
+        }
+
+        // B. Validasi Jam Flash Sale (startTime & endTime) - Jika diset
+        if (promo.startTime && jamIni < promo.startTime) {
+            return res.status(400).json({ valid: false, message: `Promo baru aktif pukul ${promo.startTime} WIB.` });
+        }
+        if (promo.endTime && jamIni > promo.endTime) {
+            return res.status(400).json({ valid: false, message: `Waktu promo telah berakhir pada pukul ${promo.endTime} WIB.` });
+        }
+        
+        // 👆 ----------------------------------- 👆
+
+        // Jika semua lolos, promo dinyatakan VALID
+        res.json({ 
+            valid: true, 
+            discount: promo.discount, 
+            message: "Promo berhasil diterapkan!" 
+        });
+
+    } catch (error) {
+        console.error("Error Cek Promo:", error);
+        res.status(500).json({ valid: false, message: "Terjadi kesalahan server saat mengecek promo." });
+    }
 });
 
 // --- 2. AMBIL DAFTAR PROMO UNTUK ADMIN (Dilindungi Satpam Anti-Intip) ---
