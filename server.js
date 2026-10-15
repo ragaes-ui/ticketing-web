@@ -2007,6 +2007,14 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
         const { code, discount, quota, eventId, eventName, tierName, startTime, endTime } = req.body;
+        // 👇 TAMBAHKAN SATPAM INI 👇
+        if (!endTime) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Gagal: Tanggal berakhir (endTime) belum terkirim dari Form HTML!" 
+            });
+        }
+        // 👆 -------------------- 👆
         
         // Atur expiresAt berdasarkan endTime dari frontend
         // Tambahkan T23:59:59 agar promo otomatis hangus di TEPAT pukul 23:59 pada hari terakhir
