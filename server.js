@@ -2003,30 +2003,31 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 
 // --- 3. SIMPAN PROMO BARU (Dilindungi Satpam) ---
 // --- 3. SIMPAN PROMO BARU ---
+// --- 3. SIMPAN PROMO BARU ---
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
-        // 👇 Tangkap tierName dari Form Admin/EO
-        const { code, discount, quota, daysActive, eventId, eventName, tierName, startTime, endTime } = req.body;
+        const { code, discount, quota, eventId, eventName, tierName, startTime, endTime } = req.body;
         
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
+        // Atur expiresAt berdasarkan endTime dari frontend
+        // Tambahkan T23:59:59 agar promo otomatis hangus di TEPAT pukul 23:59 pada hari terakhir
+        const expiresAt = new Date(endTime + "T23:59:59");
 
         const newPromo = new Promo({ 
             code: code, 
             discount: discount, 
             quota: quota, 
-            expiresAt: expiresAt,
+            expiresAt: expiresAt, // <--- Ini yang bikin error 500 tadi kalau kosong
             eventId: eventId,      
             eventName: eventName,
             tierName: tierName || 'ALL',
-            // 👇 TAMBAHKAN TANGKAPAN DATA INI 👇
             startTime: startTime || null,
-            endTime: endTime || null// 👈 Simpan target tiket
+            endTime: endTime || null
         });
 
         await newPromo.save();
         res.json({ success: true, message: 'Promo berhasil dibuat' });
     } catch (error) {
+        console.error("Error Simpan Promo:", error.message);
         res.status(500).json({ success: false, message: error.message });
     }
 });
