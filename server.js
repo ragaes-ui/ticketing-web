@@ -44,7 +44,9 @@ const promoSchema = new mongoose.Schema({
     // 👇 TAMBAHKAN 2 BARIS INI BIAR DATANYA NGGAK DIBUANG 👇
     eventId: { type: String, default: 'ALL' },
     eventName: { type: String, default: 'SEMUA EVENT' },
-    tierName: { type: String, default: 'ALL' } // 👈 TAMBAHAN TARGET TIPE TIKET
+    tierName: { type: String, default: 'ALL' }, // 👈 TAMBAHAN TARGET TIPE TIKET
+    startTime: { type: String, default: null }, 
+    endTime: { type: String, default: null }
     // 👆 ---------------------------------------------- 👆
 });
 const Promo = mongoose.models.Promo || mongoose.model('Promo', promoSchema);
@@ -2004,7 +2006,7 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
         // 👇 Tangkap tierName dari Form Admin/EO
-        const { code, discount, quota, daysActive, eventId, eventName, tierName } = req.body;
+        const { code, discount, quota, daysActive, eventId, eventName, tierName, startTime, endTime } = req.body;
         
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + parseInt(daysActive));
@@ -2016,7 +2018,10 @@ app.post('/api/promos', proteksiApiInternal, async (req, res) => {
             expiresAt: expiresAt,
             eventId: eventId,      
             eventName: eventName,
-            tierName: tierName || 'ALL' // 👈 Simpan target tiket
+            tierName: tierName || 'ALL',
+            // 👇 TAMBAHKAN TANGKAPAN DATA INI 👇
+            startTime: startTime || null,
+            endTime: endTime || null// 👈 Simpan target tiket
         });
 
         await newPromo.save();
