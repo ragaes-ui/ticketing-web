@@ -1294,22 +1294,22 @@ if (tierData && tierData.accessCode) {
     }
 });
 // 1. Bayar Pakai Saldo
+// 1. Bayar Pakai Saldo
 app.post('/api/buy-ticket', async (req, res) => {
     try {
-        const { recaptchaToken, userId, eventId, price, quantity = 1, pin, promoCode, buyerData, tierName, pajak = 0, tierAccessCode } = req.body; 
+        // 👈 Tangkap Array tickets
+        const { recaptchaToken, userId, eventId, pin, promoCode, buyerData, pajak = 0, diskon = 0, tickets } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
         const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-        
         const cfRes = await fetch(verifyUrl, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
         });
         const cfData = await cfRes.json();
-        
         if (!cfData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
         const userCheck = await User.findById(userId);
@@ -1321,24 +1321,27 @@ const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E";
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-let selectedTierIndex = -1;
-        if (tierName && event.tickets && event.tickets.length > 0) {
-            selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
-            
-            // 👇 VALIDASI KODE RAHASIA TIKET 👇
-// 👇 VALIDASI KODE RAHASIA TIKET 👇
-            if (selectedTierIndex !== -1) {
-                const tierData = event.tickets[selectedTierIndex];
-                if (tierData.accessCode) { // Jika tiket ini digembok
-                    const inputCode = (tierAccessCode || '').trim().toUpperCase();
-                    const validCodes = tierData.accessCode.split(',').map(c => c.trim().toUpperCase());
-                    
+        // Hitung subtotal dan validasi semua akses rahasia
+        let subTotal = 0;
+        let totalQuantity = 0;
+
+        for (const t of tickets) {
+            subTotal += (t.price * t.qty);
+            totalQuantity += t.qty;
+
+            if (event.tickets && event.tickets.length > 0) {
+                const dbTier = event.tickets.find(dt => dt.tierName === t.tierName);
+                if (dbTier && dbTier.accessCode) {
+                    const inputCode = (t.accessCode || '').trim().toUpperCase();
+                    const validCodes = dbTier.accessCode.split(',').map(c => c.trim().toUpperCase());
                     if (!validCodes.includes(inputCode)) {
-                        return res.status(403).json({ success: false, message: "Akses Ditolak: Kode rahasia salah!" });
+                        return res.status(403).json({ success: false, message: `Akses Ditolak: Kode rahasia untuk ${t.tierName} salah!` });
                     }
                 }
+                if (dbTier && dbTier.availableSeats < t.qty) {
+                    return res.status(400).json({ success: false, message: `Stok tiket ${t.tierName} tidak mencukupi!` });
+                }
             }
-            // 👆 ---------------------------- 👆
         }
 
         let discountAmount = 0;
@@ -1351,69 +1354,71 @@ let selectedTierIndex = -1;
             }
         }
 
-        let finalPrice = price - discountAmount;
+        let finalPrice = (subTotal - discountAmount) + parseInt(pajak);
         if (finalPrice < 0) finalPrice = 0;
-finalPrice = finalPrice + parseInt(pajak);
+        
         const user = await User.findOneAndUpdate(
-            { _id: userId, saldo: { $gte: finalPrice } }, 
-            { $inc: { saldo: -finalPrice } },
+            { _id: userId, saldo: { \$gte: finalPrice } }, 
+            { \$inc: { saldo: -finalPrice } },
             { new: true }
         );
         if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
-// 👇 PABRIK TIKET SALDO (LOOPING PER BARCODE) 👇
-        const hargaSatuan = finalPrice / quantity;
-        let kumpulanKodeTiket = []; // 👈 BIKIN ARRAY
+        // Pabrik Tiket Saldo (Looping Array)
+        let kumpulanKodeTiket = [];
+        const orderIdRandom = `SALDO-PAY-${Date.now()}`;
 
-        for (let i = 0; i < quantity; i++) {
-            const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-            const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
-            kumpulanKodeTiket.push(kodeUnik); // 👈 KUMPULKAN KODE
+        for (const t of tickets) {
+            for (let i = 0; i < t.qty; i++) {
+                const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+                const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
+                kumpulanKodeTiket.push(kodeUnik); 
 
-            const newOrder = new Order({
-                ticketCode: kodeUnik,
-                eventId: eventId,
-                price: hargaSatuan,
-                tierName: tierName || 'General',
-                quantity: 1, // 👈 Paksa jadi 1 per barcode!
-                customerName: buyerData ? buyerData.name : (user.fullName || user.username),
-                email: buyerData ? buyerData.email : user.email,
-                phone: buyerData ? buyerData.phone : user.phone,
-                nik: buyerData ? buyerData.nik : undefined,
-                status: 'valid',
-                paymentMethod: 'SALDO', 
-                orderIdMidtrans: `SALDO-PAY-${Date.now()}` 
-            });
-            await newOrder.save();
-        }
-        // 👆 ----------------------------------------- 👆
-        
-        event.availableSeats -= quantity; 
-        if (selectedTierIndex !== -1) {
-            event.tickets[selectedTierIndex].availableSeats -= quantity; 
+                const newOrder = new Order({
+                    ticketCode: kodeUnik,
+                    eventId: eventId,
+                    price: t.price,
+                    tierName: t.tierName || 'General',
+                    quantity: 1, // Paksa jadi 1 per barcode
+                    customerName: buyerData ? buyerData.name : (user.fullName || user.username),
+                    email: buyerData ? buyerData.email : user.email,
+                    phone: buyerData ? buyerData.phone : user.phone,
+                    status: 'valid',
+                    paymentMethod: 'SALDO', 
+                    orderIdMidtrans: orderIdRandom 
+                });
+                await newOrder.save();
+            }
+            
+            // Kurangi Stok Event
+            event.availableSeats -= t.qty; 
+            const tierIndex = event.tickets.findIndex(dt => dt.tierName === t.tierName);
+            if (tierIndex !== -1) {
+                event.tickets[tierIndex].availableSeats -= t.qty; 
+            }
         }
         await event.save();
-// 📧 KIRIM TIKET KE EMAIL (SALDO)
+
+        // Kirim Email
         await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
             eventName: event.name,
-            organizer: event.organizer, // 👈 TAMBAHAN PENYELENGGARA
-            tierName: tierName || 'General',
+            organizer: event.organizer, 
+            tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '), // Daftar semua tipe tiket
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            eventDateRaw: event.date,          // 👈 TAMBAHKAN INI
-eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
-            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 TAMBAHAN JAM
+            eventDateRaw: event.date,          
+            eventEndDateRaw: event.endDate,    
+            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), 
             ticketCodes: kumpulanKodeTiket,
             secretData: event.secretData,
-            qty: quantity,
-            subTotal: price, 
+            qty: totalQuantity,
+            subTotal: subTotal, 
             discount: discountAmount,
             tax: parseInt(pajak) || 0,
             totalPaid: finalPrice
         });
 
-        // 👇 UBAH JUGA BARIS INI JADI tiketPertama 👇
         res.json({ success: true, message: "Pembelian berhasil!", ticketCode: kumpulanKodeTiket[0], sisaSaldo: user.saldo });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
@@ -1430,82 +1435,71 @@ app.get('/api/check-midtrans/:orderId', async (req, res) => {
     }
 });
 // 2. Minta Token Midtrans (Jangan simpan Order dulu)
+// 2. Minta Token Midtrans (Jangan simpan Order dulu)
 app.post('/api/payment-token', async (req, res) => {
     try {
-        const { recaptchaToken, eventId, quantity = 1, price, customerName, customerEmail, customerPhone, tierName, pajak = 0, tierAccessCode } = req.body; 
+        const { recaptchaToken, eventId, tickets, customerName, customerEmail, customerPhone, pajak = 0, diskon = 0 } = req.body; 
         
         if (!recaptchaToken) return res.status(400).json({ success: false, message: "Akses ditolak. Token reCAPTCHA kosong!" });
 
-const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
+        const CLOUDFLARE_SECRET_KEY = "0x4AAAAAAEvyKgbdx_OsoemObWsg22C9l1E"; 
         const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-        
         const cfRes = await fetch(verifyUrl, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `secret=${CLOUDFLARE_SECRET_KEY}&response=${recaptchaToken}`
         });
         const cfData = await cfRes.json();
-        
         if (!cfData.success) return res.status(400).json({ success: false, message: "Verifikasi Robot gagal! Sistem menolak transaksi." });
         
-const event = await Event.findById(eventId);
+        const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event tidak ditemukan' });
 
-        // 👇 VALIDASI KODE RAHASIA TIKET 👇
-// 👇 VALIDASI KODE RAHASIA TIKET 👇
-        if (tierName && event.tickets && event.tickets.length > 0) {
-            const tierData = event.tickets.find(t => t.tierName === tierName);
-            if (tierData && tierData.accessCode) {
-                const inputCode = (tierAccessCode || '').trim().toUpperCase();
-                const validCodes = tierData.accessCode.split(',').map(c => c.trim().toUpperCase());
-                
-                if (!validCodes.includes(inputCode)) {
-                    return res.status(403).json({ message: "Akses Ditolak: Kode rahasia salah!" });
+        let subTotal = 0;
+        let item_details = [];
+
+        // Rangkum semua jenis tiket untuk Midtrans
+        for (const t of tickets) {
+            if (event.tickets && event.tickets.length > 0) {
+                const dbTier = event.tickets.find(dt => dt.tierName === t.tierName);
+                if (dbTier && dbTier.accessCode) {
+                    const inputCode = (t.accessCode || '').trim().toUpperCase();
+                    const validCodes = dbTier.accessCode.split(',').map(c => c.trim().toUpperCase());
+                    if (!validCodes.includes(inputCode)) {
+                        return res.status(403).json({ message: `Akses Ditolak: Kode rahasia untuk ${t.tierName} salah!` });
+                    }
                 }
             }
+
+            subTotal += (t.price * t.qty);
+            item_details.push({ 
+                id: `TIK-${t.tierName.substring(0, 15)}`, 
+                price: t.price, 
+                quantity: t.qty, 
+                name: `${event.name.substring(0, 20)} - ${t.tierName}`.substring(0, 50) 
+            });
         }
-        // 👆 ---------------------------- 👆
 
-        // 👇 1. HITUNG ANGKA DULU 👇
-
-        // 👇 1. HITUNG ANGKA DULU 👇
-        const numPrice = parseInt(price) || 0;
-        const numQuantity = parseInt(quantity) || 1;
         const numPajak = parseInt(pajak) || 0;
-        const gross_amount = (numPrice * numQuantity) + numPajak; // (Sudah tanpa titik koma ganda)
+        const numDiskon = parseInt(diskon) || 0;
 
+        if (numPajak > 0) {
+            item_details.push({ id: "TAX-CUSTOM", price: numPajak, quantity: 1, name: "Pajak Event" });
+        }
+        if (numDiskon > 0) {
+            item_details.push({ id: "DISCOUNT-PROMO", price: -numDiskon, quantity: 1, name: "Diskon Promo" });
+        }
+
+        let gross_amount = subTotal + numPajak - numDiskon;
         if (gross_amount <= 0) return res.status(400).json({ message: 'Total harga tidak valid' });
 
         const orderId = `TICKET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-        // 👇 2. BIKIN PARAMETER MIDTRANS 👇
         let parameter = {
-            transaction_details: { 
-                order_id: orderId, 
-                gross_amount: gross_amount 
-            },
-            customer_details: { 
-                first_name: customerName, 
-                email: customerEmail, 
-                phone: customerPhone || "0800000000" 
-            },
-            item_details: [{ 
-                id: eventId.toString().substring(0, 50), 
-                price: numPrice, 
-                quantity: numQuantity, 
-                name: `${event.name.substring(0, 30)} - ${tierName || 'General'}`.substring(0, 50) 
-            }]
+            transaction_details: { order_id: orderId, gross_amount: gross_amount },
+            customer_details: { first_name: customerName, email: customerEmail, phone: customerPhone || "0800000000" },
+            item_details: item_details
         };
-
-        // 👇 3. MASUKKAN PAJAK KE DALAM PARAMETER JIKA ADA 👇
-        if (numPajak > 0) {
-            parameter.item_details.push({
-                id: "TAX-CUSTOM",
-                price: numPajak,
-                quantity: 1,
-                name: "Pajak Event"
-            });
-        }
 
         const token = await snap.createTransactionToken(parameter);
         res.json({ token, orderId });
@@ -1517,72 +1511,70 @@ const event = await Event.findById(eventId);
 
 
 // 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
+// 3. Simpan Tiket ke DB Jika Midtrans Berhasil (VALID)
 app.post('/api/midtrans-success', async (req, res) => {
     try {
-        // 👇 PENANGKAP DATA HARUS SESUAI DENGAN FRONTEND (Ada subTotal, diskon, pajak) 👇
-        const { eventId, customerName, customerEmail, tierName, price, quantity = 1, orderId, buyerData, subTotal = 0, diskon = 0, pajak = 0 } = req.body;
+        const { eventId, customerName, customerEmail, orderId, buyerData, subTotal = 0, diskon = 0, pajak = 0, tickets } = req.body;
         
         const event = await Event.findById(eventId);
         if(!event) return res.status(404).json({ success: false, message: "Event tidak ditemukan" });
 
-let selectedTierIndex = -1;
-        if (tierName && event.tickets && event.tickets.length > 0) {
-            selectedTierIndex = event.tickets.findIndex(t => t.tierName === tierName);
-            
-        }
+        let kumpulanKodeTiket = [];
+        let totalQuantity = 0;
 
-        const hargaSatuan = price / quantity;
-        let kumpulanKodeTiket = []; // 👈 UBAH JADI ARRAY
+        // Cetak tiket sesuai array
+        for (const t of tickets) {
+            totalQuantity += t.qty;
 
-        // PABRIK TIKET LOOPING
-        for (let i = 0; i < quantity; i++) {
-            const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
-            const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
-            kumpulanKodeTiket.push(kodeUnik); // 👈 MASUKKAN SEMUA KODE KE DALAM KARUNG ARRAY
+            for (let i = 0; i < t.qty; i++) {
+                const randomStr = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+                const kodeUnik = `TIKET-${randomStr.toUpperCase()}`; 
+                kumpulanKodeTiket.push(kodeUnik); 
 
-            const newOrder = new Order({
-                ticketCode: kodeUnik,
-                eventId: eventId,
-                price: hargaSatuan, 
-                tierName: tierName || 'General',
-                quantity: 1, 
-                customerName: customerName,
-                email: customerEmail,
-                phone: buyerData ? buyerData.phone : undefined,
-                nik: buyerData ? buyerData.nik : undefined,
-                status: 'valid',
-                paymentMethod: 'MIDTRANS', 
-                orderIdMidtrans: orderId
-            });
-            await newOrder.save();
-        }
+                const newOrder = new Order({
+                    ticketCode: kodeUnik,
+                    eventId: eventId,
+                    price: t.price, 
+                    tierName: t.tierName || 'General',
+                    quantity: 1, 
+                    customerName: customerName,
+                    email: customerEmail,
+                    phone: buyerData ? buyerData.phone : undefined,
+                    status: 'valid',
+                    paymentMethod: 'MIDTRANS', 
+                    orderIdMidtrans: orderId
+                });
+                await newOrder.save();
+            }
 
-        event.availableSeats -= quantity; 
-        if (selectedTierIndex !== -1) {
-            event.tickets[selectedTierIndex].availableSeats -= quantity; 
+            event.availableSeats -= t.qty; 
+            const tierIndex = event.tickets.findIndex(dt => dt.tierName === t.tierName);
+            if (tierIndex !== -1) {
+                event.tickets[tierIndex].availableSeats -= t.qty; 
+            }
         }
         await event.save();
 
-        // 📧 KIRIM TIKET KE EMAIL (MIDTRANS)
+        let totalPaid = (parseInt(subTotal) - parseInt(diskon)) + parseInt(pajak);
+
+        // Kirim Email Midtrans
         await sendTicketEmail(customerEmail, {
             customerName: customerName,
             eventName: event.name,
-            organizer: event.organizer, // 👈 SELIPKAN INI
-            tierName: tierName || 'General',
+            organizer: event.organizer, 
+            tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '),
             location: event.location || 'TBA',
             eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
-            eventDateRaw: event.date,          // 👈 TAMBAHKAN INI
-            eventEndDateRaw: event.endDate,    // 👈 TAMBAHKAN INI
-            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), // 👈 SELIPKAN INI
-            ticketCodes: kumpulanKodeTiket, // 👈 GANTI ticketCode JADI ticketCodes 
+            eventDateRaw: event.date,          
+            eventEndDateRaw: event.endDate,    
+            eventTime: (event.startTime && event.endTime) ? `${event.startTime} - ${event.endTime} WIB` : (event.startTime || 'TBA'), 
+            ticketCodes: kumpulanKodeTiket, 
             secretData: event.secretData,
-            
-            // 👇 INI YANG TADI SALAH (DISCOUNT AMOUNT), SEKARANG SUDAH BENAR 👇
-            qty: quantity,
+            qty: totalQuantity,
             subTotal: parseInt(subTotal) || 0, 
-            discount: parseInt(diskon) || 0, // Menggunakan variabel 'diskon'
+            discount: parseInt(diskon) || 0, 
             tax: parseInt(pajak) || 0,
-            totalPaid: price 
+            totalPaid: totalPaid 
         });
 
         res.json({ success: true, ticketCode: kumpulanKodeTiket[0] });
@@ -1972,66 +1964,34 @@ app.post('/api/maintenance', async (req, res) => {
 
 // --- 1. CEK KODE PROMO SAAT CHECKOUT (Dilindungi Satpam) ---
 // --- 1. CEK KODE PROMO SAAT CHECKOUT ---
+// --- 1. CEK KODE PROMO SAAT CHECKOUT ---
 app.post('/api/check-promo', async (req, res) => {
     try {
-        const { code, eventId, tierName } = req.body;
-        
-        // 1. Cari promo di database (jangan ubah logika pencarian bawaan Mas Raga jika ada yang berbeda)
+        const { code, eventId, tickets } = req.body; // 👈 Sekarang menerima Array tickets
         const promo = await Promo.findOne({ code: code.toUpperCase() });
 
-        if (!promo) {
-            return res.status(400).json({ valid: false, message: "Kode promo tidak valid atau tidak ditemukan." });
+        if (!promo) return res.status(400).json({ valid: false, message: "Kode promo tidak valid atau tidak ditemukan." });
+        if (promo.quota <= 0) return res.status(400).json({ valid: false, message: "Kuota promo sudah habis." });
+        if (promo.eventId !== 'ALL' && promo.eventId !== eventId) return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk event ini." });
+
+        // Cek kecocokan Tier/Tipe Tiket di dalam array tickets
+        if (promo.tierName !== 'ALL') {
+            const isTierExist = tickets && tickets.some(t => t.tierName === promo.tierName);
+            if (!isTierExist) return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk tipe tiket yang kamu pilih." });
         }
 
-        // Cek apakah kuota habis
-        if (promo.quota <= 0) {
-            return res.status(400).json({ valid: false, message: "Kuota promo sudah habis." });
-        }
-
-        // Cek kecocokan Event
-        if (promo.eventId !== 'ALL' && promo.eventId !== eventId) {
-            return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk event ini." });
-        }
-
-        // Cek kecocokan Tier/Tipe Tiket
-        if (promo.tierName !== 'ALL' && promo.tierName !== tierName) {
-            return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk tipe tiket ini." });
-        }
-
-        // 👇 TAMBAHKAN BLOK VALIDASI WAKTU INI 👇
-        
-        // Dapatkan waktu saat ini di WIB (Waktu Indonesia Barat / Asia/Jakarta)
+        // Validasi Waktu
         const now = new Date();
         const wibTime = new Date(now.getTime() + (7 * 60 * 60 * 1000)); 
-        
-        // Format YYYY-MM-DD dan HH:MM untuk dibandingkan
         const hariIni = wibTime.toISOString().split('T')[0]; 
         const jamIni = wibTime.toISOString().split('T')[1].substring(0, 5); 
 
-        // A. Validasi Tanggal (validFrom & validUntil)
-        if (promo.validFrom && hariIni < promo.validFrom) {
-            return res.status(400).json({ valid: false, message: `Promo baru bisa digunakan pada tanggal ${promo.validFrom}.` });
-        }
-        if (promo.validUntil && hariIni > promo.validUntil) {
-            return res.status(400).json({ valid: false, message: "Masa aktif promo sudah lewat/kadaluarsa." });
-        }
-
-        // B. Validasi Jam Flash Sale (startTime & endTime) - Jika diset
-        if (promo.startTime && jamIni < promo.startTime) {
-            return res.status(400).json({ valid: false, message: `Promo baru aktif pukul ${promo.startTime} WIB.` });
-        }
-        if (promo.endTime && jamIni > promo.endTime) {
-            return res.status(400).json({ valid: false, message: `Waktu promo telah berakhir pada pukul ${promo.endTime} WIB.` });
-        }
+        if (promo.validFrom && hariIni < promo.validFrom) return res.status(400).json({ valid: false, message: `Promo baru bisa digunakan pada tanggal ${promo.validFrom}.` });
+        if (promo.validUntil && hariIni > promo.validUntil) return res.status(400).json({ valid: false, message: "Masa aktif promo sudah lewat/kadaluarsa." });
+        if (promo.startTime && jamIni < promo.startTime) return res.status(400).json({ valid: false, message: `Promo baru aktif pukul ${promo.startTime} WIB.` });
+        if (promo.endTime && jamIni > promo.endTime) return res.status(400).json({ valid: false, message: `Waktu promo telah berakhir pada pukul ${promo.endTime} WIB.` });
         
-        // 👆 ----------------------------------- 👆
-
-        // Jika semua lolos, promo dinyatakan VALID
-        res.json({ 
-            valid: true, 
-            discount: promo.discount, 
-            message: "Promo berhasil diterapkan!" 
-        });
+        res.json({ valid: true, discount: promo.discount, message: "Promo berhasil diterapkan!" });
 
     } catch (error) {
         console.error("Error Cek Promo:", error);
