@@ -6,9 +6,9 @@
     <title data-i18n="page_title_index">Beranda | RCELLFEST</title>
     <!-- 👇 PENGATURAN PWA & KHUSUS APPLE iOS 👇 -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#2563eb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RCELLFEST">
     <link rel="apple-touch-icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png">
 
@@ -34,15 +34,14 @@
                         <title>Maintenance</title>
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <style>
-                            body { margin:0; padding:0; font-family:sans-serif; background:#0F172A; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; }
-                            .btn { background:#3B82F6; color:white; border:none; padding:12px 30px; border-radius:50px; cursor:pointer; font-weight:bold; }
+                            body { margin:0; padding:0; font-family:sans-serif; background:#0e1e3b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; }
+                            .btn { background:white; color:#0e1e3b; border:none; padding:10px 25px; border-radius:50px; cursor:pointer; font-weight:bold; }
                         </style>
                     </head>
                     <body>
-                        <h1 style="font-size: 3rem; margin-bottom: 10px;">🚧</h1>
-                        <h2>Sistem Sedang Diperbarui</h2>
-                        <p style="color: #94A3B8; margin-bottom: 30px;">Kami sedang melakukan peningkatan sistem agar pengalamanmu lebih baik.</p>
-                        <button onclick="location.reload()" class="btn">Coba Muat Ulang</button>
+                        <h1>🚧 Lagi Didandanin! ✨</h1>
+                        <p>Website sedang maintenance rutin.</p>
+                        <button onclick="location.reload()" class="btn">Refresh</button>
                     </body>`;
                 }
             } catch (err) {}
@@ -50,726 +49,1464 @@
     </script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-KUNCI_CLIENT_KAKAK_DISINI"></script>
+    
     <link rel="icon" href="/logorcellfest.png" type="image/png">
     
     <style>
-        /* --- VARIABLES TEMA MODERN TICKETING --- */
+        /* --- CHATBOT WIDGET --- */
+        .btn-chatbot { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border: none; border-radius: 50%; box-shadow: 0 4px 20px rgba(0, 73, 204, 0.4); z-index: 9999; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
+        .btn-chatbot:hover { transform: scale(1.1); }
+        
+        .chat-widget { position: fixed; bottom: 100px; right: 30px; width: 350px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 9999; display: none; flex-direction: column; overflow: hidden; transition: 0.3s; }
+        .chat-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { height: 300px; overflow-y: auto; padding: 15px; background: var(--bg-section); display: flex; flex-direction: column; gap: 10px; }
+        .chat-footer { padding: 10px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
+        
+        .chat-msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+        .chat-msg.ai { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 0; }
+        .chat-msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+        
+        .typing-indicator { font-size: 0.8rem; color: var(--text-muted); align-self: flex-start; margin-left: 10px; display: none; font-style: italic; }
+
+        /* --- VARIABLES --- */
         :root {
-            /* Warna Dasar */
-            --primary: #1D4ED8;        /* Biru Utama (Trust/Aksi) */
-            --primary-hover: #1E40AF;
-            --primary-light: #EFF6FF;
-            --secondary: #F59E0B;      /* Aksen (Untuk Rating/Sorotan) */
+            --bg-body: #f8fafc;
+            --bg-nav: #ffffff;
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --bg-section: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
             
-            /* Backgrounds */
-            --bg-body: #F8FAFC;        /* Abu-abu sangat terang agar Card putih menonjol */
-            --bg-nav: rgba(255, 255, 255, 0.95);
-            --bg-card: #FFFFFF;
-            --bg-input: #F1F5F9;
-            --bg-section: #FFFFFF;
-            
-            /* Text */
-            --text-main: #0F172A;      /* Hitam kebiruan (elegan) */
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-            --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
-            
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
+            --cat-text-color: #475569;
+            --cat-text-active: #2563eb;
+            --hover-cat: #eff6ff;
         }
 
         [data-theme="dark"] {
-            --bg-body: #0B1120;
-            --bg-nav: rgba(15, 23, 42, 0.95);
-            --bg-card: #1E293B;
-            --bg-input: #0F172A;
-            --bg-section: #0F172A;
-            --text-main: #F8FAFC;
-            --text-muted: #94A3B8;
-            --border-color: #334155; 
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
-            --primary: #3B82F6;
-            --primary-light: rgba(59, 130, 246, 0.1);
+            --bg-body: #121212;
+            --bg-nav: #1e1e1e;
+            --bg-card: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --bg-section: #181818;
+            --text-main: #f8f9fa;
+            --text-muted: #a1a1aa;
+            --border-color: #333333; 
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.15);
         }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; /* Font modern seperti Gojek/Tokopedia */
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            padding-top: 100px; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s, color 0.3s; 
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 114px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        /* --- NAVBAR --- */
-        .navbar { 
-            background-color: var(--bg-nav) !important; 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm); 
-            padding: 10px 0; 
-            height: 70px; 
-            border-bottom: 1px solid var(--border-color);
-        }
-        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.3rem; letter-spacing: -0.5px; }
-        .nav-link { font-weight: 600; color: var(--text-muted); font-size: 0.95rem; }
+        .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
+        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
         .nav-link:hover { color: var(--primary); }
-        .nav-glass-btn { background: var(--bg-input) !important; border: 1px solid var(--border-color) !important; color: var(--text-main); }
-        .nav-glass-btn:hover { background: var(--border-color) !important; }
+        [data-theme="dark"] .nav-link { color: #e2e8f0; }
+        [data-theme="dark"] .nav-link:hover { color: var(--primary); }
 
-        /* --- HERO & SEARCH SECTION --- */
-        .hero-section {
-            padding: 20px 0 60px;
-            background-color: var(--bg-body);
-        }
-        .hero-slider-wide { border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-md); }
-        .hero-slider-wide img { aspect-ratio: 21/8; object-fit: cover; width: 100%; border-radius: var(--radius-xl); }
+        .hero-section { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; }
+        .hero-title { font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
+        @media (max-width: 768px) { .hero-section { padding: 40px 0 90px 0; } .hero-title { font-size: 2rem; } .hero-lead { font-size: 0.9rem; max-width: 90%; margin: 0 auto; } }
+        @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
+        .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
         
-        .search-wrapper {
-            margin-top: -30px;
-            position: relative;
-            z-index: 10;
-            padding: 0 15px;
-        }
-        .search-box { 
-            background: var(--bg-card); 
-            padding: 10px 15px; 
-            border-radius: 50px; 
-            box-shadow: var(--shadow-md); 
-            display: flex; 
-            align-items: center; 
-            max-width: 800px; 
-            margin: 0 auto;
-            border: 1px solid var(--border-color);
-        }
-        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px; font-size: 1rem; background: transparent; color: var(--text-main); font-weight: 500; }
-        .btn-search { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 40px; font-weight: 700; transition: 0.2s; }
-        .btn-search:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; width: 100%; max-width: 700px; }
+        .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
+        [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
+        .btn-search { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
+        .btn-search:hover { filter: brightness(0.9); }
 
-        /* --- CATEGORIES HORIZONTAL SCROLL (Modern App Style) --- */
-        .category-container {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        .category-container::-webkit-scrollbar { display: none; }
+        .category-item { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 12px; }
+        .category-item:hover, .category-item.active { background: var(--hover-cat); transform: scale(1.05); }
+        .category-item.active .cat-text { color: var(--cat-text-active); font-weight: 800; }
+        .icon-circle { width: 45px; height: 45px; background: #e6f0ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto 8px auto; }
+        [data-theme="dark"] .icon-circle { background: rgba(96, 165, 250, 0.1); color: var(--primary); }
+        .cat-text { font-size: 0.8rem; font-weight: 600; color: var(--cat-text-color); }
+
+        .card-event { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; background: var(--bg-card); height: 100%; display: flex; flex-direction: column; cursor: pointer; }
+        .card-event:hover { transform: translateY(-5px); box-shadow: 0 15px 30px var(--shadow-color); border-color: transparent; }
+        .card-img-top { height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px; }
+        .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
+        .category-badge-img { position: relative; z-index: 2; background: var(--primary); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
+        .pinned-badge-img { position: absolute; top: 12px; left: 12px; z-index: 2; background: #ef4444; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: var(--primary); padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
+        .event-venue { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .price-val { font-size: 1rem; font-weight: 700; color: #ff5e1f; margin-bottom: 15px; }
+        .btn-outline-book { border: 1px solid var(--primary); color: var(--primary); font-weight: 600; padding: 8px; border-radius: 8px; background: transparent; width: 100%; margin-top: auto; font-size: 0.9rem; position: relative; z-index: 2; }
+        .btn-outline-book:hover { background: var(--primary); color: white; }
+        .btn-outline-book.disabled { border-color: #ddd; color: #aaa; background: #f9f9f9; cursor: not-allowed; }
+        [data-theme="dark"] .btn-outline-book.disabled { border-color: #475569; color: #64748b; background: #1e293b; }
+
+        .footer-loket { background-color: #0e1e3b; color: white; padding: 50px 0 30px 0; margin-top: 0; font-size: 0.85rem; }
+        .footer-head { font-weight: 700; margin-bottom: 15px; color: white; font-size: 0.95rem; }
+        .footer-link { display: block; color: #b0c0d6; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+        .footer-link:hover { color: white; text-decoration: underline; }
+        .social-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 8px; text-decoration: none; }
+        .social-btn:hover { background: white; color: #0e1e3b; }
+
+        .modal-header-img { height: 250px; background-color: #ddd; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: flex-start; color: white; font-size: 3rem; border-radius: 12px 12px 0 0; padding: 20px; position: relative; }
+        .modal-header-img::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%); border-radius: 12px 12px 0 0; }
+        .modal-content { border-radius: 16px; border: none; background-color: var(--bg-nav); color: var(--text-main); }
+        .modal-price-tag { font-size: 1.5rem; font-weight: 800; color: #ff5e1f; }
+        .modal-desc-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
+        [data-theme="dark"] .bg-light { background-color: #334155 !important; }
+        [data-theme="dark"] .text-dark { color: #fff !important; }
+        [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+        .partner-section { background-color: var(--bg-section); border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; overflow: hidden; }
+        .partner-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-bottom: 25px; text-align: center; }
+        .logos-slider { white-space: nowrap; position: relative; }
+        .logos-slide-track { display: inline-block; animation: 35s slide-infinite linear infinite; }
+        .logos-slide-track img { height: 35px; margin: 0 40px; filter: grayscale(100%) opacity(0.6); transition: all 0.3s ease; cursor: pointer; vertical-align: middle; }
+        .logos-slide-track img:hover { filter: grayscale(0%) opacity(1); transform: scale(1.15); }
+        .logos-slider:hover .logos-slide-track { animation-play-state: paused; }
+        @keyframes slide-infinite { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        [data-theme="dark"] .logos-slide-track img { filter: brightness(0) invert(1) opacity(0.8); }
+
+        .payment-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .payment-card { border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: var(--bg-card); }
+        .payment-card:hover { border-color: var(--primary); background: var(--hover-cat); transform: translateY(-2px); }
+        .payment-card.selected { border-color: var(--primary); background: #e6f0ff; }
+        [data-theme="dark"] .payment-card.selected { background: #1e293b; border-color: var(--primary); }
+        .payment-icon { font-size: 1.5rem; color: var(--primary); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(0, 73, 204, 0.1); border-radius: 10px; }
+        .payment-details h6 { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .payment-details p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
         
-        .category-pill {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
+        .swal2-html-container .form-control { color: var(--text-main); background-color: var(--bg-input); border: 1px solid var(--border-color); }
+        .swal2-html-container .form-label { color: var(--text-muted); }
+
+        .tier-label { cursor: pointer; transition: 0.2s; border: 2px solid var(--border-color); background-color: var(--bg-card); }
+        .tier-label:hover { border-color: var(--primary); }
+        .tier-label input:checked + div { font-weight: bold; }
+        .tier-sold-out { background-color: var(--bg-section); opacity: 0.5; cursor: not-allowed; }
+
+        /* 🔥 WIDGET NOTIFIKASI BERITA 🔥 */
+        .news-toast { position: fixed; top: 110px; left: 50%; background: var(--bg-card, #18181b); border: 1px solid var(--primary, #3b82f6); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9998; width: 90%; max-width: 350px; display: flex; align-items: flex-start; gap: 15px; overflow: hidden; opacity: 0; visibility: hidden; transform: translate(-50%, -150%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .news-toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+        .news-progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--primary, #3b82f6); width: 100%; border-radius: 0 0 16px 16px; }
+        .news-toast.show .news-progress-bar { animation: shrinkBar 10s linear forwards; }
+        @keyframes shrinkBar { 0% { width: 100%; } 100% { width: 0%; } }
+        .news-icon { font-size: 1.5rem; color: var(--primary, #3b82f6); animation: pulseIcon 2s infinite; }
+        @keyframes pulseIcon { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .news-content h6 { font-size: 0.75rem; color: var(--text-muted); margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; position: relative; z-index: 2; }
+        .news-content a { color: var(--text-main); font-weight: 600; font-size: 0.9rem; text-decoration: none; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: 0.2s; position: relative; z-index: 2; }
+        .news-content a:hover { color: var(--primary, #3b82f6); }
+        .close-news { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 0; margin-left: auto; transition: 0.2s; position: relative; z-index: 2; }
+        .close-news:hover { color: var(--text-main); transform: scale(1.2); }
+
+        .signal-badge { position: fixed; bottom: 42px; right: 105px; z-index: 9998; background-color: #424242; color: #ffffff; border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .signal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-kuat { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .dot-sedang { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
+        .dot-lemah { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
+
+        .hero-slider-wide { border-radius: 20px; background: var(--bg-card); position: relative; margin-bottom: 40px; }
+        .hero-slider-wide img { aspect-ratio: 21/7; object-fit: cover; width: 100%; border-radius: 20px; }
+        .custom-nav-btn { width: 45px; height: 45px; background: white; border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 15; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #333; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .custom-nav-btn.prev-btn { left: -20px; }
+        .custom-nav-btn.next-btn { right: -20px; }
+        .custom-nav-btn:hover { background: var(--primary); color: white; transform: translateY(-50%) scale(1.1); }
+        [data-theme="dark"] .custom-nav-btn { background: #1e293b; color: white; }
+        .custom-indicators { position: absolute; bottom: -35px; margin: 0; padding: 0; display: flex; justify-content: center; gap: 8px; width: 100%; left: 0; }
+        .custom-indicators button { width: 10px !important; height: 10px !important; border-radius: 50% !important; background-color: #cbd5e1 !important; border: none !important; opacity: 1 !important; transition: 0.3s !important; margin: 0 !important; }
+        .custom-indicators button.active { background-color: var(--primary) !important; transform: scale(1.3) !important; }
+
+        @media (max-width: 768px) { 
+            .hero-slider-wide img { aspect-ratio: 16/9; } 
+            .custom-nav-btn { display: none; } 
+            body { font-family: 'Inter', 'Poppins', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 118px; transition: background-color 0.2s, color 0.2s; }
+            .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px var(--shadow-color); }
+            .form-control, .form-select { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
+            .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+            .btn-primary { background-color: var(--primary); border: none; border-radius: 8px; padding: 12px; font-weight: 600; color: white; transition: all 0.2s; }
+            .btn-primary:hover { background-color: #004494; }
         }
-        .category-pill i { font-size: 1.1rem; }
-        .category-pill:hover, .category-pill.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+
+        .navbar .container { display: flex !important; flex-wrap: nowrap !important; align-items: center; }
+        .navbar .d-flex { flex-wrap: nowrap !important; align-items: center; }
+
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: 1.05rem !important; margin-right: auto !important; white-space: nowrap; }
+            .navbar-brand img { width: 24px !important; height: 24px !important; }
+            
+            /* Sembunyikan teks ID/EN di HP agar tombol bendera muat */
+            .navbar #langText { display: none !important; } 
+            .navbar #btnLang { padding: 0 10px !important; height: 34px !important; }
+            .navbar #theme-btn { width: 34px !important; height: 34px !important; }
+            .navbar #theme-btn i { font-size: 0.85rem !important; }
+        }
+
+        #aesthetic-preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-body); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease-out, visibility 0.6s ease-out; }
+        .preloader-brand { font-size: 2.5rem; font-weight: 900; letter-spacing: 3px; color: var(--primary); text-transform: uppercase; animation: pulse-glow 1.5s infinite alternate; margin-bottom: 25px; }
+        .preloader-ring { width: 50px; height: 50px; border: 4px solid var(--border-color); border-top-color: var(--primary); border-radius: 50%; animation: spin-smooth 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; }
+        @keyframes pulse-glow { 0% { text-shadow: 0 0 10px rgba(59,130,246,0.1); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(59,130,246,0.8); transform: scale(1.05); } }
+        @keyframes spin-smooth { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hide-preloader { opacity: 0; visibility: hidden; }
+        
+        /* 🔥 TOMBOL KACA (GLASSMORPHISM) UNTUK NAVBAR 🔥 */
+        .nav-glass-btn {
+            background: rgba(0, 0, 0, 0.04) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            transition: all 0.3s ease;
+        }
+        .nav-glass-btn:hover {
+            background: rgba(0, 0, 0, 0.08) !important;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
         }
 
-        /* --- EVENT CARDS --- */
-        .card-event { 
-            border: none; 
-            border-radius: var(--radius-lg); 
-            background: var(--bg-card); 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            border: 1px solid var(--border-color);
+        [data-theme="dark"] .nav-glass-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
         }
-        .card-event:hover { 
-            transform: translateY(-6px); 
-            box-shadow: var(--shadow-md); 
-            border-color: var(--primary-light);
+        [data-theme="dark"] .nav-glass-btn:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
         }
-        .card-img-top { 
-            height: 200px; 
-            width: 100%; 
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            background-size: cover; 
-            background-position: center; 
-            position: relative; 
-        }
-        .category-badge-img { 
-            position: absolute; 
-            top: 12px; 
-            left: 12px; 
-            background: rgba(0,0,0,0.6); 
-            backdrop-filter: blur(4px);
-            color: white; 
-            font-size: 0.7rem; 
-            padding: 4px 10px; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .card-body { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; }
-        .event-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; line-height: 1.4; color: var(--text-main); }
-        .event-venue { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 500;}
         
-        .price-section { margin-top: auto; border-top: 1px dashed var(--border-color); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;}
-        .price-label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: -2px;}
-        .price-val { font-size: 1.1rem; font-weight: 800; color: #E11D48; } /* Merah harga seperti di ticketing */
-        
-        /* Tombol Beli di Card */
-        .btn-card-action {
-            background: var(--primary-light);
-            color: var(--primary);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            transition: 0.2s;
+        /* 🔥 PAKSA WARNA IKON TEMA SECARA PERMANEN 🔥 */
+        #theme-icon {
+            color: #0f172a !important; 
+            transition: color 0.3s ease;
         }
-        .card-event:hover .btn-card-action { background: var(--primary); color: white; }
-        .btn-card-action.disabled { background: var(--bg-input); color: var(--text-muted); }
+        [data-theme="dark"] #theme-icon {
+            color: #FFD700 !important; 
+        }
 
-        /* --- FOOTER MODERN --- */
-        .footer-loket { background-color: var(--bg-card); color: var(--text-main); padding: 60px 0 30px; border-top: 1px solid var(--border-color); }
-        .footer-head { font-weight: 800; margin-bottom: 20px; color: var(--text-main); font-size: 1rem; }
-        .footer-link { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 12px; transition: 0.2s; font-size: 0.9rem; font-weight: 500;}
-        .footer-link:hover { color: var(--primary); transform: translateX(5px); }
-        .social-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--bg-input); display: inline-flex; align-items: center; justify-content: center; color: var(--text-main); margin-right: 8px; transition: 0.2s; }
-        .social-btn:hover { background: var(--primary); color: white; }
-
-        /* --- CHATBOT WIDGET --- */
-        .btn-chatbot { position: fixed; bottom: 90px; right: 20px; width: 55px; height: 55px; background: var(--primary); color: white; border: none; border-radius: 50%; box-shadow: var(--shadow-md); z-index: 9999; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        
-        /* --- MOBILE BOTTOM NAV (App Style) --- */
+        /* ========================================= */
+        /* 🔥 FLOATING BOTTOM NAVBAR (LIQUID GLASS) 🔥 */
+        /* ========================================= */
         .mobile-bottom-nav { 
             display: none; 
             position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            background: var(--bg-nav) !important; 
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border-color);
-            padding: 10px 20px; 
-            padding-bottom: env(safe-area-inset-bottom, 10px); /* Untuk iPhone */
+            bottom: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 400px; 
+            
+            /* Efek Kaca Transparan (Mode Terang) */
+            background: rgba(255, 255, 255, 0.4) !important; 
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6) !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+            
+            border-radius: 50px; 
+            padding: 8px 12px; 
             z-index: 9999; 
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease; 
         }
-        .mobile-bottom-nav ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: space-around; align-items: center; }
-        .mobile-bottom-nav a { text-decoration: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 1.2rem; transition: 0.2s; }
-        .mobile-bottom-nav a.active { color: var(--primary); }
-        .mobile-bottom-nav a .nav-text { font-size: 0.7rem; font-weight: 700; }
-        
+
+        [data-theme="dark"] .mobile-bottom-nav { 
+            /* Efek Kaca Transparan (Mode Gelap) */
+            background: rgba(24, 24, 27, 0.45) !important; 
+            border-color: rgba(255, 255, 255, 0.1) !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
+        }
+        .mobile-bottom-nav ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .mobile-bottom-nav li { display: flex; justify-content: center; }
+        .mobile-bottom-nav a { text-decoration: none; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 50px; font-size: 1.3rem; transition: all 0.3s ease; }
+        .mobile-bottom-nav a.active { background-color: var(--primary, #2563eb); color: #ffffff; padding: 10px 20px; }
+        .mobile-bottom-nav a .nav-text { display: none; font-size: 0.9rem; font-weight: 700; }
+        .mobile-bottom-nav a.active .nav-text { display: block; }
         @media (max-width: 768px) {
             .mobile-bottom-nav { display: block; }
-            body { padding-bottom: 80px; }
-            .hero-slider-wide img { aspect-ratio: 16/9; border-radius: 0; }
-            .hero-slider-wide { border-radius: 0; }
-            .search-box { margin: 0 10px; border-radius: 16px; flex-direction: column; gap: 10px; padding: 15px; }
-            .search-input { width: 100%; border-bottom: 1px solid var(--border-color); border-radius: 0; padding-bottom: 10px; }
-            .btn-search { width: 100%; }
-            .btn-chatbot { bottom: 85px; right: 15px; width: 45px; height: 45px; font-size: 1.2rem;}
+            body { padding-bottom: 100px !important; }
         }
-
-        /* --- MODAL DETAIL MODERN --- */
-        .modal-content { border-radius: var(--radius-xl); border: none; overflow: hidden; background: var(--bg-card); }
-        .modal-header-img { height: 280px; position: relative; }
-        .modal-header-img::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, var(--bg-card), transparent); }
-        .btn-close-custom { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); border-radius: 50%; padding: 10px; z-index: 10;}
-        .tier-label { border: 2px solid var(--border-color); border-radius: var(--radius-md); transition: 0.2s; margin-bottom: 10px;}
-        .tier-label:hover { border-color: var(--primary-light); background: var(--bg-input); }
-        .tier-label input:checked + div { font-weight: 800; }
-        .tier-label:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
-
-        /* Sisanya (Signal, Preloader, Toast News) disesuaikan warnanya dengan root variables */
-        #aesthetic-preloader { background-color: var(--bg-body); z-index: 99999; }
-        .preloader-brand { color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="aesthetic-preloader" style="position: fixed; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: 0.5s;">
-        <div class="preloader-brand fs-1 fw-bold">RCELLFEST</div>
-        <div class="spinner-border text-primary mt-3" role="status"></div>
+    <!-- 👇 PRELOADER AESTHETIC 👇 -->
+    <div id="aesthetic-preloader">
+        <div class="preloader-brand">RCELLFEST</div>
+        <div class="preloader-ring"></div>
+        <div class="text-muted small fw-bold mt-3" style="letter-spacing: 1px;">MEMUAT HALAMAN...</div>
     </div>
+    <!-- 👆 -------------------- 👆 -->
 
-    <!-- BANNER PROMO KREATOR -->
-    <div style="background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 1040; height: 32px; display: flex; align-items: center; justify-content: center;">
-        <a href="https://rcm.rcellfest.my.id" class="text-white text-decoration-none fw-bold small">
-            🎉 Jual Tiket Eventmu di RCELLFEST! <span class="text-warning">Coba Gratis &rarr;</span>
+    <!-- 👇 BANNER CTA KREATOR DI PALING ATAS 👇 -->
+    <div style="background: linear-gradient(90deg, #2563eb, #10b981); position: fixed; top: 0; left: 0; width: 100%; z-index: 1040; height: 38px; display: flex; align-items: center; justify-content: center;" class="shadow-sm">
+        <a href="https://rcm.rcellfest.my.id" class="text-white text-decoration-none fw-bold d-flex align-items-center justify-content-center gap-2" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+            <span class="d-none d-md-inline">🎉 Yuk Buat Event Bersama Kami! Kelola dan Jual Tiketmu Sekarang</span>
+            <span class="d-inline d-md-none">🎉 Yuk Buat Event Bersama Kami!</span>
+            <span class="badge bg-white text-primary rounded-pill px-2 py-1 ms-1" style="font-size: 0.7rem;">Coba RCM Gratis <i class="bi bi-arrow-right"></i></span>
         </a>
     </div>
+    <!-- 👆 ----------------------------------- 👆 -->
 
-    <!-- NAVBAR MODERN -->
-    <nav class="navbar navbar-expand-lg fixed-top" style="top: 32px;">
+    <nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-                <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo" style="height: 28px;"> RCELLFEST
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
             </a>
-            
             <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
-                <ul class="navbar-nav gap-3">
+                <ul class="navbar-nav d-none d-md-flex">
                     <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav_explore">Jelajah</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about" data-i18n="nav_about">Tentang</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/guide" data-i18n="nav_guide">Panduan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about" data-i18n="nav_about">Tentang Kami</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/guide" data-i18n="nav_guide">Panduan & Bantuan</a></li>
                 </ul>
             </div>
             
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn nav-glass-btn rounded-circle p-2" id="theme-btn" onclick="toggleTheme()">
+            <!-- 👇 KELOMPOK TOMBOL NAVBAR 👇 -->
+            <div class="d-flex align-items-center gap-2 flex-nowrap">
+                <!-- Tombol Tema Efek Kaca -->
+                <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
                     <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-                </button>
+                </button>                
                 
+                <!-- Tombol Dropdown Bahasa -->
                 <div class="dropdown">
-                    <button class="btn nav-glass-btn rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2" data-bs-toggle="dropdown" id="btnLang">
-                        <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 16px; border-radius: 2px;">
-                        <span id="langText">ID</span>
+                    <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px;" id="btnLang">
+                        <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
+                        <span class="fw-bold small" id="langText" style="color: var(--text-main);">ID</span>
+                        <i class="bi bi-chevron-down small" style="font-size: 0.7rem; color: var(--text-muted);"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                        <li><a class="dropdown-item" href="#" onclick="changeLang('id')">🇮🇩 Indonesia</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="changeLang('en')">🇬🇧 English</a></li>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow border-0 mt-2" style="background-color: #1e293b; min-width: 130px; border-radius: 12px;">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('id')">
+                                <img src="https://flagcdn.com/w20/id.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> Indonesia
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-white" href="javascript:void(0)" onclick="changeLang('en')">
+                                <img src="https://flagcdn.com/w20/gb.png" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;"> English
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 
-                <div id="navUserArea" class="ms-2">
-                    <a href="/user-login" class="btn btn-primary rounded-pill px-4 fw-bold">Masuk</a>
+                <div id="navUserArea" class="ms-1">
+                    <a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm" data-i18n="nav_login">Masuk</a>
                 </div>
             </div>
         </div> 
     </nav>
 
-    <!-- HERO SECTION (Slider + Floating Search) -->
-    <section class="hero-section">
-        <div class="container">
-            <!-- Carousel Slider -->
-            <div id="heroEventSlider" class="carousel slide hero-slider-wide" data-bs-ride="carousel">
-                <div class="carousel-inner" id="heroSliderContent">
-                    <div class="carousel-item active" style="height: 300px; background: var(--bg-input);"></div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#heroEventSlider" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#heroEventSlider" data-bs-slide="next">
-                    <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                </button>
-            </div>
-
-            <!-- Floating Search Box -->
-            <div class="search-wrapper">
-                <div class="search-box">
-                    <i class="bi bi-search text-muted ms-2 fs-5"></i>
-                    <input type="text" id="searchInput" class="search-input mx-2" placeholder="Cari event, artis, atau kota...">
-                    <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Temukan Event</button>
-                </div>
+    <section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
+        <div class="hero-bg-circle"></div>
+        <div class="container position-relative z-1">
+            <h1 class="hero-title mb-3 text-white" data-i18n="hero_title" style="line-height: 1.3;">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
+            <p class="hero-lead text-white opacity-75 mb-4" data-i18n="hero_subtitle">Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.</p>
+            
+            <div class="search-box mx-auto position-relative z-3">
+                <i class="bi bi-search text-secondary ms-2"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari konser, artis, atau lokasi...">
+                <button onclick="searchEvent()" class="btn-search" data-i18n="btn_search">Cari</button>
             </div>
         </div>
     </section>
 
-    <!-- MAIN CONTENT (Categories & Event Grid) -->
-    <div class="container mb-5">
-        
-        <!-- Modern Categories Scroll -->
-        <h5 class="fw-bold mb-3" data-i18n="section_hot">Eksplor Kategori</h5>
-        <div class="category-container">
-            <div class="category-pill active" id="btn-cat-All" onclick="filterCategory('All')">
-                <i class="bi bi-grid-fill"></i> <span data-i18n="cat_all">Semua Event</span>
+    <div class="container position-relative z-2" style="margin-top: -40px;">
+        <div id="heroEventSlider" class="carousel slide hero-slider-wide shadow-lg" data-bs-ride="carousel">
+            
+            <div class="carousel-indicators custom-indicators" id="heroSliderIndicators"></div>
+            
+            <div class="carousel-inner rounded-4" id="heroSliderContent" style="background: var(--bg-card);">
+                <div class="carousel-item active">
+                    <div class="d-flex align-items-center justify-content-center" style="aspect-ratio: 21/7; background: rgba(0,0,0,0.1);">
+                        <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
             </div>
-            <div class="category-pill" id="btn-cat-Konser" onclick="filterCategory('Konser')">
-                <i class="bi bi-music-note-beamed"></i> <span data-i18n="cat_concert">Konser Musik</span>
-            </div>
-            <div class="category-pill" id="btn-cat-Olahraga" onclick="filterCategory('Olahraga')">
-                <i class="bi bi-trophy-fill"></i> <span data-i18n="cat_sports">Olahraga</span>
-            </div>
-            <div class="category-pill" id="btn-cat-Workshop" onclick="filterCategory('Workshop')">
-                <i class="bi bi-palette-fill"></i> <span data-i18n="cat_workshop">Workshop</span>
-            </div>
-            <div class="category-pill" id="btn-cat-Streaming" onclick="filterCategory('Streaming')">
-                <i class="bi bi-camera-reels"></i> <span data-i18n="cat_streaming">Streaming</span>
-            </div>
+
+            <button class="custom-nav-btn prev-btn" type="button" data-bs-target="#heroEventSlider" data-bs-slide="prev">
+                <i class="bi bi-chevron-left fs-5"></i>
+            </button>
+            <button class="custom-nav-btn next-btn" type="button" data-bs-target="#heroEventSlider" data-bs-slide="next">
+                <i class="bi bi-chevron-right fs-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center mb-5 g-2 px-2">
+            <div class="col-3 col-md-2" onclick="filterCategory('All')"><div class="category-item" id="btn-cat-All"><div class="icon-circle"><i class="bi bi-grid-fill"></i></div><div class="cat-text" data-i18n="cat_all">Semua</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Konser')"><div class="category-item" id="btn-cat-Konser"><div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div><div class="cat-text" data-i18n="cat_concert">Konser</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')"><div class="category-item" id="btn-cat-Olahraga"><div class="icon-circle"><i class="bi bi-trophy-fill"></i></div><div class="cat-text" data-i18n="cat_sports">Olahraga</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Workshop')"><div class="category-item" id="btn-cat-Workshop"><div class="icon-circle"><i class="bi bi-palette-fill"></i></div><div class="cat-text" data-i18n="cat_workshop">Workshop</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')"><div class="category-item" id="btn-cat-Streaming"><div class="icon-circle"><div class="icon-circle"><i class="bi bi-camera-reels"></i></div><div class="cat-text" data-i18n="cat_streaming">Streaming</div></div></div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
-            <h4 class="fw-bold m-0">Event Pilihan</h4>
-            <a href="#" class="text-primary text-decoration-none fw-bold small" onclick="filterCategory('All')">Lihat Semua <i class="bi bi-chevron-right"></i></a>
+        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+            <h5 class="fw-bold m-0">🔥 <span data-i18n="section_hot">Pilihan Hari Ini</span></h5>
+            <a href="#" class="text-decoration-none fw-bold small" onclick="filterCategory('All')"><span data-i18n="link_view_all">Lihat Semua</span> <i class="bi bi-arrow-right"></i></a>
         </div>
 
-        <!-- Event Grid -->
-        <div class="row g-4" id="event-list">
+        <div class="row g-3" id="event-list">
             <div class="col-12 text-center py-5">
                 <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-secondary small" data-i18n="loading_text">Memuat event...</p>
             </div>
         </div>
-        
-        <!-- Infinite Scroll Sensor -->
+
+        <!-- 👇 SENSOR INFINITE SCROLL OTOMATIS 👇 -->
         <div class="col-12 text-center mt-4 mb-4" id="scrollLoadContainer" style="display: none;">
             <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
             <div class="spinner-grow spinner-grow-sm text-primary mx-1" role="status" style="animation-delay: 0.2s;"></div>
             <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.4s;"></div>
+            <div class="d-block mt-2 text-muted small fw-bold" style="letter-spacing: 2px;">MENARIK DATA...</div>
         </div>
 
-        <!-- Event Coming Soon -->
-        <div id="section-coming-soon" style="display: none;" class="mt-5 pt-4 border-top">
-            <h5 class="fw-bold mb-4 text-muted"><i class="bi bi-clock-history"></i> Segera Hadir</h5>
-            <div class="row g-4" id="event-coming-soon-list"></div>
+        <!-- 👇 WADAH EVENT SEGERA HADIR / AKAN DATANG 👇 -->
+        <div id="section-coming-soon" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3 px-2 mt-5 border-top pt-4">
+                <h5 class="fw-bold m-0 text-info"><i class="bi bi-hourglass-split"></i> Akan Datang</h5>
+            </div>
+            <div class="row g-3" id="event-coming-soon-list"></div>
         </div>
-    </div>
+    </div> 
 
-    <!-- PARTNER PEMBAYARAN -->
-    <section class="py-5" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
-        <div class="container text-center">
-            <h6 class="text-muted fw-bold mb-4 text-uppercase tracking-wider">Metode Pembayaran Aman & Terpercaya</h6>
-            <div class="d-flex justify-content-center flex-wrap gap-3 opacity-75">
-                <!-- Ganti dengan logo yang bersih -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" height="24" alt="QRIS">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" height="24" alt="GoPay">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" height="24" alt="BCA">
-                <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" height="20" alt="BNI">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" height="24" alt="BRI">
+    <section class="partner-section">
+        <div class="container-fluid p-0">
+            <p class="partner-title" data-i18n="partner_title">Partner Pembayaran Resmi</p>
+            <div class="logos-slider">
+                <div class="logos-slide-track">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                </div>
+                <div class="logos-slide-track">
+                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"><img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"><img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg" alt="LinkAja"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri"><img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI"><img src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg" alt="BRI"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- FOOTER MODERN -->
     <footer class="footer-loket">
         <div class="container">
             <div class="row g-4">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo" style="height: 40px; margin-bottom: 15px;">
-                    <p class="text-muted small pe-md-4">RCELLFEST adalah platform manajemen tiket dan event terpercaya. Temukan pengalaman tak terlupakan dan kemudahan bertransaksi dalam satu sentuhan.</p>
-                </div>
-                <div class="col-6 col-md-2">
-                    <div class="footer-head">Perusahaan</div>
-                    <a href="/about" class="footer-link">Tentang Kami</a>
-                    <a href="/blog" class="footer-link">Blog & Berita</a>
-                    <a href="/career" class="footer-link">Karir</a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="footer-head">Dukungan</div>
-                    <a href="/guide" class="footer-link">Pusat Bantuan</a>
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head" data-i18n="footer_about">Tentang</div>
+                    <a href="/about" class="footer-link" data-i18n="nav_about">Tentang Kami</a>
+                    <a href="/blog" class="footer-link">Blog</a>
+                    <a href="/career" class="footer-link" data-i18n="footer_career">Karir</a>
                     <a href="/terms" class="footer-link">Syarat & Ketentuan</a>
                     <a href="/privacy" class="footer-link">Kebijakan Privasi</a>
                 </div>
-                <div class="col-md-3">
-                    <div class="footer-head">Sosial Media</div>
-                    <div class="d-flex">
-                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+                <div class="col-6 col-lg-3">
+                    <div class="footer-head" data-i18n="footer_organizer">Penyelenggara</div>
+                    <a href="https://rcm.rcellfest.my.id" class="footer-link" data-i18n="footer_create">Buat Event</a>
+                    <a href="/guide" class="footer-link" data-i18n="footer_guide">Panduan</a>
+                    <a href="/admin" class="footer-link text-warning">Login Admin</a>
+                </div>
+                <div class="col-lg-3">
+                    <div class="footer-head" data-i18n="footer_follow">Ikuti Kami</div>
+                    <div class="mb-3">
+                        <a href="https://www.instagram.com/ragaes_15" target="_blank" class="social-btn"><i class="bi bi-instagram"></i></a>
+                        <a href="https://twitter.com/rcellfest" target="_blank" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.youtube.com/@rcellfest" target="_blank" class="social-btn"><i class="bi bi-youtube"></i></a>
+                        <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
-            </div>
-            <div class="mt-5 pt-4 border-top text-center text-muted small">
-                &copy; 2025-2026 RCELLFEST ID. All rights reserved.<br>
-                Powered by IT RCELLTECH (v4.2)
-            </div>
-        </div>
+
+                <div class="col-12 text-center mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                    <small class="text-white-50 d-block mb-1">
+                        &copy; 2025-2026 RCELLFEST ID. All rights reserved.
+                    </small>
+                    <small class="text-white-50 d-block" style="font-size: 0.75rem;">
+                        Created by <a href="#" class="text-white text-decoration-none">IT RCELLTECH</a> (v4.2)
+                    </small>
+                </div>
+            </div> 
+        </div> 
     </footer>
 
     <!-- MODAL DETAIL EVENT -->
-    <div class="modal fade" id="eventDetailModal" tabindex="-1">
+    <div class="modal fade" id="eventDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal"></button>
-                <div class="modal-header-img" id="modalHeaderImg" style="background-size: cover; background-position: center;"></div>
-                
-                <div class="modal-body p-4 p-md-5" style="margin-top: -40px; position: relative; z-index: 2; background: var(--bg-card); border-radius: 24px 24px 0 0;">
-                    <div class="d-flex gap-2 mb-3">
-                        <span class="badge bg-primary px-3 py-2 rounded-pill" id="modalCategory">Konser</span>
-                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" id="modalOrganizer"><i class="bi bi-building"></i> RCELLFEST</span>
-                    </div>
-                    
-                    <h2 class="fw-bold mb-3" id="modalTitle">Judul Event</h2>
-                    
-                    <div class="row g-3 mb-4 p-3 rounded-4" style="background: var(--bg-input);">
-                        <div class="col-6 d-flex align-items-center gap-3">
-                            <div class="fs-3 text-primary"><i class="bi bi-calendar-event"></i></div>
-                            <div>
-                                <small class="text-muted d-block">Tanggal</small>
-                                <span class="fw-bold" id="modalDate">Tanggal Event</span>
-                            </div>
-                        </div>
-                        <div class="col-6 d-flex align-items-center gap-3 border-start">
-                            <div class="fs-3 text-danger"><i class="bi bi-geo-alt"></i></div>
-                            <div>
-                                <small class="text-muted d-block">Lokasi</small>
-                                <span class="fw-bold" id="modalVenue">Lokasi Event</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold mb-3">Deskripsi Event</h6>
-                    <p class="text-muted mb-4" id="modalDesc" style="line-height: 1.7; font-size: 0.95rem;"></p>
-                    
-                    <h6 class="fw-bold mb-3">Pilih Kategori Tiket</h6>
-                    <div id="ticketTierSelection" class="d-flex flex-column gap-2 mb-4"></div>
-
-                    <!-- Action Bar Bawah -->
-                    <div class="d-flex justify-content-between align-items-center p-3 rounded-4 border" style="background: var(--bg-body);">
+                <div class="position-relative">
+                    <div class="modal-header-img" id="modalHeaderImg"></div>
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <small class="text-muted d-block">Total Pembayaran</small>
-                            <h4 class="fw-bold text-danger mb-0" id="modalPrice">Rp 0</h4>
+                            <span class="badge bg-primary mb-2" id="modalCategory">General</span>
+                            <h2 class="fw-bold mb-1" id="modalTitle">Judul Event</h2>
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark border border-secondary">
+                                    <i class="bi bi-building-fill text-warning me-1"></i> 
+                                    <span id="modalOrganizer">Penyelenggara TBA</span>
+                                </span>
+                            </div>
+                            <div class="text-secondary small mt-2">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> <span id="modalVenue" class="fw-bold text-dark">Lokasi TBA</span> 
+                                &bull; <i class="bi bi-calendar-event"></i> <span id="modalDate">Tanggal</span>
+                            </div>
                         </div>
-                        <button id="btnModalBuy" class="btn btn-secondary px-4 py-2 rounded-pill fw-bold" disabled>Pilih Tiket</button>
+                    </div>
+                    <hr>
+                    <h6 class="fw-bold" data-i18n="modal_desc_title">Deskripsi & Info</h6>
+                    <p class="modal-desc-text" id="modalDesc"></p>
+                    
+                    <div class="mt-4 mb-3">
+                        <h6 class="fw-bold mb-2">Pilih Tipe Tiket</h6>
+                        <div id="ticketTierSelection" class="d-flex flex-column gap-2"></div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-secondary d-block" data-i18n="modal_price_label">Total Harga</small>
+                            <div class="modal-price-tag" id="modalPrice">Rp 0</div>
+                        </div>
+                        <button id="btnModalBuy" class="btn btn-secondary btn-lg px-4 rounded-pill fw-bold" disabled>Pilih Tiket Dulu</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- BOT NAV MOBILE -->
-    <nav class="mobile-bottom-nav">
-        <ul>
-            <li><a href="/" class="active"><i class="bi bi-house-door-fill"></i><span class="nav-text">Beranda</span></a></li>
-            <li><a href="#event-list"><i class="bi bi-compass"></i><span class="nav-text">Eksplor</span></a></li>
-            <li><a href="/user-login" id="bottomNavTicket"><i class="bi bi-ticket-perforated"></i><span class="nav-text">Tiket</span></a></li>
-            <li><a href="/user-login" id="bottomNavProfile"><i class="bi bi-person"></i><span class="nav-text">Profil</span></a></li>
-        </ul>
-    </nav>
+    <!-- POPUP NOTIFIKASI BERITA BLOGGER -->
+    <div class="news-toast" id="bloggerNewsToast">
+        <i class="bi bi-megaphone-fill news-icon"></i>
+        <div class="news-content">
+            <h6>BERITA TERBARU</h6>
+            <a href="#" id="bloggerNewsLink" target="_blank">Memuat berita...</a>
+        </div>
+        <button class="close-news" onclick="document.getElementById('bloggerNewsToast').classList.remove('show')">
+            <i class="bi bi-x"></i>
+        </button>
+        <div class="news-progress-bar"></div>
+    </div>
 
-    <!-- CHATBOT BUTTON -->
-    <button onclick="toggleChat()" class="btn-chatbot shadow-lg" id="btnChatToggle">
-        <i class="bi bi-chat-dots-fill"></i>
+    <!-- PING SIGNAL BADGE -->
+    <div class="signal-badge" id="floatingPing" title="Ping ke Server Rcellfest">
+        <span id="networkDot" class="signal-dot dot-kuat"></span> 
+        <span id="networkSpeed">Menghitung...</span>
+    </div>
+    
+    <!-- FITUR CHATBOT AI ASSISTANT -->
+    <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
+        <i class="bi bi-robot"></i>
     </button>
+
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div><i class="bi bi-robot me-2"></i> AI Support</div>
+            <button onclick="toggleChat()" class="btn-close btn-close-white" style="font-size: 0.8rem;"></button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg ai">Halo! 👋 Saya Asisten AI RCELLFEST. Ada yang ingin kamu tanyakan soal tiket atau event?</div>
+        </div>
+        <div class="typing-indicator" id="chatTyping">AI sedang mengetik...</div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" class="form-control" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
+    <!-- FLOATING BOTTOM NAVBAR KHUSUS HP -->
+    <nav class="mobile-bottom-nav">
+        <ul>
+            <li>
+                <a href="/" class="active">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span class="nav-text">Beranda</span>
+                </a>
+            </li>
+            <li>
+                <a href="#event-list">
+                    <i class="bi bi-compass"></i>
+                    <span class="nav-text">Eksplor</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user-login" id="bottomNavTicket">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span class="nav-text">Tiket</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user-login" id="bottomNavProfile">
+                    <i class="bi bi-person"></i>
+                    <span class="nav-text">Profil</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
     <script>
-        // ======= LOGIKA JAVASCRIPT MAS RAGA DI SINI (Disesuaikan Output HTML-nya) =======
         let allEvents = [];
         let detailModal; 
         
-        const translations = { /* (Tetap Sama Seperti Sebelumnya) */ };
+        const translations = {
+            id: {
+                page_title_index: "Beranda | RCELLFEST", 
+                nav_explore: "Jelajah", nav_about: "Tentang Kami", nav_guide: "Panduan & Bantuan", nav_login: "Masuk / Daftar", nav_my_ticket: "Profil Saya", nav_logout: "Keluar",
+                hero_title: "Satu sentuhan,<br>Untuk semua solusi event anda.", hero_subtitle: "Jelajahi ribuan event seru, akun streaming & konser musik, Yuk booking tiket mu Sekarang.",
+                search_placeholder: "Cari konser, artis, atau lokasi...", btn_search: "Cari",
+                cat_all: "Semua", cat_concert: "Konser", cat_sports: "Olahraga", cat_workshop: "Workshop", cat_streaming: "Streaming",
+                section_hot: "Pilihan Hari Ini", link_view_all: "Lihat Semua", loading_text: "Memuat event...",
+                partner_title: "Partner Pembayaran Resmi", footer_about: "Tentang", footer_organizer: "Penyelenggara", footer_career: "Karir", footer_create: "Buat Event", footer_guide: "Panduan", footer_follow: "Ikuti Kami",
+                modal_desc_title: "Deskripsi & Info", modal_price_label: "Harga", btn_buy_ticket: "Beli Tiket", btn_buy_account: "Beli Akun", btn_sold_out: "HABIS", btn_buy_short: "BELI",
+                txt_tba: "Lokasi TBA", txt_date_tba: "Tanggal TBA", alert_login_title: "Login Dulu", alert_login_text: "Silakan login member untuk membeli.", alert_confirm_title: "Konfirmasi"
+            },
+            en: {
+                page_title_index: "Home | RCELLFEST", 
+                nav_explore: "Explore", nav_about: "About Us", nav_guide: "Help & Guide", nav_login: "Login / Register", nav_my_ticket: "My Profiles", nav_logout: "Logout",
+                hero_title: "One touch,<br>For all your event solutions.", hero_subtitle: "Explore thousands of exciting events, streaming accounts & music concerts. Book your ticket Now.",
+                search_placeholder: "Search concerts, artists, or venue...", btn_search: "Search",
+                cat_all: "All", cat_concert: "Concerts", cat_sports: "Sports", cat_workshop: "Workshop", cat_streaming: "Streaming",
+                section_hot: "Today's Picks", link_view_all: "View All", loading_text: "Loading events...",
+                partner_title: "Official Payment Partners", footer_about: "About", footer_organizer: "Organizer", footer_career: "Career", footer_create: "Create Event", footer_guide: "Guide", footer_follow: "Follow Us",
+                modal_desc_title: "Description & Info", modal_price_label: "Price", btn_buy_ticket: "Buy Ticket", btn_buy_account: "Buy Account", btn_sold_out: "SOLD OUT", btn_buy_short: "BUY",
+                txt_tba: "Venue TBA", txt_date_tba: "Date TBA", alert_login_title: "Login Required", alert_login_text: "Please login to purchase.", alert_confirm_title: "Confirm"
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
+            
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            
+            const savedLang = localStorage.getItem('lang') || 'id';
+            updateLanguage(savedLang);
+
             checkLoginStatus();
             await loadEvents();
             
+            loadBloggerNews();
+            checkServerPing();
+            setInterval(checkServerPing, 10000);
+
             const loader = document.getElementById('aesthetic-preloader');
-            if(loader) setTimeout(() => { loader.style.opacity = '0'; setTimeout(()=> loader.remove(), 500); }, 500); 
+            if(loader) {
+                setTimeout(() => {
+                    loader.classList.add('hide-preloader');
+                }, 500); 
+            }
         });
 
+        /* FUNGSI GANTI TEMA (DARK / LIGHT MODE) */
         function toggleTheme() {
             const htmlTag = document.documentElement;
-            const newTheme = htmlTag.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            const currentTheme = htmlTag.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
             htmlTag.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            if (theme === 'dark') {
+                icon.className = 'bi bi-sun-fill';
+                icon.style.color = "#FFD700";
+            } else {
+                icon.className = 'bi bi-moon-stars-fill';
+                icon.style.color = "#0f172a";
+            }
+        }
+
+        async function checkServerPing() {
+            const speedText = document.getElementById('networkSpeed');
+            const dot = document.getElementById('networkDot');
+
+            if (!navigator.onLine) {
+                speedText.innerText = "Offline";
+                dot.style.backgroundColor = '#e74c3c';
+                dot.style.boxShadow = '0 0 8px #e74c3c';
+                return;
+            }
+
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch('/api/ping?t=' + startTime, { method: 'GET' });
+                
+                if (response.ok) {
+                    const pingTime = Date.now() - startTime;
+                    if (pingTime < 100) { 
+                        speedText.innerText = `Sinyal: Kuat (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#2ecc71'; 
+                        dot.style.boxShadow = '0 0 8px #2ecc71';
+                    } else if (pingTime < 250) { 
+                        speedText.innerText = `Sinyal: Sedang (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#f1c40f'; 
+                        dot.style.boxShadow = '0 0 8px #f1c40f';
+                    } else { 
+                        speedText.innerText = `Sinyal: Lemah (${pingTime}ms)`;
+                        dot.style.backgroundColor = '#e74c3c'; 
+                        dot.style.boxShadow = '0 0 8px #e74c3c';
+                    }
+                }
+            } catch (error) {
+                speedText.innerText = "Server Down";
+                dot.style.backgroundColor = '#e74c3c';
+                dot.style.boxShadow = '0 0 8px #e74c3c';
+            }
+        }
+
+        window.handleBloggerNews = function(data) {
+            if (data.feed && data.feed.entry && data.feed.entry.length > 0) {
+                const post = data.feed.entry[0];
+                const title = post.title.$t;
+                
+                const waktuPublishBlogger = post.published.$t; 
+                const waktuPublish = new Date(waktuPublishBlogger).getTime();
+                const waktuSekarang = Date.now();
+                const umurArtikel = waktuSekarang - waktuPublish;
+                const batasSatuHari = 24 * 60 * 60 * 1000; 
+
+                if (umurArtikel > batasSatuHari) {
+                    return; 
+                }
+                
+                let link = "#";
+                for (let i = 0; i < post.link.length; i++) {
+                    if (post.link[i].rel === "alternate") {
+                        link = post.link[i].href;
+                        break;
+                    }
+                }
+
+                document.getElementById('bloggerNewsLink').innerText = title;
+                document.getElementById('bloggerNewsLink').href = link;
+
+                setTimeout(() => {
+                    const toast = document.getElementById('bloggerNewsToast');
+                    if (toast) {
+                        toast.classList.add('show');
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                        }, 10000);
+                    }
+                }, 2500); 
+            }
+        };
+
+        function loadBloggerNews() {
+            const urlBlogger = "https://rcellnews.blogspot.com"; 
+            const feedUrl = `${urlBlogger}/feeds/posts/default?alt=json-in-script&max-results=1&callback=handleBloggerNews`;
+            const scriptEl = document.createElement('script');
+            scriptEl.src = feedUrl;
+            document.body.appendChild(scriptEl);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerHTML = t[key];
+            });
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) searchInput.placeholder = t.search_placeholder;
+            
+            const langText = document.getElementById('langText');
+            const langFlag = document.getElementById('langFlag');
+            if (langText) langText.innerText = lang.toUpperCase();
+            if (langFlag) {
+                langFlag.src = lang === 'id' ? 'https://flagcdn.com/w20/id.png' : 'https://flagcdn.com/w20/gb.png';
+            }
+        }
+
+        function changeLang(lang) {
+            localStorage.setItem('lang', lang);
+            updateLanguage(lang);
+            if(allEvents.length > 0) renderEvents(allEvents);
         }
 
         function checkLoginStatus() {
             const userRaw = localStorage.getItem('userData');
+            const navArea = document.getElementById('navUserArea');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            const btnBottomTicket = document.getElementById('bottomNavTicket');
+            const btnBottomProfile = document.getElementById('bottomNavProfile');
+            
             if (userRaw) {
                 const user = JSON.parse(userRaw);
-                document.getElementById('navUserArea').innerHTML = `
+                navArea.innerHTML = `
                     <div class="dropdown">
-                        <button class="btn nav-glass-btn rounded-pill d-flex align-items-center gap-2 px-3" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle text-primary"></i> <span class="fw-bold small">${user.username}</span>
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border rounded-pill px-2 px-md-3 py-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-primary fs-5"></i>
+                            <span class="small fw-bold text-truncate" style="max-width: 60px;">${user.username}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                            <li><a class="dropdown-item" href="/dashboard">Tiket Saya</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                            <li><a class="dropdown-item rounded-2 small" href="/dashboard">${t.nav_my_ticket}</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item text-danger" onclick="logout()">Keluar</button></li>
+                            <li><button class="dropdown-item rounded-2 text-danger small" onclick="logout()">${t.nav_logout}</button></li>
                         </ul>
-                    </div>`;
-                document.getElementById('bottomNavTicket').href = "/dashboard"; 
-                document.getElementById('bottomNavProfile').href = "/dashboard";
+                    </div>
+                `;
+                if(btnBottomTicket) btnBottomTicket.href = "/dashboard"; 
+                if(btnBottomProfile) btnBottomProfile.href = "/dashboard";
+            } else {
+                navArea.innerHTML = `<a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
+                if(btnBottomTicket) btnBottomTicket.href = "/user-login"; 
+                if(btnBottomProfile) btnBottomProfile.href = "/user-login";
             }
         }
 
-        function logout() { localStorage.removeItem('userData'); localStorage.removeItem('userToken'); window.location.reload(); }
+        function logout() {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('userToken');
+            window.location.reload();
+        }
 
         async function loadEvents() {
             try {
                 const res = await fetch('/api/events');
-                allEvents = await res.json();
-                allEvents.sort((a, b) => (b.isPinned === true ? 1 : 0) - (a.isPinned === true ? 1 : 0));
+                let dataEventCetak = await res.json();
+                
+                dataEventCetak.sort((a, b) => (b.isPinned === true ? 1 : 0) - (a.isPinned === true ? 1 : 0));
+                
+                allEvents = dataEventCetak;
                 renderEvents(allEvents);
                 updateHeroSlider(allEvents); 
-            } catch (err) { console.error("Gagal memuat event:", err); }
+            } catch (err) { 
+                console.error("Gagal memuat event:", err);
+                const lang = localStorage.getItem('lang') || 'id';
+                const errMsg = lang === 'id' ? 'Gagal memuat data event.' : 'Failed to load events.';
+                document.getElementById('event-list').innerHTML = `<div class="col-12 text-center text-danger py-5">${errMsg}</div>`;
+            }
         }
 
         function filterCategory(category) {
-            document.querySelectorAll('.category-pill').forEach(el => el.classList.remove('active'));
-            if(document.getElementById(`btn-cat-${category}`)) document.getElementById(`btn-cat-${category}`).classList.add('active');
-            renderEvents(category === 'All' ? allEvents : allEvents.filter(e => (e.category || 'General') === category));
+            document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
+            const btn = document.getElementById(`btn-cat-${category}`);
+            if(btn) btn.classList.add('active');
+            if (category === 'All') { 
+                renderEvents(allEvents); 
+            } else { 
+                const filtered = allEvents.filter(e => (e.category || 'General') === category); 
+                renderEvents(filtered); 
+            }
         }
 
-        function searchEvent() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            renderEvents(allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword))));
+        function getEventImage(event) {
+            if (event.image && event.image.startsWith("http")) { 
+                return event.image; 
+            }
+            const cat = (event.category || "General").toLowerCase();
+            switch (cat) {
+                case 'konser': return "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
+                case 'olahraga': return "https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=800&auto=format&fit=crop";
+                case 'workshop': return "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
+                case 'streaming': return "https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?q=80&w=800&auto=format&fit=crop";
+                default: return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop";
+            }
         }
 
-        // ==========================================
-        // 🔥 UPDATE HTML CARD AGAR MODERN 🔥
-        // ==========================================
+        /* --- SISTEM INFINITE SCROLL (AUTO LOAD) --- */
+        let currentRenderData = [];
         let currentVisibleCount = 0;
+        const limitPerLoad = 12; 
+        let isFetchingMore = false; 
+
+        let scrollObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreEvents(false);
+            }
+        }, { rootMargin: "150px" });
+
         function renderEvents(data) {
-            const container = document.getElementById('event-list');
-            container.innerHTML = ''; 
+            currentRenderData = data; 
+            currentVisibleCount = 0; 
+            isFetchingMore = false; 
             
-            const activeEvents = data.filter(e => e.availableSeats !== -2);
-            if(activeEvents.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center py-5 text-muted">Belum ada event di kategori ini.</div>`;
+            const container = document.getElementById('event-list');
+            const containerSoon = document.getElementById('event-coming-soon-list');
+            const sectionSoon = document.getElementById('section-coming-soon');
+            const scrollContainer = document.getElementById('scrollLoadContainer');
+            
+            container.innerHTML = ''; 
+            if (containerSoon) containerSoon.innerHTML = '';
+            
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+
+            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
+            const soonEvents = currentRenderData.filter(e => e.availableSeats === -2);
+
+            if (soonEvents.length > 0 && sectionSoon) {
+                sectionSoon.style.display = 'block';
+                let htmlSoon = '';
+                soonEvents.forEach(event => { htmlSoon += buildCard(event, lang, t); });
+                containerSoon.innerHTML = htmlSoon;
+            } else if (sectionSoon) {
+                sectionSoon.style.display = 'none';
+            }
+
+            if (activeEvents.length === 0) {
+                const emptyMsg = lang === 'id' ? 'Tidak ada event untuk kategori ini.' : 'No events found for this category.';
+                const btnMsg = lang === 'id' ? 'Lihat Semua Event' : 'View All Events';
+                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-secondary">${emptyMsg}</p><button onclick="filterCategory('All')" class="btn btn-link btn-sm">${btnMsg}</button></div>`;
+                
+                if(scrollContainer) {
+                    scrollContainer.style.display = 'none';
+                    scrollObserver.unobserve(scrollContainer);
+                }
                 return;
             }
 
-            activeEvents.forEach(event => {
-                const harga = event.price ? new Intl.NumberFormat('id-ID').format(event.price) : '0';
-                const isSoldOut = event.availableSeats === 0;
-                let dateStr = "TBA";
-                if (event.date) { try { dateStr = new Date(event.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}); } catch(e){} }
-                
-                // Cek gambar (fallback jika tidak ada)
-                let imageUrl = event.image || "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
+            if(scrollContainer) scrollObserver.observe(scrollContainer);
+            loadMoreEvents(true); 
+        }
 
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card-event" onclick="showDetail('${event._id}')">
-                            <div class="card-img-top" style="background-image: url('${imageUrl}');">
-                                <span class="category-badge-img">${event.category || 'General'}</span>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="event-title text-truncate">${event.name}</h5>
-                                <div class="event-venue text-truncate"><i class="bi bi-geo-alt-fill text-danger"></i> ${event.location || 'TBA'}</div>
-                                <div class="event-venue text-truncate mb-3"><i class="bi bi-calendar-event text-primary"></i> ${dateStr}</div>
-                                
-                                <div class="price-section">
-                                    <div>
-                                        <span class="price-label">Mulai dari</span>
-                                        <span class="price-val">Rp ${harga}</span>
-                                    </div>
-                                    <button class="btn-card-action ${isSoldOut ? 'disabled' : ''}">${isSoldOut ? 'HABIS' : 'BELI'}</button>
-                                </div>
-                            </div>
+        function loadMoreEvents(isInitial = false) {
+            if (isFetchingMore) return; 
+            
+            const container = document.getElementById('event-list');
+            const scrollContainer = document.getElementById('scrollLoadContainer');
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            
+            const activeEvents = currentRenderData.filter(e => e.availableSeats !== -2);
+            const startIndex = currentVisibleCount;
+            const endIndex = startIndex + limitPerLoad;
+            
+            if (startIndex >= activeEvents.length) return;
+            
+            isFetchingMore = true; 
+
+            const eventsToAppend = activeEvents.slice(startIndex, endIndex);
+
+            const appendData = () => {
+                let htmlChunk = '';
+                eventsToAppend.forEach(event => { 
+                    htmlChunk += buildCard(event, lang, t); 
+                });
+                
+                container.insertAdjacentHTML('beforeend', htmlChunk); 
+                
+                currentVisibleCount += eventsToAppend.length;
+
+                if (currentVisibleCount >= activeEvents.length) {
+                    if(scrollContainer) {
+                        scrollContainer.style.display = 'none';
+                        scrollObserver.unobserve(scrollContainer); 
+                    }
+                } else {
+                    if(scrollContainer) scrollContainer.style.display = 'block';
+                }
+                
+                isFetchingMore = false; 
+            };
+
+            if (isInitial) {
+                appendData(); 
+            } else {
+                setTimeout(() => { appendData(); }, 500); 
+            }
+        }
+
+        function buildCard(event, lang, t) {
+            const harga = new Intl.NumberFormat('id-ID').format(event.price);
+            const isFinished = event.availableSeats === -1;
+            const isComingSoon = event.availableSeats === -2;
+            const isSoldOut = event.availableSeats === 0;
+            
+            let dateStr = t.txt_date_tba;
+            if (event.date) { 
+                try { 
+                    const dateObj = new Date(event.date); 
+                    dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', year: 'numeric'}); 
+                } catch (e) { dateStr = event.date; } 
+            }
+            const catName = event.category || 'General'; 
+            const locationName = event.location || t.txt_tba;
+            const imageUrl = getEventImage(event);
+            const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
+            
+            const namaAman = event.name ? event.name : "event";
+            const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            // PERBAIKAN ROUTING: Mengarahkan langsung ke detail.html
+            const linkDetail = `/detail.html?event=${eventSlug}&id=${event._id}`;
+
+            let btnText = 'BELI';
+            let btnClass = 'btn-outline-book';
+            let btnAction = `onclick="event.stopPropagation(); window.location.href='${linkDetail}'"`;
+            let timerHtml = '';
+            const now = new Date();
+            const waktuSelesaiEvent = new Date(`${event.date}T${event.endTime || '23:59'}`);
+
+            if (now > waktuSelesaiEvent) {
+                btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                btnClass = 'btn-outline-book disabled text-danger border-danger';
+                btnAction = 'disabled';
+            } 
+            else if (event.salesOpenDate && new Date(event.salesOpenDate) > now) {
+                btnText = '<i class="bi bi-clock-history"></i> AKAN HADIR';
+                btnClass = 'btn-outline-book disabled border-secondary text-secondary';
+                btnAction = 'disabled';
+                timerHtml = `<div id="timer-${event._id}" style="font-size: 0.75rem; font-weight: bold; margin-top: 5px; color: var(--primary);">Menghitung...</div>`;
+                setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate, eventSlug); }, 100);
+            }
+            else if (isComingSoon) {
+                btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (isFinished) { 
+                btnText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED';
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (isSoldOut) {
+                btnText = t.btn_sold_out;
+                btnClass += ' disabled'; btnAction = 'disabled';
+            } else if (catName === 'Streaming') {
+                btnText = lang === 'id' ? 'BELI AKUN' : 'BUY ACC'; 
+            }
+
+            const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
+
+            return `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card-event" onclick="window.location.href='${linkDetail}'">
+                    <div class="card-img-top" style="background-image: url('${imageUrl}'); position: relative;">
+                        ${pinBadge}
+                        <span class="category-badge-img">${catName}</span>
+                        <div class="date-float">${dateStr}</div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="event-title" style="white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8rem; margin-bottom: 10px;">
+                            ${event.name}
+                        </h5>
+                        <div class="event-venue justify-content-center" style="overflow: hidden; padding: 0 10px;">
+                            <marquee scrollamount="3" style="white-space: nowrap; width: 100%;">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationName}
+                            </marquee>
+                        </div>
+                        <div class="price-val">${hargaLabel}</div>
+                        <div id="btn-container-${event._id}">
+                            <button ${btnAction} class="${btnClass}">
+                                ${btnText}
+                            </button>
+                            ${timerHtml}
                         </div>
                     </div>
-                `);
-            });
+                </div>
+            </div>`;
+        }
+
+        /* --- MESIN HITUNG MUNDUR --- */
+        function mulaiHitungMundur(eventId, targetDateStr, eventSlug) {
+            const targetWaktu = new Date(targetDateStr).getTime();
+
+            const intervalTimer = setInterval(function() {
+                const waktuSekarang = new Date().getTime();
+                const selisih = targetWaktu - waktuSekarang;
+
+                const tempatNampilin = document.getElementById(`timer-${eventId}`);
+                const wadahTombol = document.getElementById(`btn-container-${eventId}`);
+
+                if (selisih < 0) {
+                    clearInterval(intervalTimer); 
+                    
+                    if (wadahTombol) {
+                        const lang = localStorage.getItem('lang') || 'id';
+                        const btnText = lang === 'id' ? 'BELI TIKET' : 'BUY TICKET';
+                        wadahTombol.innerHTML = `
+                            <button onclick="event.stopPropagation(); window.location.href='/detail.html?event=${eventSlug || 'event'}&id=${eventId}'" class="btn-outline-book" style="animation: fadeIn 0.5s; background-color: var(--primary); color: white;">
+                                ${btnText}
+                            </button>
+                        `;
+                    }
+                    return;
+                }
+
+                const bulan = Math.floor(selisih / (1000 * 60 * 60 * 24 * 30));
+                const hari = Math.floor((selisih % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+                const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+                const detik = Math.floor((selisih % (1000 * 60)) / 1000);
+
+                if (tempatNampilin) {
+                    let teksTimer = '';
+                    if (bulan > 0) teksTimer += `${bulan} Bln `;
+                    if (hari > 0 || bulan > 0) teksTimer += `${hari} Hr `;
+                    teksTimer += `${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+                    
+                    tempatNampilin.innerHTML = teksTimer;
+                }
+            }, 1000);
         }
 
         function updateHeroSlider(data) {
-            const sliderContent = document.getElementById('heroSliderContent');
+            const sliderContainer = document.getElementById('heroSliderContent');
+            const indicatorContainer = document.getElementById('heroSliderIndicators');
+            const sliderWrapper = document.getElementById('heroEventSlider'); 
+            
+            if (!sliderContainer || !sliderWrapper || data.length === 0) {
+                if(sliderWrapper) sliderWrapper.style.display = 'none'; 
+                return;
+            }
+
             const slideEvents = data.filter(e => e.availableSeats !== -2).slice(0, 5);
-            if(slideEvents.length === 0) return;
+            
+            if (slideEvents.length === 0) {
+                sliderWrapper.style.display = 'none'; 
+                return;
+            }
+
+            sliderWrapper.style.display = 'block';
 
             let html = '';
-            slideEvents.forEach((event, idx) => {
-                let imageUrl = event.image || "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800&auto=format&fit=crop";
+            let indicatorsHtml = '';
+
+            slideEvents.forEach((event, index) => {
+                const imageUrl = getEventImage(event);
+                const namaAman = event.name ? event.name : "event";
+                const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const linkDetail = `/detail.html?event=${eventSlug}&id=${event._id}`;
+
+                indicatorsHtml += `<button type="button" data-bs-target="#heroEventSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}"></button>`;
+
                 html += `
-                    <div class="carousel-item ${idx === 0 ? 'active' : ''}" data-bs-interval="4000" onclick="showDetail('${event._id}')" style="cursor:pointer;">
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}" data-bs-interval="4000" style="cursor: pointer;" onclick="window.location.href='${linkDetail}'">
                         <img src="${imageUrl}" class="d-block w-100" alt="${event.name}">
-                        <div class="carousel-caption d-none d-md-block" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); left: 0; right: 0; bottom: 0; padding: 30px; border-radius: 0 0 var(--radius-xl) var(--radius-xl);">
-                            <h3 class="mb-1 fw-bold text-white text-start px-4">${event.name}</h3>
-                            <p class="text-white-50 text-start px-4 m-0"><i class="bi bi-calendar me-2"></i>${event.date}</p>
+                        <div class="carousel-caption d-none d-md-block" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); left: 0; right: 0; bottom: 0; padding: 20px; border-radius: 0 0 20px 20px;">
+                            <h5 class="mb-0 fw-bold text-white text-start px-4">${event.name}</h5>
                         </div>
-                    </div>`;
+                    </div>
+                `;
             });
-            sliderContent.innerHTML = html;
+
+            sliderContainer.innerHTML = html;
+            if(indicatorContainer) indicatorContainer.innerHTML = indicatorsHtml;
         }
 
-        // ==========================================
-        // FUNGSI MODAL DETAIL & BELI (TETAP SAMA)
-        // ==========================================
         function showDetail(eventId) {
             const event = allEvents.find(e => e._id === eventId);
             if (!event) return;
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
             
+            let dateStr = t.txt_date_tba;
+            if (event.date) { 
+                try { 
+                    const dateObj = new Date(event.date); 
+                    dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); 
+                } catch (e) { dateStr = event.date; } 
+            }
             document.getElementById('modalTitle').innerText = event.name;
-            document.getElementById('modalDate').innerText = event.date;
+            document.getElementById('modalDate').innerText = dateStr;
             document.getElementById('modalCategory').innerText = event.category || "General";
-            document.getElementById('modalVenue').innerText = event.location || "TBA";
-            document.getElementById('modalOrganizer').innerHTML = `<i class="bi bi-building"></i> ${event.organizer || 'RCELLFEST'}`;
-            document.getElementById('modalHeaderImg').style.backgroundImage = `url('${event.image || "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=800"}')`;
-            document.getElementById('modalDesc').innerHTML = event.description || "Deskripsi belum tersedia.";
+            document.getElementById('modalVenue').innerText = event.location || t.txt_tba;
+            document.getElementById('modalOrganizer').innerText = event.organizer ? "By: " + event.organizer : "By: RCELLFEST";
+            document.getElementById('modalHeaderImg').style.backgroundImage = `url('${getEventImage(event)}')`;
+            
+            let safeDescription = event.description || (lang === 'id' ? "Deskripsi lengkap belum tersedia." : "Full description not available yet.");
+            if (event.category === 'Streaming') { 
+                safeDescription = lang === 'id' ? "🔒 [PRODUK DIGITAL - AKUN PREMIUM]\n\n✅ Akun Private / Sharing Bergaransi\n✅ Email & Password otomatis muncul setelah pembayaran.\n✅ 100% Aman & Legal." : "🔒 [DIGITAL PRODUCT - PREMIUM ACCOUNT]\n\n✅ Private / Sharing Account w/ Warranty\n✅ Email & Password appear instantly after payment.\n✅ 100% Safe & Legal."; 
+            }
+            
+            const urlRegex = /(https?:\/\/[^\s]+)/g; 
+            const linkedDesc = safeDescription.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${url}</a>`);
+            
+            document.getElementById('modalDesc').innerHTML = linkedDesc;
 
-            const tierContainer = document.getElementById('ticketTierSelection');
             const btnBuy = document.getElementById('btnModalBuy');
-            document.getElementById('modalPrice').innerText = "Rp 0";
+            const priceTag = document.getElementById('modalPrice');
+            const tierContainer = document.getElementById('ticketTierSelection');
+            
+            priceTag.innerText = "Rp 0";
             tierContainer.innerHTML = '';
             
-            btnBuy.disabled = true;
-            btnBuy.className = "btn btn-secondary px-4 py-2 rounded-pill fw-bold";
-            btnBuy.innerText = "Pilih Tiket";
+            const isFinished = event.availableSeats === -1;
+            const isComingSoon = event.availableSeats === -2;
+            const isEventSoldOut = event.availableSeats === 0;
 
-            if (event.tickets && event.tickets.length > 0) {
-                event.tickets.forEach((tier, index) => {
-                    const isSoldOut = tier.availableSeats <= 0;
-                    tierContainer.innerHTML += `
-                        <label class="tier-label p-3 d-flex justify-content-between align-items-center ${isSoldOut ? 'opacity-50' : ''}" style="cursor: ${isSoldOut ? 'not-allowed' : 'pointer'};">
+            if (isComingSoon) {
+                btnBuy.innerText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON'; 
+                btnBuy.disabled = true;
+                btnBuy.className = "btn btn-info btn-lg px-4 rounded-pill fw-bold text-dark"; 
+                btnBuy.removeAttribute('onclick');
+                tierContainer.innerHTML = `<div class="alert alert-info text-center border-info"><i class="bi bi-clock-fill"></i> Tiket belum dijual / Coming Soon.</div>`;
+            }
+            else if (isFinished) {
+                btnBuy.innerText = lang === 'id' ? 'EVENT SELESAI' : 'ENDED'; 
+                btnBuy.disabled = true;
+                btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold"; 
+                btnBuy.removeAttribute('onclick');
+                tierContainer.innerHTML = `<div class="alert alert-secondary text-center">Event telah selesai.</div>`;
+            } 
+            else if (isEventSoldOut) { 
+                btnBuy.innerText = t.btn_sold_out; 
+                btnBuy.disabled = true;
+                btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold"; 
+                btnBuy.removeAttribute('onclick'); 
+                tierContainer.innerHTML = `<div class="alert alert-danger text-center">Tiket Habis Terjual.</div>`;
+            } 
+            else { 
+                btnBuy.disabled = true; 
+                btnBuy.className = "btn btn-secondary btn-lg px-4 rounded-pill fw-bold";
+                btnBuy.innerText = lang === 'id' ? "Pilih Tiket Dulu" : "Select Ticket First";
+
+                if (event.tickets && event.tickets.length > 0) {
+                    event.tickets.forEach((tier, index) => {
+                        const isTierSoldOut = tier.availableSeats <= 0;
+                        
+                        tierContainer.innerHTML += `
+                            <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${isTierSoldOut ? 'tier-sold-out' : ''}">
+                                <div class="d-flex align-items-center gap-3">
+                                    <input type="radio" name="ticketTier" value="${index}" class="form-check-input mt-0" onchange="selectTier('${eventId}', ${index})" ${isTierSoldOut ? 'disabled' : ''}>
+                                    <div style="color: var(--text-main);">
+                                        <h6 class="mb-0">${tier.tierName}</h6>
+                                        <small style="color: var(--text-muted);">Sisa: ${tier.availableSeats} tiket</small>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-primary">Rp ${tier.price.toLocaleString('id-ID')}</div>
+                            </label>
+                        `;
+                    });
+                } else {
+                    tierContainer.innerHTML = `
+                        <label class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-3">
-                                <input type="radio" name="ticketTier" class="form-check-input mt-0" onchange="selectTier('${eventId}', ${index})" ${isSoldOut ? 'disabled' : ''}>
-                                <div>
-                                    <h6 class="mb-0 fw-bold">${tier.tierName}</h6>
-                                    <small class="text-muted">Sisa: ${tier.availableSeats} tiket</small>
+                                <input type="radio" name="ticketTier" value="-1" class="form-check-input mt-0" onchange="selectTierFallback('${eventId}')">
+                                <div style="color: var(--text-main);">
+                                    <h6 class="mb-0">Tiket General</h6>
+                                    <small style="color: var(--text-muted);">Sisa: ${event.availableSeats} tiket</small>
                                 </div>
                             </div>
-                            <div class="fw-bold text-danger">Rp ${tier.price.toLocaleString('id-ID')}</div>
-                        </label>`;
-                });
+                            <div class="fw-bold text-primary">Rp ${event.price.toLocaleString('id-ID')}</div>
+                        </label>
+                    `;
+                }
             }
             detailModal.show();
         }
 
         function selectTier(eventId, tierIndex) {
             const event = allEvents.find(e => e._id === eventId);
-            const tier = event.tickets[tierIndex];
-            document.getElementById('modalPrice').innerText = `Rp ${tier.price.toLocaleString('id-ID')}`;
+            const selectedTier = event.tickets[tierIndex];
+            
+            document.getElementById('modalPrice').innerText = `Rp ${selectedTier.price.toLocaleString('id-ID')}`;
             
             const btnBuy = document.getElementById('btnModalBuy');
             btnBuy.disabled = false;
-            btnBuy.className = "btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm";
-            btnBuy.innerText = "Beli Sekarang";
-            btnBuy.onclick = () => { detailModal.hide(); buyTicket(eventId, tier); };
+            btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
+            btnBuy.innerText = "Lanjut Pembayaran";
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                buyTicket(eventId, selectedTier); 
+            };
+        }
+
+        function selectTierFallback(eventId) {
+            const event = allEvents.find(e => e._id === eventId);
+            document.getElementById('modalPrice').innerText = `Rp ${event.price.toLocaleString('id-ID')}`;
+            
+            const btnBuy = document.getElementById('btnModalBuy');
+            btnBuy.disabled = false;
+            btnBuy.className = "btn btn-primary btn-lg px-4 rounded-pill fw-bold shadow";
+            btnBuy.innerText = "Lanjut Pembayaran";
+            
+            btnBuy.onclick = function() { 
+                detailModal.hide(); 
+                const mockTier = { tierName: 'General', price: event.price, availableSeats: event.availableSeats };
+                buyTicket(eventId, mockTier); 
+            };
+        }
+
+        function searchEvent() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allEvents.filter(e => e.name.toLowerCase().includes(keyword) || (e.location && e.location.toLowerCase().includes(keyword)));
+            renderEvents(filtered);
+        }
+        
+        document.getElementById('searchInput').addEventListener("keypress", function(e) { 
+            if (e.key === "Enter") searchEvent(); 
+        });
+
+        async function cekPromo() {
+            const codeInput = document.getElementById('swal-input-promo');
+            const statusEl = document.getElementById('promo-status');
+            const code = codeInput.value;
+            
+            if(!code) return;
+            
+            statusEl.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cek...';
+            
+            try {
+                const res = await fetch('/api/check-promo', { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ code }) 
+                });
+                const data = await res.json();
+                
+                if(data.valid) { 
+                    statusEl.className = "text-success fw-bold mb-3 small"; 
+                    statusEl.innerText = `✅ ${data.message}`; 
+                } else { 
+                    statusEl.className = "text-danger fw-bold mb-3 small"; 
+                    statusEl.innerText = `❌ ${data.message}`; 
+                }
+            } catch(e) { 
+                statusEl.innerText = "Error cek promo"; 
+            }
         }
 
         async function buyTicket(eventId, selectedTier) {
-            // (Logika SweetAlert Pembelian Mas Raga Tetap Disini, Tidak Saya Ubah)
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
             const userRaw = localStorage.getItem('userData');
+            
             if (!userRaw) { 
-                window.location.href = '/user-login'; 
+                Swal.fire({ 
+                    title: t.alert_login_title, 
+                    text: t.alert_login_text, 
+                    icon: 'info', 
+                    confirmButtonText: 'Login', 
+                    confirmButtonColor: '#0049CC' 
+                }).then((r) => { 
+                    if(r.isConfirmed) window.location.href = '/user-login'; 
+                }); 
                 return; 
             }
-            const event = allEvents.find(e => e._id === eventId);
-            const user = JSON.parse(userRaw);
             
+            const user = JSON.parse(userRaw);
+            const event = allEvents.find(e => e._id === eventId);
+            if (!event) return;
+
+            const maxBuy = selectedTier.availableSeats || 1;
+
+            const { value: checkoutData } = await Swal.fire({
+                title: `<i class="bi bi-cart-check-fill text-primary me-2"></i>${lang === 'id' ? 'Detail Pemesan' : 'Buyer Details'}`,
+                html: `
+                    <div class="text-start px-2">
+                        <div class="alert alert-info py-2 small mb-3">
+                            <i class="bi bi-info-circle-fill me-1"></i> Pastikan nama sesuai untuk keperluan penukaran tiket.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Jumlah Tiket</label>
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value>1)q.value--">-</button>
+                                <input type="number" id="chk-qty" class="form-control text-center fw-bold" value="1" min="1" max="${maxBuy}" onchange="if(this.value < 1) this.value = 1; if(this.value > ${maxBuy}) this.value = ${maxBuy};">
+                                <button class="btn btn-outline-secondary px-3 fw-bold" type="button" onclick="const q=document.getElementById('chk-qty'); if(q.value<${maxBuy})q.value++">+</button>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.7rem;">Maksimal pembelian: ${maxBuy} tiket</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Nama Lengkap</label>
+                            <input type="text" id="chk-name" class="form-control" value="${user.fullName || user.username || ''}" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Email</label>
+                            <input type="email" id="chk-email" class="form-control bg-light" value="${user.email || ''}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">No. WhatsApp</label>
+                            <input type="tel" id="chk-phone" class="form-control" value="${user.phone || ''}" placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted">NIK (Nomor KTP) <span class="fw-normal">*Opsional</span></label>
+                            <input type="number" id="chk-nik" class="form-control" placeholder="16 Digit NIK">
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false, 
+                showCancelButton: true, 
+                confirmButtonText: 'Lanjut Pembayaran <i class="bi bi-arrow-right ms-1"></i>', 
+                confirmButtonColor: '#0049CC', 
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel', 
+                width: '32em',
+                preConfirm: () => {
+                    const name = document.getElementById('chk-name').value; 
+                    const phone = document.getElementById('chk-phone').value; 
+                    const nik = document.getElementById('chk-nik').value;
+                    const qty = parseInt(document.getElementById('chk-qty').value) || 1;
+                    
+                    if (!name || !phone) { 
+                        Swal.showValidationMessage('Nama dan No. WhatsApp wajib diisi!'); 
+                        return false; 
+                    }
+                    return { name, phone, nik, email: user.email, qty };
+                }
+            });
+
+            if (!checkoutData) return;
+
             const payload = {
-                eventId: event._id, eventName: event.name, tierName: selectedTier.tierName,
-                price: selectedTier.price, qty: 1, name: user.username, email: user.email,
-                phone: user.phone || '08', taxRate: event.taxRate || 0,
+                eventId: event._id,
+                eventName: event.name,
+                tierName: selectedTier.tierName,
+                price: selectedTier.price,
+                qty: checkoutData.qty,
+                name: checkoutData.name,
+                email: checkoutData.email,
+                phone: checkoutData.phone,
+                nik: checkoutData.nik,
+                taxRate: event.taxRate || 0,
+                availableSeats: selectedTier.availableSeats,
+                tierAccessCode: selectedTier.accessCode || ''
             };
+
             localStorage.setItem('checkoutData', JSON.stringify(payload));
-            window.location.href = `/checkout?event=${event.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            
+            const eventSlug = (event.name || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            window.location.href = `/checkout?event=${eventSlug}`;
         }
-        
-        function toggleChat() { alert('Fitur Chat AI Segera Hadir!'); }
+
+        /* --- SCRIPT CHATBOT AI ASSISTANT --- */
+        function toggleChat() {
+            const chatWidget = document.getElementById('chatWidget');
+            const icon = document.querySelector('#btnChatToggle i');
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+                icon.className = 'bi bi-robot';
+            } else {
+                chatWidget.style.display = 'flex';
+                icon.className = 'bi bi-x-lg';
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chatInput');
+            const message = inputEl.value.trim();
+            if (!message) return;
+
+            const chatBody = document.getElementById('chatBody');
+            const typingIndicator = document.getElementById('chatTyping');
+
+            chatBody.innerHTML += `<div class="chat-msg user">${message}</div>`;
+            inputEl.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            typingIndicator.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await res.json();
+                
+                typingIndicator.style.display = 'none';
+                chatBody.innerHTML += `<div class="chat-msg ai">${data.reply}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+
+            } catch (err) {
+                typingIndicator.style.display = 'none';
+                chatBody.innerHTML += `<div class="chat-msg ai text-danger">Koneksi terputus. Coba lagi nanti ya!</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
     </script>
 </body>
 </html>
