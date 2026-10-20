@@ -120,7 +120,7 @@
         @media (min-width: 769px) { .hero-title { font-size: 3.5rem; } .hero-lead { font-size: 1.2rem; } }
         .hero-bg-circle { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: -50px; right: -50px; pointer-events: none; }
         
-        .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; width: 100%; max-width: 700px; }
+       .search-box { background: var(--bg-card); padding: 8px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; width: 100%; max-width: 700px; }
         .search-input { border: none; outline: none; flex-grow: 1; padding: 10px 15px; font-size: 1rem; width: 100%; background: transparent; color: var(--text-main); }
         [data-theme="dark"] .search-input::placeholder { color: #94a3b8; }
         .btn-search { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
@@ -138,7 +138,6 @@
         .card-img-top { height: 180px; width: 100%; background-color: #ddd; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-start; justify-content: flex-end; padding: 12px; }
         .card-img-top::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
         .category-badge-img { position: relative; z-index: 2; background: var(--primary); color: white; font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 700; letter-spacing: 0.5px; }
-        .pinned-badge-img { position: absolute; top: 12px; left: 12px; z-index: 2; background: #ef4444; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .date-float { position: absolute; bottom: 12px; left: 12px; z-index: 2; background: var(--bg-card); color: var(--primary); padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
         .event-title { font-weight: 700; font-size: 1rem; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
@@ -226,12 +225,15 @@
         @media (max-width: 768px) { 
             .hero-slider-wide img { aspect-ratio: 16/9; } 
             .custom-nav-btn { display: none; } 
+            .blob { display: none !important; }
             body { font-family: 'Inter', 'Poppins', sans-serif; background-color: var(--bg-body); color: var(--text-main); padding-top: 118px; transition: background-color 0.2s, color 0.2s; }
+            .glass-panel, .glass-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 20px; }
             .navbar { background-color: var(--bg-nav) !important; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px var(--shadow-color); }
             .form-control, .form-select { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
             .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
             .btn-primary { background-color: var(--primary); border: none; border-radius: 8px; padding: 12px; font-weight: 600; color: white; transition: all 0.2s; }
             .btn-primary:hover { background-color: #004494; }
+            #lineupGrid img { filter: none !important; }
         }
 
         .navbar .container { display: flex !important; flex-wrap: nowrap !important; align-items: center; }
@@ -286,6 +288,9 @@
         }
 
         /* ========================================= */
+        /* 🔥 FLOATING BOTTOM NAVBAR (KHUSUS HP) 🔥 */
+        /* ========================================= */
+/* ========================================= */
         /* 🔥 FLOATING BOTTOM NAVBAR (LIQUID GLASS) 🔥 */
         /* ========================================= */
         .mobile-bottom-nav { 
@@ -297,7 +302,7 @@
             width: 90%; 
             max-width: 400px; 
             
-            /* Efek Kaca Transparan (Mode Terang) */
+            /* 👇 Efek Kaca Transparan (Mode Terang) 👇 */
             background: rgba(255, 255, 255, 0.4) !important; 
             backdrop-filter: blur(16px) saturate(180%);
             -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -311,7 +316,7 @@
         }
 
         [data-theme="dark"] .mobile-bottom-nav { 
-            /* Efek Kaca Transparan (Mode Gelap) */
+            /* 👇 Efek Kaca Transparan (Mode Gelap) 👇 */
             background: rgba(24, 24, 27, 0.45) !important; 
             border-color: rgba(255, 255, 255, 0.1) !important; 
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
@@ -348,7 +353,7 @@
     </div>
     <!-- 👆 ----------------------------------- 👆 -->
 
-    <nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
+<nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
@@ -361,7 +366,7 @@
                 </ul>
             </div>
             
-            <!-- 👇 KELOMPOK TOMBOL NAVBAR 👇 -->
+            <!-- 👇 KELOMPOK TOMBOL (SEKARANG BERADA DI DALAM CONTAINER) 👇 -->
             <div class="d-flex align-items-center gap-2 flex-nowrap">
                 <!-- Tombol Tema Efek Kaca -->
                 <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
@@ -396,7 +401,7 @@
         </div> 
     </nav>
 
-    <section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
+<section class="hero-section text-center position-relative" style="background: linear-gradient(135deg, var(--primary) 0%, #007bff 100%); padding: 50px 0 100px 0; overflow: hidden;">
         <div class="hero-bg-circle"></div>
         <div class="container position-relative z-1">
             <h1 class="hero-title mb-3 text-white" data-i18n="hero_title" style="line-height: 1.3;">Satu sentuhan,<br>Untuk semua solusi event anda.</h1>
@@ -432,13 +437,14 @@
         </div>
     </div>
 
+
     <div class="container">
         <div class="row justify-content-center mb-5 g-2 px-2">
             <div class="col-3 col-md-2" onclick="filterCategory('All')"><div class="category-item" id="btn-cat-All"><div class="icon-circle"><i class="bi bi-grid-fill"></i></div><div class="cat-text" data-i18n="cat_all">Semua</div></div></div>
             <div class="col-3 col-md-2" onclick="filterCategory('Konser')"><div class="category-item" id="btn-cat-Konser"><div class="icon-circle"><i class="bi bi-music-note-beamed"></i></div><div class="cat-text" data-i18n="cat_concert">Konser</div></div></div>
             <div class="col-3 col-md-2" onclick="filterCategory('Olahraga')"><div class="category-item" id="btn-cat-Olahraga"><div class="icon-circle"><i class="bi bi-trophy-fill"></i></div><div class="cat-text" data-i18n="cat_sports">Olahraga</div></div></div>
             <div class="col-3 col-md-2" onclick="filterCategory('Workshop')"><div class="category-item" id="btn-cat-Workshop"><div class="icon-circle"><i class="bi bi-palette-fill"></i></div><div class="cat-text" data-i18n="cat_workshop">Workshop</div></div></div>
-            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')"><div class="category-item" id="btn-cat-Streaming"><div class="icon-circle"><div class="icon-circle"><i class="bi bi-camera-reels"></i></div><div class="cat-text" data-i18n="cat_streaming">Streaming</div></div></div>
+            <div class="col-3 col-md-2" onclick="filterCategory('Streaming')"><div class="category-item" id="btn-cat-Streaming"><div class="icon-circle"><i class="bi bi-camera-reels"></i></div><div class="cat-text" data-i18n="cat_streaming">Streaming</div></div></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
@@ -452,7 +458,6 @@
                 <p class="mt-2 text-secondary small" data-i18n="loading_text">Memuat event...</p>
             </div>
         </div>
-
         <!-- 👇 SENSOR INFINITE SCROLL OTOMATIS 👇 -->
         <div class="col-12 text-center mt-4 mb-4" id="scrollLoadContainer" style="display: none;">
             <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
@@ -460,15 +465,15 @@
             <div class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.4s;"></div>
             <div class="d-block mt-2 text-muted small fw-bold" style="letter-spacing: 2px;">MENARIK DATA...</div>
         </div>
-
-        <!-- 👇 WADAH EVENT SEGERA HADIR / AKAN DATANG 👇 -->
+        <!-- 👆 --------------------------------- 👆 -->
+        <!-- 👇 TAMBAHAN WADAH EVENT AKAN DATANG 👇 -->
         <div id="section-coming-soon" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-3 px-2 mt-5 border-top pt-4">
                 <h5 class="fw-bold m-0 text-info"><i class="bi bi-hourglass-split"></i> Akan Datang</h5>
             </div>
             <div class="row g-3" id="event-coming-soon-list"></div>
         </div>
-    </div> 
+    </div> <!-- 👈 PASTIKAN ADA DIV PENUTUP INI DI SINI! (Ini penutup container event) -->
 
     <section class="partner-section">
         <div class="container-fluid p-0">
@@ -510,7 +515,7 @@
                         <a href="https://www.tiktok.com/@ragaganz01" target="_blank" class="social-btn"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
-
+<!-- 👇 Bagian Copyright rata tengah 👇 -->
                 <div class="col-12 text-center mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
                     <small class="text-white-50 d-block mb-1">
                         &copy; 2025-2026 RCELLFEST ID. All rights reserved.
@@ -519,11 +524,10 @@
                         Created by <a href="#" class="text-white text-decoration-none">IT RCELLTECH</a> (v4.2)
                     </small>
                 </div>
-            </div> 
-        </div> 
-    </footer>
+                </div> <!-- 👈 PENUTUP ROW (TAMBAHKAN INI) -->
+        </div> <!-- 👈 PENUTUP CONTAINER (TAMBAHKAN INI) -->
+    </footer> <!-- 👈 PENUTUP FOOTER (TAMBAHKAN INI) -->
 
-    <!-- MODAL DETAIL EVENT -->
     <div class="modal fade" id="eventDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -569,7 +573,7 @@
         </div>
     </div>
 
-    <!-- POPUP NOTIFIKASI BERITA BLOGGER -->
+    <!-- 🔥 INI POPUP BERITA BLOGGER NYA (Sudah di atas) 🔥 -->
     <div class="news-toast" id="bloggerNewsToast">
         <i class="bi bi-megaphone-fill news-icon"></i>
         <div class="news-content">
@@ -582,13 +586,11 @@
         <div class="news-progress-bar"></div>
     </div>
 
-    <!-- PING SIGNAL BADGE -->
     <div class="signal-badge" id="floatingPing" title="Ping ke Server Rcellfest">
         <span id="networkDot" class="signal-dot dot-kuat"></span> 
         <span id="networkSpeed">Menghitung...</span>
     </div>
     
-    <!-- FITUR CHATBOT AI ASSISTANT -->
     <button onclick="toggleChat()" class="btn-chatbot" id="btnChatToggle">
         <i class="bi bi-robot"></i>
     </button>
@@ -607,11 +609,9 @@
             <button onclick="sendChatMessage()" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- FLOATING BOTTOM NAVBAR KHUSUS HP -->
+<!-- 👇 FLOATING BOTTOM NAVBAR KHUSUS HP 👇 -->
     <nav class="mobile-bottom-nav">
         <ul>
             <li>
@@ -621,18 +621,21 @@
                 </a>
             </li>
             <li>
+                <!-- Diarahkan ke #event-list supaya layarnya otomatis scroll ke bawah -->
                 <a href="#event-list">
                     <i class="bi bi-compass"></i>
                     <span class="nav-text">Eksplor</span>
                 </a>
             </li>
             <li>
+                <!-- Diberi ID agar link-nya bisa diatur otomatis oleh Javascript -->
                 <a href="/user-login" id="bottomNavTicket">
                     <i class="bi bi-ticket-perforated"></i>
                     <span class="nav-text">Tiket</span>
                 </a>
             </li>
             <li>
+                <!-- Diberi ID agar link-nya bisa diatur otomatis oleh Javascript -->
                 <a href="/user-login" id="bottomNavProfile">
                     <i class="bi bi-person"></i>
                     <span class="nav-text">Profil</span>
@@ -640,7 +643,7 @@
             </li>
         </ul>
     </nav>
-
+    <!-- 👆 ---------------------------------- 👆 -->
     <script>
         let allEvents = [];
         let detailModal; 
@@ -670,7 +673,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
             detailModal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
             
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -687,6 +690,7 @@
             checkServerPing();
             setInterval(checkServerPing, 10000);
 
+            // 👇 INI YANG MENUTUP LAYAR LOADING 👇
             const loader = document.getElementById('aesthetic-preloader');
             if(loader) {
                 setTimeout(() => {
@@ -695,7 +699,12 @@
             }
         });
 
-        /* FUNGSI GANTI TEMA (DARK / LIGHT MODE) */
+        // ==========================================
+        // FUNGSI GANTI TEMA (DARK / LIGHT MODE)
+        // ==========================================
+// ==========================================
+        // FUNGSI GANTI TEMA (DARK / LIGHT MODE)
+        // ==========================================
         function toggleTheme() {
             const htmlTag = document.documentElement;
             const currentTheme = htmlTag.getAttribute('data-theme');
@@ -706,15 +715,15 @@
             updateThemeIcon(newTheme);
         }
 
-        function updateThemeIcon(theme) {
+function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if (!icon) return;
+
+            // Hanya tugas mengganti bentuk ikon, urusan warna dipegang CSS
             if (theme === 'dark') {
                 icon.className = 'bi bi-sun-fill';
-                icon.style.color = "#FFD700";
             } else {
                 icon.className = 'bi bi-moon-stars-fill';
-                icon.style.color = "#0f172a";
             }
         }
 
@@ -803,7 +812,7 @@
             document.body.appendChild(scriptEl);
         }
 
-        function updateLanguage(lang) {
+function updateLanguage(lang) {
             const t = translations[lang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -812,6 +821,7 @@
             const searchInput = document.getElementById('searchInput');
             if(searchInput) searchInput.placeholder = t.search_placeholder;
             
+            // 👇 Update Gambar Bendera & Teks 👇
             const langText = document.getElementById('langText');
             const langFlag = document.getElementById('langFlag');
             if (langText) langText.innerText = lang.toUpperCase();
@@ -820,10 +830,25 @@
             }
         }
 
+        // Fungsi baru menggantikan toggleLanguage
         function changeLang(lang) {
             localStorage.setItem('lang', lang);
             updateLanguage(lang);
             if(allEvents.length > 0) renderEvents(allEvents);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.classList.remove('bi-moon-stars-fill');
+                icon.classList.add('bi-sun-fill');
+                icon.style.color = "#FFD700";
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-stars-fill');
+                icon.style.color = "#ffffff";
+            }
+            // Tidak perlu mengubah background tombol karena sudah dikunci warna dark elegant (#1e293b)
         }
 
         function checkLoginStatus() {
@@ -831,9 +856,8 @@
             const navArea = document.getElementById('navUserArea');
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
-            const btnBottomTicket = document.getElementById('bottomNavTicket');
+const btnBottomTicket = document.getElementById('bottomNavTicket');
             const btnBottomProfile = document.getElementById('bottomNavProfile');
-            
             if (userRaw) {
                 const user = JSON.parse(userRaw);
                 navArea.innerHTML = `
@@ -849,10 +873,13 @@
                         </ul>
                     </div>
                 `;
+                // 👇 JIKA SUDAH LOGIN: Arahkan menu bawah ke halaman Dashboard Pembeli 👇
+                // (Sesuaikan "/dashboard" dengan nama file dashboard tiket pengguna Mas Raga)
                 if(btnBottomTicket) btnBottomTicket.href = "/dashboard"; 
                 if(btnBottomProfile) btnBottomProfile.href = "/dashboard";
             } else {
                 navArea.innerHTML = `<a href="/user-login" class="btn btn-outline-primary rounded-pill px-3 fw-bold btn-sm">${t.nav_login}</a>`;
+                // 👇 JIKA BELUM LOGIN: Arahkan menu bawah ke halaman Login 👇
                 if(btnBottomTicket) btnBottomTicket.href = "/user-login"; 
                 if(btnBottomProfile) btnBottomProfile.href = "/user-login";
             }
@@ -908,7 +935,9 @@
             }
         }
 
-        /* --- SISTEM INFINITE SCROLL (AUTO LOAD) --- */
+        // ==============================================
+        // 🔥 SISTEM INFINITE SCROLL (AUTO LOAD) 🔥
+        // ==============================================
         let currentRenderData = [];
         let currentVisibleCount = 0;
         const limitPerLoad = 12; 
@@ -1029,14 +1058,9 @@
             const imageUrl = getEventImage(event);
             const hargaLabel = (event.tickets && event.tickets.length > 1) ? `Mulai Rp ${harga}` : `Rp ${harga}`;
             
-            const namaAman = event.name ? event.name : "event";
-            const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-            // PERBAIKAN ROUTING: Mengarahkan langsung ke detail.html
-            const linkDetail = `/detail.html?event=${eventSlug}&id=${event._id}`;
-
             let btnText = 'BELI';
             let btnClass = 'btn-outline-book';
-            let btnAction = `onclick="event.stopPropagation(); window.location.href='${linkDetail}'"`;
+            let btnAction = `onclick="event.stopPropagation(); window.location.href='${'/detail?event=' + (event.name || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '&id=' + event._id}'"`;
             let timerHtml = '';
             const now = new Date();
             const waktuSelesaiEvent = new Date(`${event.date}T${event.endTime || '23:59'}`);
@@ -1051,7 +1075,7 @@
                 btnClass = 'btn-outline-book disabled border-secondary text-secondary';
                 btnAction = 'disabled';
                 timerHtml = `<div id="timer-${event._id}" style="font-size: 0.75rem; font-weight: bold; margin-top: 5px; color: var(--primary);">Menghitung...</div>`;
-                setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate, eventSlug); }, 100);
+                setTimeout(() => { mulaiHitungMundur(event._id, event.salesOpenDate); }, 100);
             }
             else if (isComingSoon) {
                 btnText = lang === 'id' ? 'BELUM DIMULAI' : 'COMING SOON';
@@ -1067,6 +1091,9 @@
             }
 
             const pinBadge = event.isPinned ? `<span class="pinned-badge-img"><i class="bi bi-pin-angle-fill"></i></span>` : '';
+            const namaAman = event.name ? event.name : "event";
+            const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
 
             return `
             <div class="col-6 col-md-4 col-lg-3">
@@ -1097,8 +1124,8 @@
             </div>`;
         }
 
-        /* --- MESIN HITUNG MUNDUR --- */
-        function mulaiHitungMundur(eventId, targetDateStr, eventSlug) {
+        // 👇 --- MESIN HITUNG MUNDUR --- 👇
+        function mulaiHitungMundur(eventId, targetDateStr) {
             const targetWaktu = new Date(targetDateStr).getTime();
 
             const intervalTimer = setInterval(function() {
@@ -1115,7 +1142,7 @@
                         const lang = localStorage.getItem('lang') || 'id';
                         const btnText = lang === 'id' ? 'BELI TIKET' : 'BUY TICKET';
                         wadahTombol.innerHTML = `
-                            <button onclick="event.stopPropagation(); window.location.href='/detail.html?event=${eventSlug || 'event'}&id=${eventId}'" class="btn-outline-book" style="animation: fadeIn 0.5s; background-color: var(--primary); color: white;">
+                            <button onclick="event.stopPropagation(); window.location.href='/detail?id=${eventId}'" class="btn-outline-book" style="animation: fadeIn 0.5s; background-color: var(--primary); color: white;">
                                 ${btnText}
                             </button>
                         `;
@@ -1166,7 +1193,7 @@
                 const imageUrl = getEventImage(event);
                 const namaAman = event.name ? event.name : "event";
                 const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                const linkDetail = `/detail.html?event=${eventSlug}&id=${event._id}`;
+                const linkDetail = `/detail?event=${eventSlug}&id=${event._id}`;
 
                 indicatorsHtml += `<button type="button" data-bs-target="#heroEventSlider" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}"></button>`;
 
@@ -1197,6 +1224,7 @@
                     dateStr = dateObj.toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); 
                 } catch (e) { dateStr = event.date; } 
             }
+            document.getElementById('modalOrganizer').innerText = "By: " + (event.organizer || "RCELLFEST");
             document.getElementById('modalTitle').innerText = event.name;
             document.getElementById('modalDate').innerText = dateStr;
             document.getElementById('modalCategory').innerText = event.category || "General";
@@ -1461,7 +1489,7 @@
             window.location.href = `/checkout?event=${eventSlug}`;
         }
 
-        /* --- SCRIPT CHATBOT AI ASSISTANT --- */
+        // --- SCRIPT CHATBOT AI ---
         function toggleChat() {
             const chatWidget = document.getElementById('chatWidget');
             const icon = document.querySelector('#btnChatToggle i');
