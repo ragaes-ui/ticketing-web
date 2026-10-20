@@ -79,6 +79,9 @@
         .btn-secondary { border-radius: 8px; }
         .input-group .btn { border-radius: 8px; }
 
+        /* TICKET LIST ITEM */
+        .ticket-item { background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
         [data-theme="dark"] .text-dark { color: var(--text-main) !important; }
         [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
@@ -88,7 +91,6 @@
         [data-theme="dark"] .fw-bold { color: var(--text-main) !important; }
         [data-theme="dark"] .btn-outline-secondary { color: var(--text-main) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] .btn-outline-secondary:hover { background-color: var(--bg-section) !important; }
-        [data-theme="dark"] span { color: inherit; }
 
         .swal2-popup { border-radius: 12px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
@@ -99,40 +101,15 @@
         @media (max-width: 576px) { .breadcrumb-item.active { max-width: 140px; } }
         
         .floating-toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translate(-50%, -20px);
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: #ffffff;
-            padding: 12px 25px;
-            border-radius: 50px; 
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            z-index: 9999;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-            pointer-events: none; 
-            width: max-content;
-            max-width: 90vw;
+            position: fixed; top: 20px; left: 50%; transform: translate(-50%, -20px);
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: #ffffff; padding: 12px 25px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            opacity: 0; z-index: 9999; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            pointer-events: none; width: max-content; max-width: 90vw;
         }
-
-        .floating-toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        [data-theme="dark"] .floating-toast {
-            background: rgba(255, 255, 255, 0.9);
-            color: #0f172a;
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
-        }
+        .floating-toast.show { opacity: 1; transform: translate(-50%, 0); }
+        [data-theme="dark"] .floating-toast { background: rgba(255, 255, 255, 0.9); color: #0f172a; box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body>
@@ -201,16 +178,11 @@
                 <div class="glass-panel position-sticky" style="top: 100px;">
                     <h5 class="fw-bold mb-3 border-bottom pb-2">Ringkasan Pesanan</h5>
                     
-                    <h6 class="fw-bold mb-1" id="sumEventName">Memuat...</h6>
-                    <p class="text-muted small mb-3"><i class="bi bi-ticket-perforated"></i> Tipe: <span class="fw-bold text-primary" id="sumTierName">-</span></p>
+                    <h6 class="fw-bold mb-3 text-primary" id="sumEventName">Memuat...</h6>
 
-                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded" style="background: var(--bg-section);">
-                        <span class="fw-bold small">Jumlah Tiket:</span>
-                        <div class="input-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(-1)">-</button>
-                            <input type="number" id="chkQty" class="form-control text-center px-1" value="1" onchange="manualUpdateQty(this.value)">
-                            <button class="btn btn-outline-secondary btn-sm fw-bold" type="button" onclick="updateQty(1)">+</button>
-                        </div>
+                    <!-- 👇 DAFTAR TIKET YANG DIPILIH DARI DETAIL 👇 -->
+                    <div id="ticketSummaryList" class="mb-3">
+                        <div class="text-center text-muted small"><span class="spinner-border spinner-border-sm"></span> Memuat tiket...</div>
                     </div>
 
                     <div class="mb-3">
@@ -222,7 +194,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Harga Satuan</span>
+                        <span class="text-muted small">SubTotal</span>
                         <span class="fw-bold small" id="sumPrice">Rp 0</span>
                     </div>
                     
@@ -269,8 +241,10 @@
         let userData = {}; 
         let checkoutData = {}; 
         let selectedPayment = null; 
-        let minQty = 1; 
-        let qty = 1; 
+        
+        // Variabel Kalkulasi Baru
+        let subTotalTagihanAwal = 0; 
+        let totalQtySemuaTiket = 0;
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
 
@@ -307,41 +281,71 @@
             try {
                 userData = JSON.parse(userRaw); 
                 checkoutData = JSON.parse(checkoutRaw);
+                
+                // Jika data rusak atau tidak bawa Array Tickets
+                if (!checkoutData.tickets || checkoutData.tickets.length === 0) {
+                    throw new Error("Keranjang kosong!");
+                }
             } catch (e) {
-                console.error("Format data rusak, menghapus data...");
+                console.error("Format data rusak, kembali ke beranda...");
                 localStorage.removeItem('checkoutData');
-                window.location.reload();
+                window.location.replace('/');
                 return;
             }
 
-            minQty = checkoutData.minQty || 1;
-            qty = minQty; 
-            
-            const qtyInput = document.getElementById('chkQty');
-            if (qtyInput) qtyInput.value = qty;
-
+            // Isi Data Pemesan
             document.getElementById('chkName').value = userData.fullName || userData.username || '';
             document.getElementById('chkEmail').value = userData.email || '';
             document.getElementById('chkPhone').value = userData.phone || '';
             document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
-            
             document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
-            document.getElementById('sumTierName').innerText = checkoutData.tierName || 'General';
-            document.getElementById('sumPrice').innerText = `Rp ${(checkoutData.price || 0).toLocaleString('id-ID')}`;
             
-            // 👇 DETEKSI EARLY ENTRY OTOMATIS & TAMPILKAN WARNING 👇
-            const eeCheckoutMatch = (checkoutData.tierName || '').match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
-            if (eeCheckoutMatch) {
+            // 👇 RENDER DAFTAR TIKET MULTI-QTY 👇
+            let summaryHtml = '';
+            subTotalTagihanAwal = 0;
+            totalQtySemuaTiket = 0;
+            let foundEarlyEntry = false;
+            let earlyEntryTime = '';
+
+            checkoutData.tickets.forEach(tiket => {
+                let hargaItem = tiket.price * tiket.qty;
+                subTotalTagihanAwal += hargaItem;
+                totalQtySemuaTiket += tiket.qty;
+
+                summaryHtml += `
+                    <div class="ticket-item">
+                        <div>
+                            <div class="fw-bold small mb-1">${tiket.tierName}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">${tiket.qty} x Rp ${tiket.price.toLocaleString('id-ID')}</div>
+                        </div>
+                        <div class="fw-bold small text-primary">Rp ${hargaItem.toLocaleString('id-ID')}</div>
+                    </div>
+                `;
+
+                // Cek apakah ada tiket jenis Early Entry
+                const eeMatch = tiket.tierName.match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
+                if (eeMatch) {
+                    foundEarlyEntry = true;
+                    earlyEntryTime = eeMatch[1];
+                }
+            });
+
+            document.getElementById('ticketSummaryList').innerHTML = summaryHtml;
+            document.getElementById('sumPrice').innerText = `Rp ${subTotalTagihanAwal.toLocaleString('id-ID')}`;
+
+            // Tampilkan Warning Early Entry
+            if (foundEarlyEntry) {
                 const warnBox = document.getElementById('earlyEntryWarningBox');
                 const warnTxt = document.getElementById('earlyEntryWarningText');
                 if (warnBox && warnTxt) {
                     warnBox.classList.remove('d-none');
-                    warnTxt.innerHTML = `Tiket ini wajib di-scan di Gate sebelum pukul <b>${eeCheckoutMatch[1]} WIB</b>. Jika lewat dari jam tersebut, tiket tidak akan bisa digunakan!`;
+                    warnTxt.innerHTML = `Terdapat tiket yang wajib di-scan di Gate sebelum pukul <b>${earlyEntryTime} WIB</b>. Jika telat, tiket tersebut hangus.`;
                 }
             }
 
             hitungTotal();
 
+            // Breadcrumb
             const breadcrumbContainer = document.getElementById('breadcrumb-container');
             if (breadcrumbContainer && checkoutData) {
                 breadcrumbContainer.innerHTML = `
@@ -360,40 +364,15 @@
             window.history.replaceState(null, '', `/detail?checkout=true&id=${checkoutData.eventId}`);
         });
 
-        function manualUpdateQty(val) { 
-            const max = checkoutData.availableSeats || 1; 
-            let newQty = parseInt(val); 
-            if (isNaN(newQty) || newQty < minQty) newQty = minQty; 
-            if (newQty > max) newQty = max; 
-            qty = newQty; 
-            document.getElementById('chkQty').value = qty; 
-            hitungTotal(); 
-        }
-
-        function updateQty(change) { 
-            const max = checkoutData.availableSeats || 1; 
-            let newQty = qty + change; 
-            
-            if (newQty >= minQty && newQty <= max) { 
-                qty = newQty; 
-                document.getElementById('chkQty').value = qty; 
-                hitungTotal(); 
-            } else if (newQty < minQty) {
-                showToast(`Minimal pembelian ${minQty} tiket!`, 'warning');
-            } else if (newQty > max) {
-                showToast(`Maksimal pembelian ${max} tiket!`, 'error');
-            }
-        }
-
         function hitungTotal() { 
-            let subTotal = (checkoutData.price * qty) - diskonPromo; 
-            if(subTotal < 0) subTotal = 0; 
+            let hargaSetelahDiskon = subTotalTagihanAwal - diskonPromo; 
+            if(hargaSetelahDiskon < 0) hargaSetelahDiskon = 0; 
             
             let persenPajak = checkoutData.taxRate || 0;
             let pajak = 0;
 
             if (persenPajak > 0) {
-                pajak = Math.round(subTotal * (persenPajak / 100));
+                pajak = Math.round(hargaSetelahDiskon * (persenPajak / 100));
                 document.getElementById('rowPajak').classList.remove('d-none');
                 document.getElementById('lblPajak').innerText = `Pajak (${persenPajak}%)`;
                 document.getElementById('sumPajak').innerText = `+ Rp ${pajak.toLocaleString('id-ID')}`;
@@ -401,7 +380,7 @@
                 document.getElementById('rowPajak').classList.add('d-none');
             }
 
-            let totalAkhir = subTotal + pajak;
+            let totalAkhir = hargaSetelahDiskon + pajak;
             document.getElementById('sumTotal').innerText = `Rp ${totalAkhir.toLocaleString('id-ID')}`; 
             
             window.pajakAktif = pajak; 
@@ -424,7 +403,8 @@
                     body: JSON.stringify({ 
                         code: code, 
                         eventId: checkoutData.eventId,
-                        tierName: checkoutData.tierName // 👈 WAJIB ADA AGAR SERVER TAHU TIKET YANG DIBELI
+                        // Kirim array tickets agar server bisa validasi semua tipe
+                        tickets: checkoutData.tickets 
                     }) 
                 });
                 const data = await res.json();
@@ -453,12 +433,8 @@
             document.getElementById('paySaldo').classList.remove('selected'); 
             document.getElementById('payMidtrans').classList.remove('selected'); 
             
-            if (method === 'saldo') {
-                document.getElementById('paySaldo').classList.add('selected'); 
-            }
-            if (method === 'midtrans') {
-                document.getElementById('payMidtrans').classList.add('selected'); 
-            }
+            if (method === 'saldo') document.getElementById('paySaldo').classList.add('selected'); 
+            if (method === 'midtrans') document.getElementById('payMidtrans').classList.add('selected'); 
         }
 
         async function prosesBayar() {
@@ -470,24 +446,21 @@
             if (!recaptchaToken) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
             if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
 
-            let totalTagihan = (checkoutData.price * qty) - diskonPromo;
-            if (totalTagihan < 0) totalTagihan = 0;
+            let totalTagihanAkhir = (subTotalTagihanAwal - diskonPromo) + (window.pajakAktif || 0);
+            if (totalTagihanAkhir < 0) totalTagihanAkhir = 0;
             
-            const buyerPayload = { name: name, phone: phone, email: userData.email, qty: qty };
+            const buyerPayload = { name: name, phone: phone, email: userData.email };
 
             if (selectedPayment === 'saldo') {
-                if (userData.saldo < totalTagihan) {
-                    return Swal.fire('Saldo Kurang', 'Saldo RCELL kamu tidak mencukupi.', 'error');
+                if (userData.saldo < totalTagihanAkhir) {
+                    return Swal.fire('Saldo Kurang', 'Saldo RCPAY kamu tidak mencukupi.', 'error');
                 }
 
                 const { value: pin } = await Swal.fire({
                     title: 'Konfirmasi PIN', 
                     html: `<input id="swal-input-pin" type="password" class="form-control text-center fw-bold fs-4" maxlength="6" style="letter-spacing: 10px; background:var(--bg-input); color:var(--text-main);" placeholder="******">`, 
                     showCancelButton: true, 
-                    confirmButtonText: 'Bayar', 
-                    confirmButtonColor: '#0049CC', 
-                    background: 'var(--bg-card)', 
-                    color: 'var(--text-main)',
+                    confirmButtonText: 'Bayar', confirmButtonColor: '#0049CC', background: 'var(--bg-card)', color: 'var(--text-main)',
                     preConfirm: () => document.getElementById('swal-input-pin').value
                 });
 
@@ -502,15 +475,13 @@
                         body: JSON.stringify({ 
                             userId: userData.id, 
                             eventId: checkoutData.eventId, 
-                            tierName: checkoutData.tierName, 
-                            price: (checkoutData.price * qty), 
-                            quantity: qty, 
+                            tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
                             pin: pin, 
                             promoCode: kodePromoAktif, 
                             buyerData: buyerPayload,
                             recaptchaToken: recaptchaToken, 
                             pajak: window.pajakAktif || 0, 
-                            tierAccessCode: checkoutData.tierAccessCode || ''
+                            diskon: diskonPromo
                         })
                     });
                     
@@ -520,7 +491,7 @@
                         userData.saldo = data.sisaSaldo; 
                         localStorage.setItem('userData', JSON.stringify(userData)); 
                         localStorage.removeItem('checkoutData'); 
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', html: `Tiket: <b>${data.ticketCode}</b>`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = '/dashboard'); 
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: `Tiket berhasil diterbitkan!`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = '/dashboard'); 
                     } else { 
                         Swal.fire('Gagal', data.message, 'error'); 
                         turnstile.reset(); 
@@ -534,28 +505,19 @@
                 Swal.fire({ title: 'Menyiapkan Tagihan...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
                 try {
-                    let hargaMidtrans = checkoutData.price; 
-                    if (diskonPromo > 0) { 
-                        let hargaSetelahDiskon = (checkoutData.price * qty) - diskonPromo;
-                        if (hargaSetelahDiskon < 0) hargaSetelahDiskon = 0;
-                        hargaMidtrans = hargaSetelahDiskon / qty; 
-                    }
-                    
                     const res = await fetch('/api/payment-token', { 
                         method: 'POST', 
                         headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
                             eventId: checkoutData.eventId, 
-                            tierName: checkoutData.tierName, 
-                            price: hargaMidtrans, 
-                            quantity: qty, 
+                            tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
                             pajak: window.pajakAktif || 0,
+                            diskon: diskonPromo,
                             customerName: name, 
                             customerEmail: userData.email, 
                             customerPhone: phone, 
                             userId: userData.id,
-                            recaptchaToken: recaptchaToken, 
-                            tierAccessCode: checkoutData.tierAccessCode || ''
+                            recaptchaToken: recaptchaToken
                         }) 
                     });
                     
@@ -576,12 +538,10 @@
                                         userId: userData.id, 
                                         customerName: name, 
                                         customerEmail: userData.email, 
-                                        tierName: checkoutData.tierName, 
-                                        price: totalTagihan, 
-                                        quantity: qty, 
+                                        tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
                                         orderId: data.orderId, 
                                         buyerData: buyerPayload,
-                                        subTotal: (checkoutData.price * qty),
+                                        subTotal: subTotalTagihanAwal,
                                         diskon: diskonPromo,
                                         pajak: window.pajakAktif || 0
                                     }) 
@@ -601,10 +561,7 @@
                         };
 
                         window.snap.pay(data.token, { 
-                            onSuccess: function(result){ 
-                                clearInterval(radarPembayaran); 
-                                prosesSuksesMidtrans(); 
-                            },
+                            onSuccess: function(result){ clearInterval(radarPembayaran); prosesSuksesMidtrans(); },
                             onPending: function(result){ 
                                 clearInterval(radarPembayaran);
                                 Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
