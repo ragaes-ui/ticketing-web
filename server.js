@@ -1357,11 +1357,11 @@ app.post('/api/buy-ticket', async (req, res) => {
         let finalPrice = (subTotal - discountAmount) + parseInt(pajak);
         if (finalPrice < 0) finalPrice = 0;
         
-        const user = await User.findOneAndUpdate(
-            { _id: userId, saldo: { \$gte: finalPrice } }, 
-            { \$inc: { saldo: -finalPrice } },
-            { new: true }
-        );
+const user = await User.findOneAndUpdate(
+    { _id: userId, saldo: { $gte: finalPrice } }, // ✅ BENAR
+    { $inc: { saldo: -finalPrice } },             // ✅ BENAR
+    { new: true }
+);
         if (!user) return res.status(400).json({ success: false, message: "Saldo tidak cukup!" });
 
         // Pabrik Tiket Saldo (Looping Array)
