@@ -27,9 +27,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-bJeyNsEecyuBT4Lm6KC55-zg"></script>
-<link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
+    <link rel="icon" href="https://i.ibb.co/W4LQdgGQ/IMG-1283.png" type="image/png">
 
-<style>
+    <style>
         /* --- THEME VARIABLES (VERSI PERBAIKAN PREMIUM) --- */
         :root {
             --bg-body: #f8fafc;
@@ -93,6 +93,12 @@
             width: 30px; text-align: center; border: none; background: transparent; font-weight: 800; 
             color: var(--text-main); font-size: 1.1rem; outline: none; pointer-events: none;
         }
+        
+        /* Modifikasi untuk Tombol Tong Sampah */
+        .btn-trash {
+            background-color: #fee2e2 !important; /* Merah muda transparan */
+        }
+        [data-theme="dark"] .btn-trash { background-color: rgba(220, 38, 38, 0.2) !important; }
 
         /* 👇 CSS FLOATING BAR CHECKOUT 👇 */
         .floating-checkout {
@@ -491,6 +497,11 @@
                             ${isLocked ? `<button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" id="unlockBtn${index}" onclick="unlockTier(${index})">Buka Kunci</button>` : ''}
                             
                             <div class="qty-controls" id="qtyBox${index}" style="${isLocked ? 'display: none;' : ''}">
+                                <!-- 👇 TOMBOL TONG SAMPAH (HAPUS TIKET) 👇 -->
+                                <button class="qty-btn text-danger border-danger btn-trash" id="trashBtn${index}" onclick="removeTier(${index})" style="display: none;" title="Batal Pilih Tiket">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+
                                 <button class="qty-btn" onclick="updateQty(${index}, -1)" ${isDisabled ? 'disabled' : ''}>-</button>
                                 <input type="text" class="qty-input" id="qtyInput${index}" value="0" readonly>
                                 <button class="qty-btn" onclick="updateQty(${index}, 1)" ${isDisabled ? 'disabled' : ''}>+</button>
@@ -499,6 +510,25 @@
                     </div>
                 `;
             });
+        }
+
+        // 👇 FUNGSI UNTUK MENGHAPUS / ME-RESET TIKET YANG DIPILIH 👇
+        function removeTier(index) {
+            cartQty[index] = 0; // Kembalikan ke 0
+            document.getElementById(`qtyInput${index}`).value = 0;
+            
+            // Hilangkan efek aktif di kartu
+            document.getElementById(`lblTier${index}`).classList.remove('selected');
+            
+            // Sembunyikan ikon tong sampah kembali
+            const trashBtn = document.getElementById(`trashBtn${index}`);
+            if (trashBtn) trashBtn.style.display = 'none';
+
+            // Hitung ulang harga
+            calculateTotal();
+            
+            // Tampilkan notifikasi kecil
+            Swal.fire({ toast: true, position: 'top', icon: 'info', title: 'Pilihan tiket dibatalkan.', showConfirmButton: false, timer: 1200, background: 'var(--bg-card)', color: 'var(--text-main)' });
         }
 
         // 👇 FUNGSI UNTUK TAMBAH/KURANG JUMLAH TIKET 👇
@@ -518,17 +548,24 @@
             // Cegah kurang dari 0 dan lebih dari sisa tiket
             if (newVal < 0) newVal = 0;
             if (newVal > tier.availableSeats) {
-                Swal.fire({ toast: true, position: 'top', icon: 'warning', title: `Stok maksimal ${tier.availableSeats}!`, showConfirmButton: false, timer: 1500 });
+                Swal.fire({ toast: true, position: 'top', icon: 'warning', title: `Stok maksimal ${tier.availableSeats}!`, showConfirmButton: false, timer: 1500, background: 'var(--bg-card)', color: 'var(--text-main)' });
                 newVal = tier.availableSeats;
             }
 
             cartQty[index] = newVal;
             document.getElementById(`qtyInput${index}`).value = newVal;
             
-            // Beri highlight kartu tiket kalau ada yang dipilih
+            // Beri highlight kartu tiket dan Tampilkan tong sampah kalau ada yang dipilih
             const lbl = document.getElementById(`lblTier${index}`);
-            if (newVal > 0) lbl.classList.add('selected');
-            else lbl.classList.remove('selected');
+            const trashBtn = document.getElementById(`trashBtn${index}`);
+            
+            if (newVal > 0) {
+                lbl.classList.add('selected');
+                if (trashBtn) trashBtn.style.display = 'flex'; // Tampilkan Tong Sampah
+            } else {
+                lbl.classList.remove('selected');
+                if (trashBtn) trashBtn.style.display = 'none'; // Sembunyikan Tong Sampah
+            }
 
             calculateTotal();
         }
