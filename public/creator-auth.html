@@ -524,7 +524,7 @@ const res = await fetch('/api/creator/login', {
                     showToast(responseData.message || "Login Gagal!", "error");
                 }
             } catch (err) {
-                showToast("Koneksi ke server gagal.", "error");
+                showToast("username atau password kamu salah!.", "error");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
