@@ -365,6 +365,7 @@
         });
 
         function hitungTotal() { 
+            // 1. Kurangi SubTotal dengan Promo Rupiah (Pastikan tidak minus)
             let hargaSetelahDiskon = subTotalTagihanAwal - diskonPromo; 
             if(hargaSetelahDiskon < 0) hargaSetelahDiskon = 0; 
             
@@ -380,6 +381,7 @@
                 document.getElementById('rowPajak').classList.add('d-none');
             }
 
+            // 2. Tambahkan Pajak ke Hasil Harga Setelah Diskon
             let totalAkhir = hargaSetelahDiskon + pajak;
             document.getElementById('sumTotal').innerText = `Rp ${totalAkhir.toLocaleString('id-ID')}`; 
             
@@ -403,15 +405,16 @@
                     body: JSON.stringify({ 
                         code: code, 
                         eventId: checkoutData.eventId,
-                        // Kirim array tickets agar server bisa validasi semua tipe
-                        tickets: checkoutData.tickets 
+                        tickets: checkoutData.tickets // 👈 Kirim array tickets agar backend bisa hitung total
                     }) 
                 });
                 const data = await res.json();
                 
                 if(data.valid) { 
+                    // Backend sekarang mengembalikan Nilai Rupiah Murni (data.discount)
                     kodePromoAktif = code.toUpperCase(); 
                     diskonPromo = data.discount; 
+                    
                     statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`; 
                     document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`; 
                     rowDiskon.classList.remove('d-none'); 
@@ -475,13 +478,13 @@
                         body: JSON.stringify({ 
                             userId: userData.id, 
                             eventId: checkoutData.eventId, 
-                            tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
+                            tickets: checkoutData.tickets, 
                             pin: pin, 
-                            promoCode: kodePromoAktif, 
+                            promoCode: kodePromoAktif,  // 👈 WAJIB DIKIRIM
+                            diskon: diskonPromo,        // 👈 WAJIB DIKIRIM
                             buyerData: buyerPayload,
                             recaptchaToken: recaptchaToken, 
-                            pajak: window.pajakAktif || 0, 
-                            diskon: diskonPromo
+                            pajak: window.pajakAktif || 0 
                         })
                     });
                     
@@ -510,9 +513,10 @@
                         headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify({ 
                             eventId: checkoutData.eventId, 
-                            tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
+                            tickets: checkoutData.tickets, 
+                            promoCode: kodePromoAktif,   // 👈 WAJIB DIKIRIM
+                            diskon: diskonPromo,         // 👈 WAJIB DIKIRIM
                             pajak: window.pajakAktif || 0,
-                            diskon: diskonPromo,
                             customerName: name, 
                             customerEmail: userData.email, 
                             customerPhone: phone, 
@@ -538,11 +542,12 @@
                                         userId: userData.id, 
                                         customerName: name, 
                                         customerEmail: userData.email, 
-                                        tickets: checkoutData.tickets, // 👈 KIRIM ARRAY TIKET
+                                        tickets: checkoutData.tickets, 
                                         orderId: data.orderId, 
                                         buyerData: buyerPayload,
+                                        promoCode: kodePromoAktif, // 👈 WAJIB DIKIRIM
+                                        diskon: diskonPromo,       // 👈 WAJIB DIKIRIM
                                         subTotal: subTotalTagihanAwal,
-                                        diskon: diskonPromo,
                                         pajak: window.pajakAktif || 0
                                     }) 
                                 });
