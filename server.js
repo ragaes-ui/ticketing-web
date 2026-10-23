@@ -39,6 +39,10 @@ const Topup = mongoose.models.Topup || mongoose.model('Topup', topupSchema);
 // --- MODEL BARU: KODE PROMO ---
 const promoSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true, uppercase: true }, 
+    // 👇 TAMBAHKAN 2 BARIS INI 👇
+    type: { type: String, enum: ['nominal', 'percent'], default: 'nominal' },
+    maxDiscount: { type: Number, default: null },
+    // 👆 ----------------------- 👆
     discount: { type: Number, required: true }, 
     quota: { type: Number, default: 100 }, 
     expiresAt: { type: Date, required: true },
@@ -1344,11 +1348,22 @@ app.post('/api/buy-ticket', async (req, res) => {
             }
         }
 
-        let discountAmount = 0;
+let discountAmount = 0;
         if (promoCode) {
             const promo = await Promo.findOne({ code: promoCode.toUpperCase() });
             if (promo && promo.quota > 0 && new Date() < promo.expiresAt) {
-                discountAmount = promo.discount;
+                
+                // 👇 MESIN KALKULASI PERSEN VS NOMINAL SAAT BAYAR SALDO 👇
+                if (promo.type === 'percent') {
+                    discountAmount = (subTotal * promo.discount) / 100;
+                    if (promo.maxDiscount && discountAmount > promo.maxDiscount) {
+                        discountAmount = promo.maxDiscount;
+                    }
+                } else {
+                    discountAmount = promo.discount;
+                }
+                // 👆 ------------------------------------------------ 👆
+
                 promo.quota -= 1;
                 await promo.save();
             }
@@ -1965,22 +1980,21 @@ app.post('/api/maintenance', async (req, res) => {
 // --- 1. CEK KODE PROMO SAAT CHECKOUT (Dilindungi Satpam) ---
 // --- 1. CEK KODE PROMO SAAT CHECKOUT ---
 // --- 1. CEK KODE PROMO SAAT CHECKOUT ---
+// --- 1. CEK KODE PROMO SAAT CHECKOUT ---
 app.post('/api/check-promo', async (req, res) => {
     try {
-        const { code, eventId, tickets } = req.body; // 👈 Sekarang menerima Array tickets
+        const { code, eventId, tickets } = req.body; 
         const promo = await Promo.findOne({ code: code.toUpperCase() });
 
         if (!promo) return res.status(400).json({ valid: false, message: "Kode promo tidak valid atau tidak ditemukan." });
         if (promo.quota <= 0) return res.status(400).json({ valid: false, message: "Kuota promo sudah habis." });
         if (promo.eventId !== 'ALL' && promo.eventId !== eventId) return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk event ini." });
 
-        // Cek kecocokan Tier/Tipe Tiket di dalam array tickets
         if (promo.tierName !== 'ALL') {
             const isTierExist = tickets && tickets.some(t => t.tierName === promo.tierName);
             if (!isTierExist) return res.status(400).json({ valid: false, message: "Promo tidak berlaku untuk tipe tiket yang kamu pilih." });
         }
 
-        // Validasi Waktu
         const now = new Date();
         const wibTime = new Date(now.getTime() + (7 * 60 * 60 * 1000)); 
         const hariIni = wibTime.toISOString().split('T')[0]; 
@@ -1991,7 +2005,29 @@ app.post('/api/check-promo', async (req, res) => {
         if (promo.startTime && jamIni < promo.startTime) return res.status(400).json({ valid: false, message: `Promo baru aktif pukul ${promo.startTime} WIB.` });
         if (promo.endTime && jamIni > promo.endTime) return res.status(400).json({ valid: false, message: `Waktu promo telah berakhir pada pukul ${promo.endTime} WIB.` });
         
-        res.json({ valid: true, discount: promo.discount, message: "Promo berhasil diterapkan!" });
+        // 👇 HITUNG SUBTOTAL & KONVERSI PERSEN KE RUPIAH 👇
+        let subTotal = 0;
+        if (tickets && tickets.length > 0) {
+            tickets.forEach(t => subTotal += (t.price * t.qty));
+        }
+
+        let potonganRupiah = 0;
+        if (promo.type === 'percent') {
+            potonganRupiah = (subTotal * promo.discount) / 100;
+            // Jika ada batas maksimal potongan (Max Diskon)
+            if (promo.maxDiscount && potonganRupiah > promo.maxDiscount) {
+                potonganRupiah = promo.maxDiscount;
+            }
+        } else {
+            // Jika tipe nominal, langsung pakai angkanya
+            potonganRupiah = promo.discount;
+        }
+
+        res.json({ 
+            valid: true, 
+            discount: potonganRupiah, // 👈 Kembalikan dalam wujud Rupiah murni agar frontend tidak bingung
+            message: "Promo berhasil diterapkan!" 
+        });
 
     } catch (error) {
         console.error("Error Cek Promo:", error);
@@ -2010,11 +2046,10 @@ app.get('/api/promos', proteksiApiInternal, async (req, res) => {
 
 // --- 3. SIMPAN PROMO BARU (Dilindungi Satpam) ---
 // --- 3. SIMPAN PROMO BARU ---
-// --- 3. SIMPAN PROMO BARU ---
 app.post('/api/promos', proteksiApiInternal, async (req, res) => {
     try {
-        // Ganti 'endTime' menjadi 'validUntil' untuk mengambil data tanggal dari frontend
-        const { code, discount, quota, eventId, eventName, tierName, validFrom, validUntil, startTime, endTime } = req.body;
+        // 👇 TAMBAHKAN maxDiscount DI SINI 👇
+        const { code, type, discount, maxDiscount, quota, eventId, eventName, tierName, validFrom, validUntil, startTime, endTime } = req.body;
         
         if (!validUntil) {
             return res.status(400).json({ 
@@ -2028,9 +2063,11 @@ app.post('/api/promos', proteksiApiInternal, async (req, res) => {
 
         const newPromo = new Promo({ 
             code: code, 
+            type: type || 'nominal',           // 👈 Simpan tipe diskon
             discount: discount, 
+            maxDiscount: maxDiscount || null,  // 👈 Sekarang aman, tidak akan error 'undefined'
             quota: quota, 
-            expiresAt: expiresAt, // Disimpan ke MongoDB pakai format tanggal yang benar
+            expiresAt: expiresAt, 
             eventId: eventId,      
             eventName: eventName,
             tierName: tierName || 'ALL',
