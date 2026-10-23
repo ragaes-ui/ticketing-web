@@ -427,7 +427,7 @@
         <label class="form-label text-warning"><i class="bi bi-tags-fill"></i> Jenis Diskon</label>
         <select id="promoType" class="form-select" onchange="aturTipePromo()" required>
             <option value="nominal">Nominal (Potongan Rp)</option>
-            <option value="percent">Persentase (%)</option>
+            <option value="persen">Persentase (%)</option>
         </select>
     </div>
     
@@ -878,7 +878,7 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
             const wrapMaxDisc = document.getElementById('wrapMaxDisc');
             const inputMaxDisc = document.getElementById('promoMaxDisc');
 
-            if (type === 'percent') {
+            if (type === 'persen') {
                 labelDisc.innerText = 'Potongan (%)';
                 inputDisc.placeholder = '10'; // 10%
                 inputDisc.setAttribute('oninput', ''); // Hapus format rupiah karena input persen hanya angka kecil
@@ -921,8 +921,8 @@ const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-blo
     <i class="bi bi-clock-history"></i> Jam: ${p.startTime || '00:00'} - ${p.endTime || '23:59'} WIB
 </span>`;                        
                         // 👇 Logika cetak teks Diskon sesuai persen/nominal 👇
-                        let diskonTeks = p.type === 'percent' ? `${p.discount}%` : `Rp ${p.discount.toLocaleString('id-ID')}`;
-                        let maxDiskonTeks = (p.type === 'percent' && p.maxDiscount) ? `<br><span class="text-info" style="font-size: 0.7rem;">(Maks Potong: Rp ${p.maxDiscount.toLocaleString('id-ID')})</span>` : '';
+                        let diskonTeks = p.type === 'persen' ? `${p.discount}%` : `Rp ${p.discount.toLocaleString('id-ID')}`;
+                        let maxDiskonTeks = (p.type === 'persen' && p.maxDiscount) ? `<br><span class="text-info" style="font-size: 0.7rem;">(Maks Potong: Rp ${p.maxDiscount.toLocaleString('id-ID')})</span>` : '';
 
                         return `
                     <div class="col-md-6 col-lg-4">
@@ -956,7 +956,7 @@ const data = {
                 code: document.getElementById('promoCode').value, 
                 type: typeVal, // Tambahan Tipe Nominal atau Percent
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
-                maxDiscount: (typeVal === 'percent' && maxDiscVal) ? parseInt(maxDiscVal.replace(/\./g, '')) : null, // Tambahan Batas Maksimal
+                maxDiscount: (typeVal === 'persen' && maxDiscVal) ? parseInt(maxDiscVal.replace(/\./g, '')) : null, // Tambahan Batas Maksimal
                 quota: document.getElementById('promoQuota').value, 
                 
                 // 👇 Data rentang tanggal yang dikirim 👇
