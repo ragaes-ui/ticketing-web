@@ -271,23 +271,23 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-    <label class="small text-warning fw-bold mb-1"><i class="bi bi-bank me-1"></i> Pajak Event (%) - Opsional</label>
-    <input type="number" id="taxRate" class="form-control" placeholder="0" min="0" max="100">
-</div>
+                                    <label class="small text-warning fw-bold mb-1"><i class="bi bi-bank me-1"></i> Pajak Event (%) - Opsional</label>
+                                    <input type="number" id="taxRate" class="form-control" placeholder="0" min="0" max="100">
+                                </div>
                                 <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" required></div>
                                 <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
                                 <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" required></div>
                                 <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
-<div class="row g-2 mb-3">
-    <div class="col-6">
-        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
-        <input type="date" id="date" class="form-control" required>
-    </div>
-    <div class="col-6">
-        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai (Opsional)</label>
-        <input type="date" id="endDate" class="form-control">
-    </div>
-</div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
+                                        <input type="date" id="date" class="form-control" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai (Opsional)</label>
+                                        <input type="date" id="endDate" class="form-control">
+                                    </div>
+                                </div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
@@ -421,7 +421,6 @@
             </div>
 
             <!-- ===================== TAB 5: KELOLA PROMO ===================== -->
-<!-- ===================== TAB 5: KELOLA PROMO ===================== -->
             <div class="tab-pane fade" id="promo-pane" role="tabpanel">
                 <div class="glass-card">
                     <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i>Kelola Kode Promo</h5>
@@ -433,7 +432,6 @@
                         </div>
                         <div class="col-md-4">
                             <label class="small text-info fw-bold mb-1">Target Tipe Tiket</label>
-                            <!-- 👇 INI UBAHANNYA: JADI DROPDOWN 👇 -->
                             <select id="promoTierName" class="form-select text-white">
                                 <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
                             </select>
@@ -442,18 +440,32 @@
                             <label class="small text-white-50 fw-bold mb-1">Kode Promo</label>
                             <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="small text-white-50 fw-bold mb-1">Potongan Harga (Rp)</label>
-                            <input type="text" id="promoDisc" class="form-control fw-bold text-info" placeholder="20.000" required oninput="formatRupiah(this)">
+                        
+                        <!-- 👇 FITUR TIPE DISKON (PERSEN / NOMINAL) 👇 -->
+                        <div class="col-md-2">
+                            <label class="small text-white-50 fw-bold mb-1">Tipe Diskon</label>
+                            <select id="promoType" class="form-select text-white" onchange="toggleMaxDiscount()">
+                                <option value="nominal">Nominal (Rp)</option>
+                                <option value="persen">Persen (%)</option>
+                            </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="small text-info fw-bold mb-1" id="lblPromoDisc">Potongan (Rp)</label>
+                            <input type="text" id="promoDisc" class="form-control fw-bold text-info" placeholder="20.000" required oninput="formatPromoNilai(this)">
+                        </div>
+                        <div class="col-md-3" id="boxMaxDiscount" style="display: none;">
+                            <label class="small text-warning fw-bold mb-1">Maks Potongan (Rp)</label>
+                            <input type="text" id="promoMaxDisc" class="form-control fw-bold text-warning" placeholder="50.000" oninput="formatRupiah(this)">
+                        </div>
+                        <div class="col-md-2">
                             <label class="small text-white-50 fw-bold mb-1">Batas Kuota</label>
                             <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="small text-white-50 fw-bold mb-1">Masa Aktif (Hari)</label>
                             <input type="number" id="promoDays" class="form-control" placeholder="7" required>
                         </div>
+                        
                         <!-- 👇 TAMBAHAN WAKTU SPESIFIK PROMO 👇 -->
                         <div class="col-12 mt-3 pt-3 border-top border-secondary border-opacity-50">
                             <label class="small text-info fw-bold mb-2"><i class="bi bi-clock-history me-1"></i> Pengaturan Waktu Spesifik (Opsional)</label>
@@ -475,10 +487,10 @@
                                     <input type="time" id="promoEndTime" class="form-control form-control-sm" style="color-scheme: dark;">
                                 </div>
                             </div>
-                            <small class="text-white-50 d-block mt-1" style="font-size: 0.7rem;">*Kosongkan jika promo berlaku setiap saat (hanya mengikuti batas kuota & hari).</small>
+                            <small class="text-white-50 d-block mt-1" style="font-size: 0.7rem;">*Kosongkan jika ingin sistem menghitung Tgl Selesai otomatis dari "Masa Aktif (Hari)".</small>
                         </div>
-                        <!-- 👆 ---------------------------- 👆 -->
-                        <div class="col-12 mt-2">
+                        
+                        <div class="col-12 mt-3">
                             <button type="submit" class="btn btn-success w-100 rounded-pill py-2"><i class="bi bi-plus-lg"></i> Buat Kode Promo</button>
                         </div>
                     </form>
@@ -487,8 +499,8 @@
                     <div id="promoList" class="row g-3"></div>
                 </div>
             </div>
-<!-- ===================== TAB 6: KELOLA RUNDOWN ===================== -->
-<!-- ===================== TAB 6: KELOLA RUNDOWN ===================== -->
+
+            <!-- ===================== TAB 6: KELOLA RUNDOWN ===================== -->
             <div class="tab-pane fade" id="rundown-pane" role="tabpanel">
                 <div class="glass-card">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -810,7 +822,7 @@
             if(fUrl){ img.src = fUrl; img.style.display = 'block'; if(txt) txt.style.display = 'none'; } else { img.style.display = 'none'; if(txt) txt.style.display = 'block'; }
         }
 
-function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
+        function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
             let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : '';
             
             // Cek apakah tiket ini punya batas jam Early Entry (saat di-edit)
@@ -909,8 +921,7 @@ function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCod
             document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
         }
 
-        // 👇 TARIK DATA DENGAN MENGHAPUS TITIK DI HARGANYA 👇
-function getTiers(id) {
+        function getTiers(id) {
             return Array.from(document.getElementById(id).querySelectorAll('.tier-row')).map(r => {
                 let nameVal = r.querySelector('.tier-name').value.replace(/\s*\(Max\s*[0-2][0-9]:[0-5][0-9]\)/ig, '').trim();
                 const isEarly = r.querySelector('.tier-is-early')?.checked;
@@ -949,16 +960,16 @@ function getTiers(id) {
             const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
                 name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, 
-                location: document.getElementById('location').value, date: document.getElementById('date').value,
+                location: document.getElementById('location').value,
                 date: document.getElementById('date').value,
-                endDate: document.getElementById('endDate').value || null, // 👈 TAMBAHKAN BARIS INI
+                endDate: document.getElementById('endDate').value || null,
                 startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value,
                 salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '',
                 mapsUrl: document.getElementById('mapsUrl').value, description: document.getElementById('description').value, image: document.getElementById('image').value,
                 secretData: secretEl ? secretEl.value : '', price: tiers[0]?.price || 0, 
                 capacity: tiers.reduce((a,b)=>a+b.totalSeats,0), availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
                 lineupImages: lineupImagesAdd,
-                taxRate: taxRateValue  // 👈 PASTIKAN ADA INI JUGA YA
+                taxRate: taxRateValue 
             };
             try {
                 await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
@@ -983,11 +994,9 @@ function getTiers(id) {
                 document.getElementById('editOrganizer').value = ev.organizer || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
-                // 👇 PASTIKAN PAJAK KEBACA DI MODAL 👇
                 const taxInput = document.getElementById('editTaxRate');
                 if (taxInput) taxInput.value = ev.taxRate || 0;
                 if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0];
-                // 👇 TAMBAHAN UNTUK MUNCULIN TANGGAL SELESAI DI MODAL 👇
                 if(ev.endDate) { 
                     document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; 
                 } else { 
@@ -995,7 +1004,7 @@ function getTiers(id) {
                 }
                 document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || '';
                 document.getElementById('editImage').value = ev.image || ''; previewImage(ev.image, 'editPreview');
-document.getElementById('editTiers').innerHTML = ''; 
+                document.getElementById('editTiers').innerHTML = ''; 
                 if(ev.tickets) {
                     ev.tickets.forEach(t => {
                         let openDateFormatted = '';
@@ -1007,7 +1016,8 @@ document.getElementById('editTiers').innerHTML = '';
                         }
                         addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode);
                     });
-                }                if(ev.salesOpenDate) {
+                }                
+                if(ev.salesOpenDate) {
                     const d = new Date(ev.salesOpenDate);
                     const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0');
                     const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0');
@@ -1023,7 +1033,6 @@ document.getElementById('editTiers').innerHTML = '';
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             const id = document.getElementById('editId').value; const tiers = getTiers('editTiers');
             const lineupImagesEdit = Array.from(document.querySelectorAll('#editLineups .lineup-url')).map(inp => inp.value).filter(val => val !== '');
-            // 👇 TANGKAP PAJAK SEBELUM DISIMPAN 👇
             const taxInput = document.getElementById('editTaxRate');
             const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
@@ -1035,17 +1044,15 @@ document.getElementById('editTiers').innerHTML = '';
                 image: document.getElementById('editImage').value, price: tiers[0]?.price || 0,
                 availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers,
                 lineupImages: lineupImagesEdit,
-                taxRate: taxRateValue // 👈 KIRIM PAJAK KE DATABASE
+                taxRate: taxRateValue 
             };
             await fetch(`/api/events/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
             eModal.hide(); loadTable(); Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_edit, background: '#1c1c2d', color: '#fff' });
         }
 
-// --- MANAJEMEN PROMO ---
-// Fungsi otomatis menarik daftar nama tiket berdasarkan Event yang dipilih
-// --- MANAJEMEN PROMO ---
+        // --- MANAJEMEN PROMO ---
         
-        // 👇 FUNGSI BARU: Tarik data tier tiket berdasarkan event yang dipilih
+        // FUNGSI BARU: Tarik data tier tiket berdasarkan event yang dipilih
         function updatePromoTierDropdown() {
             const eventId = document.getElementById('promoEventId').value;
             const tierSelect = document.getElementById('promoTierName');
@@ -1063,6 +1070,37 @@ document.getElementById('editTiers').innerHTML = '';
             tierSelect.innerHTML = html;
         }
 
+        // FUNGSI BARU: Tampilkan / Sembunyikan kolom Maks Potongan untuk Persen
+        function toggleMaxDiscount() {
+            const type = document.getElementById('promoType').value;
+            const boxMax = document.getElementById('boxMaxDiscount');
+            const lblDisc = document.getElementById('lblPromoDisc');
+            const inputDisc = document.getElementById('promoDisc');
+            
+            if (type === 'persen') {
+                boxMax.style.display = 'block';
+                lblDisc.innerText = 'Potongan (%)';
+                inputDisc.placeholder = '10';
+                inputDisc.value = inputDisc.value.replace(/\./g, ''); // Hapus titik kalau ganti ke persen
+            } else {
+                boxMax.style.display = 'none';
+                lblDisc.innerText = 'Potongan (Rp)';
+                inputDisc.placeholder = '20.000';
+                formatPromoNilai(inputDisc); // Kembalikan titik rupiah
+            }
+        }
+        
+        function formatPromoNilai(input) {
+            const type = document.getElementById('promoType').value;
+            if (type === 'nominal') {
+                formatRupiah(input);
+            } else {
+                let val = parseInt(input.value.replace(/[^0-9]/g, '')) || 0;
+                if (val > 100) val = 100;
+                input.value = val ? val : '';
+            }
+        }
+
         async function loadPromos() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             
@@ -1073,55 +1111,71 @@ document.getElementById('editTiers').innerHTML = '';
                 eventsData.forEach(ev => { opts += `<option value="${ev._id}">${ev.name}</option>`; });
                 promoSelect.innerHTML = opts;
                 
-                updatePromoTierDropdown(); // 👈 Panggil agar dropdown tiket ikut terisi
+                updatePromoTierDropdown();
             }
 
             // 2. RENDER KARTU PROMO
             try { 
                 const res = await fetch('/api/promos'); const data = await res.json(); 
-                document.getElementById('promoList').innerHTML = data.length === 0 ? `<div class="text-white-50 col-12">${t.empty_table}</div>` : data.map(p => `
+                document.getElementById('promoList').innerHTML = data.length === 0 ? `<div class="text-white-50 col-12">${t.empty_table}</div>` : data.map(p => {
+                    let discText = p.type === 'persen' ? `${p.discount}% (Maks Rp ${p.maxDiscount ? p.maxDiscount.toLocaleString('id-ID') : '∞'})` : `Rp ${p.discount.toLocaleString('id-ID')}`;
+                    
+                    return `
                     <div class="col-md-4">
                         <div class="promo-ticket m-0 h-100">
                             <div>
                                 <b class="text-warning fs-5">${p.code}</b><br>
                                 <span class="badge bg-info text-dark mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT'}</span><br>
                                 <span class="badge bg-secondary text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-ticket-detailed"></i> ${p.tierName === 'ALL' || !p.tierName ? 'SEMUA TIKET' : p.tierName}</span><br>
-                                <small class="text-white-50">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small>
+                                <small class="text-white-50">Diskon: <span class="text-info fw-bold">${discText}</span> <br>Sisa Kuota: <span class="text-white fw-bold">${p.quota}</span></small>
                             </div>
                             <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </div>
-                    </div>`).join(''); 
+                    </div>`
+                }).join(''); 
             } catch(e) {}
         }
 
-document.getElementById('formPromo').addEventListener('submit', async (e) => {
+        document.getElementById('formPromo').addEventListener('submit', async (e) => {
             e.preventDefault(); const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             
-            // Tangkap Event ID dan Nama Event dari Dropdown
             const promoSelect = document.getElementById('promoEventId');
             const selectedEventName = promoSelect.options[promoSelect.selectedIndex].text;
             const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
 
-            // 👇 UBAH BAGIAN INI UNTUK MENAMBAHKAN WAKTU 👇
+            const typeVal = document.getElementById('promoType').value;
+            const rawDisc = document.getElementById('promoDisc').value;
+            const discVal = typeVal === 'nominal' ? (parseInt(rawDisc.replace(/\./g, '')) || 0) : (parseInt(rawDisc) || 0);
+            const rawMax = document.getElementById('promoMaxDisc').value;
+            const maxDiscVal = (typeVal === 'persen' && rawMax) ? (parseInt(rawMax.replace(/\./g, '')) || null) : null;
+
+            let finalValidUntil = document.getElementById('promoValidUntil').value;
+            if (!finalValidUntil) {
+                const days = parseInt(document.getElementById('promoDays').value) || 1;
+                const d = new Date();
+                d.setDate(d.getDate() + days);
+                finalValidUntil = d.toISOString().split('T')[0]; 
+            }
+
             const data = { 
-                code: document.getElementById('promoCode').value, 
-                discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
+                code: document.getElementById('promoCode').value.trim().toUpperCase(), 
+                type: typeVal,
+                discount: discVal,
+                maxDiscount: maxDiscVal,
                 quota: document.getElementById('promoQuota').value, 
-                daysActive: document.getElementById('promoDays').value,
                 eventId: promoSelect.value, 
                 eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT' : selectedEventName,
                 tierName: tierVal,
                 
-                // Tambahan Payload Waktu
                 validFrom: document.getElementById('promoValidFrom').value || null,
-                validUntil: document.getElementById('promoValidUntil').value || null,
+                validUntil: finalValidUntil,
                 startTime: document.getElementById('promoStartTime').value || null,
                 endTime: document.getElementById('promoEndTime').value || null
             };
-            // 👆 ---------------------------------------- 👆
 
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
             e.target.reset(); 
+            toggleMaxDiscount();
             loadPromos(); 
             Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: t.alert_success_promo, background: '#1c1c2d', color: '#fff' });
         });
@@ -1317,14 +1371,9 @@ document.getElementById('formPromo').addEventListener('submit', async (e) => {
                 }
             });
         }
-// ==========================================
+
+        // ==========================================
         // ⏳ MANAJEMEN RUNDOWN EVENT
-        // ==========================================
-// ==========================================
-        // ⏳ MANAJEMEN RUNDOWN EVENT (KALENDER & TIME PICKER)
-        // ==========================================
-// ==========================================
-        // ⏳ MANAJEMEN RUNDOWN EVENT (ADMIN + FOTO ARTIS SUPABASE)
         // ==========================================
         let allRundownsAdmin = [];
 
@@ -1346,7 +1395,6 @@ document.getElementById('formPromo').addEventListener('submit', async (e) => {
             });
         }
 
-        // Fungsi Upload Foto Artis ke Supabase di Admin
         async function uploadAdminRowPhoto(input) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -1388,7 +1436,6 @@ document.getElementById('formPromo').addEventListener('submit', async (e) => {
             }
         }
 
-        // Fungsi Hapus Foto Artis Manual (Tombol X Merah)
         function removeAdminRowPhoto(btn) {
             const row = btn.closest('.rd-item-row');
             const previewImg = row.querySelector('.rd-img-preview');
@@ -1399,7 +1446,6 @@ document.getElementById('formPromo').addEventListener('submit', async (e) => {
             btn.classList.add('d-none');
         }
 
-        // Fungsi Tambah Baris Input Sesi Acara di Admin
         function addRundownRow(dateVal = '', time = '', title = '', stage = '', desc = '', imgUrl = '') {
             const container = document.getElementById('rdRowsContainer');
             if (!container) return;
