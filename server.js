@@ -40,7 +40,7 @@ const Topup = mongoose.models.Topup || mongoose.model('Topup', topupSchema);
 const promoSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true, uppercase: true }, 
     // 👇 TAMBAHKAN 2 BARIS INI 👇
-    type: { type: String, enum: ['nominal', 'percent'], default: 'nominal' },
+    type: { type: String, enum: ['nominal', 'persen'], default: 'nominal' },
     maxDiscount: { type: Number, default: null },
     // 👆 ----------------------- 👆
     discount: { type: Number, required: true }, 
