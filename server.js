@@ -1354,7 +1354,7 @@ let discountAmount = 0;
             if (promo && promo.quota > 0 && new Date() < promo.expiresAt) {
                 
                 // 👇 MESIN KALKULASI PERSEN VS NOMINAL SAAT BAYAR SALDO 👇
-                if (promo.type === 'percent') {
+                if (promo.type === 'persen') {
                     discountAmount = (subTotal * promo.discount) / 100;
                     if (promo.maxDiscount && discountAmount > promo.maxDiscount) {
                         discountAmount = promo.maxDiscount;
@@ -2012,7 +2012,7 @@ app.post('/api/check-promo', async (req, res) => {
         }
 
         let potonganRupiah = 0;
-        if (promo.type === 'percent') {
+        if (promo.type === 'persen') {
             potonganRupiah = (subTotal * promo.discount) / 100;
             // Jika ada batas maksimal potongan (Max Diskon)
             if (promo.maxDiscount && potonganRupiah > promo.maxDiscount) {
