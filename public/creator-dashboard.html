@@ -417,10 +417,35 @@
         <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
     </select>
 </div>
-    <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label><input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required></div>
-    <!-- (Kolom diskon, kuota, hari biarkan saja sama) -->
-                    <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_disc">Potongan (Rp)</label><input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)"></div>
-                    <div class="col-md-4"><label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label><input type="number" id="promoQuota" class="form-control" placeholder="100" required></div>
+    <div class="col-md-4">
+        <label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label>
+        <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
+    </div>
+    
+    <!-- 👇 TAMBAHAN PILIHAN TIPE DISKON 👇 -->
+    <div class="col-md-4">
+        <label class="form-label text-warning"><i class="bi bi-tags-fill"></i> Jenis Diskon</label>
+        <select id="promoType" class="form-select" onchange="aturTipePromo()" required>
+            <option value="nominal">Nominal (Potongan Rp)</option>
+            <option value="percent">Persentase (%)</option>
+        </select>
+    </div>
+    
+    <div class="col-md-4">
+        <label class="form-label" id="labelPromoDisc" data-i18n="lbl_promo_disc">Potongan (Rp)</label>
+        <input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)">
+    </div>
+    
+    <!-- 👇 BATAS MAKSIMAL DISKON (HANYA MUNCUL JIKA PERSEN) 👇 -->
+    <div class="col-md-4" id="wrapMaxDisc" style="display: none;">
+        <label class="form-label text-info">Maks. Potongan <small>(Opsional)</small></label>
+        <input type="text" id="promoMaxDisc" class="form-control fw-bold" placeholder="Cth: 50.000" oninput="formatRupiah(this)">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label>
+        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
+    </div>
                     <div class="col-md-6 mt-3">
     <label class="form-label text-warning"><i class="bi bi-calendar-event"></i> Dari Tanggal</label>
     <input type="date" id="promoStartDate" class="form-control" style="color-scheme: dark;" required>
@@ -844,6 +869,30 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
             }
             tierSelect.innerHTML = html;
         }
+        
+        // 👇 FUNGSI BARU UNTUK ATUR UI PERSEN VS NOMINAL 👇
+        function aturTipePromo() {
+            const type = document.getElementById('promoType').value;
+            const labelDisc = document.getElementById('labelPromoDisc');
+            const inputDisc = document.getElementById('promoDisc');
+            const wrapMaxDisc = document.getElementById('wrapMaxDisc');
+            const inputMaxDisc = document.getElementById('promoMaxDisc');
+
+            if (type === 'percent') {
+                labelDisc.innerText = 'Potongan (%)';
+                inputDisc.placeholder = '10'; // 10%
+                inputDisc.setAttribute('oninput', ''); // Hapus format rupiah karena input persen hanya angka kecil
+                inputDisc.value = inputDisc.value.replace(/\./g, ''); // Bersihkan titik
+                wrapMaxDisc.style.display = 'block';
+            } else {
+                labelDisc.innerText = 'Potongan (Rp)';
+                inputDisc.placeholder = '20.000';
+                inputDisc.setAttribute('oninput', 'formatRupiah(this)');
+                formatRupiah(inputDisc); 
+                wrapMaxDisc.style.display = 'none';
+                inputMaxDisc.value = ''; // Reset nilai
+            }
+        }
 
 // 👇 1. UPDATE TAMPILAN KARTU PROMO 👇
         async function loadPromos() { 
@@ -866,12 +915,15 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
                     promoListHTML.innerHTML = `<div class="text-muted col-12">Belum ada promo.</div>`; 
                 } else { 
                     promoListHTML.innerHTML = myPromos.map(p => {
-                        // 👇 Logika memunculkan teks jam aktif 👇
                         // 👇 Logika memunculkan teks tanggal & jam aktif 👇
 const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-block">
     <i class="bi bi-calendar-range"></i> Tgl: ${p.validFrom} s/d ${p.validUntil} <br>
     <i class="bi bi-clock-history"></i> Jam: ${p.startTime || '00:00'} - ${p.endTime || '23:59'} WIB
 </span>`;                        
+                        // 👇 Logika cetak teks Diskon sesuai persen/nominal 👇
+                        let diskonTeks = p.type === 'percent' ? `${p.discount}%` : `Rp ${p.discount.toLocaleString('id-ID')}`;
+                        let maxDiskonTeks = (p.type === 'percent' && p.maxDiscount) ? `<br><span class="text-info" style="font-size: 0.7rem;">(Maks Potong: Rp ${p.maxDiscount.toLocaleString('id-ID')})</span>` : '';
+
                         return `
                     <div class="col-md-6 col-lg-4">
                         <div class="promo-ticket m-0 h-100">
@@ -879,8 +931,8 @@ const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-blo
                                 <b class="text-warning fs-5">${p.code}</b><br>
                                 <span class="badge bg-success text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-tag-fill"></i> ${p.eventName || 'SEMUA EVENT SAYA'}</span><br>
                                 <span class="badge bg-secondary text-white mt-1 mb-2" style="font-size: 0.65rem;"><i class="bi bi-ticket-detailed"></i> ${p.tierName === 'ALL' ? 'SEMUA TIKET' : p.tierName}</span><br>
-                                <small class="text-muted">Diskon: Rp ${p.discount.toLocaleString('id-ID')} <br>Sisa Kuota: <span class="fw-bold">${p.quota}</span></small>
-                                ${timeLimit} <!-- 👈 Munculkan jam aktif di sini -->
+                                <small class="text-muted">Diskon: <b class="text-white">${diskonTeks}</b>${maxDiskonTeks} <br>Sisa Kuota: <span class="fw-bold">${p.quota}</span></small>
+                                ${timeLimit}
                             </div>
                             <button onclick="hapusPromo('${p._id}')" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </div>
@@ -897,9 +949,14 @@ const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-blo
             if(!promoSelect.value) return Swal.fire('Error', 'Buat event dulu!', 'warning'); 
             const tierVal = document.getElementById('promoTierName').value.trim() || 'ALL';
             
+            const typeVal = document.getElementById('promoType').value;
+            const maxDiscVal = document.getElementById('promoMaxDisc').value;
+            
 const data = { 
                 code: document.getElementById('promoCode').value, 
+                type: typeVal, // Tambahan Tipe Nominal atau Percent
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
+                maxDiscount: (typeVal === 'percent' && maxDiscVal) ? parseInt(maxDiscVal.replace(/\./g, '')) : null, // Tambahan Batas Maksimal
                 quota: document.getElementById('promoQuota').value, 
                 
                 // 👇 Data rentang tanggal yang dikirim 👇
@@ -915,6 +972,9 @@ const data = {
             
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
             e.target.reset(); 
+            document.getElementById('wrapMaxDisc').style.display = 'none'; // reset UI
+            document.getElementById('labelPromoDisc').innerText = 'Potongan (Rp)'; // reset UI
+            document.getElementById('promoDisc').setAttribute('oninput', 'formatRupiah(this)'); // reset UI
             loadPromos(); 
             Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
         });
@@ -1120,7 +1180,7 @@ const data = {
             finally { btn.innerHTML = originalText; btn.disabled = false; } 
         });
 
-        async function loadMyEvents() { const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; try { const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; } tbody.innerHTML = myEventsData.map(event => { const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')"><i class="bi bi-trash"></i></button></td></tr>`; }).join(''); } catch (err) {} }
+        async function loadMyEvents() { const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; try { const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; } tbody.innerHTML = myEventsData.map(event => { const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; const namaAman = event.name ? event.name : "event"; const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''); const linkPublic = `https://rcellfest.my.id/detail?event=${eventSlug}&id=${event._id}`; return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><a href="${linkPublic}" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3 me-1" title="Lihat Halaman Tiket"><i class="bi bi-globe"></i></a><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')" title="Edit Event"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')" title="Hapus Event"><i class="bi bi-trash"></i></button></td></tr>`; }).join(''); } catch (err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal memuat event.</td></tr>'; } }
         async function hapusEvent(id) { Swal.fire({ title: 'Hapus Event?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya', background: 'var(--bg-card)', color: 'var(--text-main)' }).then(async (result) => { if (result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); await loadMyEvents(); loadDashboardStats(); } }); }
         
         function bukaModalEdit(id) { const ev = myEventsData.find(e => e._id === id); if(ev) { document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name; document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || ''; document.getElementById('editCategory').value = ev.category || 'General'; document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; document.getElementById('editSecretData').value = ev.secretData || ''; document.getElementById('editTaxRate').value = ev.taxRate || 0; if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImageUrl').value = ev.image || ''; 
@@ -1169,53 +1229,7 @@ const data = {
                 Swal.fire({ html: `<div class="mt-2 pb-2"><i class="bi bi-check2-circle text-success" style="font-size: 3.5rem;"></i><h4 class="fw-bolder mt-2 mb-1">Pembaruan Berhasil</h4><p class="text-muted small mb-0">Perubahan data event telah disimpan.</p></div>`, background: 'var(--bg-card)', color: 'var(--text-main)', showConfirmButton: false, timer: 2500, customClass: { popup: 'rounded-4 swal-custom-popup', backdrop: 'swal-blur-backdrop' } }); 
             } catch(err) { Swal.fire('Error', err.message || 'Gagal menyimpan perubahan.', 'error'); } finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
-async function loadMyEvents() { 
-            const tbody = document.getElementById('myEventsTableBody'); 
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; 
-            try { 
-                const res = await fetch('/api/events'); 
-                const allEvents = await res.json(); 
-                myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); 
-                
-                if (myEventsData.length === 0) { 
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; 
-                    return; 
-                } 
 
-                tbody.innerHTML = myEventsData.map(event => { 
-                    const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); 
-                    let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; 
-                    
-                    // 👇 Membuat link otomatis menuju halaman detail event publik 👇
-                    const namaAman = event.name ? event.name : "event";
-                    const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                    // 👇 Kode yang sudah diperbaiki (URL Absolut)
-const linkPublic = `https://rcellfest.my.id/detail?event=${eventSlug}&id=${event._id}`;
-
-                    return `<tr>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                <img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
-                                <div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div>
-                            </div>
-                        </td>
-                        <td>${event.date ? event.date.split('T')[0] : '-'}</td>
-                        <td class="text-success fw-bold">Rp ${harga}</td>
-                        <td>${statusBadge}</td>
-                        <td class="text-end">
-                            <!-- 👇 INI TOMBOL BARU UNTUK KUNJUNGI HALAMAN TIKET 👇 -->
-                            <a href="${linkPublic}" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3 me-1" title="Lihat Halaman Tiket">
-                                <i class="bi bi-globe"></i>
-                            </a>
-                            <button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')" title="Edit Event"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')" title="Hapus Event"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`; 
-                }).join(''); 
-            } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal memuat event.</td></tr>';
-            } 
-        }
         // ==========================================
         // ⏳ MANAJEMEN RUNDOWN KHUSUS EO
         // ==========================================
