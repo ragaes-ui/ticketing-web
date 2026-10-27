@@ -528,17 +528,18 @@ const isLocked = tier.isLocked;
             calculateTotal();
             
             // Tampilkan notifikasi kecil
-            Swal.fire({
+// Tampilkan notifikasi kecil ala pill hijau
+Swal.fire({
     toast: true,
     position: 'top',
-    html: '<div class="d-flex align-items-center gap-3 fw-bold"><i class="bi bi-trash3-fill text-danger fs-5"></i> Tiket Dibatalkan</div>',
+    html: '<div style="display: flex; align-items: center; gap: 8px; font-weight: bold; font-family: sans-serif;">✅ Pilihan Tiket Dibatalkan!</div>',
     showConfirmButton: false,
     timer: 1500,
-    background: 'var(--bg-card)',
-    color: 'var(--text-main)',
-    padding: '0.5em 1em',
+    background: '#10b981', // Warna hijau cerah mirip di gambar
+    color: '#ffffff', // Warna teks putih
+    padding: '10px 20px',
     customClass: {
-        popup: 'rounded-pill shadow-lg border' // Membuat bentuk kapsul & shadow
+        popup: 'rounded-pill shadow-lg border-0' // Membuat bentuk kapsul tanpa border
     }
 });
         }
