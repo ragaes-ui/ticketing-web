@@ -1134,7 +1134,38 @@ app.post('/api/my-tickets', async (req, res) => {
     try { const tickets = await Order.find({ email: req.body.email, status: { $in: ['valid', 'used'] } }).populate('eventId'); res.json(tickets); } 
     catch (error) { res.status(500).json({ error: error.message }); }
 });
+// ==========================================
+// 🎟️ API DETAIL 1 TIKET (Dengan Proteksi Kepemilikan)
+// ==========================================
+app.post('/api/ticket-detail', proteksiApiInternal, async (req, res) => {
+    try {
+        const { ticketCode, userEmail } = req.body;
 
+        if (!ticketCode) {
+            return res.status(400).json({ success: false, message: "Kode tiket wajib disertakan!" });
+        }
+
+        // Cari tiket berdasarkan kode tiket
+        const ticket = await Order.findOne({ ticketCode: ticketCode.toUpperCase() }).populate('eventId');
+        
+        if (!ticket) {
+            return res.status(404).json({ success: false, message: "Tiket tidak ditemukan di sistem." });
+        }
+
+        // Validasi Kepemilikan Ganda: Cek apakah email yang sedang login cocok dengan pemilik tiket
+        if (userEmail && ticket.email.toLowerCase() !== userEmail.toLowerCase()) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Akses Ditolak! Tiket ini milik akun lain dan tidak dapat dibuka." 
+            });
+        }
+
+        res.json({ success: true, ticket });
+    } catch (error) {
+        console.error("Error get ticket detail:", error);
+        res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
+    }
+});
 app.post('/api/tickets/transfer', async (req, res) => {
     try {
         const { ticket_code, receiver_email, userId, pin } = req.body;
