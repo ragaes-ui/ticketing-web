@@ -528,7 +528,19 @@ const isLocked = tier.isLocked;
             calculateTotal();
             
             // Tampilkan notifikasi kecil
-            Swal.fire({ toast: true, position: 'top', icon: 'info', title: 'Tiket di-drop dari keranjang 🗑️', showConfirmButton: false, timer: 1500, background: 'var(--bg-card)', color: 'var(--text-main)' });
+            Swal.fire({
+    toast: true,
+    position: 'top',
+    html: '<div class="d-flex align-items-center gap-3 fw-bold"><i class="bi bi-trash3-fill text-danger fs-5"></i> Tiket Dibatalkan</div>',
+    showConfirmButton: false,
+    timer: 1500,
+    background: 'var(--bg-card)',
+    color: 'var(--text-main)',
+    padding: '0.5em 1em',
+    customClass: {
+        popup: 'rounded-pill shadow-lg border' // Membuat bentuk kapsul & shadow
+    }
+});
         }
 
         // 👇 FUNGSI UNTUK TAMBAH/KURANG JUMLAH TIKET 👇
