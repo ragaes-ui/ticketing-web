@@ -1451,27 +1451,57 @@ function toggleTheme() {
                     `;
                 }
 
-                htmlContent += `
-                    <div class="col-md-6 col-lg-4 ticket-card-wrapper">
-                        <div class="ticket-card h-100">
-                            <div class="ticket-header ${headerClass}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="fw-bold mb-0 text-start" style="max-width: 65%; overflow: hidden;">
-                                        <marquee scrollamount="4" style="white-space: nowrap;">${event.name}</marquee>
-                                    </h5>
-                                    <span class="badge bg-white text-dark bg-opacity-75" style="font-size: 0.7rem;">${labelHeader}</span>
+htmlContent += `
+                    <div class="col-12 ticket-card-wrapper mb-3"> 
+                        <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative;">
+                            
+                            <!-- Bagian Atas -->
+                            <div class="p-3 d-flex align-items-center gap-3">
+                                <div style="min-width: 70px; height: 60px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                    ${isStreaming ? '<i class="bi bi-camera-reels-fill"></i>' : '<i class="bi bi-ticket-perforated-fill"></i>'}
                                 </div>
-                                <div class="small mt-1 opacity-75 text-start">${iconHeader} ${category}</div>
+                                <div class="text-truncate">
+                                    <span class="badge mb-1" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600;">Transaksi Berhasil</span>
+                                    <h5 class="fw-bold mb-0 text-truncate" style="font-size: 1.1rem; color: var(--text-main);">${event.name}</h5>
+                                </div>
                             </div>
-                            <div class="ticket-body justify-content-start">
-                                <span class="ticket-date mb-3" style="display: block;">
-                                    <i class="bi bi-calendar-event me-1"></i> ${dateStr}
-                                </span>
-                                ${mainContent}
-                                <div class="mt-auto w-100 pt-3">
-                                    <div>${statusBadge}</div>
-                                    <div class="ticket-code mt-2">${ticket.ticketCode}</div>
+
+                            <!-- Garis Putus & Bolongan Khas Tiket -->
+                            <div style="position: relative; display: flex; align-items: center; height: 20px;">
+                                <div style="width: 20px; height: 20px; background-color: var(--bg-body); border-radius: 50%; position: absolute; left: -10px; border-right: 1px solid var(--border-color);"></div>
+                                <div style="flex-grow: 1; border-bottom: 2px dashed var(--border-color); margin: 0 15px;"></div>
+                                <div style="width: 20px; height: 20px; background-color: var(--bg-body); border-radius: 50%; position: absolute; right: -10px; border-left: 1px solid var(--border-color);"></div>
+                            </div>
+
+                            <!-- Bagian Bawah -->
+                            <div class="p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+                                    <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${ticket.ticketCode.substring(0,6).toUpperCase()}</span></span>
+                                    <span>${qty} Tiket &middot; <span class="fw-bold" style="color: var(--text-main);">Rp ${hargaTiket.toLocaleString('id-ID')}</span></span>
                                 </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="#" class="text-muted fw-bold text-decoration-none small" data-bs-toggle="collapse" data-bs-target="#detail-${ticket.ticketCode}">Detail Transaksi</a>
+                                    <button class="btn btn-info text-white rounded-pill fw-bold px-3 py-1 shadow-sm" style="background-color: #009eb5; border: none; font-size: 0.9rem;" data-bs-toggle="collapse" data-bs-target="#detail-${ticket.ticketCode}">
+                                        Buka E-Ticket
+                                    </button>
+                                </div>
+
+                                <!-- AREA KONTEN (TERSEMBUNYI, MUNCUL PAS TOMBOL DIKLIK) -->
+                                <div class="collapse mt-3" id="detail-${ticket.ticketCode}">
+                                    <div class="pt-3 border-top" style="border-color: var(--border-color) !important;">
+                                        <span class="ticket-date mb-3 fw-medium text-primary" style="display: block; font-size: 0.9rem;">
+                                            <i class="bi bi-calendar-event me-1"></i> ${dateStr}
+                                        </span>
+                                        <!-- Ini memuat semua QR Code, tombol PDF, Upgrade, dan rincian harga -->
+                                        ${mainContent}
+                                        <div class="text-center mt-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
+                                            ${statusBadge}
+                                            <div class="ticket-code mt-2">${ticket.ticketCode}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
