@@ -1483,20 +1483,23 @@ function toggleTheme() {
                                 <div style="width: 20px; height: 20px; background-color: var(--bg-body); border-radius: 50%; position: absolute; right: -10px; border-left: 1px solid var(--border-color);"></div>
                             </div>
 
-                            <!-- Bagian Bawah -->
+<!-- Bagian Bawah -->
                             <div class="p-3">
-                                <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+                                <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
                                     <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${trxId}</span></span>
                                     <span>${qty} Tiket &middot; <span class="fw-bold" style="color: var(--text-main);">Rp ${hargaTiket.toLocaleString('id-ID')}</span></span>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="ticket-date fw-medium text-primary small">
+                                <!-- Tanggal Event diposisikan di baris sendiri agar tidak bertabrakan -->
+                                <div class="mb-3">
+                                    <span class="ticket-date fw-medium text-primary small d-block">
                                         <i class="bi bi-calendar-event me-1"></i> ${dateStr}
                                     </span>
-                                    
-                                    <!-- 👇 TOMBOL BERPINDAH HALAMAN 👇 -->
-                                    <button class="btn btn-info text-white rounded-pill fw-bold px-4 py-1 shadow-sm" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
+                                </div>
+
+                                <!-- Tombol Buka E-Ticket di baris bawah dengan lebar penuh -->
+                                <div>
+                                    <button class="btn btn-info text-white rounded-pill fw-bold py-2 shadow-sm w-100" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
                                         Buka E-Ticket
                                     </button>
                                 </div>
