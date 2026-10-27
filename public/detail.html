@@ -155,10 +155,24 @@
             .floating-checkout { padding: 12px 15px; } /* Sesuaikan padding floating bar di HP */
             .floating-checkout h4 { font-size: 1.2rem !important; }
         }
+        /* NOTIFIKASI TOAST KECIL DI ATAS */
+        #toast-notif {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: #10B981; color: white; padding: 10px 24px; border-radius: 50px;
+            font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.3s; 
+            z-index: 9999; width: max-content; max-width: 90%;
+        }
+        #toast-notif.show { top: 24px; }
     </style>
 </head>
 <body>
-
+<!-- WADAH NOTIFIKASI TOAST -->
+    <div id="toast-notif">
+        <span id="toast-icon">✅</span>
+        <span id="toast-message">Pilihan tiket dibatalkan!</span>
+    </div>
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand text-decoration-none" href="/">
@@ -513,6 +527,7 @@ const isLocked = tier.isLocked;
         }
 
         // 👇 FUNGSI UNTUK MENGHAPUS / ME-RESET TIKET YANG DIPILIH 👇
+// 👇 FUNGSI UNTUK MENGHAPUS / ME-RESET TIKET YANG DIPILIH 👇
         function removeTier(index) {
             cartQty[index] = 0; // Kembalikan ke 0
             document.getElementById(`qtyInput${index}`).value = 0;
@@ -527,22 +542,11 @@ const isLocked = tier.isLocked;
             // Hitung ulang harga
             calculateTotal();
             
-            // Tampilkan notifikasi kecil
-// Tampilkan notifikasi kecil ala pill hijau
-Swal.fire({
-    toast: true,
-    position: 'top',
-    html: '<div style="display: flex; align-items: center; gap: 8px; font-weight: bold; font-family: sans-serif;">✅ Pilihan Tiket Dibatalkan!</div>',
-    showConfirmButton: false,
-    timer: 1500,
-    background: '#10b981', // Warna hijau cerah mirip di gambar
-    color: '#ffffff', // Warna teks putih
-    padding: '10px 20px',
-    customClass: {
-        popup: 'rounded-pill shadow-lg border-0' // Membuat bentuk kapsul tanpa border
-    }
-});
+            showToast("Pilihan tiket dibatalkan!", "info");
         }
+
+        // 👇 FUNGSI UNTUK TAMBAH/KURANG JUMLAH TIKET 👇
+        function updateQty(index, change) {
 
         // 👇 FUNGSI UNTUK TAMBAH/KURANG JUMLAH TIKET 👇
         function updateQty(index, change) {
@@ -751,6 +755,20 @@ Swal.fire({
 
         function previewPoster(url) {
             Swal.fire({ imageUrl: url, imageAlt: 'Poster Line Up', showConfirmButton: false, showCloseButton: true, width: 'auto', padding: '0', background: 'transparent', backdrop: 'rgba(0,0,0,0.9)' });
+        }
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notif');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message; 
+            if (type === 'error') {
+                toast.style.background = '#EF4444'; toastIcon.textContent = '❌';
+            } else if (type === 'info') {
+                toast.style.background = '#10B981'; toastIcon.textContent = '✅'; 
+            }
+            toast.classList.add('show'); 
+            setTimeout(() => { toast.classList.remove('show'); }, 2000); 
         }
     </script>
 </body>
