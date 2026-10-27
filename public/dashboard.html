@@ -1457,8 +1457,8 @@ function toggleTheme() {
                 const trxId = ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
 
                 // 👇 RENDER KARTU TIKET DENGAN BANNER FULL-WIDTH 👇
-                htmlContent += `
-                    <div class="col-12 ticket-card-wrapper mb-3"> 
+htmlContent += `
+    <div class="col-12 col-md-6 col-lg-4 ticket-card-wrapper mb-3"> 
                         <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
                             
                             <!-- 1. Banner Poster Event di Atas (Full-Width) -->
