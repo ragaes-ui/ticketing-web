@@ -15,9 +15,71 @@
 
     <style>
         :root {
-            --bg-body: #121212; --bg-card: #1e1e1e; --bg-section: #2d2d2d; 
-            --text-main: #f8f9fa; --text-muted: #a1a1aa;
-            --border-color: #333333; --primary: #3b82f6;
+            color-scheme: dark;
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --bg-section: #2d2d2d;
+            --text-main: #f8f9fa;
+            --text-muted: #b8bec8;
+            --border-color: #3f3f46;
+            --primary: #3b82f6;
+
+            /* Selaraskan variabel Bootstrap dengan palet dark mode */
+            --bs-body-color: var(--text-main);
+            --bs-body-bg: var(--bg-body);
+            --bs-secondary-color: var(--text-muted);
+            --bs-tertiary-color: #9ca3af;
+            --bs-border-color: var(--border-color);
+            --bs-emphasis-color: #ffffff;
+            --bs-link-color: #93c5fd;
+            --bs-link-hover-color: #bfdbfe;
+        }
+
+        html,
+        body {
+            color-scheme: dark;
+        }
+
+        /* Perjelas utilitas teks Bootstrap di atas latar gelap */
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .text-success {
+            color: #4ade80 !important;
+        }
+
+        .text-danger {
+            color: #f87171 !important;
+        }
+
+        .btn-outline-secondary {
+            color: #e5e7eb;
+            border-color: #737373;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-secondary:focus-visible {
+            color: #ffffff;
+            background-color: #374151;
+            border-color: #9ca3af;
+        }
+
+        .ticket-main-card {
+            color: var(--text-main);
+        }
+
+        .ticket-main-card .info-label {
+            color: #b8bec8;
+        }
+
+        .ticket-main-card .info-value {
+            color: #f8fafc;
+        }
+
+        /* Jaga keterbacaan saat tombol/elemen Bootstrap berada di mode gelap */
+        .ticket-main-card .border {
+            border-color: var(--border-color) !important;
         }
         body { 
             background-color: var(--bg-body); 
