@@ -1452,58 +1452,58 @@ function toggleTheme() {
                 }
 
 // 👇 1. TARIK DATA LOGO EVENT & ID TRANSAKSI 👇
+// 👇 TARIK DATA POSTER & TRANSAKSI 👇
                 const eventImg = event.image || event.poster || event.banner || event.logo || null;
-                const logoContent = eventImg 
-                    ? `<img src="${eventImg}" alt="Event" style="width: 100%; height: 100%; object-fit: cover;">`
-                    : (isStreaming ? '<i class="bi bi-camera-reels-fill"></i>' : '<i class="bi bi-ticket-perforated-fill"></i>');
-
                 const trxId = ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
-                // 👆 ------------------------------------------ 👆
 
-                // 👇 2. RENDER KARTU TIKET (VERSI PINDAH HALAMAN) 👇
+                // 👇 RENDER KARTU TIKET DENGAN BANNER FULL-WIDTH 👇
                 htmlContent += `
                     <div class="col-12 ticket-card-wrapper mb-3"> 
-                        <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative;">
+                        <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
                             
-                            <!-- Bagian Atas -->
-                            <div class="p-3 d-flex align-items-center gap-3">
-                                <div style="min-width: 70px; height: 60px; border-radius: 8px; background: var(--bg-section); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem; overflow: hidden;">
-                                    ${logoContent}
-                                </div>
-                                <div class="text-truncate">
-                                    <span class="badge mb-1" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600;">Transaksi Berhasil</span>
-                                    <h5 class="fw-bold mb-0 text-truncate" style="font-size: 1.1rem; color: var(--text-main);">${event.name}</h5>
+                            <!-- 1. Banner Poster Event di Atas (Full-Width) -->
+                            <div style="width: 100%; height: 110px; background: var(--bg-section); border-bottom: 1px solid var(--border-color); overflow: hidden; position: relative;">
+                                ${eventImg 
+                                    ? `<img src="${eventImg}" alt="Event" style="width: 100%; height: 100%; object-fit: cover;">`
+                                    : `<div class="d-flex align-items-center justify-content-center h-100 text-primary fs-2"><i class="bi bi-ticket-perforated-fill"></i></div>`
+                                }
+                            </div>
+
+                            <!-- 2. Informasi Utama (Nama Event & Badge) -->
+                            <div class="p-3 pb-2">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                    <h5 class="fw-bold mb-0 text-truncate" style="font-size: 1.1rem; color: var(--text-main);" title="${event.name}">${event.name}</h5>
+                                    <span class="badge flex-shrink-0" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; font-size: 0.75rem;">Berhasil</span>
                                 </div>
                             </div>
 
-                            <!-- Garis Putus -->
-                            <div style="position: relative; display: flex; align-items: center; height: 20px;">
-                                <div style="width: 20px; height: 20px; background-color: var(--bg-body); border-radius: 50%; position: absolute; left: -10px; border-right: 1px solid var(--border-color);"></div>
+                            <!-- Garis Putus & Bolongan Khas Tiket -->
+                            <div style="position: relative; display: flex; align-items: center; height: 15px;">
+                                <div style="width: 18px; height: 18px; background-color: var(--bg-body); border-radius: 50%; position: absolute; left: -9px; border-right: 1px solid var(--border-color);"></div>
                                 <div style="flex-grow: 1; border-bottom: 2px dashed var(--border-color); margin: 0 15px;"></div>
-                                <div style="width: 20px; height: 20px; background-color: var(--bg-body); border-radius: 50%; position: absolute; right: -10px; border-left: 1px solid var(--border-color);"></div>
+                                <div style="width: 18px; height: 18px; background-color: var(--bg-body); border-radius: 50%; position: absolute; right: -9px; border-left: 1px solid var(--border-color);"></div>
                             </div>
 
-<!-- Bagian Bawah -->
-                            <div class="p-3">
+                            <!-- 3. Bagian Bawah (OrderID, Harga, Tanggal & Tombol) -->
+                            <div class="p-3 pt-2">
                                 <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
                                     <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${trxId}</span></span>
                                     <span>${qty} Tiket &middot; <span class="fw-bold" style="color: var(--text-main);">Rp ${hargaTiket.toLocaleString('id-ID')}</span></span>
                                 </div>
 
-                                <!-- Tanggal Event diposisikan di baris sendiri agar tidak bertabrakan -->
                                 <div class="mb-3">
                                     <span class="ticket-date fw-medium text-primary small d-block">
                                         <i class="bi bi-calendar-event me-1"></i> ${dateStr}
                                     </span>
                                 </div>
 
-                                <!-- Tombol Buka E-Ticket di baris bawah dengan lebar penuh -->
                                 <div>
                                     <button class="btn btn-info text-white rounded-pill fw-bold py-2 shadow-sm w-100" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
                                         Buka E-Ticket
                                     </button>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 `;
