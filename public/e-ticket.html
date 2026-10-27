@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -25,7 +27,6 @@
             padding-bottom: 30px;
         }
         
-        /* Navbar Simple */
         .top-nav {
             padding: 15px 20px;
             display: flex;
@@ -49,12 +50,7 @@
         }
         .btn-back:hover { background: rgba(255,255,255,0.2); }
 
-        /* Desain Kartu Tiket Utama */
-        .ticket-wrapper {
-            max-width: 450px;
-            margin: 30px auto 0;
-            padding: 0 15px;
-        }
+        .ticket-wrapper { max-width: 450px; margin: 30px auto 0; padding: 0 15px; }
         .ticket-main-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -62,86 +58,44 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .ticket-poster {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background-color: var(--bg-section);
-        }
+        .ticket-poster { width: 100%; height: 180px; object-fit: cover; background-color: var(--bg-section); }
         
-        /* Efek Sobekan Tiket Tengah */
-        .ticket-divider {
-            position: relative;
-            display: flex;
-            align-items: center;
-            height: 30px;
-            background: var(--bg-card);
-        }
+        .ticket-divider { position: relative; display: flex; align-items: center; height: 30px; background: var(--bg-card); }
         .ticket-divider::before, .ticket-divider::after {
-            content: '';
-            position: absolute;
-            width: 30px; height: 30px;
-            background-color: var(--bg-body);
-            border-radius: 50%;
-            top: 0;
+            content: ''; position: absolute; width: 30px; height: 30px; background-color: var(--bg-body); border-radius: 50%; top: 0;
         }
         .ticket-divider::before { left: -15px; border-right: 1px solid var(--border-color); }
         .ticket-divider::after { right: -15px; border-left: 1px solid var(--border-color); }
-        .dashed-line {
-            flex-grow: 1;
-            border-bottom: 2px dashed var(--border-color);
-            margin: 0 20px;
-        }
+        .dashed-line { flex-grow: 1; border-bottom: 2px dashed var(--border-color); margin: 0 20px; }
 
-        .qr-box {
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
+        .qr-box { background: white; padding: 10px; border-radius: 12px; display: inline-block; margin-bottom: 10px; }
         .qr-box img { width: 180px; height: 180px; }
         
         .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            text-align: left;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left;
+            margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);
         }
         .info-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
-        .info-value { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+        .info-value { font-size: 0.95rem; font-weight: 700; color: var(--text-main); word-break: break-word; }
     </style>
 </head>
 <body>
 
-    <!-- Header / Navbar -->
     <div class="top-nav">
-        <!-- Kembali ke halaman dashboard utama -->
-        <button class="btn-back" onclick="window.location.href='/'">
-            <i class="bi bi-arrow-left"></i>
-        </button>
+        <button class="btn-back" onclick="window.location.href='/'"><i class="bi bi-arrow-left"></i></button>
         <h5 class="mb-0 fw-bold">Detail E-Ticket</h5>
     </div>
 
-    <!-- Area Loading -->
     <div id="loadingArea" class="text-center py-5 mt-5">
         <div class="spinner-border text-primary" role="status"></div>
         <p class="mt-3 text-muted fw-medium">Menarik data tiket...</p>
     </div>
 
-    <!-- Area Tiket (Akan dirender oleh JS) -->
     <div class="ticket-wrapper" id="ticketWrapper" style="display: none;">
-        <!-- Area yang akan di-print menjadi PDF -->
-        <div id="pdf-print-area">
-            <div class="ticket-main-card" id="ticketContent">
-                <!-- Konten Tiket HTML masuk kesini -->
-            </div>
+        <div class="ticket-main-card" id="ticketContent">
+            <!-- Konten HTML Tiket akan dirender disini -->
         </div>
         
-        <!-- Tombol Aksi -->
         <div class="d-flex gap-2 mt-4">
             <button onclick="downloadPDF()" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">
                 <i class="bi bi-download me-2"></i> Simpan PDF
@@ -150,10 +104,9 @@
     </div>
 
     <script>
-        // 1. Ambil Parameter ?id= dari URL
         const urlParams = new URLSearchParams(window.location.search);
         const ticketId = urlParams.get('id');
-        let currentTicketData = null; // Menyimpan data untuk PDF
+        let currentTicketData = null; 
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (!ticketId) {
@@ -168,8 +121,6 @@
             if (!user) return window.location.href = '/user-login';
 
             try {
-                // Panggil API Backend (sesuaikan dengan API kamu yang bisa menarik 1 tiket spesifik, 
-                // atau tarik semua lalu filter berdasarkan ticketId)
                 const res = await fetch('/api/my-tickets', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email })
@@ -178,15 +129,11 @@
                 if (!res.ok) throw new Error("Gagal mengambil data tiket");
                 const allTickets = await res.json();
                 
-                // Cari tiket yang cocok dengan ID di URL
                 const ticket = allTickets.find(t => t.ticketCode === ticketId);
                 
-                if (!ticket) {
-                    throw new Error("Tiket tidak ditemukan atau bukan milikmu.");
-                }
+                if (!ticket) throw new Error("Tiket tidak ditemukan atau bukan milikmu.");
 
                 renderTicketUI(ticket, user);
-
             } catch (error) {
                 document.getElementById('loadingArea').innerHTML = `
                     <i class="bi bi-exclamation-triangle text-danger display-4"></i>
@@ -200,49 +147,88 @@
             const event = ticket.eventId;
             if (!event) return;
 
-            // Variabel Data
+            const category = event.category || 'General';
+            const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
             const eventImg = event.image || event.poster || event.banner || event.logo || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketCode}&bgcolor=ffffff`;
             const trxId = ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
+            
             const pemesanName = ticket.customerName || user.fullName || user.username;
+            const pemesanPhone = ticket.phone || '-';
+            const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
             const tierName = ticket.tierName || 'General';
             const qty = ticket.quantity || 1;
             
-            // Format Tanggal
             let dateStr = "TBA";
             if (event.date) {
                 const d = new Date(event.date);
                 dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             }
 
-            // Simpan data untuk kebutuhan fungsi download PDF
+            // 👇 Logika Peta (Google Maps) 👇
+            let locationText = event.location || 'TBA';
+            let locCheck = locationText.toLowerCase().replace(/\s/g, ''); 
+            let mapsQuery = encodeURIComponent(locationText);
+            
+            let gridLokasiHTML = '';
+            if (locCheck !== 'tba' && locCheck !== 'comingsoon') {
+                let iframePeta = isStreaming ? '' : `
+                    <div class="mt-2" style="border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 50%; height: 0;">
+                        <iframe src="https://maps.google.com/maps?q=${mapsQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                `;
+
+                gridLokasiHTML = `
+                    <div style="grid-column: span 2;">
+                        <button class="btn btn-sm btn-outline-secondary w-100 rounded-pill mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#lokasiMap">
+                            <i class="bi bi-geo-alt me-1"></i> Lihat Lokasi Peta
+                        </button>
+                        <div class="collapse mt-2" id="lokasiMap">
+                            <div class="p-2 border rounded text-start" style="background: rgba(0,0,0,0.2); border-color: var(--border-color) !important;">
+                                <div class="info-value" style="font-size: 0.85rem;"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${locationText}</div>
+                                ${iframePeta}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Simpan data lengkap untuk fitur PDF (Sama seperti dashboard.html)
             currentTicketData = {
-                eventName: event.name,
-                code: ticket.ticketCode
+                eventName: event.name, 
+                date: dateStr, 
+                location: locationText,
+                code: ticket.ticketCode, 
+                isStreaming: isStreaming, 
+                desc: event.description || "",
+                secretData: event.secretData || "Akun belum tersedia / Hubungi Admin.", 
+                buyerName: pemesanName, 
+                buyerPhone: pemesanPhone, 
+                paymentMethod: metodeBayar, 
+                tierName: tierName, 
+                quantity: qty
             };
 
-            // Bangun HTML Tiket
             const html = `
-                <!-- Poster Event -->
                 <img src="${eventImg}" class="ticket-poster" alt="Event Poster">
                 
-                <!-- Info Event Singkat -->
                 <div class="p-3 text-center">
                     <span class="badge bg-primary text-white mb-2 rounded-pill px-3 py-1">${tierName}</span>
                     <h4 class="fw-bold mb-1">${event.name}</h4>
-                    <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> ${event.location || 'TBA'}</p>
+                    <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> ${locationText}</p>
                 </div>
 
-                <!-- Pembatas Sobekan -->
                 <div class="ticket-divider"><div class="dashed-line"></div></div>
 
-                <!-- Area Barcode & Detail Penumpang -->
                 <div class="p-4 text-center">
-                    <p class="small text-muted fw-bold mb-2">Tunjukkan QR Code ini di Pintu Masuk</p>
-                    
-                    <div class="qr-box shadow-sm">
-                        <img src="${qrUrl}" alt="QR Code" crossorigin="anonymous">
-                    </div>
+                    ${isStreaming 
+                        ? `<div class="mb-3 p-3 bg-dark border rounded text-start">
+                               <small class="text-muted d-block mb-1">ACCOUNT CREDENTIALS:</small>
+                               <div class="fw-bold" style="white-space: pre-wrap;">${currentTicketData.secretData}</div>
+                           </div>` 
+                        : `<p class="small text-muted fw-bold mb-2">Tunjukkan QR Code ini di Pintu Masuk</p>
+                           <div class="qr-box shadow-sm"><img src="${qrUrl}" alt="QR Code" crossorigin="anonymous"></div>`
+                    }
                     
                     <div class="mt-2 mb-3">
                         <span class="badge bg-light text-dark border fw-bold" style="font-family: monospace; letter-spacing: 2px; font-size: 1rem;">
@@ -250,11 +236,10 @@
                         </span>
                     </div>
 
-                    <!-- Grid Detail Spesifik -->
                     <div class="info-grid">
                         <div>
                             <div class="info-label">Nama Pemesan</div>
-                            <div class="info-value">${pemesanName}</div>
+                            <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
                         </div>
                         <div>
                             <div class="info-label">Order ID</div>
@@ -266,8 +251,9 @@
                         </div>
                         <div>
                             <div class="info-label">Jumlah</div>
-                            <div class="info-value">${qty} Tiket</div>
+                            <div class="info-value text-danger">${qty} Tiket</div>
                         </div>
+                        ${gridLokasiHTML}
                     </div>
                 </div>
             `;
@@ -277,38 +263,116 @@
             document.getElementById('ticketWrapper').style.display = 'block';
         }
 
+        // 👇 Logika Pembuatan PDF yang 100% sama dengan Dashboard.html 👇
         async function downloadPDF() {
             if (!currentTicketData) return;
-            
-            Swal.fire({ title: 'Menyiapkan PDF...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+            const data = currentTicketData;
 
-            const element = document.getElementById('pdf-print-area');
-            const cleanEvent = currentTicketData.eventName.replace(/[^a-zA-Z0-9]/g, "_");
-            const filename = `ETicket_${cleanEvent}_${currentTicketData.code}.pdf`;
+            Swal.fire({ title: 'Sedang membuat PDF...', didOpen: () => Swal.showLoading()});
 
-            // Tunggu gambar ter-load sempurna sebelum cetak
-            const imgs = element.querySelectorAll('img');
-            const promises = Array.from(imgs).map(img => {
-                if (img.complete) return Promise.resolve();
-                return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-            });
+            const element = document.createElement('div');
+            document.body.appendChild(element);
+            element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
+
+            let contentMiddle = '';
+            let labelType = data.isStreaming ? "AKUN PREMIUM" : "TIKET MASUK";
             
+            if (data.isStreaming) {
+                contentMiddle = `
+                    <div style="border: 2px solid #000; padding: 15px; margin: 20px 0; text-align: left; background-color: #f8f9fa;">
+                        <p style="margin:0; font-size: 12px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
+                        <p style="margin:10px 0 0 0; font-size: 14px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
+                    </div>`;
+            } else {
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
+                contentMiddle = `
+                    <div style="margin: 20px 0;">
+                        <img src="${qrUrl}" style="width: 180px; height: 180px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Tunjukkan QR Code ini di pintu masuk.</p>
+                    </div>`;
+            }
+
+            element.innerHTML = `
+                <div id="pdf-print-area-hidden" style="padding: 30px; background-color: #ffffff; border: 1px solid #ddd;">
+                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin:0; color: #0049CC; font-weight: 800;">RCELLFEST</h2>
+                        <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
+                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                            ${data.tierName} </span>
+                        <p style="margin: 8px 0 0 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
+                        
+                        <div style="margin-top: 12px; background: #e8f5e9; border: 1px dashed #28a745; padding: 8px 15px; border-radius: 6px; display: inline-block;">
+                            <p style="margin:0; font-size: 10px; color:#155724; font-weight:bold;">MASA BERLAKU TIKET:</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#155724; font-weight:bold;">${data.date}</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                        <div style="width: 30%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerName}</p>
+                        </div>
+                        <div style="width: 20%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">JUMLAH</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
+                        </div>
+                        <div style="width: 25%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">WHATSAPP</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
+                        </div>
+                        <div style="width: 25%;">
+                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">METODE BAYAR</p>
+                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">${contentMiddle}</div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin:0; font-size: 10px; color: #999; font-weight:bold;">KODE TIKET / BOOKING ID</p>
+                        <p style="margin:0; font-size: 22px; font-weight: bold; letter-spacing: 3px; font-family: monospace; color: #000;">${data.code}</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <p style="margin:0;">Printed automatically by RCELLFEST System.</p>
+                        <p style="margin:0;">www.rcellfest.my.id</p>
+                    </div>
+                </div>
+            `;
+
             try {
+                const imgs = element.querySelectorAll('img');
+                const promises = Array.from(imgs).map(img => {
+                    if (img.complete) return Promise.resolve();
+                    return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                });
                 await Promise.all(promises);
-                
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const cleanBuyer = data.buyerName.replace(/[^a-zA-Z0-9]/g, "_");
+                const cleanEvent = data.eventName.replace(/[^a-zA-Z0-9]/g, "_");
+                const cleanTier = data.tierName.replace(/[^a-zA-Z0-9]/g, "");
+                const customFileName = `Tiket_${cleanBuyer}_${cleanEvent}_${cleanTier}.pdf`;
+
                 const opt = { 
-                    margin: [5, 5, 5, 5], 
-                    filename: filename, 
+                    margin: [10, 10, 10, 10], 
+                    filename: customFileName, 
                     image: { type: 'jpeg', quality: 1 }, 
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#1e1e1e' }, 
-                    jsPDF: { unit: 'mm', format: [120, 220], orientation: 'portrait' } 
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, windowY: 0 }, 
+                    jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
                 };
                 
-                await html2pdf().set(opt).from(element).save();
-                Swal.close();
+                await html2pdf().set(opt).from(element.querySelector('#pdf-print-area-hidden')).save();
             } catch (error) {
-                console.error(error);
-                Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat membuat PDF.'});
+                console.error("Error Cetak PDF:", error);
+                Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF'});
+            } finally {
+                document.body.removeChild(element);
+                Swal.close();
             }
         }
     </script>
