@@ -1451,14 +1451,27 @@ function toggleTheme() {
                     `;
                 }
 
-htmlContent += `
+// 👇 1. TARIK DATA LOGO EVENT & ID TRANSAKSI 👇
+                // (Otomatis mencari field image/poster/banner di database kamu)
+                const eventImg = event.image || event.poster || event.banner || event.logo || null;
+                const logoContent = eventImg 
+                    ? `<img src="${eventImg}" alt="Event" style="width: 100%; height: 100%; object-fit: cover;">`
+                    : (isStreaming ? '<i class="bi bi-camera-reels-fill"></i>' : '<i class="bi bi-ticket-perforated-fill"></i>');
+
+                // (Otomatis mencari field transactionId atau orderId dari transaksi Midtrans kamu)
+                const trxId = ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
+                // 👆 ------------------------------------------ 👆
+
+                // 👇 2. RENDER HTML DENGAN LOGO & ORDER ID BARU 👇
+                htmlContent += `
                     <div class="col-12 ticket-card-wrapper mb-3"> 
                         <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative;">
                             
                             <!-- Bagian Atas -->
                             <div class="p-3 d-flex align-items-center gap-3">
-                                <div style="min-width: 70px; height: 60px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
-                                    ${isStreaming ? '<i class="bi bi-camera-reels-fill"></i>' : '<i class="bi bi-ticket-perforated-fill"></i>'}
+                                <!-- Kotak Logo Event (sudah otomatis pakai gambar jika ada) -->
+                                <div style="min-width: 70px; height: 60px; border-radius: 8px; background: var(--bg-section); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem; overflow: hidden;">
+                                    ${logoContent}
                                 </div>
                                 <div class="text-truncate">
                                     <span class="badge mb-1" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600;">Transaksi Berhasil</span>
@@ -1476,7 +1489,8 @@ htmlContent += `
                             <!-- Bagian Bawah -->
                             <div class="p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
-                                    <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${ticket.ticketCode.substring(0,6).toUpperCase()}</span></span>
+                                    <!-- Order ID ditarik dari ID Transaksi asli -->
+                                    <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${trxId}</span></span>
                                     <span>${qty} Tiket &middot; <span class="fw-bold" style="color: var(--text-main);">Rp ${hargaTiket.toLocaleString('id-ID')}</span></span>
                                 </div>
 
@@ -1487,13 +1501,12 @@ htmlContent += `
                                     </button>
                                 </div>
 
-                                <!-- AREA KONTEN (TERSEMBUNYI, MUNCUL PAS TOMBOL DIKLIK) -->
+                                <!-- AREA KONTEN (TERSEMBUNYI) -->
                                 <div class="collapse mt-3" id="detail-${ticket.ticketCode}">
                                     <div class="pt-3 border-top" style="border-color: var(--border-color) !important;">
                                         <span class="ticket-date mb-3 fw-medium text-primary" style="display: block; font-size: 0.9rem;">
                                             <i class="bi bi-calendar-event me-1"></i> ${dateStr}
                                         </span>
-                                        <!-- Ini memuat semua QR Code, tombol PDF, Upgrade, dan rincian harga -->
                                         ${mainContent}
                                         <div class="text-center mt-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
                                             ${statusBadge}
