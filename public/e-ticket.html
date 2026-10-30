@@ -363,76 +363,76 @@ let dateStr = "TBA";
             document.body.appendChild(element);
             element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
 
-            let contentMiddle = '';
+let contentMiddle = '';
             let labelType = data.isStreaming ? "AKUN PREMIUM" : "TIKET MASUK";
             
             if (data.isStreaming) {
                 contentMiddle = `
-                    <div style="border: 2px solid #000; padding: 15px; margin: 20px 0; text-align: left; background-color: #f8f9fa;">
-                        <p style="margin:0; font-size: 12px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
-                        <p style="margin:10px 0 0 0; font-size: 14px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
+                    <div style="border: 2px solid #000; padding: 12px; margin: 15px 0; text-align: left; background-color: #f8f9fa; border-radius: 8px;">
+                        <p style="margin:0; font-size: 11px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
+                        <p style="margin:8px 0 0 0; font-size: 13px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
                     </div>`;
             } else {
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
+                // 👇 QR Code diperkecil ukurannya menjadi 130px 👇
                 contentMiddle = `
-                    <div style="margin: 20px 0;">
-                        <img src="${qrUrl}" style="width: 180px; height: 180px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
-                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Tunjukkan QR Code ini di pintu masuk.</p>
+                    <div style="margin: 15px 0;">
+                        <img src="${qrUrl}" style="width: 130px; height: 130px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
+                        <p style="font-size: 11px; color: #666; margin-top: 5px; font-weight: 500;">Tunjukkan QR Code ini di pintu masuk.</p>
                     </div>`;
             }
 
+            // 👇 Desain HTML PDF yang jauh lebih padat agar muat 1 Halaman A5 👇
             element.innerHTML = `
-                <div id="pdf-print-area-hidden" style="padding: 30px; background-color: #ffffff; border: 1px solid #ddd;">
-                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <h2 style="margin:0; color: #0049CC; font-weight: 800;">RCELLFEST</h2>
-                        <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
+                <div id="pdf-print-area-hidden" style="padding: 20px; background-color: #ffffff; border: 1px solid #ddd; page-break-inside: avoid;">
+                    
+                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin:0; color: #0049CC; font-weight: 900; font-size: 20px; letter-spacing: 1px;">RCELLFEST</h2>
+                        <span style="background: #0049CC; color: white; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; letter-spacing: 1px;">${labelType}</span>
                     </div>
-                    <!-- 👇 MUNCULKAN BANNER EVENT DI SINI 👇 -->
-                    <div style="margin-bottom: 20px; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
+                    
+                    <!-- Banner Event (Tinggi diperpendek menjadi 100px) -->
+                    <div style="margin-bottom: 15px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
                         <img src="${data.eventImg}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
                     </div>
-                    <!-- 👆 ============================== 👆 -->
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1 style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
-                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
-                            ${data.tierName} </span>
-                        <p style="margin: 8px 0 0 0; color: #555; font-size: 14px;">${data.date} | ${data.location}</p>
-                        
-                        <div style="margin-top: 12px; background: #e8f5e9; border: 1px dashed #28a745; padding: 8px 15px; border-radius: 6px; display: inline-block;">
-                            <p style="margin:0; font-size: 10px; color:#155724; font-weight:bold;">MASA BERLAKU TIKET:</p>
-                            <p style="margin:2px 0 0 0; font-size: 13px; color:#155724; font-weight:bold;">${data.date}</p>
-                        </div>
+
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h1 style="margin: 0; font-size: 18px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
+                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                            ${data.tierName} 
+                        </span>
+                        <p style="margin: 8px 0 0 0; color: #555; font-size: 12px; font-weight: 500;">${data.date} | ${data.location}</p>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
-                        <div style="width: 30%;">
-                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
-                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerName}</p>
+                    <!-- Kotak Informasi Pemesan (Dibuat lebih ramping) -->
+                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left;">
+                        <div style="width: 32%;">
+                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
+                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.buyerName}</p>
                         </div>
-                        <div style="width: 20%;">
-                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">JUMLAH</p>
-                            <p style="margin:2px 0 0 0; font-size: 13px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
-                        </div>
-                        <div style="width: 25%;">
-                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">WHATSAPP</p>
-                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
+                        <div style="width: 18%;">
+                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">JUMLAH</p>
+                            <p style="margin:2px 0 0 0; font-size: 12px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
                         </div>
                         <div style="width: 25%;">
-                            <p style="margin:0; font-size: 10px; color:#555; font-weight:bold;">METODE BAYAR</p>
-                            <p style="margin:2px 0 0 0; font-size: 13px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
+                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">WHATSAPP</p>
+                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
+                        </div>
+                        <div style="width: 25%;">
+                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">METODE BAYAR</p>
+                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
                         </div>
                     </div>
 
                     <div style="text-align: center;">${contentMiddle}</div>
                     
-                    <div style="background: #f8f9fa; padding: 15px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
-                        <p style="margin:0; font-size: 10px; color: #999; font-weight:bold;">KODE TIKET / BOOKING ID</p>
-                        <p style="margin:0; font-size: 22px; font-weight: bold; letter-spacing: 3px; font-family: monospace; color: #000;">${data.code}</p>
+                    <div style="background: #f8f9fa; padding: 12px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin:0; font-size: 9px; color: #999; font-weight:bold; letter-spacing: 1px;">KODE TIKET / BOOKING ID</p>
+                        <p style="margin:2px 0 0 0; font-size: 20px; font-weight: bold; letter-spacing: 4px; font-family: monospace; color: #000;">${data.code}</p>
                     </div>
                     
-                    <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        <p style="margin:0;">Printed automatically by RCELLFEST System.</p>
-                        <p style="margin:0;">www.rcellfest.my.id</p>
+                    <div style="margin-top: 15px; text-align: center; font-size: 9px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <p style="margin:0;">Printed automatically by RCELLFEST System. | www.rcellfest.my.id</p>
                     </div>
                 </div>
             `;
