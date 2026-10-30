@@ -213,7 +213,7 @@
             const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
             const eventImg = event.image || event.poster || event.banner || event.logo || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketCode}&bgcolor=ffffff`;
-            const trxId = ticket.orderidmidtrans || ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
+            const trxId = ticket.orderIdMidtrans || ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
             
             const pemesanName = ticket.customerName || user.fullName || user.username;
             const pemesanPhone = ticket.phone || '-';
