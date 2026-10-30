@@ -374,10 +374,10 @@
                 </div>
                 
                 <div class="d-flex gap-2 mb-4 overflow-auto pb-1" style="white-space: nowrap; scrollbar-width: none;">
-                    <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" id="btn-filter-all" onclick="filterMyTickets('All')">Semua Tiket</button>
-                    <button class="btn btn-glass btn-sm rounded-pill px-3 fw-bold" id="btn-filter-closest" onclick="filterMyTickets('Terdekat')">
-                        <i class="bi bi-calendar2-check-fill me-1"></i> Event Terdekat
-                    </button>
+<button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" id="btn-filter-all" onclick="filterMyTickets('All')" data-i18n="tab_all_tickets">Semua Tiket</button>
+<button class="btn btn-glass btn-sm rounded-pill px-3 fw-bold" id="btn-filter-closest" onclick="filterMyTickets('Terdekat')" data-i18n="txt_upcoming_events">
+    <i class="bi bi-calendar2-check-fill me-1"></i> Event Terdekat
+</button>
                 </div>
 
                 <div id="ticketList" class="row g-4">
@@ -864,11 +864,11 @@ function renderProfile() {
                 menu_password: "Ubah Kata Sandi",
                 menu_devices: "Perangkat Masuk",
                 // 👇 TAMBAHKAN KOSAKATA INI 👇
-                status_success_alt: "BERHASIL",
-                btn_open_ticket: "BUKA TIKET",
-                tab_all_tickets: "SEMUA TIKET",
-                txt_upcoming_events: "EVENT TERDEKAT",
-                btn_share_ticket: "BAGIKAN TIKET"
+badge_success: "Berhasil",
+    btn_open_ticket: "Buka E-Ticket",
+    btn_share_ticket: "Bagikan Tiket",
+    tab_all_tickets: "Semua Tiket",
+    txt_upcoming_events: "Event Terdekat"
             },
             en: {
                 page_title: "My Dashboard | RCELLFEST", // 👈 Tambahkan ini juga
@@ -901,7 +901,12 @@ function renderProfile() {
                 btn_open_ticket: "OPEN TICKET",
                 tab_all_tickets: "ALL TICKETS",
                 txt_upcoming_events: "UPCOMING EVENTS",
-                btn_share_ticket: "SHARE TICKET"
+                btn_share_ticket: "SHARE TICKET",
+                badge_success: "Success",
+                btn_open_ticket: "Open E-Ticket",
+                btn_share_ticket: "Share Ticket",
+                tab_all_tickets: "All Tickets",
+                txt_upcoming_events: "Upcoming Events"
             }
         };
 
@@ -1488,7 +1493,7 @@ htmlContent += `
 <div class="p-3 pb-2">
     <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
         <h5 class="fw-bold mb-0 text-truncate" style="font-size: 1.1rem; color: var(--text-main);" title="${event.name}">${event.name}</h5>
-        <span class="badge flex-shrink-0" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; font-size: 0.75rem;">Berhasil</span>
+        <span class="badge flex-shrink-0" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; font-size: 0.75rem;">${t.badge_success}</span>
     </div>
     <!-- 👇 Label Jenis Tiket 👇 -->
     <div class="mt-1">
@@ -1518,15 +1523,15 @@ htmlContent += `
                                     </span>
                                 </div>
 
-                                <!-- 👇 DUA TOMBOL BERDAMPINGAN 👇 -->
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-info text-white rounded-pill fw-bold py-2 shadow-sm w-100" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
-                                        Buka E-Ticket
-                                    </button>
-<button class="btn btn-outline-primary rounded-pill fw-bold py-2 shadow-sm w-100" style="font-size: 0.9rem;" onclick="openTransferModal('${ticket.ticketCode}')">
-    Bagikan Tiket
-</button>
-                                </div>
+<!-- 👇 DUA TOMBOL BERDAMPINGAN 👇 -->
+<div class="d-flex gap-2">
+    <button class="btn btn-info text-white rounded-pill fw-bold py-2 shadow-sm w-100" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
+        ${t.btn_open_ticket}
+    </button>
+    <button class="btn btn-outline-primary rounded-pill fw-bold py-2 shadow-sm w-100" style="font-size: 0.9rem;" onclick="openTransferModal('${ticket.ticketCode}')">
+        ${t.btn_share_ticket}
+    </button>
+</div>
                             </div>
 
                         </div>
