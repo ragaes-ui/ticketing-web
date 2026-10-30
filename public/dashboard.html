@@ -1223,7 +1223,7 @@ function toggleTheme() {
             }
         }
 
-        function renderMyTickets(tickets) {
+        function renderMyTickets(tickets) {    
             const list = document.getElementById('ticketList');
             const lang = localStorage.getItem('lang') || 'id';
             const t = translations[lang];
@@ -1235,9 +1235,77 @@ function toggleTheme() {
 
             let htmlContent = '';
             tickets.forEach((ticket) => {
+                // ... (bagian atas renderMyTickets biarkan tetap sama) ...
+
+                // 👇 TARIK KOSA KATA DARI KAMUS BAHASA 👇
+                const badgeSuccessText = t.status_success_alt || (lang === 'id' ? 'BERHASIL' : 'SUCCESS');
+                const btnOpenText = t.btn_open_ticket || (lang === 'id' ? 'BUKA E-TICKET' : 'OPEN E-TICKET');
+                const btnShareText = t.btn_share_ticket || (lang === 'id' ? 'BAGIKAN TIKET' : 'SHARE TICKET');
+                const textAllTickets = t.tab_all_tickets || (lang === 'id' ? 'Semua Tiket' : 'All Tickets');
+                const textClosestEvents = t.txt_upcoming_events || (lang === 'id' ? 'Event Terdekat' : 'Upcoming Events');
+
+                // Update juga teks tombol filter di atas secara dinamis jika diperlukan
+                document.getElementById('btn-filter-all').innerText = textAllTickets;
+                document.getElementById('btn-filter-closest').innerHTML = `<i class="bi bi-calendar2-check-fill me-1"></i> ${textClosestEvents}`;
+
+                // 👇 RENDER KARTU TIKET DENGAN VARIABEL BAHASA 👇
+                htmlContent += `
+    <div class="col-12 col-md-6 col-lg-4 ticket-card-wrapper mb-3">  
+        <div class="ticket-horizontal-card shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            
+            <!-- 1. Banner Poster Event di Atas -->
+            <div style="width: 100%; height: 110px; background: var(--bg-section); border-bottom: 1px solid var(--border-color); overflow: hidden; position: relative;">
+                ${eventImg 
+                    ? `<img src="${eventImg}" alt="Event" style="width: 100%; height: 100%; object-fit: cover;">`
+                    : `<div class="d-flex align-items-center justify-content-center h-100 text-primary fs-2"><i class="bi bi-ticket-perforated-fill"></i></div>`
+                }
+            </div>
+
+            <!-- 2. Informasi Utama (Nama Event & Badge BERHASIL) -->
+            <div class="p-3 pb-2">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                    <h5 class="fw-bold mb-0 text-truncate" style="font-size: 1.1rem; color: var(--text-main);" title="${event.name}">${event.name}</h5>
+                    <span class="badge flex-shrink-0" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; font-size: 0.75rem;">${badgeSuccessText}</span>
+                </div>
+            </div>
+
+            <!-- Garis Putus & Bolongan Khas Tiket -->
+            <div style="position: relative; display: flex; align-items: center; height: 15px;">
+                <div style="width: 18px; height: 18px; background-color: var(--bg-body); border-radius: 50%; position: absolute; left: -9px; border-right: 1px solid var(--border-color);"></div>
+                <div style="flex-grow: 1; border-bottom: 2px dashed var(--border-color); margin: 0 15px;"></div>
+                <div style="width: 18px; height: 18px; background-color: var(--bg-body); border-radius: 50%; position: absolute; right: -9px; border-left: 1px solid var(--border-color);"></div>
+            </div>
+
+            <!-- 3. Bagian Bawah (Tombol Buka & Bagikan Tiket) -->
+            <div class="p-3 pt-2">
+                <div class="d-flex justify-content-between align-items-center mb-2 text-muted small">
+                    <span>OrderID <span class="fw-bold" style="color: var(--text-main);">${trxId}</span></span>
+                    <span>${qty} Tiket &middot; <span class="fw-bold" style="color: var(--text-main);">Rp ${hargaTiket.toLocaleString('id-ID')}</span></span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="ticket-date fw-medium text-primary small d-block">
+                        <i class="bi bi-calendar-event me-1"></i> ${dateStr}
+                    </span>
+                </div>
+
+                <!-- 👇 TOMBOL BERDAMPINGAN (BERUBAH BAHASA OTOMATIS) 👇 -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-info text-white rounded-pill fw-bold py-2 shadow-sm w-100" style="background-color: #009eb5; border: none; font-size: 0.9rem;" onclick="window.location.href='/e-ticket?id=${ticket.ticketCode}'">
+                        ${btnOpenText}
+                    </button>
+                    <button class="btn btn-outline-primary rounded-pill fw-bold py-2 shadow-sm w-100" style="font-size: 0.9rem;" onclick="openTransferModal('${ticket.ticketCode}')">
+                        ${btnShareText}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+`;
                 const event = ticket.eventId;
                 if(!event) return;
-
+    
                 const category = event.category || 'General';
                 const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
                 
