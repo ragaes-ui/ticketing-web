@@ -283,6 +283,7 @@ let dateStr = "TBA";
 
             // Simpan data lengkap untuk fitur PDF (Sama seperti dashboard.html)
             currentTicketData = {
+                eventImg: eventImg, // 👈 TAMBAHKAN BARIS INI
                 eventName: event.name, 
                 date: dateStr, 
                 location: locationText,
@@ -386,7 +387,11 @@ let dateStr = "TBA";
                         <h2 style="margin:0; color: #0049CC; font-weight: 800;">RCELLFEST</h2>
                         <span style="background: #0049CC; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">${labelType}</span>
                     </div>
-                    
+                    <!-- 👇 MUNCULKAN BANNER EVENT DI SINI 👇 -->
+                    <div style="margin-bottom: 20px; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
+                        <img src="${data.eventImg}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
+                    </div>
+                    <!-- 👆 ============================== 👆 -->
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h1 style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
                         <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
