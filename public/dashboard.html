@@ -333,17 +333,17 @@
                     </div>
                 </div>
             </div>
-            <!-- 👇 TAMBAHAN BANNER PETUNJUK MENU 👇 -->
-            <div class="mt-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
-                <div class="d-flex align-items-start text-muted" style="font-size: 0.85rem;">
-                    <i class="bi bi-info-circle-fill text-primary me-2 fs-5" style="line-height: 1.2;"></i>
-                    <span>
-                        <strong style="color: var(--text-main);">Pusat Pengaturan Pindah!</strong><br>
-                        Menu isi Saldo, ubah PIN, ganti Password, hingga riwayat Perangkat Masuk sekarang bisa diakses dengan mengeklik <strong>Foto Profil (Avatar) di pojok kanan atas</strong> <i class="bi bi-arrow-up-right fw-bold text-primary ms-1"></i>
-                    </span>
-                </div>
-            </div>
-            <!-- 👆 ----------------------------- 👆 -->
+<!-- 👇 TAMBAHAN BANNER PETUNJUK MENU 👇 -->
+<div class="mt-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
+    <div class="d-flex align-items-start text-muted" style="font-size: 0.85rem;">
+        <i class="bi bi-info-circle-fill text-primary me-2 fs-5" style="line-height: 1.2;"></i>
+        <span>
+            <strong style="color: var(--text-main);" data-i18n="banner_title">Pusat Pengaturan Pindah!</strong><br>
+            <span data-i18n="banner_desc">Menu isi Saldo, ubah PIN, ganti Password, hingga riwayat Perangkat Masuk sekarang bisa diakses dengan mengeklik <strong>Foto Profil (Avatar) di pojok kanan atas</strong> <i class="bi bi-arrow-up-right fw-bold text-primary ms-1"></i></span>
+        </span>
+    </div>
+</div>
+<!-- 👆 ----------------------------- 👆 -->
         </div>
 
         <ul class="nav nav-pills mb-4 gap-2" id="dashboardTabs" role="tablist">
@@ -837,6 +837,8 @@ function renderProfile() {
 // --- KAMUS BAHASA ---
         const translations = {
             id: {
+                banner_title: "Pusat Pengaturan Pindah!",
+banner_desc: "Menu isi Saldo, ubah PIN, ganti Password, hingga riwayat Perangkat Masuk sekarang bisa diakses dengan mengeklik <strong>Foto Profil (Avatar) di pojok kanan atas</strong> <i class='bi bi-arrow-up-right fw-bold text-primary ms-1'></i>",
                 page_title: "Dashboard Saya | RCELLFEST", // 👈 Tambahkan ini
                 nav_home: "Home", nav_logout: "Keluar",
                 section_assets: "Aset Digital Saya", btn_buy_new: "Beli Baru",
@@ -871,6 +873,8 @@ badge_success: "Berhasil",
     txt_upcoming_events: "Event Terdekat"
             },
             en: {
+                banner_title: "Settings Center Moved!",
+banner_desc: "Top Up, PIN, Password, and Login Devices can now be accessed by clicking your <strong>Profile Picture (Avatar) at the top right corner</strong> <i class='bi bi-arrow-up-right fw-bold text-primary ms-1'></i>",
                 page_title: "My Dashboard | RCELLFEST", // 👈 Tambahkan ini juga
                 nav_home: "Home", nav_logout: "Logout",
                 section_assets: "My Digital Assets", btn_buy_new: "Buy New",
