@@ -62,6 +62,22 @@
 .navbar-brand:hover {
     text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary); /* Efek glowing saat di-hover */
 }
+        .rcellfest-gradient-text {
+    background: linear-gradient(90deg, #ff007f, #7928ca, #ff007f);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: italic;
+    font-weight: 900;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    animation: shineGradient 3s linear infinite;
+}
+
+@keyframes shineGradient {
+    to {
+        background-position: 200% center;
+    }
+}
 
         .glass-card, .modal-content, .ticket-card, .custom-search-box {
             background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; box-shadow: 0 4px 15px var(--shadow-color) !important; padding: 25px; color: var(--text-main);
@@ -230,8 +246,9 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
-            </a>
+                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2">
+    <span class="rcellfest-gradient-text">RCELLFEST Tix</span>
+</a>
             
 <div class="d-flex align-items-center gap-2 gap-md-3">
                 
