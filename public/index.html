@@ -109,6 +109,26 @@
         
         .navbar { background-color: var(--bg-nav) !important; box-shadow: 0 1px 10px var(--shadow-color); padding: 12px 0; height: 76px; transition: background-color 0.3s; }
         .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.4rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .rcellfest-gradient-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900; /* Cetak sangat tebal */
+    font-style: italic; /* Cetak miring seperti di logo */
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    
+    /* Efek Gradasi Warna (Oranye -> Merah Muda -> Ungu) */
+    background: linear-gradient(90deg, #FF7A00 0%, #FF004D 50%, #9D00FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    
+    /* Efek Garis Tepi (Outline) Hitam */
+    -webkit-text-stroke: 1px #000000;
+    
+    /* Sedikit bayangan agar pop-up di layar terang/gelap */
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+}
         .nav-link { font-weight: 500; color: var(--text-muted); margin: 0 10px; }
         .nav-link:hover { color: var(--primary); }
         [data-theme="dark"] .nav-link { color: #e2e8f0; }
@@ -356,8 +376,9 @@
 <nav class="navbar navbar-expand-lg fixed-top" style="top: 38px;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2"> RCELLFEST
-            </a>
+                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2">
+    <span class="rcellfest-gradient-text">RCELLFEST</span>
+</a>
             <div class="collapse navbar-collapse justify-content-center d-none d-lg-block">
                 <ul class="navbar-nav d-none d-md-flex">
                     <li class="nav-item"><a class="nav-link" href="#" data-i18n="nav_explore">Jelajah</a></li>
