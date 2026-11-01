@@ -351,6 +351,18 @@
             .mobile-bottom-nav { display: block; }
             body { padding-bottom: 100px !important; }
         }
+        /* Penyesuaian ukuran teks dan logo Navbar khusus untuk HP */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.1rem !important; /* Mengecilkan ukuran teks di layar HP */
+        letter-spacing: 0px !important; /* Merapatkan jarak antar huruf */
+    }
+    .navbar-brand img {
+        width: 24px !important; /* Mengecilkan ukuran logo sedikit */
+        height: 24px !important;
+    }
+}
+
     </style>
 </head>
 <body>
