@@ -729,7 +729,8 @@ const isLocked = tier.isLocked;
                         tierName: t.tierName,
                         price: t.price,
                         qty: cartQty[i],
-                        tierAccessCode: enteredCodes[i] || ''
+                        accessCode: enteredCodes[i] || '',      // 👈 TAMBAHKAN INI (Nama standar)
+                        tierAccessCode: enteredCodes[i] || ''   // 👈 Biarkan ini (Nama lama)
                     });
                 }
             } // 👈 PASTIKAN ADA KURUNG KURAWAL PENUTUP INI
