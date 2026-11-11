@@ -484,7 +484,8 @@
                             diskon: diskonPromo,        // 👈 WAJIB DIKIRIM
                             buyerData: buyerPayload,
                             recaptchaToken: recaptchaToken, 
-                            pajak: window.pajakAktif || 0 
+                            pajak: window.pajakAktif || 0 ,
+                            accessCode: checkoutData.accessCode || checkoutData.tierAccessCode
                         })
                     });
                     
@@ -521,7 +522,8 @@
                             customerEmail: userData.email, 
                             customerPhone: phone, 
                             userId: userData.id,
-                            recaptchaToken: recaptchaToken
+                            recaptchaToken: recaptchaToken,
+                            accessCode: checkoutData.accessCode || checkoutData.tierAccessCode
                         }) 
                     });
                     
@@ -548,7 +550,8 @@
                                         promoCode: kodePromoAktif, // 👈 WAJIB DIKIRIM
                                         diskon: diskonPromo,       // 👈 WAJIB DIKIRIM
                                         subTotal: subTotalTagihanAwal,
-                                        pajak: window.pajakAktif || 0
+                                        pajak: window.pajakAktif || 0,
+                                        accessCode: checkoutData.accessCode || checkoutData.tierAccessCode
                                     }) 
                                 });
                                 
