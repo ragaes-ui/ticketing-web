@@ -720,6 +720,7 @@ const isLocked = tier.isLocked;
             }
 
             // Kumpulkan semua tiket yang qty-nya lebih dari 0
+// Kumpulkan semua tiket yang qty-nya lebih dari 0
             const selectedTicketsArray = [];
             for (let i in cartQty) {
                 if (cartQty[i] > 0) {
@@ -731,6 +732,15 @@ const isLocked = tier.isLocked;
                         tierAccessCode: enteredCodes[i] || ''
                     });
                 }
+            } // 👈 PASTIKAN ADA KURUNG KURAWAL PENUTUP INI
+
+            // 👇 TAMBAHAN: Ambil kode akses dari tiket yang sudah dibuka kuncinya
+            let mainAccessCode = "";
+            for (let i in enteredCodes) {
+                if (enteredCodes[i] && cartQty[i] > 0) {
+                    mainAccessCode = enteredCodes[i];
+                    break;
+                }
             }
 
             // Bungkus data multi-tiket untuk dibawa ke halaman checkout
@@ -740,7 +750,8 @@ const isLocked = tier.isLocked;
                 eventDate: currentEvent.date,
                 eventLocation: currentEvent.location,
                 taxRate: currentEvent.taxRate || 0,
-                tickets: selectedTicketsArray // 👈 Kumpulan array tiket yang dibeli
+                tickets: selectedTicketsArray, // 👈 Kumpulan array tiket yang dibeli
+                accessCode: mainAccessCode     // 👈 TAMBAHAN: Taruh kode akses di sini agar terbaca oleh checkout.html
             };
 
             // Simpan ke dalam memori
