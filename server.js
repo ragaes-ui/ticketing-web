@@ -457,28 +457,50 @@ const cekApiKeyPublic = (req, res, next) => {
     next(); // Kalau cocok, silakan masuk
 };
 
-app.get('/api/v1/public/events', cekApiKeyPublic, async (req, res) => {
+// ==========================================
+// 🌐 PUBLIC API: AMBIL DETAIL 1 EVENT UNTUK WEBSITE LAIN
+// ==========================================
+app.get('/api/v1/public/events/:id', cekApiKeyPublic, async (req, res) => {
     try {
-        // Cuma ngirim event yang tiketnya masih ada (> 0)
-        const events = await Event.find({ availableSeats: { $gt: 0 } });
+        const eventId = req.params.id;
         
-        // Bikin data yang aman untuk pihak luar (Jangan kirim secretData!)
-        const safeData = events.map(ev => ({
-            id: ev._id,
-            eventName: ev.name,
-            category: ev.category,
-            date: ev.date,
-            time: `${ev.startTime} - ${ev.endTime}`,
-            location: ev.location,
-            price: ev.price,
-            availableTickets: ev.availableSeats,
-            image: ev.image || "", // 👈 INI TAMBAHANNYA
-    lineupImages: ev.lineupImages || [] // 👈 INI TAMBAHANNYA
-        }));
+        if (!mongoose.Types.ObjectId.isValid(eventId)) {
+            return res.status(400).json({ success: false, message: "ID Event tidak valid!" });
+        }
 
-        res.json({ success: true, total: safeData.length, data: safeData });
-    } catch (err) { 
-        res.status(500).json({ success: false, message: "Server Error", error: err.message }); 
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ success: false, message: "Event tidak ditemukan!" });
+        }
+
+        // Format data yang aman dikirim ke website luar (tanpa data rahasia)
+        const safeEventData = {
+            id: event._id,
+            eventName: event.name,
+            category: event.category,
+            organizer: event.organizer,
+            date: event.date,
+            endDate: event.endDate || null,
+            time: `${event.startTime} - ${event.endTime}`,
+            location: event.location,
+            mapsUrl: event.mapsUrl,
+            description: event.description,
+            price: event.price,
+            availableTickets: event.availableSeats,
+            image: event.image || "",
+            lineupImages: event.lineupImages || [],
+            tickets: event.tickets.map(t => ({
+                tierName: t.tierName,
+                price: t.price,
+                availableSeats: t.availableSeats,
+                minQty: t.minQty || 1,
+                isLocked: !!t.accessCode
+            }))
+        };
+
+        res.json({ success: true, data: safeEventData });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Server Error", error: err.message });
     }
 });
 // ==========================================
