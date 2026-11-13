@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Event RCELLFEST di Web Luar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-5">
+
+    <div class="container" id="detailContainer">
+        <div class="text-center">Memuat detail event...</div>
+    </div>
+
+    <script>
+        async function ambilEventDariRcellfest() {
+            // Ganti dengan URL domain Vercel backend kamu
+            const eventId = "69c9becbefdadf011a4b5282"; 
+            const apiUrl = `https://rcellfest.vercel.app/api/v1/public/events/${eventId}`;
+            
+            // Masukkan API Key yang sama persis seperti di .env / Vercel
+            const apiKey = "RCELLFESTAPI2026"; 
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                const container = document.getElementById('detailContainer');
+
+                if (result.success) {
+                    const ev = result.data;
+                    
+                    // Render data event ke website luar
+                    container.innerHTML = `
+                        <div class="card shadow-sm p-4">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <img src="${ev.image}" class="img-fluid rounded" alt="Poster Event">
+                                </div>
+                                <div class="col-md-7">
+                                    <span class="badge bg-primary mb-2">${ev.category}</span>
+                                    <h2 class="fw-bold">${ev.eventName}</h2>
+                                    <p class="text-muted"><i class="bi bi-geo-alt"></i> ${ev.location}</p>
+                                    <p class="text-muted"><i class="bi bi-calendar"></i> ${ev.date}</p>
+                                    <h4 class="text-success fw-bold">Mulai Rp ${ev.price.toLocaleString('id-ID')}</h4>
+                                    <p class="mt-3">${ev.description}</p>
+                                    <a href="https://rcellfest.my.id/detail?id=${ev.id}" target="_blank" class="btn btn-dark rounded-pill px-4 mt-2">Beli Tiket Resmi</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
+                }
+            } catch (error) {
+                console.error("Gagal memuat API:", error);
+                document.getElementById('detailContainer').innerHTML = `<div class="alert alert-danger">Gagal terhubung ke server RCELLFEST.</div>`;
+            }
+        }
+
+        ambilEventDariRcellfest();
+    </script>
+</body>
+</html>
