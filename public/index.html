@@ -373,19 +373,19 @@
    ========================================== */
 @media (min-width: 992px) {
     .navbar.fixed-top {
-        /* Melepas dari pinggir layar dan menempatkan di tengah */
         width: max-content !important;
         min-width: 600px;
-        top: 25px !important; /* Jarak dari atas layar */
+        
+        /* 👇 UBAH BAGIAN INI: Tambah angkanya agar turun di bawah banner */
+        top: 65px !important; 
+        
         left: 50% !important;
         transform: translateX(-50%) !important;
         
-        /* Membentuk pil dan memberi bayangan */
         border-radius: 50px !important;
         padding: 10px 35px !important;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
         
-        /* Efek kaca (Glassmorphism) */
         background-color: var(--bg-nav, rgba(255, 255, 255, 0.85)) !important;
         backdrop-filter: blur(15px) !important;
         -webkit-backdrop-filter: blur(15px) !important;
@@ -394,12 +394,11 @@
         transition: all 0.3s ease;
     }
 
-    /* Penyesuaian jarak konten agar tidak tertutup navbar yang turun */
+    /* 👇 UBAH BAGIAN INI JUGA: Tambah jarak agar konten web tidak tertutup navbar */
     body {
-        padding-top: 110px !important;
+        padding-top: 150px !important; 
     }
 
-    /* Penyesuaian khusus Dark Mode agar tetap elegan */
     [data-theme="dark"] .navbar.fixed-top {
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
         border-color: rgba(255, 255, 255, 0.1) !important;
