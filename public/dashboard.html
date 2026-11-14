@@ -159,7 +159,7 @@
         /* ========================================= */
         /* 🔥 FIX MENU PROFIL KEPOTONG DI HP 🔥 */
         /* ========================================= */
-        @media (max-width: 576px) {
+@media (max-width: 576px) {
             .dropdown-menu.custom-profile-menu {
                 transform: none !important;
                 top: 110% !important;
@@ -172,6 +172,12 @@
                 font-size: 0.85rem !important;
                 padding: 10px 15px !important;
             }
+
+            /* 👇 TAMBAHKAN DI SINI AGAR 1 BARIS RAPI DI HP 👇 */
+            .navbar .navbar-brand { font-size: 1.05rem !important; letter-spacing: 0.5px; }
+            .navbar #navAvatarDisplay { width: 34px !important; height: 34px !important; }
+            .navbar .btn-jelajahi { padding: 0 9px !important; }
+            .navbar .badge-new { font-size: 0.5rem; padding: 2px 4px; top: -4px; right: -4px; }
         }
 
         /* 👇 Tambahan untuk merapikan Navbar di HP 👇 */
@@ -310,14 +316,14 @@
         <div class="text-muted small fw-bold mt-3" style="letter-spacing: 1px;">MEMUAT PROFIL...</div>
     </div>
     <!-- 👆 -------------------- 👆 -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 32px; width: 32px; object-fit: contain;" class="me-2">
+<nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container flex-nowrap">
+            <a class="navbar-brand d-flex align-items-center me-0" href="/">
+                <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 28px; width: 28px; object-fit: contain;" class="me-1 me-sm-2">
                 <span class="rcellfest-gradient-text">RCELLFEST Tix</span>
             </a>
             
-            <div class="d-flex align-items-center gap-2 gap-md-3">
+            <div class="d-flex align-items-center gap-1 gap-sm-2 gap-md-3 ms-auto">
                 <!-- 👇 Tombol Tema Baru 👇 -->
                 <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; background-color: #1e293b;">
                     <i class="bi bi-sun-fill text-warning" id="theme-icon"></i>
