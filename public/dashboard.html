@@ -397,7 +397,7 @@
     </nav>
 
     <div class="container pb-5 mt-4">
-        <div class="glass-card mb-4">
+        <div class="glass-card mb-4" id="profileSection">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-3">
@@ -1744,15 +1744,42 @@
             } catch(e) {}
         }
 
-        // ==========================================
-        // 🔥 DETEKSI SCROLL UNTUK MOBILE BOTTOM NAV
+// ==========================================
+        // 🔥 DETEKSI SCROLL & AUTO-PINDAH TAB AKTIF (SCROLL SPY)
         // ==========================================
         let lastScrollTop = 0;
         const mobileNav = document.querySelector('.mobile-bottom-nav');
+        const navTicket = document.getElementById('bottomNavTicket');
+        const navProfile = document.getElementById('bottomNavProfile');
+        const ticketSection = document.getElementById('dashboardTabs');
+
+        function updateBottomNavActive() {
+            if (!navTicket || !navProfile || !ticketSection) return;
+
+            // Ambil jarak bagian tiket dari puncak layar HP
+            const rect = ticketSection.getBoundingClientRect();
+
+            // Jika area tiket sudah naik melewati 45% tinggi layar (user scroll ke arah tiket)
+            if (rect.top <= window.innerHeight * 0.45) {
+                navTicket.classList.add('active');
+                navProfile.classList.remove('active');
+            } else {
+                // Jika user berada di atas / area kartu nama & profil
+                navProfile.classList.add('active');
+                navTicket.classList.remove('active');
+            }
+        }
+
+        // Jalankan saat halaman pertama kali dibuka
+        document.addEventListener('DOMContentLoaded', updateBottomNavActive);
 
         window.addEventListener('scroll', () => {
             if (!mobileNav) return;
-            
+
+            // 1. Update posisi ikon aktif (Profil vs Tiket)
+            updateBottomNavActive();
+
+            // 2. Efek mengecil (shrink) saat scroll ke bawah
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
             if (currentScroll < 0) return;
 
