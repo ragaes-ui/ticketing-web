@@ -373,9 +373,16 @@
             display: none !important;
         }
 
-        @media (max-width: 768px) {
+@media (max-width: 768px) {
             .mobile-bottom-nav { display: block; }
             body { padding-bottom: 100px !important; }
+            
+            /* Sembunyikan indikator sinyal & chatbot AI khusus di mobile */
+            .signal-badge,
+            .btn-chatbot,
+            .chat-widget {
+                display: none !important;
+            }
         }
         /* Penyesuaian ukuran teks dan logo Navbar khusus untuk HP */
         @media (max-width: 576px) {
