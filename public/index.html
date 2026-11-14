@@ -311,6 +311,7 @@
         /* 🔥 FLOATING BOTTOM NAVBAR (KHUSUS HP) 🔥 */
         /* ========================================= */
 /* ========================================= */
+/* ========================================= */
         /* 🔥 FLOATING BOTTOM NAVBAR (LIQUID GLASS) 🔥 */
         /* ========================================= */
         .mobile-bottom-nav { 
@@ -322,7 +323,7 @@
             width: 90%; 
             max-width: 400px; 
             
-            /* 👇 Efek Kaca Transparan (Mode Terang) 👇 */
+            /* Efek Kaca Transparan (Mode Terang) */
             background: rgba(255, 255, 255, 0.4) !important; 
             backdrop-filter: blur(16px) saturate(180%);
             -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -332,21 +333,46 @@
             border-radius: 50px; 
             padding: 8px 12px; 
             z-index: 9999; 
-            transition: all 0.3s ease; 
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important; 
         }
 
         [data-theme="dark"] .mobile-bottom-nav { 
-            /* 👇 Efek Kaca Transparan (Mode Gelap) 👇 */
+            /* Efek Kaca Transparan (Mode Gelap) */
             background: rgba(24, 24, 27, 0.45) !important; 
             border-color: rgba(255, 255, 255, 0.1) !important; 
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
         }
+
         .mobile-bottom-nav ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .mobile-bottom-nav li { display: flex; justify-content: center; }
         .mobile-bottom-nav a { text-decoration: none; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 50px; font-size: 1.3rem; transition: all 0.3s ease; }
         .mobile-bottom-nav a.active { background-color: var(--primary, #2563eb); color: #ffffff; padding: 10px 20px; }
         .mobile-bottom-nav a .nav-text { display: none; font-size: 0.9rem; font-weight: 700; }
         .mobile-bottom-nav a.active .nav-text { display: block; }
+
+        /* ========================================= */
+        /* 🔥 EFEK SHRINK MOBILE BOTTOM NAV SAAT SCROLL 🔥 */
+        /* ========================================= */
+        .mobile-bottom-nav.shrink {
+            width: 68% !important;
+            max-width: 260px !important;
+            padding: 5px 10px !important;
+            bottom: 16px !important;
+        }
+
+        .mobile-bottom-nav.shrink a {
+            padding: 7px 10px !important;
+            font-size: 1.1rem !important;
+        }
+
+        .mobile-bottom-nav.shrink a.active {
+            padding: 7px 12px !important;
+        }
+
+        .mobile-bottom-nav.shrink a.active .nav-text {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .mobile-bottom-nav { display: block; }
             body { padding-bottom: 100px !important; }
@@ -1608,6 +1634,31 @@ const btnBottomTicket = document.getElementById('bottomNavTicket');
                 chatBody.scrollTop = chatBody.scrollHeight;
             }
         }
+        // ==========================================
+// 🔥 DETEKSI SCROLL UNTUK MOBILE BOTTOM NAV
+// ==========================================
+let lastScrollTop = 0;
+const mobileNav = document.querySelector('.mobile-bottom-nav');
+
+window.addEventListener('scroll', () => {
+    if (!mobileNav) return;
+    
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Abaikan efek mantul (rubber-band scrolling) di layar sentuh iOS/Android
+    if (currentScroll < 0) return;
+
+    // Jika scroll ke bawah dan melewati jarak 60px dari atas -> Kecilkan
+    if (currentScroll > lastScrollTop && currentScroll > 60) {
+        mobileNav.classList.add('shrink');
+    } 
+    // Jika scroll ke atas sedikit saja -> Kembalikan melebar seperti semula
+    else if (currentScroll < lastScrollTop) {
+        mobileNav.classList.remove('shrink');
+    }
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+}, { passive: true });
     </script>
 </body>
 </html>
