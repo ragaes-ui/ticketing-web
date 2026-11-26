@@ -286,9 +286,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
         const startStr = dStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         eventDateStr = startStr;
 
-// 👇 DETEKSI MASA BERLAKU UNTUK EMAIL 👇
         const tierLower = (ticketData.tierName || '').toLowerCase();
-        
         const multiDayMatch = tierLower.match(/([0-9]+)\s*day/);
         const specificDayMatch = tierLower.match(/day\s*([0-9]+)/);
         
@@ -300,8 +298,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                 const endStr = dEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
                 eventDateStr = `${startStr} s/d ${endStr}`;
             }
-        } 
-        else if (specificDayMatch) {
+        } else if (specificDayMatch) {
             const dayNumber = parseInt(specificDayMatch[1]);
             if (dayNumber > 1) {
                 const dSpecific = new Date(dStart);
@@ -310,9 +307,17 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
             }
         }
     }
-        // 👆 ---------------------------------- 👆
 
-    // 🔥 LOGIKA BARU: Looping pembuatan banyak QR Code 🔥
+    // 👇 FORMAT TANGGAL LAHIR PEMEGANG TIKET 👇
+    let birthDateFormatted = "-";
+    if (ticketData.birthDate) {
+        const dBirth = new Date(ticketData.birthDate);
+        birthDateFormatted = !isNaN(dBirth)
+            ? dBirth.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
+            : ticketData.birthDate;
+    }
+
+    // 🔥 Looping pembuatan banyak QR Code 🔥
     let qrCodesHTML = '';
     if (ticketData.ticketCodes && ticketData.ticketCodes.length > 0) {
         ticketData.ticketCodes.forEach((kode, index) => {
@@ -366,7 +371,6 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                     <p style="text-align: left;">Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
                     <p style="text-align: left;">Berikut adalah <b>${ticketData.qty} tiket</b> resmi kamu untuk masuk ke area event:</p>
                     
-                    <!-- 👇 DI SINI TEMPAT BARCODE BERJEJER 👇 -->
                     <div style="text-align: center;">
                         ${qrCodesHTML}
                     </div>
@@ -374,21 +378,28 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                     ${secretDataBlock} ${receiptBlock} 
                     
                     <div style="background: #f8f9fa; border-left: 4px solid #0049CC; padding: 15px; margin: 20px 0; text-align: left;">
-                        <p style="margin: 5px 0;"><b>Event:</b> ${ticketData.eventName}</p>
-                        <p style="margin: 5px 0;"><b>Penyelenggara:</b> ${ticketData.organizer || 'RCELLFEST'}</p>
-                        <p style="margin: 5px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
-                        <p style="margin: 5px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
-                        <p style="margin: 5px 0;"><b>Waktu:</b> ${ticketData.eventTime}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #0049CC; text-transform: uppercase;">👤 DATA PEMEGANG TIKET</p>
+                        <p style="margin: 4px 0;"><b>Nama Lengkap:</b> ${ticketData.customerName || '-'}</p>
+                        <p style="margin: 4px 0;"><b>NIK:</b> ${ticketData.nik || '-'}</p>
+                        <p style="margin: 4px 0;"><b>Tanggal Lahir:</b> ${birthDateFormatted}</p>
+                        <p style="margin: 4px 0;"><b>Jenis Kelamin:</b> ${ticketData.gender || '-'}</p>
+                        
+                        <hr style="border: 0; border-top: 1px dashed #ddd; margin: 12px 0;">
+                        
+                        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #0049CC; text-transform: uppercase;">🎟️ DETAIL EVENT</p>
+                        <p style="margin: 4px 0;"><b>Event:</b> ${ticketData.eventName}</p>
+                        <p style="margin: 4px 0;"><b>Penyelenggara:</b> ${ticketData.organizer || 'RCELLFEST'}</p>
+                        <p style="margin: 4px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
+                        <p style="margin: 4px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
+                        <p style="margin: 4px 0;"><b>Waktu:</b> ${ticketData.eventTime}</p>
                     </div>
                     
-                    <!-- 👇 KOTAK MASA BERLAKU DI EMAIL 👇 -->
                     <div style="background-color: #e8f5e9; border: 1px dashed #28a745; padding: 15px; border-radius: 8px; margin: 0 0 20px 0; text-align: center;">
                         <p style="margin: 0; font-size: 12px; color: #155724; font-weight: bold; text-transform: uppercase;">🗓️ MASA BERLAKU TIKET</p>
                         <p style="margin: 5px 0 0 0; font-size: 16px; color: #155724; font-weight: bold;">${eventDateStr}</p>
                     </div>
-                    <!-- 👆 -------------------------- 👆 -->
                     
-                    <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan semua QR Code ini kepada petugas di pintu masuk (gate) untuk di-scan satu per satu.</p>
+                    <p style="font-size: 11px; color: #999; margin-top: 20px;">*Tunjukkan semua QR Code ini beserta kartu identitas (KTP/Kartu Pelajar) kepada petugas di pintu masuk (gate).</p>
                 </div>
                 <div style="background: #eee; padding: 15px; text-align: center; font-size: 11px; color: #777;">
                     &copy; ${new Date().getFullYear()} RCELLTECH ID. Digital Payment & Ticketing Solution.
@@ -1480,6 +1491,9 @@ const user = await User.findOneAndUpdate(
         // Kirim Email
         await sendTicketEmail(buyerData ? buyerData.email : user.email, {
             customerName: buyerData ? buyerData.name : (user.fullName || user.username),
+            nik: buyerData ? buyerData.nik : "",
+            birthDate: buyerData ? buyerData.birthDate : "",
+            gender: buyerData ? buyerData.gender : "",
             eventName: event.name,
             organizer: event.organizer, 
             tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '), // Daftar semua tipe tiket
@@ -1641,6 +1655,9 @@ app.post('/api/midtrans-success', async (req, res) => {
         // Kirim Email Midtrans
         await sendTicketEmail(customerEmail, {
             customerName: customerName,
+            nik: buyerData ? buyerData.nik : "",
+            birthDate: buyerData ? buyerData.birthDate : "",
+            gender: buyerData ? buyerData.gender : "",
             eventName: event.name,
             organizer: event.organizer, 
             tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '),
@@ -1699,6 +1716,9 @@ app.post('/api/payment-notification', async (req, res) => {
                     // 📧 TAMBAHAN: KIRIM EMAIL TIKET BARU HASIL UPGRADE 📧
                     await sendTicketEmail(ticket.email, {
                         customerName: ticket.customerName,
+                        nik: ticket.nik || "",
+            birthDate: ticket.birthDate || "",
+            gender: ticket.gender || "",
                         eventName: event.name + " (UPGRADED)",
                         tierName: newTierName,
                         location: event.location || 'TBA',
