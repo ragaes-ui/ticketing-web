@@ -390,12 +390,47 @@
             document.getElementById('ticketWrapper').style.display = 'block';
         }
 
+        // 👇 Konverter Gambar ke Base64 Anti-Blokir CORS 👇
+        async function urlToBase64(url) {
+            if (!url || url.startsWith('data:')) return url;
+
+            try {
+                const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    return await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            } catch (e) {}
+
+            try {
+                const proxyRes = await fetch(`/api/image-base64?url=${encodeURIComponent(url)}`);
+                if (proxyRes.ok) {
+                    const json = await proxyRes.json();
+                    if (json.base64) return json.base64;
+                }
+            } catch (e) {}
+
+            return url;
+        }
+
         // 👇 Logika Pembuatan PDF (Muat 1 Halaman A5) 👇
         async function downloadPDF() {
             if (!currentTicketData) return;
             const data = currentTicketData;
 
-            Swal.fire({ title: 'Sedang membuat PDF...', didOpen: () => Swal.showLoading()});
+            Swal.fire({ title: 'Sedang membuat PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const qrRawUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
+
+            const [bannerBase64, qrBase64] = await Promise.all([
+                urlToBase64(data.eventImg),
+                data.isStreaming ? Promise.resolve('') : urlToBase64(qrRawUrl)
+            ]);
 
             const element = document.createElement('div');
             document.body.appendChild(element);
@@ -411,10 +446,9 @@
                         <p style="margin:6px 0 0 0; font-size: 12px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
                     </div>`;
             } else {
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
                 contentMiddle = `
                     <div style="margin: 10px 0;">
-                        <img src="${qrUrl}" style="width: 118px; height: 118px; border: 3px solid #333; padding: 4px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
+                        <img src="${qrBase64}" style="width: 118px; height: 118px; border: 3px solid #333; padding: 4px; border-radius: 10px; display:block; margin: 0 auto;">
                         <p style="font-size: 10px; color: #666; margin-top: 4px; margin-bottom: 0; font-weight: 500;">Tunjukkan QR Code &amp; KTP/Identitas di pintu masuk.</p>
                     </div>`;
             }
@@ -428,9 +462,7 @@
                     </div>
                     
                     <!-- Banner Event -->
-                    <div style="margin-bottom: 12px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
-                        <img src="${data.eventImg}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
-                    </div>
+                    <div style="margin-bottom: 12px; height: 95px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa; background-image: url('${bannerBase64}'); background-size: cover; background-position: center center;"></div>
 
                     <div style="text-align: center; margin-bottom: 12px;">
                         <h1 style="margin: 0; font-size: 17px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
@@ -491,13 +523,7 @@
             `;
 
             try {
-                const imgs = element.querySelectorAll('img');
-                const promises = Array.from(imgs).map(img => {
-                    if (img.complete) return Promise.resolve();
-                    return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-                });
-                await Promise.all(promises);
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 250));
 
                 const cleanBuyer = data.buyerName.replace(/[^a-zA-Z0-9]/g, "_");
                 const cleanEvent = data.eventName.replace(/[^a-zA-Z0-9]/g, "_");
@@ -508,7 +534,7 @@
                     margin: [10, 10, 10, 10], 
                     filename: customFileName, 
                     image: { type: 'jpeg', quality: 1 }, 
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, windowY: 0 }, 
+                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', scrollY: 0, windowY: 0 }, 
                     jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
                 };
                 
