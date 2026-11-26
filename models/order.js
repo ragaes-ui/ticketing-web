@@ -13,6 +13,8 @@ const orderSchema = new mongoose.Schema({
   email: String,
   phone: String, // 👈 TAMBAHAN: Untuk menyimpan No. WhatsApp
   nik: String,   // 👈 TAMBAHAN: Untuk menyimpan NIK KTP (Opsional)
+  birthDate: { type: String, default: "" }, // 👈 TAMBAHAN: Untuk menyimpan Tanggal Lahir
+  gender: { type: String, default: "" },    // 👈 TAMBAHAN: Untuk menyimpan Jenis Kelamin
   
   // PENTING: Update status agar mendukung flow pembayaran
   status: { 
