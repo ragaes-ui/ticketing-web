@@ -279,6 +279,9 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTicketEmail = async (customerEmail, ticketData) => {
+    // 👇 AMBIL GAMBAR POSTER EVENT 👇
+    const eventImage = ticketData.eventImage || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
+
     // 👇 1. LOGIKA TANGGAL MASA BERLAKU 👇
     let eventDateStr = ticketData.eventDate || "Tanggal TBA";
     if (ticketData.eventDateRaw) {
@@ -317,20 +320,23 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
             : ticketData.birthDate;
     }
 
-    // 🔥 Looping pembuatan banyak QR Code 🔥
+    // 🔥 Looping pembuatan banyak QR Code (Mendukung array ticketCodes maupun 1 ticketCode saat upgrade) 🔥
+    const codesList = ticketData.ticketCodes && ticketData.ticketCodes.length > 0
+        ? ticketData.ticketCodes
+        : (ticketData.ticketCode ? [ticketData.ticketCode] : []);
+    const totalQty = ticketData.qty || codesList.length || 1;
+
     let qrCodesHTML = '';
-    if (ticketData.ticketCodes && ticketData.ticketCodes.length > 0) {
-        ticketData.ticketCodes.forEach((kode, index) => {
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${kode}`;
-            qrCodesHTML += `
-                <div style="margin: 15px 10px; padding: 20px; border: 2px dashed #0049CC; display: inline-block; border-radius: 10px; text-align: center; background: #f8f9fa;">
-                    <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: bold; color: #0049CC;">TIKET ${index + 1} DARI ${ticketData.qty}</p>
-                    <img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
-                    <h3 style="margin-top: 15px; color: #333; letter-spacing: 2px; font-family: monospace;">${kode}</h3>
-                </div>
-            `;
-        });
-    }
+    codesList.forEach((kode, index) => {
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${kode}`;
+        qrCodesHTML += `
+            <div style="margin: 15px 10px; padding: 20px; border: 2px dashed #0049CC; display: inline-block; border-radius: 10px; text-align: center; background: #f8f9fa;">
+                <p style="margin: 0 0 10px 0; font-size: 12px; font-weight: bold; color: #0049CC;">TIKET ${index + 1} DARI ${totalQty}</p>
+                <img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
+                <h3 style="margin-top: 15px; color: #333; letter-spacing: 2px; font-family: monospace;">${kode}</h3>
+            </div>
+        `;
+    });
 
     let secretDataBlock = '';
     let receiptBlock = '';
@@ -340,7 +346,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
         receiptBlock = `
             <div style="background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; margin: 20px 0; text-align: left; border-radius: 8px;">
                 <h4 style="margin-top: 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Rincian Pembayaran</h4>
-                <p style="margin: 5px 0;">Harga Tiket (${ticketData.qty}x): Rp ${ticketData.subTotal.toLocaleString('id-ID')}</p>
+                <p style="margin: 5px 0;">Harga Tiket (${totalQty}x): Rp ${ticketData.subTotal.toLocaleString('id-ID')}</p>
                 ${discountRow}
                 ${taxRow}
                 <hr style="border: 0; border-top: 1px dashed #ddd; margin: 10px 0;">
@@ -361,15 +367,21 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
     const mailOptions = {
         from: '"No-Reply - RCELLFEST Official" <' + process.env.EMAIL_USER + '>',
         to: customerEmail,
-        subject: `E-Tiket RCELLFEST: ${ticketData.eventName} (${ticketData.qty} Tiket)`,
+        subject: `E-Tiket RCELLFEST: ${ticketData.eventName} (${totalQty} Tiket)`,
         html: `
             <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <div style="background: linear-gradient(135deg, #0049CC, #007bff); padding: 20px; text-align: center; color: white;">
                     <h2 style="margin: 0; letter-spacing: 2px;">RCELLFEST E-TICKET</h2>
                 </div>
+
+                <!-- 🖼️ BANNER GAMBAR EVENT -->
+                <div style="width: 100%; background-color: #0f172a;">
+                    <img src="${eventImage}" alt="${ticketData.eventName}" style="width: 100%; max-height: 240px; object-fit: cover; display: block; border: 0;">
+                </div>
+
                 <div style="padding: 30px; background: #fff; text-align: center;">
                     <p style="text-align: left;">Halo <b>${ticketData.customerName}</b>, pembayaran kamu telah berhasil!</p>
-                    <p style="text-align: left;">Berikut adalah <b>${ticketData.qty} tiket</b> resmi kamu untuk masuk ke area event:</p>
+                    <p style="text-align: left;">Berikut adalah <b>${totalQty} tiket</b> resmi kamu untuk masuk ke area event:</p>
                     
                     <div style="text-align: center;">
                         ${qrCodesHTML}
@@ -391,7 +403,7 @@ const sendTicketEmail = async (customerEmail, ticketData) => {
                         <p style="margin: 4px 0;"><b>Penyelenggara:</b> ${ticketData.organizer || 'RCELLFEST'}</p>
                         <p style="margin: 4px 0;"><b>Tipe:</b> ${ticketData.tierName}</p>
                         <p style="margin: 4px 0;"><b>Lokasi:</b> ${ticketData.location}</p>
-                        <p style="margin: 4px 0;"><b>Waktu:</b> ${ticketData.eventTime}</p>
+                        <p style="margin: 4px 0;"><b>Waktu:</b> ${ticketData.eventTime || 'TBA'}</p>
                     </div>
                     
                     <div style="background-color: #e8f5e9; border: 1px dashed #28a745; padding: 15px; border-radius: 8px; margin: 0 0 20px 0; text-align: center;">
@@ -1513,6 +1525,7 @@ const user = await User.findOneAndUpdate(
             birthDate: buyerData ? buyerData.birthDate : "",
             gender: buyerData ? buyerData.gender : "",
             eventName: event.name,
+            eventImage: event.image, // 👈 TAMBAHKAN BARIS INI
             organizer: event.organizer, 
             tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '), // Daftar semua tipe tiket
             location: event.location || 'TBA',
@@ -1677,6 +1690,7 @@ app.post('/api/midtrans-success', async (req, res) => {
             birthDate: buyerData ? buyerData.birthDate : "",
             gender: buyerData ? buyerData.gender : "",
             eventName: event.name,
+            eventImage: event.image, // 👈 TAMBAHKAN BARIS INI
             organizer: event.organizer, 
             tierName: tickets.map(t => `${t.tierName} (${t.qty}x)`).join(', '),
             location: event.location || 'TBA',
@@ -1738,6 +1752,7 @@ app.post('/api/payment-notification', async (req, res) => {
             birthDate: ticket.birthDate || "",
             gender: ticket.gender || "",
                         eventName: event.name + " (UPGRADED)",
+                        eventImage: event.image, // 👈 TAMBAHKAN BARIS INI
                         tierName: newTierName,
                         location: event.location || 'TBA',
                         eventDate: event.date ? new Date(event.date).toLocaleDateString('id-ID') : 'TBA',
