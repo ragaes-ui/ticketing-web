@@ -189,7 +189,6 @@
     </div>
     <!-- 👆 ---------------------------- 👆 -->
     <!-- SIDEBAR -->
-<!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         
         <!-- BAGIAN LOGO (Sudah ditutup rapi) -->
@@ -298,21 +297,70 @@
         </div>
 
         <!-- ============================================== -->
-        <!-- AREA 2: BUAT EVENT BARU (Diringkas agar hemat tempat) -->
+        <!-- AREA 2: BUAT EVENT BARU -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="createEventArea">
             <div class="card-custom">
                 <form id="formEvent">
                     <div class="mb-3">
-    <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
-    <!-- 👇 Diubah ke file input 👇 -->
-    <input type="file" id="eventImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'addPreview', 'addTxt')">
-    <small class="text-info mt-1 d-block" style="font-size: 0.75rem;">*Gambar akan otomatis masuk ke Supabase</small>
-    <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div>
-</div>
+                        <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
+                        <input type="file" id="eventImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'addPreview', 'addTxt')">
+                        <small class="text-info mt-1 d-block" style="font-size: 0.75rem;">*Gambar akan otomatis masuk ke Supabase</small>
+                        <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div>
+                    </div>
                     <div class="mb-3 p-3 mt-3" style="border: 1px dashed var(--border-color); border-radius: 12px;"><label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label><div id="addLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button></div>
                     <div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="category" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div><div class="col-md-6"><label class="form-label text-warning"><i class="bi bi-bank me-1"></i> <span data-i18n="lbl_tax">Pajak Event (%)</span></label><input type="text" id="taxRate" class="form-control" placeholder="0" min="0" max="100"></div></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="name" class="form-control" required></div>
+
+                    <!-- 👇 INPUT MEDIA SOSIAL & LOGO PENYELENGGARA 👇 -->
+                    <div class="mb-3 p-3" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.35); border-radius: 12px;">
+                        <label class="form-label text-info mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold mb-1 d-block">Logo Penyelenggara / EO</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="addLogoPreview" style="display:none; width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                <div class="flex-grow-1">
+                                    <input type="file" id="organizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewLocalImage(this, 'addLogoPreview', null)">
+                                    <small class="text-info d-block mt-1" style="font-size: 0.7rem;">*Opsional, logo akan otomatis diunggah ke Supabase</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-success" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-whatsapp"></i></span>
+                                    <input type="text" id="whatsapp" class="form-control form-control-sm" placeholder="No. WA Admin (62812...)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text" style="background-color: var(--input-bg); border-color: var(--input-border); color: #E1306C;"><i class="bi bi-instagram"></i></span>
+                                    <input type="url" id="instagram" class="form-control form-control-sm" placeholder="Link Instagram (https://...)">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-info" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-tiktok"></i></span>
+                                    <input type="url" id="tiktok" class="form-control form-control-sm" placeholder="Link TikTok">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-danger" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-youtube"></i></span>
+                                    <input type="url" id="youtube" class="form-control form-control-sm" placeholder="Link YouTube">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-primary" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-globe2"></i></span>
+                                    <input type="url" id="website" class="form-control form-control-sm" placeholder="Link Website">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi / Venue</label><input type="text" id="location" class="form-control" required></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Google Maps</label><input type="text" id="mapsUrl" class="form-control"></div>
                     <div class="row g-2 mb-3"><div class="col-6"><label class="form-label" data-i18n="lbl_start_date">Tgl Mulai</label><input type="date" id="date" class="form-control" required></div><div class="col-6"><label class="form-label" data-i18n="lbl_end_date">Tgl Selesai</label><input type="date" id="endDate" class="form-control"></div></div>
@@ -363,7 +411,7 @@
                         <input type="month" id="filterMonth" class="form-control form-control-sm">
                     </div>
                     <!-- 👇 TAMBAHAN FILTER TAHUNAN 👇 -->
-<div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4">
                         <label class="small text-muted mb-1 fw-bold">Tahunan</label>
                         <select id="filterYear" class="form-control form-control-sm">
                             <option value="">Semua Tahun</option>
@@ -405,71 +453,71 @@
         <div class="content-area d-none" id="promoArea">
             <div class="card-custom">
                 <h5 class="fw-bold text-success mb-4"><i class="bi bi-ticket-perforated me-2"></i><span data-i18n="menu_promo">Kelola Kode Promo</span></h5>
-<form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
-<div class="col-md-4">
-    <label class="form-label" data-i18n="lbl_promo_target">Target Event</label>
-    <select id="promoEventId" class="form-select" onchange="updatePromoTierDropdown()" required></select>
-</div>
-<!-- 👇 UBAH JADI DROPDOWN OTOMATIS 👇 -->
-<div class="col-md-4">
-    <label class="form-label text-info">Target Tipe Tiket</label>
-    <select id="promoTierName" class="form-select">
-        <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
-    </select>
-</div>
-    <div class="col-md-4">
-        <label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label>
-        <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
-    </div>
-    
-    <!-- 👇 TAMBAHAN PILIHAN TIPE DISKON 👇 -->
-    <div class="col-md-4">
-        <label class="form-label text-warning"><i class="bi bi-tags-fill"></i> Jenis Diskon</label>
-        <select id="promoType" class="form-select" onchange="aturTipePromo()" required>
-            <option value="nominal">Nominal (Potongan Rp)</option>
-            <option value="persen">Persentase (%)</option>
-        </select>
-    </div>
-    
-    <div class="col-md-4">
-        <label class="form-label" id="labelPromoDisc" data-i18n="lbl_promo_disc">Potongan (Rp)</label>
-        <input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)">
-    </div>
-    
-    <!-- 👇 BATAS MAKSIMAL DISKON (HANYA MUNCUL JIKA PERSEN) 👇 -->
-    <div class="col-md-4" id="wrapMaxDisc" style="display: none;">
-        <label class="form-label text-info">Maks. Potongan <small>(Opsional)</small></label>
-        <input type="text" id="promoMaxDisc" class="form-control fw-bold" placeholder="Cth: 50.000" oninput="formatRupiah(this)">
-    </div>
+                <form id="formPromo" class="row g-3 mb-5 p-4 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3);">
+                    <div class="col-md-4">
+                        <label class="form-label" data-i18n="lbl_promo_target">Target Event</label>
+                        <select id="promoEventId" class="form-select" onchange="updatePromoTierDropdown()" required></select>
+                    </div>
+                    <!-- 👇 UBAH JADI DROPDOWN OTOMATIS 👇 -->
+                    <div class="col-md-4">
+                        <label class="form-label text-info">Target Tipe Tiket</label>
+                        <select id="promoTierName" class="form-select">
+                            <option value="ALL">-- Berlaku Untuk Semua Tiket --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" data-i18n="lbl_promo_code">Kode Promo</label>
+                        <input type="text" id="promoCode" class="form-control text-uppercase" placeholder="MABAR20" required>
+                    </div>
+                    
+                    <!-- 👇 TAMBAHAN PILIHAN TIPE DISKON 👇 -->
+                    <div class="col-md-4">
+                        <label class="form-label text-warning"><i class="bi bi-tags-fill"></i> Jenis Diskon</label>
+                        <select id="promoType" class="form-select" onchange="aturTipePromo()" required>
+                            <option value="nominal">Nominal (Potongan Rp)</option>
+                            <option value="persen">Persentase (%)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label" id="labelPromoDisc" data-i18n="lbl_promo_disc">Potongan (Rp)</label>
+                        <input type="text" id="promoDisc" class="form-control fw-bold" placeholder="20.000" required oninput="formatRupiah(this)">
+                    </div>
+                    
+                    <!-- 👇 BATAS MAKSIMAL DISKON (HANYA MUNCUL JIKA PERSEN) 👇 -->
+                    <div class="col-md-4" id="wrapMaxDisc" style="display: none;">
+                        <label class="form-label text-info">Maks. Potongan <small>(Opsional)</small></label>
+                        <input type="text" id="promoMaxDisc" class="form-control fw-bold" placeholder="Cth: 50.000" oninput="formatRupiah(this)">
+                    </div>
 
-    <div class="col-md-4">
-        <label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label>
-        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
-    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" data-i18n="lbl_promo_quota">Batas Kuota</label>
+                        <input type="number" id="promoQuota" class="form-control" placeholder="100" required>
+                    </div>
                     <div class="col-md-6 mt-3">
-    <label class="form-label text-warning"><i class="bi bi-calendar-event"></i> Dari Tanggal</label>
-    <input type="date" id="promoStartDate" class="form-control" style="color-scheme: dark;" required>
-</div>
-<div class="col-md-6 mt-3">
-    <label class="form-label text-warning"><i class="bi bi-calendar-check-fill"></i> Sampai Tanggal</label>
-    <input type="date" id="promoEndDate" class="form-control" style="color-scheme: dark;" required>
-</div>
+                        <label class="form-label text-warning"><i class="bi bi-calendar-event"></i> Dari Tanggal</label>
+                        <input type="date" id="promoStartDate" class="form-control" style="color-scheme: dark;" required>
+                    </div>
+                    <div class="col-md-6 mt-3">
+                        <label class="form-label text-warning"><i class="bi bi-calendar-check-fill"></i> Sampai Tanggal</label>
+                        <input type="date" id="promoEndDate" class="form-control" style="color-scheme: dark;" required>
+                    </div>
                     <!-- 👇 TAMBAHKAN 2 BARIS INI (INPUT JAM FLASH SALE) 👇 -->
-    <div class="col-md-6 mt-3">
-        <label class="form-label text-warning"><i class="bi bi-clock"></i> Jam Mulai (Opsional)</label>
-        <input type="time" id="promoStartTime" class="form-control" style="color-scheme: dark;" title="Kosongkan jika berlaku 24 jam">
-    </div>
-    <div class="col-md-6 mt-3">
-        <label class="form-label text-warning"><i class="bi bi-clock-fill"></i> Jam Berakhir (Opsional)</label>
-        <input type="time" id="promoEndTime" class="form-control" style="color-scheme: dark;" title="Kosongkan jika berlaku 24 jam">
-    </div>
+                    <div class="col-md-6 mt-3">
+                        <label class="form-label text-warning"><i class="bi bi-clock"></i> Jam Mulai (Opsional)</label>
+                        <input type="time" id="promoStartTime" class="form-control" style="color-scheme: dark;" title="Kosongkan jika berlaku 24 jam">
+                    </div>
+                    <div class="col-md-6 mt-3">
+                        <label class="form-label text-warning"><i class="bi bi-clock-fill"></i> Jam Berakhir (Opsional)</label>
+                        <input type="time" id="promoEndTime" class="form-control" style="color-scheme: dark;" title="Kosongkan jika berlaku 24 jam">
+                    </div>
                     <div class="col-12 mt-3"><button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_create_promo">Buat Kode Promo</span></button></div>
                 </form>
                 <h6 class="fw-bold text-muted mb-3" data-i18n="txt_promo_list">Daftar Promo Event Anda</h6><div id="promoList" class="row g-3"></div>
             </div>
         </div>
 
-<!-- ============================================== -->
+        <!-- ============================================== -->
         <!-- AREA 5: SCANNER TIKET -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="scannerArea">
@@ -487,7 +535,6 @@
         </div>
 
         <!-- ============================================== -->
- <!-- ============================================== -->
         <!-- AREA 6: KELOLA RUNDOWN EVENT -->
         <!-- ============================================== -->
         <div class="content-area d-none" id="rundownArea">
@@ -510,7 +557,6 @@
                         </select>
                     </div>
 
-                    <!-- 👇 INI YANG DIUBAH JADI 4 KOLOM DENGAN KALENDER 👇 -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-3">
                             <label class="form-label">Slug Link (Tanpa Spasi)</label>
@@ -532,7 +578,6 @@
                             <input type="date" id="eoRdEndDate" class="form-control" style="color-scheme: dark;">
                         </div>
                     </div>
-                    <!-- 👆 -------------------------------------------- 👆 -->
 
                     <div class="d-flex justify-content-between align-items-center mt-4 mb-2 flex-wrap gap-2">
                         <label class="form-label text-info m-0"><i class="bi bi-clock-history me-1"></i> Susunan Tanggal & Jam Artis (Timeline)</label>
@@ -557,11 +602,10 @@
     <!-- 🔥 AREA INVISIBLE UNTUK CETAK GELANG 🔥 -->
     <div id="printGelangArea"></div>
 
-<!-- MODAL PENGATURAN -->
+    <!-- MODAL PENGATURAN -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content p-4">
-<!-- 👇 HEADER MODAL (DITAMBAH TOMBOL SILANG/X) 👇 -->
                 <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
                     <h5 class="fw-bold m-0"><i class="bi bi-gear-fill text-info me-2"></i> <span data-i18n="btn_settings">Pengaturan Akun & Keamanan</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -597,7 +641,6 @@
                         </div>
                     </div>
                 </div>
-<!-- 👇 FOOTER MODAL (DITAMBAH TOMBOL TUTUP UNTUK HP) 👇 -->
                 <div class="mt-4 pt-3 border-top border-secondary text-end">
                     <button type="button" class="btn btn-secondary fw-bold px-4 rounded-pill" data-bs-dismiss="modal">Tutup Pengaturan</button>
                 </div>
@@ -613,15 +656,66 @@
                 <div style="max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
                     <input type="hidden" id="editId">
                     <div class="mb-3">
-    <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
-    <!-- 👇 Diubah ke file input & tambah hidden input 👇 -->
-    <input type="file" id="editImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'editPreview', null)">
-    <input type="hidden" id="editImageUrl"> <!-- Menyimpan link lama -->
-    <div class="img-preview-box mt-2"><img id="editPreview"></div>
-</div>
+                        <label class="form-label" data-i18n="lbl_banner">Poster Event / Banner</label>
+                        <input type="file" id="editImageFile" class="form-control" accept="image/*" onchange="previewLocalImage(this, 'editPreview', null)">
+                        <input type="hidden" id="editImageUrl">
+                        <div class="img-preview-box mt-2"><img id="editPreview"></div>
+                    </div>
                     <div class="mb-3 p-3" style="border: 1px dashed var(--border-color); border-radius: 12px;"><label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label><div id="editLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button></div>
                     <div class="row g-2 mb-3"><div class="col-md-6"><label class="form-label text-warning" data-i18n="lbl_tax">Pajak Event (%)</label><input type="number" id="editTaxRate" class="form-control"></div><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="editCategory" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div></div>
-                    <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="editName" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi</label><input type="text" id="editLocation" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Maps</label><input type="text" id="editMapsUrl" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="editName" class="form-control"></div>
+
+                    <!-- 👇 EDIT MEDIA SOSIAL & LOGO PENYELENGGARA 👇 -->
+                    <div class="mb-3 p-3" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.35); border-radius: 12px;">
+                        <label class="form-label text-info mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold mb-1 d-block">Logo Penyelenggara / EO</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="editLogoPreview" style="display:none; width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                <div class="flex-grow-1">
+                                    <input type="file" id="editOrganizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewLocalImage(this, 'editLogoPreview', null)">
+                                    <input type="hidden" id="editOrganizerLogoUrl">
+                                    <small class="text-info d-block mt-1" style="font-size: 0.7rem;">*Kosongkan jika tidak ingin mengganti logo</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-success" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-whatsapp"></i></span>
+                                    <input type="text" id="editWhatsapp" class="form-control form-control-sm" placeholder="No. WA Admin (62812...)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text" style="background-color: var(--input-bg); border-color: var(--input-border); color: #E1306C;"><i class="bi bi-instagram"></i></span>
+                                    <input type="url" id="editInstagram" class="form-control form-control-sm" placeholder="Link Instagram (https://...)">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-info" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-tiktok"></i></span>
+                                    <input type="url" id="editTiktok" class="form-control form-control-sm" placeholder="Link TikTok">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-danger" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-youtube"></i></span>
+                                    <input type="url" id="editYoutube" class="form-control form-control-sm" placeholder="Link YouTube">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text text-primary" style="background-color: var(--input-bg); border-color: var(--input-border);"><i class="bi bi-globe2"></i></span>
+                                    <input type="url" id="editWebsite" class="form-control form-control-sm" placeholder="Link Website">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3"><label class="form-label" data-i18n="lbl_location">Lokasi</label><input type="text" id="editLocation" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_maps">Link Maps</label><input type="text" id="editMapsUrl" class="form-control"></div>
                     <div class="row g-2 mb-3"><div class="col-6"><label class="form-label" data-i18n="lbl_start_date">Tgl Mulai</label><input type="date" id="editDate" class="form-control"></div><div class="col-6"><label class="form-label" data-i18n="lbl_end_date">Tgl Selesai</label><input type="date" id="editEndDate" class="form-control"></div></div>
                     <div class="row g-2 mb-3"><div class="col-6"><label class="form-label" data-i18n="lbl_start_time">Jam Mulai</label><input type="time" id="editStartTime" class="form-control"></div><div class="col-6"><label class="form-label" data-i18n="lbl_end_time">Jam Selesai</label><input type="time" id="editEndTime" class="form-control"></div></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_open_date">Waktu Buka Tiket</label><input type="datetime-local" id="editSalesOpenDate" class="form-control"></div><div class="mb-3"><label class="form-label" data-i18n="lbl_desc">Deskripsi</label><textarea id="editDescription" class="form-control" rows="2"></textarea></div><div class="mb-3"><label class="form-label text-danger" data-i18n="lbl_secret">Data Rahasia</label><textarea id="editSecretData" class="form-control border-danger" rows="2"></textarea></div>
@@ -704,9 +798,8 @@
         // Panggil pertama kali dan cek perubahan waktu tiap 1 menit
         updateTimeGreeting();
         setInterval(updateTimeGreeting, 60000); 
-        // 👆 -------------------------------- 👆
 
-let organizerInfo = null; let myEventsData = []; let myChart = null; 
+        let organizerInfo = null; let myEventsData = []; let myChart = null; 
         let myBuyersData = []; let currentFilteredBuyers = [];
         
         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -870,7 +963,6 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
             tierSelect.innerHTML = html;
         }
         
-        // 👇 FUNGSI BARU UNTUK ATUR UI PERSEN VS NOMINAL 👇
         function aturTipePromo() {
             const type = document.getElementById('promoType').value;
             const labelDisc = document.getElementById('labelPromoDisc');
@@ -880,9 +972,9 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
 
             if (type === 'persen') {
                 labelDisc.innerText = 'Potongan (%)';
-                inputDisc.placeholder = '10'; // 10%
-                inputDisc.setAttribute('oninput', ''); // Hapus format rupiah karena input persen hanya angka kecil
-                inputDisc.value = inputDisc.value.replace(/\./g, ''); // Bersihkan titik
+                inputDisc.placeholder = '10';
+                inputDisc.setAttribute('oninput', '');
+                inputDisc.value = inputDisc.value.replace(/\./g, '');
                 wrapMaxDisc.style.display = 'block';
             } else {
                 labelDisc.innerText = 'Potongan (Rp)';
@@ -890,11 +982,10 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
                 inputDisc.setAttribute('oninput', 'formatRupiah(this)');
                 formatRupiah(inputDisc); 
                 wrapMaxDisc.style.display = 'none';
-                inputMaxDisc.value = ''; // Reset nilai
+                inputMaxDisc.value = '';
             }
         }
 
-// 👇 1. UPDATE TAMPILAN KARTU PROMO 👇
         async function loadPromos() { 
             const promoSelect = document.getElementById('promoEventId'); 
             if (myEventsData.length > 0) { 
@@ -915,12 +1006,10 @@ let organizerInfo = null; let myEventsData = []; let myChart = null;
                     promoListHTML.innerHTML = `<div class="text-muted col-12">Belum ada promo.</div>`; 
                 } else { 
                     promoListHTML.innerHTML = myPromos.map(p => {
-                        // 👇 Logika memunculkan teks tanggal & jam aktif 👇
-const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-block">
-    <i class="bi bi-calendar-range"></i> Tgl: ${p.validFrom} s/d ${p.validUntil} <br>
-    <i class="bi bi-clock-history"></i> Jam: ${p.startTime || '00:00'} - ${p.endTime || '23:59'} WIB
-</span>`;                        
-                        // 👇 Logika cetak teks Diskon sesuai persen/nominal 👇
+                        const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-block">
+                            <i class="bi bi-calendar-range"></i> Tgl: ${p.validFrom} s/d ${p.validUntil} <br>
+                            <i class="bi bi-clock-history"></i> Jam: ${p.startTime || '00:00'} - ${p.endTime || '23:59'} WIB
+                        </span>`;                        
                         let diskonTeks = p.type === 'persen' ? `${p.discount}%` : `Rp ${p.discount.toLocaleString('id-ID')}`;
                         let maxDiskonTeks = (p.type === 'persen' && p.maxDiscount) ? `<br><span class="text-info" style="font-size: 0.7rem;">(Maks Potong: Rp ${p.maxDiscount.toLocaleString('id-ID')})</span>` : '';
 
@@ -942,7 +1031,6 @@ const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-blo
             } catch(e) { } 
         }
 
-        // 👇 2. UPDATE PENGIRIMAN DATA PROMO KE SERVER 👇
         document.getElementById('formPromo').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             const promoSelect = document.getElementById('promoEventId'); 
@@ -952,17 +1040,14 @@ const timeLimit = `<br><span class="text-warning small fw-bold mt-2 d-inline-blo
             const typeVal = document.getElementById('promoType').value;
             const maxDiscVal = document.getElementById('promoMaxDisc').value;
             
-const data = { 
+            const data = { 
                 code: document.getElementById('promoCode').value, 
-                type: typeVal, // Tambahan Tipe Nominal atau Percent
+                type: typeVal,
                 discount: parseInt(document.getElementById('promoDisc').value.replace(/\./g, '')) || 0, 
-                maxDiscount: (typeVal === 'persen' && maxDiscVal) ? parseInt(maxDiscVal.replace(/\./g, '')) : null, // Tambahan Batas Maksimal
+                maxDiscount: (typeVal === 'persen' && maxDiscVal) ? parseInt(maxDiscVal.replace(/\./g, '')) : null,
                 quota: document.getElementById('promoQuota').value, 
-                
-                // 👇 Data rentang tanggal yang dikirim 👇
                 validFrom: document.getElementById('promoStartDate').value, 
                 validUntil: document.getElementById('promoEndDate').value, 
-                
                 eventId: promoSelect.value, 
                 eventName: promoSelect.value === 'ALL' ? 'SEMUA EVENT SAYA' : promoSelect.options[promoSelect.selectedIndex].text, 
                 tierName: tierVal,
@@ -972,9 +1057,9 @@ const data = {
             
             await fetch('/api/promos', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }); 
             e.target.reset(); 
-            document.getElementById('wrapMaxDisc').style.display = 'none'; // reset UI
-            document.getElementById('labelPromoDisc').innerText = 'Potongan (Rp)'; // reset UI
-            document.getElementById('promoDisc').setAttribute('oninput', 'formatRupiah(this)'); // reset UI
+            document.getElementById('wrapMaxDisc').style.display = 'none';
+            document.getElementById('labelPromoDisc').innerText = 'Potongan (Rp)';
+            document.getElementById('promoDisc').setAttribute('oninput', 'formatRupiah(this)');
             loadPromos(); 
             Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Promo dibuat!', background: 'var(--bg-card)', color: 'var(--text-main)' }); 
         });
@@ -1146,6 +1231,10 @@ const data = {
                 const bannerFile = document.getElementById('eventImageFile').files[0];
                 if (bannerFile) bannerUrl = await uploadToSupabase(bannerFile);
 
+                let organizerLogoUrl = "";
+                const logoFile = document.getElementById('organizerLogoFile').files[0];
+                if (logoFile) organizerLogoUrl = await uploadToSupabase(logoFile);
+
                 let lineupUrls = [];
                 const lineupRows = document.querySelectorAll('#addLineups .lineup-row');
                 for (let row of lineupRows) {
@@ -1158,7 +1247,14 @@ const data = {
 
                 const data = { 
                     name: document.getElementById('name').value, category: document.getElementById('category').value, 
-                    organizer: organizerInfo.organizerName, creatorId: organizerInfo.id, location: document.getElementById('location').value, 
+                    organizer: organizerInfo.organizerName, creatorId: organizerInfo.id,
+                    organizerLogo: organizerLogoUrl,
+                    whatsapp: document.getElementById('whatsapp').value.trim(),
+                    instagram: document.getElementById('instagram').value.trim(),
+                    tiktok: document.getElementById('tiktok').value.trim(),
+                    youtube: document.getElementById('youtube').value.trim(),
+                    website: document.getElementById('website').value.trim(),
+                    location: document.getElementById('location').value, 
                     date: document.getElementById('date').value, endDate: document.getElementById('endDate').value || null, 
                     startTime: document.getElementById('startTime').value, endTime: document.getElementById('endTime').value, 
                     salesOpenDate: document.getElementById('salesOpenDate').value ? document.getElementById('salesOpenDate').value + ':00+07:00' : '', 
@@ -1173,7 +1269,9 @@ const data = {
                 if (res.ok) { 
                     Swal.fire({ html: `<div class="mt-2"><i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i><h3 class="fw-bolder mt-3 mb-2">Event Berhasil Dibuat</h3><p class="text-muted" style="font-size: 0.95rem;">Event baru Anda telah berhasil dipublikasikan.</p></div>`, background: 'var(--bg-card)', color: 'var(--text-main)', showConfirmButton: true, confirmButtonText: 'Selesai', buttonsStyling: false, customClass: { popup: 'rounded-4 swal-custom-popup', confirmButton: 'btn btn-primary rounded-pill px-5 py-2 fw-bold mt-2', backdrop: 'swal-blur-backdrop' } }); 
                     e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
-                    document.getElementById('addLineups').innerHTML = ''; previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt'); 
+                    document.getElementById('addLineups').innerHTML = ''; 
+                    previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt');
+                    previewLocalImage(document.getElementById('organizerLogoFile'), 'addLogoPreview', null);
                     await loadMyEvents(); switchMenu('myevents'); 
                 } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } 
             } catch (err) { Swal.fire('Error', err.message || 'Gagal mengupload gambar.', 'error'); } 
@@ -1183,9 +1281,40 @@ const data = {
         async function loadMyEvents() { const tbody = document.getElementById('myEventsTableBody'); tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><span class="spinner-border text-primary"></span></td></tr>'; try { const res = await fetch('/api/events'); const allEvents = await res.json(); myEventsData = allEvents.filter(event => event.creatorId === organizerInfo.id); if (myEventsData.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada event.</td></tr>'; return; } tbody.innerHTML = myEventsData.map(event => { const harga = new Intl.NumberFormat('id-ID').format(event.price || 0); let statusBadge = event.availableSeats === -1 ? '<span class="badge bg-secondary">SELESAI</span>' : '<span class="badge bg-success">AKTIF</span>'; const namaAman = event.name ? event.name : "event"; const eventSlug = namaAman.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''); const linkPublic = `https://rcellfest.my.id/detail?event=${eventSlug}&id=${event._id}`; return `<tr><td><div class="d-flex align-items-center gap-3"><img src="${event.image || 'https://placehold.co/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"><div class="fw-bold text-wrap" style="max-width: 200px;">${event.name}</div></div></td><td>${event.date ? event.date.split('T')[0] : '-'}</td><td class="text-success fw-bold">Rp ${harga}</td><td>${statusBadge}</td><td class="text-end"><a href="${linkPublic}" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3 me-1" title="Lihat Halaman Tiket"><i class="bi bi-globe"></i></a><button class="btn btn-sm btn-outline-info rounded-pill px-3 me-1" onclick="bukaModalEdit('${event._id}')" title="Edit Event"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hapusEvent('${event._id}')" title="Hapus Event"><i class="bi bi-trash"></i></button></td></tr>`; }).join(''); } catch (err) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal memuat event.</td></tr>'; } }
         async function hapusEvent(id) { Swal.fire({ title: 'Hapus Event?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya', background: 'var(--bg-card)', color: 'var(--text-main)' }).then(async (result) => { if (result.isConfirmed) { await fetch(`/api/events/${id}`, { method: 'DELETE' }); await loadMyEvents(); loadDashboardStats(); } }); }
         
-        function bukaModalEdit(id) { const ev = myEventsData.find(e => e._id === id); if(ev) { document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name; document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || ''; document.getElementById('editCategory').value = ev.category || 'General'; document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; document.getElementById('editSecretData').value = ev.secretData || ''; document.getElementById('editTaxRate').value = ev.taxRate || 0; if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; document.getElementById('editStartTime').value = ev.startTime || ''; document.getElementById('editEndTime').value = ev.endTime || ''; document.getElementById('editImageUrl').value = ev.image || ''; 
-            document.getElementById('editImageFile').value = ''; previewImage(ev.image, 'editPreview'); 
-            if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } document.getElementById('editLineups').innerHTML = ''; if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); document.getElementById('editTiers').innerHTML = ''; if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } editModal.show(); } }
+        function bukaModalEdit(id) { 
+            const ev = myEventsData.find(e => e._id === id); 
+            if(ev) { 
+                document.getElementById('editId').value = ev._id; 
+                document.getElementById('editName').value = ev.name; 
+                document.getElementById('editOrganizerLogoUrl').value = ev.organizerLogo || '';
+                document.getElementById('editOrganizerLogoFile').value = '';
+                previewImage(ev.organizerLogo, 'editLogoPreview');
+                document.getElementById('editWhatsapp').value = ev.whatsapp || '';
+                document.getElementById('editInstagram').value = ev.instagram || '';
+                document.getElementById('editTiktok').value = ev.tiktok || '';
+                document.getElementById('editYoutube').value = ev.youtube || '';
+                document.getElementById('editWebsite').value = ev.website || '';
+                document.getElementById('editLocation').value = ev.location || ''; 
+                document.getElementById('editDescription').value = ev.description || ''; 
+                document.getElementById('editCategory').value = ev.category || 'General'; 
+                document.getElementById('editMapsUrl').value = ev.mapsUrl || ''; 
+                document.getElementById('editSecretData').value = ev.secretData || ''; 
+                document.getElementById('editTaxRate').value = ev.taxRate || 0; 
+                if(ev.date) document.getElementById('editDate').value = ev.date.split('T')[0]; 
+                if(ev.endDate) document.getElementById('editEndDate').value = ev.endDate.split('T')[0]; else document.getElementById('editEndDate').value = ''; 
+                document.getElementById('editStartTime').value = ev.startTime || ''; 
+                document.getElementById('editEndTime').value = ev.endTime || ''; 
+                document.getElementById('editImageUrl').value = ev.image || ''; 
+                document.getElementById('editImageFile').value = ''; 
+                previewImage(ev.image, 'editPreview'); 
+                if(ev.salesOpenDate) { const d = new Date(ev.salesOpenDate); document.getElementById('editSalesOpenDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } else { document.getElementById('editSalesOpenDate').value = ''; } 
+                document.getElementById('editLineups').innerHTML = ''; 
+                if(ev.lineupImages) ev.lineupImages.forEach(url => addLineupRow('editLineups', url)); 
+                document.getElementById('editTiers').innerHTML = ''; 
+                if(ev.tickets) { ev.tickets.forEach(t => { let openDateFormatted = ''; if(t.salesOpenDate) { const d = new Date(t.salesOpenDate); openDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } addTierRow('editTiers', t.tierName, t.price, t.availableSeats, t.minQty || 1, openDateFormatted, t.isLocked, t.accessCode); }); } 
+                editModal.show(); 
+            } 
+        }
         
         async function saveEditEvent() { 
             const id = document.getElementById('editId').value; 
@@ -1201,6 +1330,10 @@ const data = {
                 let finalBannerUrl = document.getElementById('editImageUrl').value;
                 const bannerFile = document.getElementById('editImageFile').files[0];
                 if (bannerFile) finalBannerUrl = await uploadToSupabase(bannerFile);
+
+                let finalOrganizerLogoUrl = document.getElementById('editOrganizerLogoUrl').value;
+                const logoFile = document.getElementById('editOrganizerLogoFile').files[0];
+                if (logoFile) finalOrganizerLogoUrl = await uploadToSupabase(logoFile);
 
                 let finalLineupUrls = [];
                 const lineupRows = document.querySelectorAll('#editLineups .lineup-row');
@@ -1219,7 +1352,14 @@ const data = {
                     name: document.getElementById('editName').value, category: document.getElementById('editCategory').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, 
                     startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '', 
                     location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value, mapsUrl: document.getElementById('editMapsUrl').value, secretData: document.getElementById('editSecretData').value, 
-                    image: finalBannerUrl, price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, 
+                    image: finalBannerUrl,
+                    organizerLogo: finalOrganizerLogoUrl,
+                    whatsapp: document.getElementById('editWhatsapp').value.trim(),
+                    instagram: document.getElementById('editInstagram').value.trim(),
+                    tiktok: document.getElementById('editTiktok').value.trim(),
+                    youtube: document.getElementById('editYoutube').value.trim(),
+                    website: document.getElementById('editWebsite').value.trim(),
+                    price: tiers[0]?.price || 0, availableSeats: tiers.reduce((a,b)=>a+b.totalSeats,0), tickets: tiers, 
                     lineupImages: finalLineupUrls, taxRate: document.getElementById('editTaxRate') ? (parseInt(document.getElementById('editTaxRate').value) || 0) : 0, 
                     creatorId: organizerInfo.id, organizer: organizerInfo.organizerName 
                 }; 
