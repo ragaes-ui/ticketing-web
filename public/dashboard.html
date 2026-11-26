@@ -121,6 +121,9 @@
         [data-theme="dark"] .form-control, [data-theme="dark"] .form-select { color: var(--text-main) !important; background-color: var(--bg-input) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] select option { background-color: var(--bg-input) !important; color: var(--text-main) !important; }
 
+        .swal2-popup { border-radius: 16px !important; background: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; }
+        .swal2-title, .swal2-html-container { color: var(--text-main) !important; }
+
         .custom-profile-menu { border-radius: 20px !important; min-width: 270px; padding: 15px 0 10px 0; background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; }
         .btn-lihat-profil { background-color: #0d9488 !important; color: #ffffff !important; border: none; border-radius: 50px !important; padding: 10px; font-size: 1rem; }
         .custom-profile-menu .dropdown-item { padding: 12px 20px; color: var(--text-main); transition: all 0.2s ease; font-size: 0.95rem; }
@@ -159,7 +162,7 @@
         /* ========================================= */
         /* 🔥 FIX MENU PROFIL KEPOTONG DI HP 🔥 */
         /* ========================================= */
-@media (max-width: 576px) {
+        @media (max-width: 576px) {
             .dropdown-menu.custom-profile-menu {
                 transform: none !important;
                 top: 110% !important;
@@ -173,14 +176,12 @@
                 padding: 10px 15px !important;
             }
 
-            /* 👇 TAMBAHKAN DI SINI AGAR 1 BARIS RAPI DI HP 👇 */
             .navbar .navbar-brand { font-size: 1.05rem !important; letter-spacing: 0.5px; }
             .navbar #navAvatarDisplay { width: 34px !important; height: 34px !important; }
             .navbar .btn-jelajahi { padding: 0 9px !important; }
             .navbar .badge-new { font-size: 0.5rem; padding: 2px 4px; top: -4px; right: -4px; }
         }
 
-        /* 👇 Tambahan untuk merapikan Navbar di HP 👇 */
         .navbar #langText { display: none !important; } 
         .navbar #btnLang { padding: 0 10px !important; height: 34px !important; }
         .navbar #theme-btn { width: 34px !important; height: 34px !important; }
@@ -222,9 +223,6 @@
         .mobile-bottom-nav a .nav-text { display: none; font-size: 0.9rem; font-weight: 700; }
         .mobile-bottom-nav a.active .nav-text { display: block; }
 
-        /* ========================================= */
-        /* 🔥 EFEK SHRINK MOBILE BOTTOM NAV SAAT SCROLL 🔥 */
-        /* ========================================= */
         .mobile-bottom-nav.shrink {
             width: 68% !important;
             max-width: 260px !important;
@@ -248,11 +246,7 @@
         @media (max-width: 768px) {
             .mobile-bottom-nav { display: block; }
             body { padding-bottom: 100px !important; }
-            
-            /* Sembunyikan indikator sinyal khusus di mobile */
-            .signal-badge {
-                display: none !important;
-            }
+            .signal-badge { display: none !important; }
         }
 
         /* ========================================= */
@@ -306,17 +300,144 @@
             opacity: 0;
             visibility: hidden;
         }
+
+        /* === TOAST SLIDE DARI SAMPING & PROGRESS BAR BERJALAN === */
+        #rc-toast-container {
+            position: fixed;
+            top: 84px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+
+        .rc-side-toast {
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            width: 340px;
+            max-width: 100%;
+            background: var(--bg-card, #1e1e1e);
+            color: var(--text-main, #f8f9fa);
+            border: 1px solid var(--border-color, #333333);
+            border-radius: 14px;
+            padding: 14px 16px 16px;
+            box-shadow: 0 12px 30px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(calc(100% + 32px));
+            opacity: 0;
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+        }
+
+        .rc-side-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .rc-toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .rc-toast-info .rc-toast-icon    { background: rgba(59, 130, 246, 0.16); color: #3b82f6; }
+        .rc-toast-info .rc-toast-bar     { background: #3b82f6; }
+
+        .rc-toast-success .rc-toast-icon { background: rgba(16, 185, 129, 0.16); color: #10b981; }
+        .rc-toast-success .rc-toast-bar  { background: #10b981; }
+
+        .rc-toast-error .rc-toast-icon   { background: rgba(239, 68, 68, 0.16); color: #ef4444; }
+        .rc-toast-error .rc-toast-bar    { background: #ef4444; }
+
+        .rc-toast-warning .rc-toast-icon { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+        .rc-toast-warning .rc-toast-bar  { background: #f59e0b; }
+
+        .rc-toast-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rc-toast-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+
+        .rc-toast-msg {
+            font-size: 0.82rem;
+            color: var(--text-muted, #a1a1aa);
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .rc-toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted, #a1a1aa);
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 2px 4px;
+            cursor: pointer;
+            align-self: flex-start;
+            transition: color 0.15s ease;
+        }
+
+        .rc-toast-close:hover {
+            color: var(--text-main, #f8f9fa);
+        }
+
+        .rc-toast-bar {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3.5px;
+            width: 100%;
+            transform-origin: left center;
+            animation: rcToastProgress linear forwards;
+        }
+
+        .rc-side-toast:hover .rc-toast-bar {
+            animation-play-state: paused;
+        }
+
+        @keyframes rcToastProgress {
+            from { transform: scaleX(1); }
+            to   { transform: scaleX(0); }
+        }
+
+        @media (max-width: 480px) {
+            #rc-toast-container {
+                top: 76px;
+                right: 12px;
+                left: 12px;
+            }
+            .rc-side-toast {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-<!-- 👇 PRELOADER AESTHETIC 👇 -->
+    <!-- 👇 PRELOADER AESTHETIC 👇 -->
     <div id="aesthetic-preloader">
         <div class="preloader-brand">RCELLFEST</div>
         <div class="preloader-ring"></div>
         <div class="text-muted small fw-bold mt-3" style="letter-spacing: 1px;">MEMUAT PROFIL...</div>
     </div>
-    <!-- 👆 -------------------- 👆 -->
-<nav class="navbar navbar-expand-lg fixed-top">
+
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container flex-nowrap">
             <a class="navbar-brand d-flex align-items-center me-0" href="/">
                 <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" alt="Logo RCELLFEST" style="height: 28px; width: 28px; object-fit: contain;" class="me-1 me-sm-2">
@@ -324,12 +445,12 @@
             </a>
             
             <div class="d-flex align-items-center gap-1 gap-sm-2 gap-md-3 ms-auto">
-                <!-- 👇 Tombol Tema Baru 👇 -->
+                <!-- Tombol Tema Baru -->
                 <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; background-color: #1e293b;">
                     <i class="bi bi-sun-fill text-warning" id="theme-icon"></i>
                 </button>                
                 
-                <!-- 👇 Tombol Dropdown Bahasa Bendera 👇 -->
+                <!-- Tombol Dropdown Bahasa Bendera -->
                 <div class="dropdown">
                     <button class="btn btn-dark rounded-pill d-flex align-items-center gap-2 border-0 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 38px; padding: 0 14px; background-color: #1e293b;" id="btnLang">
                         <img src="https://flagcdn.com/w20/id.png" id="langFlag" style="width: 18px; height: 18px; object-fit: cover; border-radius: 50%;">
@@ -679,6 +800,51 @@
 
     <script>
         // ==========================================
+        // NOTIFIKASI TOAST DARI SAMPING + PROGRESS BAR
+        // ==========================================
+        function showSideAlert(title, message, type = 'info', duration = 3500) {
+            let container = document.getElementById('rc-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'rc-toast-container';
+                document.body.appendChild(container);
+            }
+
+            const icons = {
+                info: '<i class="bi bi-info-lg"></i>',
+                success: '<i class="bi bi-check-lg"></i>',
+                error: '<i class="bi bi-x-lg"></i>',
+                warning: '<i class="bi bi-exclamation-lg"></i>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `rc-side-toast rc-toast-${type}`;
+            toast.innerHTML = `
+                <div class="rc-toast-icon">${icons[type] || icons.info}</div>
+                <div class="rc-toast-body">
+                    <div class="rc-toast-title">${title}</div>
+                    <div class="rc-toast-msg">${message}</div>
+                </div>
+                <button type="button" class="rc-toast-close" aria-label="Tutup">&times;</button>
+                <div class="rc-toast-bar" style="animation-duration: ${duration}ms;"></div>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => toast.classList.add('show'));
+            });
+
+            const closeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 380);
+            };
+
+            toast.querySelector('.rc-toast-close').addEventListener('click', closeToast);
+            toast.querySelector('.rc-toast-bar').addEventListener('animationend', closeToast);
+        }
+
+        // ==========================================
         // 🔥 LOGIKA UPLOAD AVATAR KE SUPABASE (BASE64) 🔥
         // ==========================================
         function fileToBase64(file) {
@@ -697,20 +863,17 @@
             
             if (file.size > 5 * 1024 * 1024) {
                 input.value = '';
-                return Swal.fire({
-                    icon: 'error', 
-                    title: 'Oops', 
-                    text: lang === 'id' ? 'Ukuran foto maksimal 5MB!' : 'Max file size is 5MB!',
-                    background: '#1e1e1e', color: '#fff'
-                });
+                return showSideAlert(
+                    lang === 'id' ? 'File Terlalu Besar' : 'File Too Large',
+                    lang === 'id' ? 'Ukuran foto maksimal 5MB!' : 'Max file size is 5MB!',
+                    'error'
+                );
             }
 
             Swal.fire({ 
                 title: lang === 'id' ? 'Mengunggah Foto...' : 'Uploading Photo...', 
                 allowOutsideClick: false, 
-                didOpen: () => Swal.showLoading(), 
-                background: '#1e1e1e', 
-                color: '#fff' 
+                didOpen: () => Swal.showLoading()
             });
 
             try {
@@ -748,24 +911,22 @@
                 user.avatar = newAvatarUrl;
                 localStorage.setItem('userData', JSON.stringify(user));
                 renderProfile();
+                Swal.close();
 
-                Swal.fire({
-                    icon: 'success', 
-                    title: 'Sukses 📸', 
-                    text: lang === 'id' ? 'Foto profil berhasil diperbarui!' : 'Profile picture updated!', 
-                    background: '#1e1e1e', 
-                    color: '#fff'
-                });
+                showSideAlert(
+                    lang === 'id' ? 'Foto Diperbarui' : 'Photo Updated',
+                    lang === 'id' ? 'Foto profil berhasil diperbarui!' : 'Profile picture updated!',
+                    'success'
+                );
 
             } catch (error) {
                 console.error(error);
-                Swal.fire({
-                    icon: 'error', 
-                    title: 'Gagal', 
-                    text: error.message || (lang === 'id' ? 'Terjadi kesalahan saat mengunggah foto.' : 'Upload failed.'), 
-                    background: '#1e1e1e', 
-                    color: '#fff'
-                });
+                Swal.close();
+                showSideAlert(
+                    lang === 'id' ? 'Gagal Mengunggah' : 'Upload Failed',
+                    error.message || (lang === 'id' ? 'Terjadi kesalahan saat mengunggah foto.' : 'Upload failed.'),
+                    'error'
+                );
             } finally {
                 input.value = '';
             }
@@ -779,11 +940,11 @@
             const defaultAvatar = 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
 
             if (!user.avatar || user.avatar === defaultAvatar) {
-                return Swal.fire({
-                    icon: 'info', title: 'Info', 
-                    text: lang === 'id' ? 'Foto profil Anda sudah menggunakan gambar bawaan.' : 'Your profile picture is already the default image.',
-                    background: '#1e1e1e', color: '#fff'
-                });
+                return showSideAlert(
+                    'Info',
+                    lang === 'id' ? 'Foto profil Anda sudah menggunakan gambar bawaan.' : 'Your profile picture is already the default image.',
+                    'info'
+                );
             }
 
             const result = await Swal.fire({
@@ -794,12 +955,11 @@
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: lang === 'id' ? 'Ya, Hapus!' : 'Yes, Delete!',
-                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel',
-                background: '#1e1e1e', color: '#fff'
+                cancelButtonText: lang === 'id' ? 'Batal' : 'Cancel'
             });
 
             if (result.isConfirmed) {
-                Swal.fire({ title: lang === 'id' ? 'Menghapus...' : 'Deleting...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#1e1e1e', color: '#fff' });
+                Swal.fire({ title: lang === 'id' ? 'Menghapus...' : 'Deleting...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
                 try {
                     const res = await fetch('/api/user/update-avatar', {
@@ -808,18 +968,28 @@
                         body: JSON.stringify({ userId: user.id, avatar: defaultAvatar })
                     });
 
+                    Swal.close();
                     if (res.ok) {
                         user.avatar = defaultAvatar;
                         localStorage.setItem('userData', JSON.stringify(user));
                         renderProfile(); 
 
-                        Swal.fire({icon: 'success', title: 'Terhapus!', text: lang === 'id' ? 'Foto profil berhasil dihapus.' : 'Profile picture deleted.', background: '#1e1e1e', color: '#fff'});
+                        showSideAlert(
+                            lang === 'id' ? 'Terhapus!' : 'Deleted!',
+                            lang === 'id' ? 'Foto profil berhasil dihapus.' : 'Profile picture deleted.',
+                            'success'
+                        );
                     } else {
                         throw new Error("Gagal menghapus di database");
                     }
                 } catch (error) {
                     console.error(error);
-                    Swal.fire({icon: 'error', title: 'Gagal', text: lang === 'id' ? 'Gagal terhubung ke server.' : 'Server connection failed.', background: '#1e1e1e', color: '#fff'});
+                    Swal.close();
+                    showSideAlert(
+                        lang === 'id' ? 'Gagal' : 'Failed',
+                        lang === 'id' ? 'Gagal terhubung ke server.' : 'Server connection failed.',
+                        'error'
+                    );
                 }
             }
         }
@@ -1101,13 +1271,13 @@
             const t = translations[lang];
             
             if (user.hasPin && (!oldPin || oldPin.length !== 6 || isNaN(oldPin))) {
-                return Swal.fire({icon: 'warning', title: 'Oops', text: t.err_old_pin});
+                return showSideAlert('Oops', t.err_old_pin, 'warning');
             }
             if(newPin.length !== 6 || isNaN(newPin)) {
-                return Swal.fire({icon: 'error', title: 'Oops', text: t.err_pin_len});
+                return showSideAlert('Oops', t.err_pin_len, 'warning');
             }
             if (newPin !== confirmPin) {
-                return Swal.fire({icon: 'error', title: 'Error', text: t.err_pin_match});
+                return showSideAlert('PIN Tidak Cocok', t.err_pin_match, 'error');
             }
             
             const payload = { userId: user.id, newPin: newPin };
@@ -1124,11 +1294,18 @@
                     user.hasPin = true; 
                     localStorage.setItem('userData', JSON.stringify(user));
                     pinModal.hide();
-                    Swal.fire({icon:'success', title: lang === 'id' ? 'Sukses' : 'Success', text: lang === 'id' ? 'PIN berhasil disimpan!' : 'PIN saved successfully!'});
+                    showSideAlert(
+                        lang === 'id' ? 'PIN Disimpan' : 'PIN Saved',
+                        lang === 'id' ? 'PIN keamanan berhasil disimpan!' : 'PIN saved successfully!',
+                        'success'
+                    );
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message});
+                    showSideAlert('Gagal', data.message || 'Gagal menyimpan PIN.', 'error');
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error(e); 
+                showSideAlert('Error', 'Gagal terhubung ke server.', 'error');
+            }
         }
 
         const topupModal = new bootstrap.Modal(document.getElementById('topupModal'));
@@ -1141,7 +1318,7 @@
             const lang = localStorage.getItem('lang') || 'id';
             
             if (!amount || amount < 10000) {
-                return Swal.fire({icon: 'error', title: 'Oops...', text: 'Minimal top up Rp 10.000'});
+                return showSideAlert('Nominal Kurang', 'Minimal top up saldo adalah Rp 10.000', 'warning');
             }
 
             btnPay.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...`;
@@ -1159,23 +1336,25 @@
                     topupModal.hide();
                     window.snap.pay(data.token, {
                         onSuccess: function(result) {
-                            Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Top Up sukses! Saldo sedang diproses.'}).then(() => fetchLatestProfile()); 
+                            showSideAlert('Top Up Berhasil!', 'Saldo sedang ditambahkan ke akunmu.', 'success', 3500);
+                            fetchLatestProfile();
                         },
                         onPending: function(result) {
-                            Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di instruksi Midtrans.'});
+                            showSideAlert('Menunggu Pembayaran', 'Selesaikan pembayaran sesuai instruksi Midtrans.', 'info');
                         },
                         onError: function(result) {
-                            Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.'});
+                            showSideAlert('Pembayaran Gagal', 'Terjadi kesalahan saat memproses top up.', 'error');
                         },
                         onClose: function() {
-                            Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup popup pembayaran.'}).then(() => fetchLatestProfile()); 
+                            showSideAlert('Top Up Dibatalkan', 'Kamu menutup jendela pembayaran.', 'warning');
+                            fetchLatestProfile();
                         }
                     });
                 } else {
                     throw new Error(data.message || 'Gagal mendapatkan token transaksi');
                 }
             } catch (err) {
-                Swal.fire({icon: 'error', title: 'Error', text: err.message});
+                showSideAlert('Error', err.message, 'error');
             } finally {
                 btnPay.innerHTML = translations[lang].btn_pay_topup;
                 btnPay.disabled = false;
@@ -1189,7 +1368,9 @@
             const oldPass = document.getElementById('oldPass').value;
             const newPass = document.getElementById('newPass').value;
 
-            if (!oldPass || !newPass) return Swal.fire({icon: 'warning', title: 'Oops', text: 'Semua kolom wajib diisi!'});
+            if (!oldPass || !newPass) {
+                return showSideAlert('Data Belum Lengkap', 'Semua kolom kata sandi wajib diisi!', 'warning');
+            }
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
             try {
@@ -1198,15 +1379,19 @@
                     body: JSON.stringify({ userId: user.id, oldPassword: oldPass, newPassword: newPass })
                 });
                 const data = await res.json();
+                Swal.close();
+
                 if (res.ok && data.success) {
                     passModal.hide(); 
-                    Swal.fire({icon: 'success', title: 'Sukses', text: 'Password berhasil diubah! Silakan login ulang.'}).then(() => logout()); 
+                    showSideAlert('Kata Sandi Diubah', 'Silakan login ulang menggunakan kata sandi baru.', 'success', 2200);
+                    setTimeout(() => logout(), 2000);
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah password.'});
+                    showSideAlert('Gagal', data.message || 'Gagal mengubah password.', 'error');
                 }
             } catch (e) {
                 console.error(e);
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.'});
+                Swal.close();
+                showSideAlert('Error', 'Gagal terhubung ke server.', 'error');
             }
         }
 
@@ -1464,10 +1649,12 @@
 
         async function prosesTransfer() {
             const ticketCode = document.getElementById('transferTicketCode').value;
-            const receiverEmail = document.getElementById('receiverEmail').value;
+            const receiverEmail = document.getElementById('receiverEmail').value.trim();
             const lang = localStorage.getItem('lang') || 'id';
 
-            if (!receiverEmail) return Swal.fire({icon: 'warning', title: 'Oops', text: 'Email penerima wajib diisi!'});
+            if (!receiverEmail) {
+                return showSideAlert('Email Kosong', 'Email penerima wajib diisi!', 'warning');
+            }
 
             transferModalInstance.hide();
 
@@ -1501,13 +1688,22 @@
                     body: JSON.stringify({ ticket_code: ticketCode, receiver_email: receiverEmail, userId: user.id, pin: pin })
                 });
                 const data = await res.json();
+                Swal.close();
+
                 if (res.ok) {
-                    Swal.fire({ icon: 'success', title: 'Sukses!', text: lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}` }).then(() => { loadTickets(); });
+                    showSideAlert(
+                        lang === 'id' ? 'Transfer Berhasil' : 'Transfer Success',
+                        lang === 'id' ? `Tiket berhasil pindah ke ${data.receiver}` : `Ticket transferred to ${data.receiver}`,
+                        'success',
+                        4000
+                    );
+                    loadTickets();
                 } else {
-                    Swal.fire({icon: 'error', title: 'Gagal', text: data.message});
+                    showSideAlert('Transfer Gagal', data.message || 'Gagal mengirim tiket.', 'error');
                 }
             } catch (error) {
-                Swal.fire({icon: 'error', title: 'Error', text: 'Gangguan server.'});
+                Swal.close();
+                showSideAlert('Error', 'Gangguan koneksi ke server.', 'error');
             }
         }
 
@@ -1570,7 +1766,9 @@
             const ticketId = document.getElementById('upgTicketId').value;
             const newTierName = document.getElementById('upgTierSelect').value;
             
-            if(!newTierName) return Swal.fire({icon: 'warning', title: 'Tunggu', text: 'Pilih tiket tujuan dulu!'});
+            if(!newTierName) {
+                return showSideAlert('Pilih Tiket', 'Pilih tiket tujuan upgrade terlebih dahulu!', 'warning');
+            }
 
             const btn = document.getElementById('btnProsesUpgrade');
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
@@ -1588,14 +1786,21 @@
 
                 window.snap.pay(data.token, {
                     onSuccess: function() {
-                        Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Tiket di-upgrade ke ' + newTierName}).then(() => location.reload());
+                        showSideAlert('Upgrade Berhasil!', `Tiket berhasil di-upgrade ke ${newTierName}.`, 'success', 2200);
+                        setTimeout(() => location.reload(), 2000);
                     },
-                    onPending: function() { Swal.fire({icon: 'info', title: 'Pending', text: 'Selesaikan pembayaran di Midtrans.'}); },
-                    onError: function() { Swal.fire({icon: 'error', title: 'Gagal', text: 'Pembayaran gagal.'}); },
-                    onClose: function () { Swal.fire({icon: 'warning', title: 'Batal', text: 'Menutup jendela pembayaran.'}); }
+                    onPending: function() { 
+                        showSideAlert('Menunggu Pembayaran', 'Selesaikan pembayaran upgrade di Midtrans.', 'info'); 
+                    },
+                    onError: function() { 
+                        showSideAlert('Upgrade Gagal', 'Pembayaran upgrade gagal diproses.', 'error'); 
+                    },
+                    onClose: function () { 
+                        showSideAlert('Dibatalkan', 'Kamu menutup jendela pembayaran upgrade.', 'warning'); 
+                    }
                 });
             } catch (error) {
-                Swal.fire({icon: 'error', title: 'Gagal', text: error.message});
+                showSideAlert('Upgrade Gagal', error.message, 'error');
             } finally {
                 btn.innerHTML = 'Bayar'; btn.disabled = false;
             }
@@ -1708,13 +1913,14 @@
                 };
                 
                 await html2pdf().set(opt).from(element.querySelector('#pdf-print-area')).save();
+                Swal.close();
             } catch (error) {
                 console.error("Error Cetak PDF:", error);
-                Swal.fire({icon: 'error', title: 'Oops', text: 'Gagal membuat file PDF'});
+                Swal.close();
+                showSideAlert('Gagal Cetak', 'Gagal membuat file PDF.', 'error');
             } finally {
                 document.body.removeChild(element);
                 window.scrollTo(0, currentScroll);
-                Swal.close();
             }
         }
 
@@ -1722,8 +1928,7 @@
             navigator.clipboard.writeText(text); 
             const lang = localStorage.getItem('lang') || 'id'; 
             const t = translations[lang]; 
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }); 
-            Toast.fire({ icon: 'success', title: t.toast_copy }); 
+            showSideAlert(t.toast_copy, text, 'success', 2000);
         }
         
         function logout() { 
@@ -1737,14 +1942,27 @@
         }
 
         async function saveName() { 
-            const newName = document.getElementById('inputNewName').value;
+            const newName = document.getElementById('inputNewName').value.trim();
+            if (!newName) {
+                return showSideAlert('Nama Kosong', 'Nama lengkap tidak boleh kosong!', 'warning');
+            }
             try {
-                await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
-                user.fullName = newName; localStorage.setItem('userData',JSON.stringify(user)); renderProfile(); nameModal.hide(); Swal.fire({icon:'success', title:'Sukses'}); 
-            } catch(e) {}
+                const res = await fetch('/api/user/update-name', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({userId: user.id, newName}) });
+                if (res.ok) {
+                    user.fullName = newName; 
+                    localStorage.setItem('userData', JSON.stringify(user)); 
+                    renderProfile(); 
+                    nameModal.hide(); 
+                    showSideAlert('Nama Diperbarui', `Nama profil diubah menjadi ${newName}.`, 'success');
+                } else {
+                    showSideAlert('Gagal', 'Gagal memperbarui nama.', 'error');
+                }
+            } catch(e) {
+                showSideAlert('Error', 'Gagal terhubung ke server.', 'error');
+            }
         }
 
-// ==========================================
+        // ==========================================
         // 🔥 DETEKSI SCROLL & AUTO-PINDAH TAB AKTIF (SCROLL SPY)
         // ==========================================
         let lastScrollTop = 0;
@@ -1756,30 +1974,24 @@
         function updateBottomNavActive() {
             if (!navTicket || !navProfile || !ticketSection) return;
 
-            // Ambil jarak bagian tiket dari puncak layar HP
             const rect = ticketSection.getBoundingClientRect();
 
-            // Jika area tiket sudah naik melewati 45% tinggi layar (user scroll ke arah tiket)
             if (rect.top <= window.innerHeight * 0.45) {
                 navTicket.classList.add('active');
                 navProfile.classList.remove('active');
             } else {
-                // Jika user berada di atas / area kartu nama & profil
                 navProfile.classList.add('active');
                 navTicket.classList.remove('active');
             }
         }
 
-        // Jalankan saat halaman pertama kali dibuka
         document.addEventListener('DOMContentLoaded', updateBottomNavActive);
 
         window.addEventListener('scroll', () => {
             if (!mobileNav) return;
 
-            // 1. Update posisi ikon aktif (Profil vs Tiket)
             updateBottomNavActive();
 
-            // 2. Efek mengecil (shrink) saat scroll ke bawah
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
             if (currentScroll < 0) return;
 
