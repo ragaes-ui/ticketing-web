@@ -719,7 +719,41 @@ app.post('/api/upload-image', async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 });
+// ==========================================
+// 🗑️ API HAPUS GAMBAR / LOGO DARI SUPABASE
+// ==========================================
+app.post('/api/delete-image', async (req, res) => {
+    try {
+        const { imageUrl, eventId } = req.body;
 
+        if (!imageUrl) {
+            return res.status(400).json({ success: false, message: 'URL gambar kosong.' });
+        }
+
+        // 1. Hapus file fisik dari Supabase Storage jika URL berasal dari Supabase
+        if (imageUrl.includes('supabase.co')) {
+            const fileName = imageUrl.split('?')[0].split('/').pop();
+            const { error } = await supabase.storage
+                .from('rcell-images')
+                .remove([fileName]);
+
+            if (error) {
+                console.error('Gagal menghapus file di Supabase:', error);
+                return res.status(500).json({ success: false, message: 'Gagal hapus file di Supabase: ' + error.message });
+            }
+        }
+
+        // 2. Jika sedang dalam mode Edit Event (ada eventId), kosongkan juga field organizerLogo di MongoDB
+        if (eventId && mongoose.Types.ObjectId.isValid(eventId)) {
+            await Event.findByIdAndUpdate(eventId, { $set: { organizerLogo: "" } });
+        }
+
+        res.json({ success: true, message: 'Logo berhasil dihapus dari Supabase!' });
+    } catch (err) {
+        console.error('Error delete-image:', err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 app.put('/api/events/:id', async (req, res) => {
     try {
