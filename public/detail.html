@@ -283,6 +283,131 @@
             z-index: 9999; width: max-content; max-width: 90%;
         }
         #toast-notif.show { top: 24px; }
+        /* === TOAST SLIDE DARI SAMPING & PROGRESS BAR BERJALAN === */
+#rc-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: calc(100vw - 32px);
+}
+
+.rc-side-toast {
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+    width: 340px;
+    max-width: 100%;
+    background: var(--bg-card, #ffffff);
+    color: var(--text-main, #1e1b18);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    padding: 14px 16px 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateX(calc(100% + 32px));
+    opacity: 0;
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.rc-side-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.rc-toast-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+/* Variasi Warna Ikon & Garis Berjalan */
+.rc-toast-info .rc-toast-icon { background: rgba(59, 130, 246, 0.14); color: #2563eb; }
+.rc-toast-info .rc-toast-bar  { background: #2563eb; }
+
+.rc-toast-cancel .rc-toast-icon { background: rgba(239, 68, 68, 0.14); color: #dc2626; }
+.rc-toast-cancel .rc-toast-bar  { background: #dc2626; }
+
+.rc-toast-warning .rc-toast-icon { background: rgba(245, 158, 11, 0.16); color: #d97706; }
+.rc-toast-warning .rc-toast-bar  { background: #d97706; }
+
+.rc-toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rc-toast-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 2px;
+}
+
+.rc-toast-msg {
+    font-size: 0.82rem;
+    color: var(--text-muted, #64748b);
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.rc-toast-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #64748b);
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: color 0.15s ease;
+}
+
+.rc-toast-close:hover {
+    color: var(--text-main, #0f172a);
+}
+
+/* Garis Indikator Berjalan di Bawah */
+.rc-toast-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3.5px;
+    width: 100%;
+    transform-origin: left center;
+    animation: rcToastProgress linear forwards;
+}
+
+.rc-side-toast:hover .rc-toast-bar {
+    animation-play-state: paused;
+}
+
+@keyframes rcToastProgress {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+@media (max-width: 480px) {
+    #rc-toast-container {
+        top: 14px;
+        right: 12px;
+        left: 12px;
+    }
+    .rc-side-toast {
+        width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -779,7 +904,8 @@
             });
         }
 
-        function removeTier(index) {
+function removeTier(index) {
+            const tierName = currentEvent.tickets[index]?.tierName || 'Tiket';
             cartQty[index] = 0;
             document.getElementById(`qtyInput${index}`).value = 0;
             document.getElementById(`lblTier${index}`).classList.remove('selected');
@@ -788,7 +914,7 @@
             if (trashBtn) trashBtn.style.display = 'none';
 
             calculateTotal();
-            showToast("Pilihan tiket dibatalkan!", "info");
+            showSideAlert('Tiket Dibatalkan', `Pilihan "${tierName}" telah dibatalkan.`, 'cancel');
         }
 
         function updateQty(index, change) {
@@ -821,6 +947,9 @@
             } else {
                 lbl.classList.remove('selected');
                 if (trashBtn) trashBtn.style.display = 'none';
+                if (currentVal > 0) {
+                    showSideAlert('Tiket Dibatalkan', `Pilihan "${tier.tierName}" telah dibatalkan.`, 'cancel');
+                }
             }
 
             calculateTotal();
@@ -1007,6 +1136,46 @@
             }
             toast.classList.add('show'); 
             setTimeout(() => { toast.classList.remove('show'); }, 2000); 
+        }
+        function showSideAlert(title, message, type = 'cancel', duration = 3500) {
+            let container = document.getElementById('rc-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'rc-toast-container';
+                document.body.appendChild(container);
+            }
+
+            const icons = {
+                info: '<i class="bi bi-info-lg"></i>',
+                cancel: '<i class="bi bi-x-lg"></i>',
+                warning: '<i class="bi bi-exclamation-lg"></i>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `rc-side-toast rc-toast-${type}`;
+            toast.innerHTML = `
+                <div class="rc-toast-icon">${icons[type] || icons.info}</div>
+                <div class="rc-toast-body">
+                    <div class="rc-toast-title">${title}</div>
+                    <div class="rc-toast-msg">${message}</div>
+                </div>
+                <button type="button" class="rc-toast-close" aria-label="Tutup">&times;</button>
+                <div class="rc-toast-bar" style="animation-duration: ${duration}ms;"></div>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => toast.classList.add('show'));
+            });
+
+            const closeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 380);
+            };
+
+            toast.querySelector('.rc-toast-close').addEventListener('click', closeToast);
+            toast.querySelector('.rc-toast-bar').addEventListener('animationend', closeToast);
         }
     </script>
 </body>
