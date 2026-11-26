@@ -67,9 +67,33 @@
 
         .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 20px; }
         
-        .form-control, .form-select { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
+        .form-control, .form-select { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
         .form-control:read-only { background-color: var(--bg-section); opacity: 0.7; color: var(--text-muted); }
+
+        /* LIVE VALIDATION STATES */
+        .form-control.is-valid {
+            border-color: #10b981 !important;
+            background-image: none !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+        .form-control.is-invalid {
+            border-color: #ef4444 !important;
+            background-image: none !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+        .live-feedback {
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 18px;
+            margin-top: 5px;
+            transition: color 0.15s ease;
+        }
+        .live-feedback.text-valid { color: #10b981 !important; }
+        .live-feedback.text-invalid { color: #ef4444 !important; }
 
         .payment-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
         .payment-card:hover { border-color: var(--primary); background: var(--primary-light); }
@@ -135,21 +159,23 @@
                 <div class="glass-panel">
                     <h5 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Detail Pemesan</h5>
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">Nama Lengkap (Sesuai KTP)</label>
                             <input type="text" id="chkName" class="form-control" placeholder="Masukkan nama lengkap">
                         </div>
                         <div class="col-md-6">
-        <label class="small fw-bold text-muted mb-1">NIK (16 Digit KTP)</label>
-        <input type="text" id="chkNik" class="form-control" inputmode="numeric" maxlength="16" placeholder="Masukkan 16 digit NIK" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-    </div>
+                            <label class="small fw-bold text-muted mb-1">NIK (16 Digit KTP)</label>
+                            <input type="text" id="chkNik" class="form-control" inputmode="numeric" maxlength="16" placeholder="Masukkan 16 digit NIK" oninput="validateNik()" onblur="validateNik(true)">
+                            <div id="nikFeedback" class="live-feedback text-muted">16 digit angka sesuai KTP</div>
+                        </div>
                         <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">Email</label>
                             <input type="email" id="chkEmail" class="form-control" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">No. WhatsApp</label>
-                            <input type="tel" id="chkPhone" class="form-control" placeholder="0812xxxx">
+                            <input type="tel" id="chkPhone" class="form-control" inputmode="tel" maxlength="15" placeholder="0812xxxx" oninput="validatePhone()" onblur="validatePhone(true)">
+                            <div id="phoneFeedback" class="live-feedback text-muted">Contoh: 081234567890</div>
                         </div>
                         <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">Tanggal Lahir</label>
@@ -265,6 +291,103 @@
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
 
+        function setFieldState(input, fbEl, state, message) {
+            input.classList.remove('is-valid', 'is-invalid');
+            fbEl.className = 'live-feedback';
+
+            if (state === 'valid') {
+                input.classList.add('is-valid');
+                fbEl.classList.add('text-valid');
+                fbEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>${message}</span>`;
+            } else if (state === 'invalid') {
+                input.classList.add('is-invalid');
+                fbEl.classList.add('text-invalid');
+                fbEl.innerHTML = `<i class="bi bi-x-circle-fill"></i> <span>${message}</span>`;
+            } else {
+                fbEl.classList.add('text-muted');
+                fbEl.innerHTML = `<span>${message}</span>`;
+            }
+        }
+
+        function validateNik(forceShowEmpty = false) {
+            const input = document.getElementById('chkNik');
+            const fb = document.getElementById('nikFeedback');
+            
+            // Bersihkan otomatis karakter non-angka dan batasi 16 digit
+            input.value = input.value.replace(/\D/g, '').slice(0, 16);
+            const val = input.value;
+
+            if (!val) {
+                if (forceShowEmpty) {
+                    setFieldState(input, fb, 'invalid', 'NIK wajib diisi (16 digit angka).');
+                } else {
+                    setFieldState(input, fb, 'neutral', '16 digit angka sesuai KTP');
+                }
+                return false;
+            }
+
+            if (val.startsWith('00')) {
+                setFieldState(input, fb, 'invalid', 'Format NIK salah: kode wilayah tidak boleh 00.');
+                return false;
+            }
+
+            if (val.length < 16) {
+                setFieldState(input, fb, 'invalid', `Format NIK belum lengkap (${val.length}/16 digit).`);
+                return false;
+            }
+
+            setFieldState(input, fb, 'valid', 'Format NIK benar (16 digit).');
+            return true;
+        }
+
+        function validatePhone(forceShowEmpty = false) {
+            const input = document.getElementById('chkPhone');
+            const fb = document.getElementById('phoneFeedback');
+
+            // Hanya izinkan angka dan tanda '+' di awal
+            let val = input.value.replace(/(?!^\+)\D/g, '');
+            input.value = val;
+
+            if (!val) {
+                if (forceShowEmpty) {
+                    setFieldState(input, fb, 'invalid', 'No. WhatsApp wajib diisi.');
+                } else {
+                    setFieldState(input, fb, 'neutral', 'Contoh: 081234567890');
+                }
+                return false;
+            }
+
+            // Harus diawali 08, 628, atau +628
+            if (!/^(08|628|\+628)/.test(val)) {
+                setFieldState(input, fb, 'invalid', 'Format salah: nomor harus diawali 08 atau 628.');
+                return false;
+            }
+
+            const digitsOnly = val.replace(/\D/g, '');
+            const minLen = digitsOnly.startsWith('62') ? 11 : 10;
+            const maxLen = digitsOnly.startsWith('62') ? 15 : 14;
+
+            // Pastikan digit operator setelah 08 / 628 bukan 0
+            const operatorDigit = digitsOnly.startsWith('62') ? digitsOnly[3] : digitsOnly[2];
+            if (operatorDigit === '0') {
+                setFieldState(input, fb, 'invalid', 'Format salah: kode operator tidak valid.');
+                return false;
+            }
+
+            if (digitsOnly.length < minLen) {
+                setFieldState(input, fb, 'invalid', `Nomor belum lengkap (${digitsOnly.length}/${minLen} digit).`);
+                return false;
+            }
+
+            if (digitsOnly.length > maxLen) {
+                setFieldState(input, fb, 'invalid', `Nomor terlalu panjang (maksimal ${maxLen} digit).`);
+                return false;
+            }
+
+            setFieldState(input, fb, 'valid', 'Format nomor WhatsApp benar.');
+            return true;
+        }
+
         function showToast(pesan, tipe = 'warning') {
             const oldToast = document.querySelector('.floating-toast');
             if (oldToast) oldToast.remove();
@@ -314,8 +437,14 @@
             document.getElementById('chkName').value = userData.fullName || userData.username || '';
             document.getElementById('chkEmail').value = userData.email || '';
             document.getElementById('chkPhone').value = userData.phone || '';
+            if (userData.nik) document.getElementById('chkNik').value = userData.nik;
             if (userData.birthDate) document.getElementById('chkBirthDate').value = userData.birthDate;
             if (userData.gender) document.getElementById('chkGender').value = userData.gender;
+
+            // Jalankan pengecekan awal jika data sudah terisi dari profil akun
+            if (document.getElementById('chkNik').value) validateNik();
+            if (document.getElementById('chkPhone').value) validatePhone();
+
             document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
             document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
             
@@ -467,12 +596,20 @@
             const gender = document.getElementById('chkGender').value;
             const recaptchaToken = turnstile.getResponse();
 
-            if (!name || !phone || !birthDate || !gender) {
-                return Swal.fire('Data Belum Lengkap', 'Nama, NIK, No. WhatsApp, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
+            const isNikValid = validateNik(true);
+            const isPhoneValid = validatePhone(true);
+
+            if (!name || !birthDate || !gender) {
+                return Swal.fire('Data Belum Lengkap', 'Nama Lengkap, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
             }
-            if (nik.length !== 16) {
-        return Swal.fire('NIK Tidak Valid', 'NIK harus berjumlah 16 digit angka sesuai KTP!', 'warning');
-    }
+            if (!isNikValid) {
+                document.getElementById('chkNik').focus();
+                return Swal.fire('Format NIK Salah', 'Pastikan NIK berisi 16 digit angka sesuai KTP.', 'warning');
+            }
+            if (!isPhoneValid) {
+                document.getElementById('chkPhone').focus();
+                return Swal.fire('Format Nomor Salah', 'Masukkan nomor WhatsApp yang valid (diawali 08 atau 628).', 'warning');
+            }
             if (!recaptchaToken) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
             if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
 
@@ -514,11 +651,11 @@
                             eventId: checkoutData.eventId, 
                             tickets: checkoutData.tickets, 
                             pin: pin, 
-                            promoCode: kodePromoAktif,  // 👈 WAJIB DIKIRIM
-                            diskon: diskonPromo,        // 👈 WAJIB DIKIRIM
+                            promoCode: kodePromoAktif,
+                            diskon: diskonPromo,
                             buyerData: buyerPayload,
                             recaptchaToken: recaptchaToken, 
-                            pajak: window.pajakAktif || 0 ,
+                            pajak: window.pajakAktif || 0,
                             accessCode: checkoutData.accessCode || checkoutData.tierAccessCode
                         })
                     });
@@ -549,8 +686,8 @@
                         body: JSON.stringify({ 
                             eventId: checkoutData.eventId, 
                             tickets: checkoutData.tickets, 
-                            promoCode: kodePromoAktif,   // 👈 WAJIB DIKIRIM
-                            diskon: diskonPromo,         // 👈 WAJIB DIKIRIM
+                            promoCode: kodePromoAktif,
+                            diskon: diskonPromo,
                             pajak: window.pajakAktif || 0,
                             customerName: name, 
                             customerEmail: userData.email, 
@@ -581,8 +718,8 @@
                                         tickets: checkoutData.tickets, 
                                         orderId: data.orderId, 
                                         buyerData: buyerPayload,
-                                        promoCode: kodePromoAktif, // 👈 WAJIB DIKIRIM
-                                        diskon: diskonPromo,       // 👈 WAJIB DIKIRIM
+                                        promoCode: kodePromoAktif,
+                                        diskon: diskonPromo,
                                         subTotal: subTotalTagihanAwal,
                                         pajak: window.pajakAktif || 0,
                                         accessCode: checkoutData.accessCode || checkoutData.tierAccessCode
