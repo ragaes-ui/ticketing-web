@@ -205,6 +205,23 @@
             }
         }
 
+        function formatBirthDateIndo(rawDate) {
+            if (!rawDate) return '-';
+            try {
+                const parts = String(rawDate).split('-');
+                if (parts.length === 3) {
+                    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+                const parsed = new Date(rawDate);
+                return !isNaN(parsed)
+                    ? parsed.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : rawDate;
+            } catch (e) {
+                return rawDate;
+            }
+        }
+
         function renderTicketUI(ticket, user) {
             const event = ticket.eventId;
             if (!event) return;
@@ -213,16 +230,18 @@
             const isStreaming = category === 'Streaming' || category.toLowerCase().includes('stream');
             const eventImg = event.image || event.poster || event.banner || event.logo || 'https://i.ibb.co/W4LQdgGQ/IMG-1283.png';
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${ticket.ticketCode}&bgcolor=ffffff`;
-            console.log("Data dari database:", ticket); // 👈 Tambahkan ini untuk mengintip data
             const trxId = ticket.orderIdMidtrans || ticket.transactionId || ticket.orderId || ticket.ticketCode.substring(0,8).toUpperCase();
             
             const pemesanName = ticket.customerName || user.fullName || user.username;
+            const pemesanNik = ticket.nik || '-';
+            const pemesanBirthDate = formatBirthDateIndo(ticket.birthDate);
+            const pemesanGender = ticket.gender || '-';
             const pemesanPhone = ticket.phone || '-';
             const metodeBayar = ticket.paymentMethod ? ticket.paymentMethod.toUpperCase() : 'MIDTRANS';
             const tierName = ticket.tierName || 'General';
             const qty = ticket.quantity || 1;
             
-let dateStr = "TBA";
+            let dateStr = "TBA";
             if (event.date) {
                 try {
                     const localeConfig = 'id-ID';
@@ -281,9 +300,9 @@ let dateStr = "TBA";
                 `;
             }
 
-            // Simpan data lengkap untuk fitur PDF (Sama seperti dashboard.html)
+            // Simpan data lengkap untuk fitur PDF
             currentTicketData = {
-                eventImg: eventImg, // 👈 TAMBAHKAN BARIS INI
+                eventImg: eventImg,
                 eventName: event.name, 
                 date: dateStr, 
                 location: locationText,
@@ -291,7 +310,10 @@ let dateStr = "TBA";
                 isStreaming: isStreaming, 
                 desc: event.description || "",
                 secretData: event.secretData || "Akun belum tersedia / Hubungi Admin.", 
-                buyerName: pemesanName, 
+                buyerName: pemesanName,
+                buyerNik: pemesanNik,
+                buyerBirthDate: pemesanBirthDate,
+                buyerGender: pemesanGender,
                 buyerPhone: pemesanPhone, 
                 paymentMethod: metodeBayar, 
                 tierName: tierName, 
@@ -331,16 +353,32 @@ let dateStr = "TBA";
                             <div class="info-value text-truncate" title="${pemesanName}">${pemesanName}</div>
                         </div>
                         <div>
+                            <div class="info-label">NIK</div>
+                            <div class="info-value" style="font-family: monospace;">${pemesanNik}</div>
+                        </div>
+                        <div>
+                            <div class="info-label">Tanggal Lahir</div>
+                            <div class="info-value">${pemesanBirthDate}</div>
+                        </div>
+                        <div>
+                            <div class="info-label">Jenis Kelamin</div>
+                            <div class="info-value">${pemesanGender}</div>
+                        </div>
+                        <div>
                             <div class="info-label">Order ID</div>
                             <div class="info-value">${trxId}</div>
                         </div>
                         <div>
-                            <div class="info-label">Tanggal</div>
+                            <div class="info-label">Tanggal Event</div>
                             <div class="info-value text-success">${dateStr}</div>
                         </div>
                         <div>
                             <div class="info-label">Jumlah</div>
                             <div class="info-value text-danger">${qty} Tiket</div>
+                        </div>
+                        <div>
+                            <div class="info-label">No. WhatsApp</div>
+                            <div class="info-value">${pemesanPhone}</div>
                         </div>
                         ${gridLokasiHTML}
                     </div>
@@ -352,7 +390,7 @@ let dateStr = "TBA";
             document.getElementById('ticketWrapper').style.display = 'block';
         }
 
-        // 👇 Logika Pembuatan PDF yang 100% sama dengan Dashboard.html 👇
+        // 👇 Logika Pembuatan PDF (Muat 1 Halaman A5) 👇
         async function downloadPDF() {
             if (!currentTicketData) return;
             const data = currentTicketData;
@@ -363,75 +401,90 @@ let dateStr = "TBA";
             document.body.appendChild(element);
             element.style.cssText = 'width: 500px; position: absolute; top: 0; left: -9999px; background: #ffffff; color: #000000; font-family: sans-serif;';
 
-let contentMiddle = '';
+            let contentMiddle = '';
             let labelType = data.isStreaming ? "AKUN PREMIUM" : "TIKET MASUK";
             
             if (data.isStreaming) {
                 contentMiddle = `
-                    <div style="border: 2px solid #000; padding: 12px; margin: 15px 0; text-align: left; background-color: #f8f9fa; border-radius: 8px;">
-                        <p style="margin:0; font-size: 11px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
-                        <p style="margin:8px 0 0 0; font-size: 13px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
+                    <div style="border: 2px solid #000; padding: 10px; margin: 10px 0; text-align: left; background-color: #f8f9fa; border-radius: 8px;">
+                        <p style="margin:0; font-size: 10px; font-weight: bold; color: #555;">ACCOUNT CREDENTIALS:</p>
+                        <p style="margin:6px 0 0 0; font-size: 12px; font-family: monospace; color: #000; line-height: 1.4; white-space: pre-wrap;">${data.secretData}</p>
                     </div>`;
             } else {
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${data.code}&bgcolor=ffffff`;
-                // 👇 QR Code diperkecil ukurannya menjadi 130px 👇
                 contentMiddle = `
-                    <div style="margin: 15px 0;">
-                        <img src="${qrUrl}" style="width: 130px; height: 130px; border: 4px solid #333; padding: 5px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
-                        <p style="font-size: 11px; color: #666; margin-top: 5px; font-weight: 500;">Tunjukkan QR Code ini di pintu masuk.</p>
+                    <div style="margin: 10px 0;">
+                        <img src="${qrUrl}" style="width: 118px; height: 118px; border: 3px solid #333; padding: 4px; border-radius: 10px; display:block; margin: 0 auto;" crossorigin="anonymous">
+                        <p style="font-size: 10px; color: #666; margin-top: 4px; margin-bottom: 0; font-weight: 500;">Tunjukkan QR Code &amp; KTP/Identitas di pintu masuk.</p>
                     </div>`;
             }
 
-            // 👇 Desain HTML PDF yang jauh lebih padat agar muat 1 Halaman A5 👇
             element.innerHTML = `
-                <div id="pdf-print-area-hidden" style="padding: 20px; background-color: #ffffff; border: 1px solid #ddd; page-break-inside: avoid;">
+                <div id="pdf-print-area-hidden" style="padding: 18px; background-color: #ffffff; border: 1px solid #ddd; page-break-inside: avoid;">
                     
-                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <h2 style="margin:0; color: #0049CC; font-weight: 900; font-size: 20px; letter-spacing: 1px;">RCELLFEST</h2>
+                    <div style="border-bottom: 2px solid #0049CC; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin:0; color: #0049CC; font-weight: 900; font-size: 19px; letter-spacing: 1px;">RCELLFEST</h2>
                         <span style="background: #0049CC; color: white; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; letter-spacing: 1px;">${labelType}</span>
                     </div>
                     
-                    <!-- Banner Event (Tinggi diperpendek menjadi 100px) -->
-                    <div style="margin-bottom: 15px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
+                    <!-- Banner Event -->
+                    <div style="margin-bottom: 12px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #f8f9fa;">
                         <img src="${data.eventImg}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
                     </div>
 
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h1 style="margin: 0; font-size: 18px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
-                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <h1 style="margin: 0; font-size: 17px; line-height: 1.2; font-weight: bold; color: #000;">${data.eventName}</h1>
+                        <span style="display:inline-block; background: #ff9800; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase;">
                             ${data.tierName} 
                         </span>
-                        <p style="margin: 8px 0 0 0; color: #555; font-size: 12px; font-weight: 500;">${data.date} | ${data.location}</p>
+                        <p style="margin: 6px 0 0 0; color: #555; font-size: 11px; font-weight: 500;">${data.date} | ${data.location}</p>
                     </div>
 
-                    <!-- Kotak Informasi Pemesan (Dibuat lebih ramping) -->
-                    <div style="display: flex; justify-content: space-between; background: #f0f7ff; border: 1px solid #cce5ff; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left;">
-                        <div style="width: 32%;">
-                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
-                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.buyerName}</p>
+                    <!-- Kotak Informasi Pemegang Tiket (2 Baris Rapi) -->
+                    <div style="background: #f0f7ff; border: 1px solid #cce5ff; padding: 10px 12px; border-radius: 8px; margin-bottom: 10px; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; gap: 6px;">
+                            <div style="width: 31%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">NAMA PEMESAN</p>
+                                <p style="margin:2px 0 0 0; font-size: 11px; color:#000; font-weight:bold; word-break: break-word;">${data.buyerName}</p>
+                            </div>
+                            <div style="width: 31%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">NIK</p>
+                                <p style="margin:2px 0 0 0; font-size: 11px; color:#000; font-weight:bold; font-family: monospace;">${data.buyerNik}</p>
+                            </div>
+                            <div style="width: 22%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">TGL LAHIR</p>
+                                <p style="margin:2px 0 0 0; font-size: 10.5px; color:#000; font-weight:bold;">${data.buyerBirthDate}</p>
+                            </div>
+                            <div style="width: 16%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">GENDER</p>
+                                <p style="margin:2px 0 0 0; font-size: 10.5px; color:#000; font-weight:bold;">${data.buyerGender}</p>
+                            </div>
                         </div>
-                        <div style="width: 18%;">
-                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">JUMLAH</p>
-                            <p style="margin:2px 0 0 0; font-size: 12px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
-                        </div>
-                        <div style="width: 25%;">
-                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">WHATSAPP</p>
-                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
-                        </div>
-                        <div style="width: 25%;">
-                            <p style="margin:0; font-size: 9px; color:#555; font-weight:bold;">METODE BAYAR</p>
-                            <p style="margin:2px 0 0 0; font-size: 12px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
+
+                        <div style="display: flex; justify-content: space-between; gap: 6px; border-top: 1px dashed #b8daff; padding-top: 7px; margin-top: 7px;">
+                            <div style="width: 38%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">NO. WHATSAPP</p>
+                                <p style="margin:2px 0 0 0; font-size: 11px; color:#000; font-weight:bold;">${data.buyerPhone}</p>
+                            </div>
+                            <div style="width: 30%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">JUMLAH</p>
+                                <p style="margin:2px 0 0 0; font-size: 11px; color:#ff0000; font-weight:bold;">${data.quantity || 1} TIKET</p>
+                            </div>
+                            <div style="width: 32%;">
+                                <p style="margin:0; font-size: 8.5px; color:#555; font-weight:bold;">METODE BAYAR</p>
+                                <p style="margin:2px 0 0 0; font-size: 11px; color:#000; font-weight:bold;">${data.paymentMethod}</p>
+                            </div>
                         </div>
                     </div>
 
                     <div style="text-align: center;">${contentMiddle}</div>
                     
-                    <div style="background: #f8f9fa; padding: 12px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
-                        <p style="margin:0; font-size: 9px; color: #999; font-weight:bold; letter-spacing: 1px;">KODE TIKET / BOOKING ID</p>
-                        <p style="margin:2px 0 0 0; font-size: 20px; font-weight: bold; letter-spacing: 4px; font-family: monospace; color: #000;">${data.code}</p>
+                    <div style="background: #f8f9fa; padding: 10px; text-align: center; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin:0; font-size: 8.5px; color: #999; font-weight:bold; letter-spacing: 1px;">KODE TIKET / BOOKING ID</p>
+                        <p style="margin:2px 0 0 0; font-size: 18px; font-weight: bold; letter-spacing: 4px; font-family: monospace; color: #000;">${data.code}</p>
                     </div>
                     
-                    <div style="margin-top: 15px; text-align: center; font-size: 9px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <div style="margin-top: 10px; text-align: center; font-size: 8.5px; color: #aaa; border-top: 1px dashed #ccc; padding-top: 8px;">
                         <p style="margin:0;">Printed automatically by RCELLFEST System. | www.rcellfest.my.id</p>
                     </div>
                 </div>
