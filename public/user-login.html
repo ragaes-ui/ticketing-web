@@ -28,7 +28,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <!-- Tambahan Bootstrap JS untuk Dropdown Bahasa -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <link rel="icon" href="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" type="image/png">
@@ -43,25 +42,24 @@
             --text-main: #f8fafc;
             --text-muted: #a1a1aa;
             --border-color: #3f3f46;
+            --shadow-color: rgba(0, 0, 0, 0.45);
         }
 
         /* 👇 OVERRIDE UNTUK MODE TERANG 👇 */
-/* 👇 OVERRIDE UNTUK MODE TERANG 👇 */
         [data-theme="light"] {
-            --bg-dark: #f8fafc; /* Latar luar abu-abu sangat muda */
-            --bg-panel: #ffffff; /* Panel form putih bersih */
+            --bg-dark: #f8fafc;
+            --bg-panel: #ffffff;
             --input-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #e2e8f0; /* Garis tepi sangat tipis dan halus */
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(15, 23, 42, 0.12);
         }
         
-        /* 1. Perhalus Bayangan (Shadow) Panel Kanan agar lebih menyatu */
         [data-theme="light"] .login-form-area {
             box-shadow: -10px 0 40px rgba(0, 0, 0, 0.04);
         }
 
-        /* 2. Banner Kiri Lebih Cerah dan Modern */
         [data-theme="light"] .login-banner {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(226, 232, 240, 0.9) 100%), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1200&auto=format&fit=crop') center/cover;
         }
@@ -72,14 +70,11 @@
         [data-theme="light"] .banner-text p, 
         [data-theme="light"] .text-white-50 { color: #475569 !important; }
 
-        /* 3. Input Form Lebih Mewah (Efek Timbul Tipis) */
         [data-theme="light"] .form-control { 
             color: #0f172a; 
             box-shadow: 0 1px 2px rgba(0,0,0,0.03); 
         }
         [data-theme="light"] .form-control::placeholder { color: #94a3b8; }
-        
-        /* Warna ikon di dalam input agar lebih soft */
         [data-theme="light"] .input-wrapper i { color: #94a3b8; }
 
         /* --- SPLIT LAYOUT --- */
@@ -122,7 +117,6 @@
         .form-header h2 { font-weight: 800; font-size: 2rem; margin-bottom: 8px; color: var(--text-main); }
         .form-header p { color: var(--text-muted); font-size: 0.95rem; }
 
-        /* 👇 Diubah agar warna menyesuaikan tema dan tidak tembus pandang 👇 */
         .form-label { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
         
         .input-wrapper { position: relative; margin-bottom: 20px; }
@@ -203,18 +197,9 @@
             .form-header h2 { font-size: 1.8rem; }
         }
 
-        /* NOTIFIKASI TOAST KECIL DI ATAS */
-        #toast-notif {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: #10B981; color: white; padding: 10px 24px; border-radius: 50px;
-            font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.3s; 
-            z-index: 9999; width: max-content; max-width: 90%;
-        }
-        #toast-notif.show { top: 24px; }
         .text-muted { color: var(--text-muted) !important; }
         .swal2-html-container label { color: var(--text-main) !important; }
+
         /* 🔥 TOMBOL KACA (GLASSMORPHISM) UNTUK NAVBAR 🔥 */
         .nav-glass-btn {
             background: rgba(0, 0, 0, 0.04) !important;
@@ -234,11 +219,138 @@
         [data-theme="dark"] .nav-glass-btn:hover {
             background: rgba(255, 255, 255, 0.15) !important;
         }
+
+        /* === TOAST SLIDE DARI SAMPING & PROGRESS BAR BERJALAN === */
+        #rc-toast-container {
+            position: fixed;
+            top: 68px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+
+        .rc-side-toast {
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            width: 340px;
+            max-width: 100%;
+            background: var(--bg-panel, #18181b);
+            color: var(--text-main, #f8fafc);
+            border: 1px solid var(--border-color, #3f3f46);
+            border-radius: 14px;
+            padding: 14px 16px 16px;
+            box-shadow: 0 12px 30px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(calc(100% + 32px));
+            opacity: 0;
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+        }
+
+        .rc-side-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .rc-toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .rc-toast-info .rc-toast-icon    { background: rgba(59, 130, 246, 0.16); color: #3b82f6; }
+        .rc-toast-info .rc-toast-bar     { background: #3b82f6; }
+
+        .rc-toast-success .rc-toast-icon { background: rgba(16, 185, 129, 0.16); color: #10b981; }
+        .rc-toast-success .rc-toast-bar  { background: #10b981; }
+
+        .rc-toast-error .rc-toast-icon   { background: rgba(239, 68, 68, 0.16); color: #ef4444; }
+        .rc-toast-error .rc-toast-bar    { background: #ef4444; }
+
+        .rc-toast-warning .rc-toast-icon { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+        .rc-toast-warning .rc-toast-bar  { background: #f59e0b; }
+
+        .rc-toast-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rc-toast-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+
+        .rc-toast-msg {
+            font-size: 0.82rem;
+            color: var(--text-muted, #a1a1aa);
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .rc-toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted, #a1a1aa);
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 2px 4px;
+            cursor: pointer;
+            align-self: flex-start;
+            transition: color 0.15s ease;
+        }
+
+        .rc-toast-close:hover {
+            color: var(--text-main, #f8fafc);
+        }
+
+        .rc-toast-bar {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3.5px;
+            width: 100%;
+            transform-origin: left center;
+            animation: rcToastProgress linear forwards;
+        }
+
+        .rc-side-toast:hover .rc-toast-bar {
+            animation-play-state: paused;
+        }
+
+        @keyframes rcToastProgress {
+            from { transform: scaleX(1); }
+            to   { transform: scaleX(0); }
+        }
+
+        @media (max-width: 480px) {
+            #rc-toast-container {
+                top: 62px;
+                right: 12px;
+                left: 12px;
+            }
+            .rc-side-toast {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-<!-- 👇 TOMBOL SWITCH TEMA & BAHASA (VERSI KACA) 👇 -->
+    <!-- 👇 TOMBOL SWITCH TEMA & BAHASA (VERSI KACA) 👇 -->
     <div class="position-fixed top-0 end-0 p-3 d-flex gap-2" style="z-index: 9999;">
         <!-- Tombol Tema -->
         <button class="btn nav-glass-btn rounded-circle d-flex align-items-center justify-content-center shadow-sm" id="theme-btn" onclick="toggleTheme()" style="width: 38px; height: 38px; padding: 0;">
@@ -265,12 +377,6 @@
                 </li>
             </ul>
         </div>
-    </div>
-
-    <!-- WADAH NOTIFIKASI TOAST -->
-    <div id="toast-notif">
-        <span id="toast-icon">✅</span>
-        <span id="toast-message">Sukses!</span>
     </div>
 
     <div class="login-wrapper">
@@ -365,12 +471,56 @@
         </div>
     </div>
 
-    <!-- SEMUA JAVASCRIPT AMAN -->
+    <!-- SEMUA JAVASCRIPT -->
     <script>
         let isLogin = true;
 
         // ==========================================
-// ==========================================
+        // NOTIFIKASI TOAST DARI SAMPING + PROGRESS BAR
+        // ==========================================
+        function showSideAlert(title, message, type = 'info', duration = 3500) {
+            let container = document.getElementById('rc-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'rc-toast-container';
+                document.body.appendChild(container);
+            }
+
+            const icons = {
+                info: '<i class="bi bi-info-lg"></i>',
+                success: '<i class="bi bi-check-lg"></i>',
+                error: '<i class="bi bi-x-lg"></i>',
+                warning: '<i class="bi bi-exclamation-lg"></i>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `rc-side-toast rc-toast-${type}`;
+            toast.innerHTML = `
+                <div class="rc-toast-icon">${icons[type] || icons.info}</div>
+                <div class="rc-toast-body">
+                    <div class="rc-toast-title">${title}</div>
+                    <div class="rc-toast-msg">${message}</div>
+                </div>
+                <button type="button" class="rc-toast-close" aria-label="Tutup">&times;</button>
+                <div class="rc-toast-bar" style="animation-duration: ${duration}ms;"></div>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => toast.classList.add('show'));
+            });
+
+            const closeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 380);
+            };
+
+            toast.querySelector('.rc-toast-close').addEventListener('click', closeToast);
+            toast.querySelector('.rc-toast-bar').addEventListener('animationend', closeToast);
+        }
+
+        // ==========================================
         // FITUR DARK/LIGHT MODE & MULTI-BAHASA
         // ==========================================
         function toggleTheme() {
@@ -389,11 +539,11 @@
             if (theme === 'dark') {
                 icon.classList.remove('bi-moon-stars-fill');
                 icon.classList.add('bi-sun-fill');
-                icon.style.color = "#FFD700"; // Kuning terang saat mode gelap
+                icon.style.color = "#FFD700";
             } else {
                 icon.classList.remove('bi-sun-fill');
                 icon.classList.add('bi-moon-stars-fill');
-                icon.style.color = "#0f172a"; // Hitam elegan saat mode terang
+                icon.style.color = "#0f172a";
             }
         }
 
@@ -444,7 +594,7 @@
             }
         };
 
-let currentLang = localStorage.getItem('lang') || 'id';
+        let currentLang = localStorage.getItem('lang') || 'id';
 
         function applyLanguage() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -454,7 +604,6 @@ let currentLang = localStorage.getItem('lang') || 'id';
                 }
             });
             
-            // Update Bendera & Teks Tombol
             const langText = document.getElementById('langText');
             const langFlag = document.getElementById('langFlag');
             if (langText) langText.innerText = currentLang.toUpperCase();
@@ -480,21 +629,6 @@ let currentLang = localStorage.getItem('lang') || 'id';
         // ==========================================
         // LOGIKA APLIKASI
         // ==========================================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast-notif');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
-            
-            toastMessage.textContent = message; 
-            if (type === 'error') {
-                toast.style.background = '#EF4444'; toastIcon.textContent = '❌';
-            } else {
-                toast.style.background = '#10B981'; toastIcon.textContent = '✅';
-            }
-            toast.classList.add('show'); 
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-
         function toggleMode() {
             isLogin = !isLogin;
             const elements = {
@@ -509,7 +643,6 @@ let currentLang = localStorage.getItem('lang') || 'id';
             };
 
             if (isLogin) {
-                // Set data-i18n keys for Login
                 elements.mainTitle.setAttribute('data-i18n', 'hLogTitle');
                 elements.subTitle.setAttribute('data-i18n', 'hLogSub');
                 elements.btn.setAttribute('data-i18n', 'bLog');
@@ -521,7 +654,6 @@ let currentLang = localStorage.getItem('lang') || 'id';
                 elements.forgotPass.classList.remove('d-none');
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).removeAttribute('required'));
             } else {
-                // Set data-i18n keys for Register
                 elements.mainTitle.setAttribute('data-i18n', 'hRegTitle');
                 elements.subTitle.setAttribute('data-i18n', 'hRegSub');
                 elements.btn.setAttribute('data-i18n', 'bReg');
@@ -534,11 +666,13 @@ let currentLang = localStorage.getItem('lang') || 'id';
                 ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).setAttribute('required', 'true'));
             }
             
-            // Panggil applyLanguage agar teks langsung berubah sesuai bahasa yang sedang aktif
             applyLanguage();
         }
 
         async function resetPasswordFlow() {
+            const bgPanel = getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim() || '#18181b';
+            const textMain = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#fff';
+
             const { value: formValues } = await Swal.fire({
                 title: 'Reset Password',
                 html: `
@@ -553,8 +687,8 @@ let currentLang = localStorage.getItem('lang') || 'id';
                         <input id="reset-newpass" type="password" class="form-control" placeholder="Minimal 6 karakter">
                     </div>
                 `,
-                background: getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim() || '#18181b',
-                color: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#fff',
+                background: bgPanel,
+                color: textMain,
                 showCancelButton: true,
                 confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#3f3f46',
@@ -583,7 +717,7 @@ let currentLang = localStorage.getItem('lang') || 'id';
             });
 
             if (formValues) {
-                Swal.fire({ title: 'Memverifikasi...', background: '#18181b', color: '#fff', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: 'Memverifikasi...', background: bgPanel, color: textMain, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 try {
                     const res = await fetch('/api/reset-password', {
@@ -593,19 +727,21 @@ let currentLang = localStorage.getItem('lang') || 'id';
                     });
                     
                     const data = await res.json();
+                    Swal.close();
 
                     if (res.ok && data.success) {
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Password berhasil diubah. Silakan Login dengan password baru.', background: '#18181b', color: '#fff' });
+                        showSideAlert('Password Diubah', 'Password berhasil diubah. Silakan Login dengan password baru.', 'success', 4000);
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: data.message, background: '#18181b', color: '#fff' });
+                        showSideAlert('Akses Ditolak', data.message || 'Gagal mereset password.', 'error');
                     }
                 } catch (err) {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi ke server gagal.', background: '#18181b', color: '#fff' });
+                    Swal.close();
+                    showSideAlert('Koneksi Gagal', 'Koneksi ke server gagal.', 'error');
                 }
             }
         }
 
-document.getElementById('authForm').addEventListener('submit', async (e) => {
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const recaptchaToken = grecaptcha.getResponse();
@@ -613,14 +749,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
             const textMain = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#fff';
 
             if (!recaptchaToken) {
-                return Swal.fire({ 
-                    icon: 'warning', 
-                    title: 'Tunggu Sebentar!', 
-                    text: 'Harap centang "Saya bukan robot" terlebih dahulu.', 
-                    background: bgPanel, 
-                    color: textMain,
-                    confirmButtonColor: '#2563eb'
-                });
+                return showSideAlert('Tunggu Sebentar!', 'Harap centang "Saya bukan robot" terlebih dahulu.', 'warning');
             }
 
             const btn = document.getElementById('btnSubmit');
@@ -648,12 +777,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
 
                     if (data.success) {
                         if (data.user.role === 'admin') {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Upss ada yang salah nihh!',
-                                text: 'Ini halaman masuk untuk User biasa. Silakan gunakan link Portal Khusus Admin.',
-                                background: bgPanel, color: textMain, confirmButtonColor: '#2563eb'
-                            });
+                            showSideAlert('Akses Salah Halaman', 'Ini halaman masuk User biasa. Silakan gunakan Portal Khusus Admin.', 'warning', 4500);
                             grecaptcha.reset();
                             return;
                         }
@@ -661,10 +785,10 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
                         
-                        showToast("Login Berhasil! Mengalihkan...", "success");
+                        showSideAlert('Login Berhasil', 'Mengalihkan ke beranda...', 'success', 1500);
                         setTimeout(() => { window.location.href = 'index.html'; }, 1000);
                     } else {
-                        showToast(data.message || "Gagal Login!", "error");
+                        showSideAlert('Gagal Login', data.message || 'Email/Username atau password salah!', 'error');
                         grecaptcha.reset();
                     }
                 } 
@@ -679,7 +803,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
                     const password = document.getElementById('password').value;
 
                     if (username.includes(' ')) {
-                        showToast("Username tidak boleh menggunakan spasi!", "error");
+                        showSideAlert('Username Tidak Valid', 'Username tidak boleh menggunakan spasi!', 'warning');
                         grecaptcha.reset();
                         return;
                     }
@@ -694,10 +818,12 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
                     const otpData = await otpRes.json();
 
                     if (!otpRes.ok || !otpData.success) {
-                        showToast(otpData.message || "Gagal mengirim OTP!", "error");
+                        showSideAlert('Gagal Kirim OTP', otpData.message || 'Gagal mengirim OTP ke email!', 'error');
                         grecaptcha.reset();
                         return;
                     }
+
+                    showSideAlert('Kode OTP Terkirim', `Cek kotak masuk atau spam pada ${email}`, 'info', 3500);
 
                     // B. Tampilkan Popup Input 6 Angka OTP
                     const { value: kodeOtp } = await Swal.fire({
@@ -726,6 +852,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
 
                     // Jika user klik tombol Batal pada popup OTP
                     if (!kodeOtp) {
+                        showSideAlert('Verifikasi Dibatalkan', 'Pendaftaran akun dibatalkan.', 'warning');
                         grecaptcha.reset();
                         return;
                     }
@@ -749,31 +876,17 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
                     const regData = await regRes.json();
 
                     if (regRes.ok && regData.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Registrasi Berhasil! 🎉',
-                            text: 'Email kamu telah terverifikasi. Silakan login menggunakan akun barumu.',
-                            background: bgPanel,
-                            color: textMain,
-                            confirmButtonColor: '#2563eb'
-                        });
+                        showSideAlert('Registrasi Berhasil!', 'Email terverifikasi. Silakan login dengan akun barumu.', 'success', 4000);
                         document.getElementById('authForm').reset();
-                        toggleMode(); // Otomatis kembali ke tampilan Login
+                        toggleMode();
                         grecaptcha.reset();
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Verifikasi Gagal',
-                            text: regData.message || 'Kode OTP salah atau sudah kadaluarsa.',
-                            background: bgPanel,
-                            color: textMain,
-                            confirmButtonColor: '#2563eb'
-                        });
+                        showSideAlert('Verifikasi Gagal', regData.message || 'Kode OTP salah atau sudah kadaluarsa.', 'error');
                         grecaptcha.reset();
                     }
                 }
             } catch (err) {
-                showToast("Cek koneksi internet Anda", "error");
+                showSideAlert('Koneksi Terputus', 'Cek koneksi internet Anda dan coba lagi.', 'error');
                 grecaptcha.reset();
             } finally {
                 btn.disabled = false;
