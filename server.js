@@ -543,7 +543,25 @@ const proteksiApiInternal = (req, res, next) => {
 
     next(); // Jika aman (dipanggil oleh fetch HTML kita), silakan lanjut!
 };
+app.get('/api/image-base64', async (req, res) => {
+    try {
+        const imageUrl = req.query.url;
+        if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+            return res.status(400).json({ error: 'URL gambar tidak valid' });
+        }
 
+        const response = await fetch(imageUrl);
+        if (!response.ok) throw new Error('Gagal mengambil gambar');
+
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        const arrayBuffer = await response.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+        res.json({ base64: `data:${contentType};base64,${base64}` });
+    } catch (err) {
+        res.status(500).json({ error: 'Gagal konversi gambar' });
+    }
+});
 // --- API BACA SEMUA EVENT (Dilindungi Satpam) ---
 app.get('/api/events', proteksiApiInternal, async (req, res) => {
     try { 
