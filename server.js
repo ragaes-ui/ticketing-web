@@ -594,25 +594,39 @@ app.get('/api/events/:id', proteksiApiInternal, async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
     try {
-        // 👇 1. Tangkap semua data dari request frontend, termasuk salesOpenDate dan pajak
-        const { name, organizer, date, endDate, startTime, endTime, price, capacity, description, category, location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate, creatorId, image } = req.body;
+        const { 
+            name, organizer, organizerLogo, whatsapp, instagram, tiktok, youtube, website,
+            date, endDate, startTime, endTime, price, capacity, description, category, 
+            location, mapsUrl, tickets, secretData, salesOpenDate, lineupImages, taxRate, creatorId, image 
+        } = req.body;
         
         const newEvent = new Event({
-            name, organizer, date, 
-            endDate: endDate || null, // 👈 2. TAMBAHKAN DI SINI AGAR TERSIMPAN KE DATABASE
+            name, 
+            organizer, 
+            organizerLogo: organizerLogo || "",
+            whatsapp: whatsapp || "",
+            instagram: instagram || "",
+            tiktok: tiktok || "",
+            youtube: youtube || "",
+            website: website || "",
+            date, 
+            endDate: endDate || null,
             startTime: startTime || "", 
             endTime: endTime || "",     
-            price, totalCapacity: capacity, availableSeats: capacity,
-            description: description || "", category: category || "General", location: location || "TBA", mapsUrl: mapsUrl || "", 
+            price, 
+            totalCapacity: capacity, 
+            availableSeats: capacity,
+            description: description || "", 
+            category: category || "General", 
+            location: location || "TBA", 
+            mapsUrl: mapsUrl || "", 
             secretData: secretData || "", 
-            // 👇 2. Masukkan salesOpenDate ke dalam database (event utama) 👇
             salesOpenDate: salesOpenDate || null,
-            // 👇 3. Pastikan tickets (array) yang sudah mengandung salesOpenDate per-tier ikut tersimpan 👇
             tickets: tickets || [],
             lineupImages: lineupImages || [],
             taxRate: taxRate || 0,
             creatorId: creatorId || "admin-pusat",
-            image: image || "" // 👈 INI YANG KETINGGALAN MAS! WAJIB DITAMBAH BIAR POSTERNYA MUNCUL// 👈 2. SIMPAN ID KREATOR KE DATABASE
+            image: image || ""
         });
         
         await newEvent.save();
@@ -670,21 +684,24 @@ app.put('/api/events/:id', async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(404).json({ error: "ID Konser gak valid" });
         
-        // 👇 LOGIKA PENYELAMAT KODE RAHASIA 👇
         const oldEvent = await Event.findById(req.params.id);
+
+        // Hapus logo lama dari Supabase jika EO mengganti dengan logo baru
+        if (oldEvent && oldEvent.organizerLogo && oldEvent.organizerLogo.includes('supabase.co') && req.body.organizerLogo && req.body.organizerLogo !== oldEvent.organizerLogo) {
+            const oldLogoFile = oldEvent.organizerLogo.split('?')[0].split('/').pop();
+            await supabase.storage.from('rcell-images').remove([oldLogoFile]);
+        }
+
+        // LOGIKA PENYELAMAT KODE RAHASIA
         if (req.body.tickets && oldEvent && oldEvent.tickets) {
             req.body.tickets = req.body.tickets.map((newTicket) => {
-                // Cari tiket lama yang namanya sama
                 const oldTicket = oldEvent.tickets.find(t => t.tierName === newTicket.tierName);
-                
-                // Kalau di frontend isinya "***TERKUNCI***", berarti admin gak ngubah kodenya. Ambil kode aslinya dari DB!
                 if (newTicket.accessCode === '***TERKUNCI***' && oldTicket) {
                     newTicket.accessCode = oldTicket.accessCode;
                 }
                 return newTicket;
             });
         }
-        // 👆 -------------------------------- 👆
 
         const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true }); 
         res.json({ message: "Sukses update!", data: updatedEvent });
@@ -693,14 +710,16 @@ app.put('/api/events/:id', async (req, res) => {
 
 app.delete('/api/events/:id', async (req, res) => {
     try { 
-        // 1. Cari event-nya dulu sebelum dihapus dari Database
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({ message: "Event tidak ditemukan!" });
 
-        // 2. Kumpulkan semua URL gambar (Banner + Poster Lineup) yang berasal dari Supabase
         let urlsToDelete = [];
         if (event.image && event.image.includes('supabase.co')) {
             urlsToDelete.push(event.image);
+        }
+        // Ikut hapus file logo EO jika ada di Supabase
+        if (event.organizerLogo && event.organizerLogo.includes('supabase.co')) {
+            urlsToDelete.push(event.organizerLogo);
         }
         if (event.lineupImages && event.lineupImages.length > 0) {
             event.lineupImages.forEach(url => {
@@ -708,27 +727,12 @@ app.delete('/api/events/:id', async (req, res) => {
             });
         }
 
-        // 3. Ekstrak nama file dari URL dan hapus dari Supabase
         if (urlsToDelete.length > 0) {
-            const fileNames = urlsToDelete.map(url => {
-                // Mengambil bagian terakhir dari URL (nama filenya saja)
-                return url.split('?')[0].split('/').pop();
-            });
-
-            // Perintah hapus masal ke Supabase
-            const { data, error } = await supabase
-                .storage
-                .from('rcell-images') // Pastikan nama bucket sesuai
-                .remove(fileNames);
-            
-            if (error) {
-                console.error("Gagal menghapus gambar di Supabase:", error);
-            } else {
-                console.log("Gambar berhasil dihapus dari Supabase:", fileNames);
-            }
+            const fileNames = urlsToDelete.map(url => url.split('?')[0].split('/').pop());
+            const { error } = await supabase.storage.from('rcell-images').remove(fileNames);
+            if (error) console.error("Gagal menghapus gambar di Supabase:", error);
         }
 
-        // 4. Setelah gambar bersih, baru hapus data dari MongoDB
         await Event.findByIdAndDelete(req.params.id); 
         res.json({ message: "Event beserta gambar-gambarnya berhasil dibersihkan!" }); 
     } 
