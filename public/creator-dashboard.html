@@ -1124,18 +1124,85 @@
             return data.imageUrl;
         }
 
-        function addLineupRow(containerId, existingUrl = '') { 
+function addLineupRow(containerId, existingUrl = '') { 
             const isEdit = existingUrl !== '';
             const html = `
                 <div class="mb-2 lineup-row p-2 border border-secondary rounded" style="background: var(--input-bg);">
                     <div class="d-flex gap-2 align-items-center">
                         <input type="file" class="form-control form-control-sm lineup-file border-secondary" accept="image/*">
                         <input type="hidden" class="lineup-existing-url" value="${existingUrl}">
-                        <button class="btn btn-sm btn-danger border-secondary" type="button" onclick="this.closest('.lineup-row').remove()"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-sm btn-danger border-secondary" type="button" onclick="hapusBarisLineup(this)"><i class="bi bi-trash"></i></button>
                     </div>
                     ${isEdit ? `<div class="mt-1 small text-info"><i class="bi bi-link-45deg"></i> File lama: <a href="${existingUrl}" target="_blank" class="text-info">Lihat Gambar</a> (Abaikan jika tak diganti)</div>` : ''}
                 </div>`;
             document.getElementById(containerId).insertAdjacentHTML('beforeend', html); 
+        }
+
+        async function hapusBarisLineup(btn) {
+            const row = btn.closest('.lineup-row');
+            const existingUrl = row.querySelector('.lineup-existing-url')?.value.trim();
+
+            // Jika foto baru yang belum di-upload, langsung hapus barisnya
+            if (!existingUrl) {
+                row.remove();
+                return;
+            }
+
+            const confirmRes = await Swal.fire({
+                title: 'Hapus Poster Line Up?',
+                text: 'Gambar akan dihapus permanen dari Supabase!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                background: 'var(--bg-card)',
+                color: 'var(--text-main)'
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+
+            try {
+                const res = await fetch('/api/delete-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageUrl: existingUrl })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="bi bi-trash"></i>`;
+                    return Swal.fire('Gagal', data.message || 'Gagal menghapus gambar di Supabase.', 'error');
+                }
+
+                row.remove();
+                const eventId = document.getElementById('editId').value;
+                if (eventId) {
+                    const evIndex = myEventsData.findIndex(e => e._id === eventId);
+                    if (evIndex !== -1 && Array.isArray(myEventsData[evIndex].lineupImages)) {
+                        myEventsData[evIndex].lineupImages = myEventsData[evIndex].lineupImages.filter(u => u !== existingUrl);
+                    }
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Poster lineup dihapus dari Supabase!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-main)'
+                });
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-trash"></i>`;
+                Swal.fire('Error', 'Koneksi ke server terputus.', 'error');
+            }
         }
 
         // ==========================================
@@ -1459,14 +1526,16 @@
 
                 let finalLineupUrls = [];
                 const lineupRows = document.querySelectorAll('#editLineups .lineup-row');
+// Hapus file lineup lama di Supabase jika ditimpa dengan gambar baru
                 for (let row of lineupRows) {
                     const fileInput = row.querySelector('.lineup-file');
                     const hiddenUrl = row.querySelector('.lineup-existing-url').value;
-                    if (fileInput && fileInput.files[0]) {
-                        const url = await uploadToSupabase(fileInput.files[0]);
-                        finalLineupUrls.push(url);
-                    } else if (hiddenUrl) {
-                        finalLineupUrls.push(hiddenUrl);
+                    if (fileInput && fileInput.files[0] && hiddenUrl) {
+                        await fetch('/api/delete-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ imageUrl: hiddenUrl })
+                        }).catch(() => {});
                     }
                 }
 
