@@ -73,11 +73,129 @@
         .event-hero-content { position: relative; z-index: 2; width: 100%; }
         
         .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 25px; box-shadow: 0 10px 25px var(--shadow-color); margin-bottom: 20px; transition: background 0.3s, border 0.3s; }
-        .sticky-checkout { position: sticky; top: 100px; }
         
         .tier-label { transition: 0.2s; border: 1px solid var(--border-color); background-color: var(--bg-card); display: block; margin-bottom: 12px; border-radius: 16px !important; overflow: hidden; }
         .tier-label.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 15px var(--primary-light); }
         .tier-sold-out { opacity: 0.4; pointer-events: none; background-color: var(--bg-section); border-style: dashed; }
+
+        /* ========================================= */
+        /* 🔥 3 KOTAK MENU (LINEUP, TIKET, SOSMED) 🔥 */
+        /* ========================================= */
+        .detail-box-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+            margin-bottom: 20px;
+        }
+
+        .tab-box-item {
+            background-color: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .tab-box-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .tab-box-item .box-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background-color: var(--bg-section);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+        }
+
+        .tab-box-item .box-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .tab-box-item .box-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Kotak saat aktif dipilih */
+        .tab-box-item.active {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.16);
+        }
+
+        .tab-box-item.active .box-icon {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .tab-box-item.active .box-title {
+            color: var(--primary);
+        }
+
+        /* Panel Konten Per Kotak */
+        .detail-tab-panel {
+            display: none;
+            animation: fadeSlideUp 0.28s ease forwards;
+        }
+
+        .detail-tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Sosial Media Penyelenggara */
+        .social-link-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background-color: var(--bg-section);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .social-link-card:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        @media (max-width: 576px) {
+            .detail-box-tabs { gap: 8px; margin-top: 18px; }
+            .tab-box-item { padding: 12px 6px; }
+            .tab-box-item .box-icon { width: 34px; height: 34px; font-size: 1.05rem; }
+            .tab-box-item .box-title { font-size: 0.82rem; }
+            .tab-box-item .box-subtitle { font-size: 0.68rem; }
+        }
 
         /* 👇 CSS KHUSUS QTY SELECTOR 👇 */
         .qty-controls { display: flex; align-items: center; gap: 10px; }
@@ -96,7 +214,7 @@
         
         /* Modifikasi untuk Tombol Tong Sampah */
         .btn-trash {
-            background-color: #fee2e2 !important; /* Merah muda transparan */
+            background-color: #fee2e2 !important;
         }
         [data-theme="dark"] .btn-trash { background-color: rgba(220, 38, 38, 0.2) !important; }
 
@@ -152,7 +270,7 @@
             .navbar .d-flex a.btn, .navbar .d-flex button.btn-outline-primary { max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 10px !important; padding-right: 10px !important; font-size: 0.8rem !important; }
             .navbar .d-flex button.rounded-circle { width: 32px !important; height: 32px !important; padding: 0 !important; }
             .navbar .d-flex button.rounded-circle i { font-size: 0.8rem !important; }
-            .floating-checkout { padding: 12px 15px; } /* Sesuaikan padding floating bar di HP */
+            .floating-checkout { padding: 12px 15px; }
             .floating-checkout h4 { font-size: 1.2rem !important; }
         }
         /* NOTIFIKASI TOAST KECIL DI ATAS */
@@ -168,11 +286,12 @@
     </style>
 </head>
 <body>
-<!-- WADAH NOTIFIKASI TOAST -->
+    <!-- WADAH NOTIFIKASI TOAST -->
     <div id="toast-notif">
         <span id="toast-icon">✅</span>
         <span id="toast-message">Pilihan tiket dibatalkan!</span>
     </div>
+
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand text-decoration-none" href="/">
@@ -184,7 +303,9 @@
             </div>
         </div>
     </nav>
-<div id="breadcrumb-container" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);"></div>
+
+    <div id="breadcrumb-container" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);"></div>
+
     <div class="container mt-5 pt-5 text-center" id="loadingDataContainer">
         <div class="spinner-border text-primary mt-5" style="width: 3rem; height: 3rem;" role="status"></div>
         <h4 class="mt-3 fw-bold" style="color: var(--text-muted);">Sedang Memuat Data Event...</h4>
@@ -192,6 +313,7 @@
     </div>
     
     <div class="container pb-5" id="mainContainer" style="display: none;">
+        <!-- HERO BANNER EVENT -->
         <div class="event-hero" id="eventHero">
             <div class="event-hero-content">
                 <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill" id="elCategory">General</span>
@@ -205,31 +327,80 @@
             </div>
         </div>
 
-        <div class="row mt-4 g-4">
-            <div class="col-lg-7">
-                <div class="glass-panel mb-4">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Deskripsi & Info Event</h5>
-                    <p id="elDesc" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-muted);"></p>
+        <!-- 👇 3 KOTAK MENU PEMISAH (LINEUP | TIKET | PENYELENGGARA) 👇 -->
+        <div class="detail-box-tabs">
+            <!-- Kotak 1: Lineup -->
+            <div class="tab-box-item" id="btn-tab-lineup" onclick="switchDetailTab('lineup')">
+                <div class="box-icon">
+                    <i class="bi bi-stars"></i>
                 </div>
-                <div class="glass-panel mt-4" id="lineupSection" style="display: none;">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-stars text-warning me-2"></i>EXTRAORDINARY LINE UP</h5>
-                    <div class="row g-3" id="lineupGrid"></div>
-                </div>
+                <p class="box-title">Lineup</p>
+                <span class="box-subtitle" id="subTabLineup">Pengisi Acara</span>
             </div>
 
-            <div class="col-lg-5">
-                <div class="glass-panel sticky-checkout" style="padding-bottom: 30px;">
-                    <h5 class="fw-bold mb-3">Pilih Tipe Tiket</h5>
-                    
-                    <div id="ticketTierSelection">
-                        <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
-                    </div>
+            <!-- Kotak 2: Tiket (Default Aktif) -->
+            <div class="tab-box-item active" id="btn-tab-tiket" onclick="switchDetailTab('tiket')">
+                <div class="box-icon">
+                    <i class="bi bi-ticket-perforated-fill"></i>
+                </div>
+                <p class="box-title">Tiket</p>
+                <span class="box-subtitle" id="subTabTiket">Pilih Kategori</span>
+            </div>
+
+            <!-- Kotak 3: Media Sosial Penyelenggara -->
+            <div class="tab-box-item" id="btn-tab-sosmed" onclick="switchDetailTab('sosmed')">
+                <div class="box-icon">
+                    <i class="bi bi-share-fill"></i>
+                </div>
+                <p class="box-title">Penyelenggara</p>
+                <span class="box-subtitle">Media Sosial</span>
+            </div>
+        </div>
+
+        <!-- 👇 KONTEN MASING-MASING KOTAK 👇 -->
+
+        <!-- PANEL 1: LINEUP -->
+        <div class="detail-tab-panel" id="panel-lineup">
+            <div class="glass-panel">
+                <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-stars text-warning me-2"></i>EXTRAORDINARY LINE UP</h5>
+                <div class="row g-3" id="lineupGrid"></div>
+            </div>
+        </div>
+
+        <!-- PANEL 2: TIKET (DEFAULT AKTIF) -->
+        <div class="detail-tab-panel active" id="panel-tiket">
+            <div class="glass-panel" style="padding-bottom: 30px;">
+                <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-ticket-detailed-fill text-primary me-2"></i>Pilih Tipe Tiket</h5>
+                <div id="ticketTierSelection">
+                    <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
                 </div>
             </div>
         </div>
+
+        <!-- PANEL 3: MEDIA SOSIAL PENYELENGGARA -->
+        <div class="detail-tab-panel" id="panel-sosmed">
+            <div class="glass-panel">
+                <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                    <img src="https://cdn.phototourl.com/member/2026-11-01-05bda4e2-c68d-493e-ba4c-e689b9408d60.png" id="organizerLogoImg" alt="Logo EO" class="rounded-circle border" style="width: 56px; height: 56px; object-fit: cover; background: var(--bg-section);">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Diselenggarakan Oleh</small>
+                        <h5 class="fw-bold mb-0" id="organizerCardName">RCELLFEST</h5>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3"><i class="bi bi-globe2 text-primary me-2"></i>Media Sosial & Kontak Resmi</h6>
+                <div id="organizerSocialList" class="d-flex flex-column gap-2"></div>
+            </div>
+        </div>
+
+        <!-- DESKRIPSI & INFO EVENT (TETAP TAMPIL DI BAWAH AGAR SYARAT & INFO SELALU TERBACA) -->
+        <div class="glass-panel mt-3">
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-info-circle-fill text-primary me-2"></i>Deskripsi & Info Event</h5>
+            <p id="elDesc" class="mb-0" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-muted);"></p>
+        </div>
     </div>
 
-    <!-- 👇 FLOATING BAR CHECKOUT (MUNcUL DI BAWAH) 👇 -->
+    <!-- 👇 FLOATING BAR CHECKOUT (MUNCUL DI BAWAH) 👇 -->
     <div class="floating-checkout" id="floatingCheckout">
         <div class="container d-flex justify-content-between align-items-center p-0">
             <div>
@@ -254,6 +425,20 @@
         let currentEvent = null;
         let enteredCodes = {};      
         let cartQty = {}; // Menyimpan kuantitas setiap tiket { index: qty }
+
+        // ==========================================
+        // 🔥 FUNGSI PINDAH KOTAK (LINEUP / TIKET / SOSMED)
+        // ==========================================
+        function switchDetailTab(tabName) {
+            document.querySelectorAll('.tab-box-item').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.detail-tab-panel').forEach(panel => panel.classList.remove('active'));
+
+            const activeBtn = document.getElementById(`btn-tab-${tabName}`);
+            const activePanel = document.getElementById(`panel-${tabName}`);
+
+            if (activeBtn) activeBtn.classList.add('active');
+            if (activePanel) activePanel.classList.add('active');
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -322,8 +507,9 @@
                 
                 currentEvent = await res.json();
                 
+                const organizerName = currentEvent.organizer || "RCELLFEST";
                 document.getElementById('elTitle').innerText = currentEvent.name;
-                document.getElementById('elOrganizer').innerText = "Creator: " + (currentEvent.organizer || "RCELLFEST");
+                document.getElementById('elOrganizer').innerText = "Creator: " + organizerName;
                 document.getElementById('elCategory').innerText = currentEvent.category || "General";
                 
                 const venueElement = document.getElementById('elVenue');
@@ -384,21 +570,23 @@
                 document.getElementById('elDate').innerText = dateStr;
                 document.getElementById('elTime').innerText = timeStr; 
 
+                // 1. Render Tiket
                 renderTickets();
                 
-                const lineupSection = document.getElementById('lineupSection');
+                // 2. Render Lineup ke dalam Panel Lineup
                 const lineupGrid = document.getElementById('lineupGrid');
+                const subTabLineup = document.getElementById('subTabLineup');
 
                 if (currentEvent.lineupImages && currentEvent.lineupImages.length > 0) {
-                    lineupSection.style.display = 'block'; 
+                    subTabLineup.innerText = `${currentEvent.lineupImages.length} Poster`;
                     let htmlLineUp = '';
                     
                     currentEvent.lineupImages.forEach(imgUrl => {
                         const safeImgUrl = imgUrl.includes('ibb.co') ? `${imgUrl}?v=${new Date().getTime()}` : imgUrl;
                         htmlLineUp += `
-                        <div class="col-6 col-md-4 mb-3 d-flex justify-content-center">
-                            <div onclick="previewPoster('${imgUrl}')" class="lineup-card">
-                                <img src="${imgUrl}" class="lineup-img">
+                        <div class="col-6 col-md-4 mb-2 d-flex justify-content-center">
+                            <div onclick="previewPoster('${safeImgUrl}')" class="lineup-card">
+                                <img src="${safeImgUrl}" class="lineup-img" alt="Lineup">
                                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2" style="pointer-events: none; width: max-content;">
                                     <span class="badge bg-dark bg-opacity-75 text-white rounded-pill px-2 py-1 badge-pulse" style="font-size: 0.65rem; backdrop-filter: blur(4px); border: 1px solid rgba(255,193,7,0.5);">
                                         <i class="bi bi-zoom-in text-warning"></i> Zoom
@@ -409,14 +597,75 @@
                     });
                     lineupGrid.innerHTML = htmlLineUp;
                 } else {
-                    lineupSection.style.display = 'none'; 
+                    subTabLineup.innerText = `Segera Hadir`;
+                    lineupGrid.innerHTML = `
+                        <div class="col-12 text-center py-4 text-muted">
+                            <i class="bi bi-mic-mute display-5 d-block mb-2 opacity-50"></i>
+                            <p class="mb-0">Daftar lineup belum diumumkan oleh penyelenggara.</p>
+                        </div>`;
                 }
+
+                // 3. Render Media Sosial Penyelenggara ke dalam Panel Penyelenggara
+                renderOrganizerSocials(currentEvent, rawDesc);
 
                 document.getElementById('loadingDataContainer').style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
 
             } catch (error) {
                 showError();
+            }
+        }
+
+        // ==========================================
+        // 🔥 RENDER MEDIA SOSIAL & KONTAK PENYELENGGARA
+        // ==========================================
+        function renderOrganizerSocials(event, rawDesc) {
+            document.getElementById('organizerCardName').innerText = event.organizer || "RCELLFEST";
+            if (event.organizerLogo) {
+                document.getElementById('organizerLogoImg').src = event.organizerLogo;
+            }
+
+            const socialContainer = document.getElementById('organizerSocialList');
+            const extractedLinks = rawDesc.match(/(https?:\/\/[^\s]+)/g) || [];
+
+            // Cek dari field database maupun link yang tertulis di deskripsi event
+            const igUrl = event.instagram || extractedLinks.find(u => u.includes('instagram.com'));
+            const tiktokUrl = event.tiktok || extractedLinks.find(u => u.includes('tiktok.com'));
+            const waUrl = event.whatsapp 
+                ? (event.whatsapp.startsWith('http') ? event.whatsapp : `https://wa.me/${event.whatsapp.replace(/[^0-9]/g, '')}`)
+                : extractedLinks.find(u => u.includes('wa.me') || u.includes('whatsapp.com'));
+            const ytUrl = event.youtube || extractedLinks.find(u => u.includes('youtube.com') || u.includes('youtu.be'));
+            const webUrl = event.website || extractedLinks.find(u => 
+                !u.includes('instagram.com') && !u.includes('tiktok.com') && 
+                !u.includes('wa.me') && !u.includes('whatsapp.com') && 
+                !u.includes('youtube.com') && !u.includes('youtu.be')
+            );
+
+            const items = [
+                { label: 'Instagram Official', url: igUrl, icon: 'bi-instagram', color: '#E1306C' },
+                { label: 'TikTok Official', url: tiktokUrl, icon: 'bi-tiktok', color: '#00f2fe' },
+                { label: 'WhatsApp Admin / Narahubung', url: waUrl, icon: 'bi-whatsapp', color: '#25D366' },
+                { label: 'YouTube Channel', url: ytUrl, icon: 'bi-youtube', color: '#FF0000' },
+                { label: 'Website / Tautan Resmi', url: webUrl, icon: 'bi-globe2', color: '#3b82f6' }
+            ].filter(item => item.url);
+
+            if (items.length === 0) {
+                socialContainer.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-link-45deg display-5 d-block mb-2 opacity-50"></i>
+                        <p class="mb-0">Penyelenggara belum mencantumkan tautan media sosial.</p>
+                    </div>`;
+            } else {
+                socialContainer.innerHTML = items.map(item => `
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="social-link-card">
+                        <i class="bi ${item.icon} fs-4" style="color: ${item.color};"></i>
+                        <div>
+                            <div>${item.label}</div>
+                            <small class="text-muted fw-normal d-block text-truncate" style="max-width: 240px;">${item.url}</small>
+                        </div>
+                        <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+                    </a>
+                `).join('');
             }
         }
 
@@ -428,6 +677,7 @@
 
         function renderTickets() {
             const container = document.getElementById('ticketTierSelection');
+            const subTabTiket = document.getElementById('subTabTiket');
             container.innerHTML = '';
 
             const now = new Date();
@@ -438,11 +688,13 @@
             const isEventSoldOut = currentEvent.availableSeats === 0;
 
             if (now > waktuSelesaiEvent || isFinished) {
+                if (subTabTiket) subTabTiket.innerText = 'Selesai';
                 container.innerHTML = `<div class="alert alert-danger text-center fw-bold border-danger"><i class="bi bi-x-octagon-fill fs-4 d-block mb-2"></i> Event ini telah selesai.</div>`;
                 return;
             }
 
             if (currentEvent.salesOpenDate && new Date(currentEvent.salesOpenDate) > now) {
+                if (subTabTiket) subTabTiket.innerText = 'Segera Buka';
                 container.innerHTML = `
                     <div class="alert alert-info text-center border-info shadow-sm" style="background: var(--primary-light);">
                         <div class="small text-muted fw-bold mb-2"><i class="bi bi-ticket-detailed-fill"></i> PENJUALAN TIKET DIBUKA DALAM:</div>
@@ -453,10 +705,12 @@
             }
 
             if (isComingSoon) {
+                if (subTabTiket) subTabTiket.innerText = 'Coming Soon';
                 container.innerHTML = `<div class="alert alert-info text-center"><i class="bi bi-clock-fill"></i> Tiket belum dijual.</div>`;
                 return;
             }
             if (isEventSoldOut) {
+                if (subTabTiket) subTabTiket.innerText = 'Sold Out';
                 container.innerHTML = `<div class="alert alert-danger text-center fw-bold">Seluruh Tiket Habis Terjual.</div>`;
                 return;
             }
@@ -465,6 +719,8 @@
             if (!tickets || tickets.length === 0) {
                 tickets = [{ tierName: 'General', price: currentEvent.price, availableSeats: currentEvent.availableSeats, minQty: 1 }];
             }
+
+            if (subTabTiket) subTabTiket.innerText = `${tickets.length} Kategori`;
 
             tickets.sort((a, b) => {
                 const aHabis = a.availableSeats <= 0; 
@@ -475,7 +731,6 @@
             });
 
             tickets.forEach((tier, index) => {
-                // Set default cart qty ke 0
                 cartQty[index] = 0; 
 
                 const isSoldOut = tier.availableSeats <= 0;
@@ -490,8 +745,7 @@
 
                 const isDisabled = isSoldOut || isTierNotOpenYet;
                 const statusClass = isDisabled ? 'tier-sold-out' : '';
-                
-const isLocked = tier.isLocked;
+                const isLocked = tier.isLocked;
 
                 container.innerHTML += `
                     <div class="tier-label p-3 rounded-3 d-flex justify-content-between align-items-center ${statusClass}" id="lblTier${index}">
@@ -511,7 +765,6 @@ const isLocked = tier.isLocked;
                             ${isLocked ? `<button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" id="unlockBtn${index}" onclick="unlockTier(${index})">Buka Kunci</button>` : ''}
                             
                             <div class="qty-controls" id="qtyBox${index}" style="${isLocked ? 'display: none;' : ''}">
-                                <!-- 👇 TOMBOL TONG SAMPAH (HAPUS TIKET) 👇 -->
                                 <button class="qty-btn text-danger border-danger btn-trash" id="trashBtn${index}" onclick="removeTier(${index})" style="display: none;" title="Batal Pilih Tiket">
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>
@@ -526,40 +779,30 @@ const isLocked = tier.isLocked;
             });
         }
 
-        // 👇 FUNGSI UNTUK MENGHAPUS / ME-RESET TIKET YANG DIPILIH 👇
-// 👇 FUNGSI UNTUK MENGHAPUS / ME-RESET TIKET YANG DIPILIH 👇
         function removeTier(index) {
-            cartQty[index] = 0; // Kembalikan ke 0
+            cartQty[index] = 0;
             document.getElementById(`qtyInput${index}`).value = 0;
-            
-            // Hilangkan efek aktif di kartu
             document.getElementById(`lblTier${index}`).classList.remove('selected');
             
-            // Sembunyikan ikon tong sampah kembali
             const trashBtn = document.getElementById(`trashBtn${index}`);
             if (trashBtn) trashBtn.style.display = 'none';
 
-            // Hitung ulang harga
             calculateTotal();
-            
             showToast("Pilihan tiket dibatalkan!", "info");
         }
 
-        // 👇 FUNGSI UNTUK TAMBAH/KURANG JUMLAH TIKET 👇
         function updateQty(index, change) {
             const tier = currentEvent.tickets[index];
             const currentVal = cartQty[index];
             let newVal = currentVal + change;
             const minQty = tier.minQty || 1;
 
-            // Logika Minimum Beli:
             if (change > 0 && currentVal === 0) {
-                newVal = minQty; // Kalau tambah dari 0, langsung lompat ke minimum
+                newVal = minQty;
             } else if (change < 0 && currentVal === minQty) {
-                newVal = 0; // Kalau kurang dari batas minimum, langsung 0
+                newVal = 0;
             }
 
-            // Cegah kurang dari 0 dan lebih dari sisa tiket
             if (newVal < 0) newVal = 0;
             if (newVal > tier.availableSeats) {
                 Swal.fire({ toast: true, position: 'top', icon: 'warning', title: `Stok maksimal ${tier.availableSeats}!`, showConfirmButton: false, timer: 1500, background: 'var(--bg-card)', color: 'var(--text-main)' });
@@ -569,22 +812,20 @@ const isLocked = tier.isLocked;
             cartQty[index] = newVal;
             document.getElementById(`qtyInput${index}`).value = newVal;
             
-            // Beri highlight kartu tiket dan Tampilkan tong sampah kalau ada yang dipilih
             const lbl = document.getElementById(`lblTier${index}`);
             const trashBtn = document.getElementById(`trashBtn${index}`);
             
             if (newVal > 0) {
                 lbl.classList.add('selected');
-                if (trashBtn) trashBtn.style.display = 'flex'; // Tampilkan Tong Sampah
+                if (trashBtn) trashBtn.style.display = 'flex';
             } else {
                 lbl.classList.remove('selected');
-                if (trashBtn) trashBtn.style.display = 'none'; // Sembunyikan Tong Sampah
+                if (trashBtn) trashBtn.style.display = 'none';
             }
 
             calculateTotal();
         }
 
-        // 👇 FUNGSI MENGHITUNG TOTAL DAN MENAMPILKAN FLOATING BAR 👇
         function calculateTotal() {
             let totalItem = 0;
             let totalPrice = 0;
@@ -606,7 +847,6 @@ const isLocked = tier.isLocked;
             }
         }
 
-        // 👇 FUNGSI BUKA GEMBOK TIKET 👇
         function unlockTier(index) {
             const tierInfo = currentEvent.tickets[index];
 
@@ -640,18 +880,15 @@ const isLocked = tier.isLocked;
                 if (result.isConfirmed) {
                     enteredCodes[index] = result.value.trim();
                     
-                    // Sembunyikan gembok, tampilkan tombol +/-
                     document.getElementById(`unlockBtn${index}`).style.display = 'none';
                     document.getElementById(`qtyBox${index}`).style.display = 'flex';
                     
-                    // Ubah ikon gembok jadi hijau terbuka
                     const iconSpan = document.getElementById(`lockIcon${index}`);
                     if(iconSpan) {
                         iconSpan.classList.remove('bi-lock-fill', 'text-danger');
                         iconSpan.classList.add('bi-unlock-fill', 'text-success');
                     }
                     
-                    // Otomatis tambah 1 tiket (atau minQty) setelah berhasil buka
                     updateQty(index, 1);
 
                     Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Kunci Terbuka!', showConfirmButton: false, timer: 1500, background: 'var(--bg-card)', color: 'var(--text-main)' });
@@ -659,7 +896,6 @@ const isLocked = tier.isLocked;
             });
         }
 
-        // --- MESIN HITUNG MUNDUR ---
         function mulaiHitungMundurDetail(targetDateStr) {
             const targetWaktu = new Date(targetDateStr).getTime();
             const intervalTimer = setInterval(function() {
@@ -708,7 +944,6 @@ const isLocked = tier.isLocked;
             }, 1000);
         }
 
-        // --- PROSES PINDAH KE HALAMAN CHECKOUT MULTI TIKET ---
         function startCheckout() {
             const userRaw = localStorage.getItem('userData');
             
@@ -719,8 +954,6 @@ const isLocked = tier.isLocked;
                 }).then(r => { if(r.isConfirmed) window.location.href = '/user-login'; });
             }
 
-            // Kumpulkan semua tiket yang qty-nya lebih dari 0
-// Kumpulkan semua tiket yang qty-nya lebih dari 0
             const selectedTicketsArray = [];
             for (let i in cartQty) {
                 if (cartQty[i] > 0) {
@@ -729,13 +962,12 @@ const isLocked = tier.isLocked;
                         tierName: t.tierName,
                         price: t.price,
                         qty: cartQty[i],
-                        accessCode: enteredCodes[i] || '',      // 👈 TAMBAHKAN INI (Nama standar)
-                        tierAccessCode: enteredCodes[i] || ''   // 👈 Biarkan ini (Nama lama)
+                        accessCode: enteredCodes[i] || '',
+                        tierAccessCode: enteredCodes[i] || ''
                     });
                 }
-            } // 👈 PASTIKAN ADA KURUNG KURAWAL PENUTUP INI
+            }
 
-            // 👇 TAMBAHAN: Ambil kode akses dari tiket yang sudah dibuka kuncinya
             let mainAccessCode = "";
             for (let i in enteredCodes) {
                 if (enteredCodes[i] && cartQty[i] > 0) {
@@ -744,27 +976,24 @@ const isLocked = tier.isLocked;
                 }
             }
 
-            // Bungkus data multi-tiket untuk dibawa ke halaman checkout
             const checkoutData = {
                 eventId: currentEvent._id,
                 eventName: currentEvent.name,
                 eventDate: currentEvent.date,
                 eventLocation: currentEvent.location,
                 taxRate: currentEvent.taxRate || 0,
-                tickets: selectedTicketsArray, // 👈 Kumpulan array tiket yang dibeli
-                accessCode: mainAccessCode     // 👈 TAMBAHAN: Taruh kode akses di sini agar terbaca oleh checkout.html
+                tickets: selectedTicketsArray,
+                accessCode: mainAccessCode
             };
 
-            // Simpan ke dalam memori
             localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-            
-            // Lempar pembeli ke halaman checkout! 🚀
             window.location.href = `/checkout?id=${currentEvent._id}`;
         }
 
         function previewPoster(url) {
             Swal.fire({ imageUrl: url, imageAlt: 'Poster Line Up', showConfirmButton: false, showCloseButton: true, width: 'auto', padding: '0', background: 'transparent', backdrop: 'rgba(0,0,0,0.9)' });
         }
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notif');
             const toastMessage = document.getElementById('toast-message');
