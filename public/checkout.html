@@ -125,16 +125,132 @@
         .breadcrumb-item.active { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; display: inline-block; vertical-align: middle; }
         @media (max-width: 576px) { .breadcrumb-item.active { max-width: 140px; } }
         
-        .floating-toast {
-            position: fixed; top: 20px; left: 50%; transform: translate(-50%, -20px);
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            color: #ffffff; padding: 12px 25px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
-            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            opacity: 0; z-index: 9999; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-            pointer-events: none; width: max-content; max-width: 90vw;
+        /* === TOAST SLIDE DARI SAMPING & PROGRESS BAR BERJALAN === */
+        #rc-toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
         }
-        .floating-toast.show { opacity: 1; transform: translate(-50%, 0); }
-        [data-theme="dark"] .floating-toast { background: rgba(255, 255, 255, 0.9); color: #0f172a; box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); }
+
+        .rc-side-toast {
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            width: 340px;
+            max-width: 100%;
+            background: var(--bg-card, #ffffff);
+            color: var(--text-main, #0f172a);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 14px;
+            padding: 14px 16px 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(calc(100% + 32px));
+            opacity: 0;
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+        }
+
+        .rc-side-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .rc-toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .rc-toast-info .rc-toast-icon    { background: rgba(59, 130, 246, 0.14); color: #2563eb; }
+        .rc-toast-info .rc-toast-bar     { background: #2563eb; }
+
+        .rc-toast-success .rc-toast-icon { background: rgba(16, 185, 129, 0.14); color: #10b981; }
+        .rc-toast-success .rc-toast-bar  { background: #10b981; }
+
+        .rc-toast-error .rc-toast-icon   { background: rgba(239, 68, 68, 0.14); color: #dc2626; }
+        .rc-toast-error .rc-toast-bar    { background: #dc2626; }
+
+        .rc-toast-warning .rc-toast-icon { background: rgba(245, 158, 11, 0.16); color: #d97706; }
+        .rc-toast-warning .rc-toast-bar  { background: #d97706; }
+
+        .rc-toast-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rc-toast-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+
+        .rc-toast-msg {
+            font-size: 0.82rem;
+            color: var(--text-muted, #64748b);
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .rc-toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted, #64748b);
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 2px 4px;
+            cursor: pointer;
+            align-self: flex-start;
+            transition: color 0.15s ease;
+        }
+
+        .rc-toast-close:hover {
+            color: var(--text-main, #0f172a);
+        }
+
+        .rc-toast-bar {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3.5px;
+            width: 100%;
+            transform-origin: left center;
+            animation: rcToastProgress linear forwards;
+        }
+
+        .rc-side-toast:hover .rc-toast-bar {
+            animation-play-state: paused;
+        }
+
+        @keyframes rcToastProgress {
+            from { transform: scaleX(1); }
+            to   { transform: scaleX(0); }
+        }
+
+        @media (max-width: 480px) {
+            #rc-toast-container {
+                top: 14px;
+                right: 12px;
+                left: 12px;
+            }
+            .rc-side-toast {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -274,8 +390,8 @@
                     </button>
                 </div>
             </div>
-        </div> <!-- Penutup Row -->
-    </div> <!-- Penutup Container -->
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -285,11 +401,55 @@
         let checkoutData = {}; 
         let selectedPayment = null; 
         
-        // Variabel Kalkulasi Baru
         let subTotalTagihanAwal = 0; 
         let totalQtySemuaTiket = 0;
         let kodePromoAktif = ""; 
         let diskonPromo = 0;
+
+        // ==========================================
+        // 🔥 NOTIFIKASI TOAST DARI SAMPING + PROGRESS BAR
+        // ==========================================
+        function showSideAlert(title, message, type = 'warning', duration = 3500) {
+            let container = document.getElementById('rc-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'rc-toast-container';
+                document.body.appendChild(container);
+            }
+
+            const icons = {
+                info: '<i class="bi bi-info-lg"></i>',
+                success: '<i class="bi bi-check-lg"></i>',
+                error: '<i class="bi bi-x-lg"></i>',
+                warning: '<i class="bi bi-exclamation-lg"></i>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `rc-side-toast rc-toast-${type}`;
+            toast.innerHTML = `
+                <div class="rc-toast-icon">${icons[type] || icons.info}</div>
+                <div class="rc-toast-body">
+                    <div class="rc-toast-title">${title}</div>
+                    <div class="rc-toast-msg">${message}</div>
+                </div>
+                <button type="button" class="rc-toast-close" aria-label="Tutup">&times;</button>
+                <div class="rc-toast-bar" style="animation-duration: ${duration}ms;"></div>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => toast.classList.add('show'));
+            });
+
+            const closeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 380);
+            };
+
+            toast.querySelector('.rc-toast-close').addEventListener('click', closeToast);
+            toast.querySelector('.rc-toast-bar').addEventListener('animationend', closeToast);
+        }
 
         function setFieldState(input, fbEl, state, message) {
             input.classList.remove('is-valid', 'is-invalid');
@@ -313,7 +473,6 @@
             const input = document.getElementById('chkNik');
             const fb = document.getElementById('nikFeedback');
             
-            // Bersihkan otomatis karakter non-angka dan batasi 16 digit
             input.value = input.value.replace(/\D/g, '').slice(0, 16);
             const val = input.value;
 
@@ -344,7 +503,6 @@
             const input = document.getElementById('chkPhone');
             const fb = document.getElementById('phoneFeedback');
 
-            // Hanya izinkan angka dan tanda '+' di awal
             let val = input.value.replace(/(?!^\+)\D/g, '');
             input.value = val;
 
@@ -357,7 +515,6 @@
                 return false;
             }
 
-            // Harus diawali 08, 628, atau +628
             if (!/^(08|628|\+628)/.test(val)) {
                 setFieldState(input, fb, 'invalid', 'Format salah: nomor harus diawali 08 atau 628.');
                 return false;
@@ -367,7 +524,6 @@
             const minLen = digitsOnly.startsWith('62') ? 11 : 10;
             const maxLen = digitsOnly.startsWith('62') ? 15 : 14;
 
-            // Pastikan digit operator setelah 08 / 628 bukan 0
             const operatorDigit = digitsOnly.startsWith('62') ? digitsOnly[3] : digitsOnly[2];
             if (operatorDigit === '0') {
                 setFieldState(input, fb, 'invalid', 'Format salah: kode operator tidak valid.');
@@ -388,29 +544,6 @@
             return true;
         }
 
-        function showToast(pesan, tipe = 'warning') {
-            const oldToast = document.querySelector('.floating-toast');
-            if (oldToast) oldToast.remove();
-
-            const toast = document.createElement('div');
-            toast.className = 'floating-toast';
-            
-            let icon = 'bi-info-circle-fill';
-            let color = 'inherit';
-            if (tipe === 'warning') { icon = 'bi-exclamation-triangle-fill'; color = '#f59e0b'; }
-            if (tipe === 'error') { icon = 'bi-x-circle-fill'; color = '#ef4444'; }
-            if (tipe === 'success') { icon = 'bi-check-circle-fill'; color = '#10b981'; }
-
-            toast.innerHTML = `<i class="bi ${icon}" style="color: ${color}; font-size: 1.1rem;"></i> <span>${pesan}</span>`;
-            document.body.appendChild(toast);
-
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 400);
-            }, 3000);
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -422,7 +555,6 @@
                 userData = JSON.parse(userRaw); 
                 checkoutData = JSON.parse(checkoutRaw);
                 
-                // Jika data rusak atau tidak bawa Array Tickets
                 if (!checkoutData.tickets || checkoutData.tickets.length === 0) {
                     throw new Error("Keranjang kosong!");
                 }
@@ -433,7 +565,6 @@
                 return;
             }
 
-            // Isi Data Pemesan
             document.getElementById('chkName').value = userData.fullName || userData.username || '';
             document.getElementById('chkEmail').value = userData.email || '';
             document.getElementById('chkPhone').value = userData.phone || '';
@@ -441,14 +572,12 @@
             if (userData.birthDate) document.getElementById('chkBirthDate').value = userData.birthDate;
             if (userData.gender) document.getElementById('chkGender').value = userData.gender;
 
-            // Jalankan pengecekan awal jika data sudah terisi dari profil akun
             if (document.getElementById('chkNik').value) validateNik();
             if (document.getElementById('chkPhone').value) validatePhone();
 
             document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
             document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
             
-            // 👇 RENDER DAFTAR TIKET MULTI-QTY 👇
             let summaryHtml = '';
             subTotalTagihanAwal = 0;
             totalQtySemuaTiket = 0;
@@ -470,7 +599,6 @@
                     </div>
                 `;
 
-                // Cek apakah ada tiket jenis Early Entry
                 const eeMatch = tiket.tierName.match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
                 if (eeMatch) {
                     foundEarlyEntry = true;
@@ -481,7 +609,6 @@
             document.getElementById('ticketSummaryList').innerHTML = summaryHtml;
             document.getElementById('sumPrice').innerText = `Rp ${subTotalTagihanAwal.toLocaleString('id-ID')}`;
 
-            // Tampilkan Warning Early Entry
             if (foundEarlyEntry) {
                 const warnBox = document.getElementById('earlyEntryWarningBox');
                 const warnTxt = document.getElementById('earlyEntryWarningText');
@@ -493,7 +620,6 @@
 
             hitungTotal();
 
-            // Breadcrumb
             const breadcrumbContainer = document.getElementById('breadcrumb-container');
             if (breadcrumbContainer && checkoutData) {
                 breadcrumbContainer.innerHTML = `
@@ -513,7 +639,6 @@
         });
 
         function hitungTotal() { 
-            // 1. Kurangi SubTotal dengan Promo Rupiah (Pastikan tidak minus)
             let hargaSetelahDiskon = subTotalTagihanAwal - diskonPromo; 
             if(hargaSetelahDiskon < 0) hargaSetelahDiskon = 0; 
             
@@ -529,7 +654,6 @@
                 document.getElementById('rowPajak').classList.add('d-none');
             }
 
-            // 2. Tambahkan Pajak ke Hasil Harga Setelah Diskon
             let totalAkhir = hargaSetelahDiskon + pajak;
             document.getElementById('sumTotal').innerText = `Rp ${totalAkhir.toLocaleString('id-ID')}`; 
             
@@ -543,7 +667,9 @@
             const rowDiskon = document.getElementById('rowDiskon'); 
             const code = inputEl.value.trim();
             
-            if(!code) return;
+            if(!code) {
+                return showSideAlert('Kode Kosong', 'Masukkan kode promo terlebih dahulu.', 'warning');
+            }
             statusEl.innerHTML = '<span class="text-info spinner-border spinner-border-sm me-1"></span> <span class="text-info small">Mengecek...</span>';
             
             try {
@@ -553,29 +679,30 @@
                     body: JSON.stringify({ 
                         code: code, 
                         eventId: checkoutData.eventId,
-                        tickets: checkoutData.tickets // 👈 Kirim array tickets agar backend bisa hitung total
+                        tickets: checkoutData.tickets
                     }) 
                 });
                 const data = await res.json();
                 
                 if(data.valid) { 
-                    // Backend sekarang mengembalikan Nilai Rupiah Murni (data.discount)
                     kodePromoAktif = code.toUpperCase(); 
                     diskonPromo = data.discount; 
                     
                     statusEl.innerHTML = `<span class="text-success fw-bold">✅ ${data.message}</span>`; 
                     document.getElementById('sumDiskon').innerText = `- Rp ${diskonPromo.toLocaleString('id-ID')}`; 
                     rowDiskon.classList.remove('d-none'); 
+                    showSideAlert('Promo Diterapkan', data.message, 'success');
                 } else { 
                     kodePromoAktif = ""; 
                     diskonPromo = 0; 
                     statusEl.innerHTML = `<span class="text-danger fw-bold">❌ ${data.message}</span>`; 
                     rowDiskon.classList.add('d-none'); 
-                    showToast(data.message, 'error');
+                    showSideAlert('Promo Gagal', data.message, 'error');
                 }
                 hitungTotal();
             } catch(e) { 
                 statusEl.innerHTML = '<span class="text-danger">Gagal mengecek promo.</span>'; 
+                showSideAlert('Koneksi Gagal', 'Gagal mengecek kode promo ke server.', 'error');
             }
         }
 
@@ -600,18 +727,22 @@
             const isPhoneValid = validatePhone(true);
 
             if (!name || !birthDate || !gender) {
-                return Swal.fire('Data Belum Lengkap', 'Nama Lengkap, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
+                return showSideAlert('Data Belum Lengkap', 'Nama Lengkap, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
             }
             if (!isNikValid) {
                 document.getElementById('chkNik').focus();
-                return Swal.fire('Format NIK Salah', 'Pastikan NIK berisi 16 digit angka sesuai KTP.', 'warning');
+                return showSideAlert('Format NIK Salah', 'Pastikan NIK berisi 16 digit angka sesuai KTP.', 'warning');
             }
             if (!isPhoneValid) {
                 document.getElementById('chkPhone').focus();
-                return Swal.fire('Format Nomor Salah', 'Masukkan nomor WhatsApp yang valid (diawali 08 atau 628).', 'warning');
+                return showSideAlert('Format Nomor Salah', 'Masukkan nomor WhatsApp yang valid (diawali 08 atau 628).', 'warning');
             }
-            if (!recaptchaToken) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
-            if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
+            if (!recaptchaToken) {
+                return showSideAlert('Verifikasi Gagal', 'Harap centang verifikasi keamanan terlebih dahulu!', 'error');
+            }
+            if (!selectedPayment) {
+                return showSideAlert('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
+            }
 
             let totalTagihanAkhir = (subTotalTagihanAwal - diskonPromo) + (window.pajakAktif || 0);
             if (totalTagihanAkhir < 0) totalTagihanAkhir = 0;
@@ -627,7 +758,7 @@
 
             if (selectedPayment === 'saldo') {
                 if (userData.saldo < totalTagihanAkhir) {
-                    return Swal.fire('Saldo Kurang', 'Saldo RCPAY kamu tidak mencukupi.', 'error');
+                    return showSideAlert('Saldo Kurang', 'Saldo RCPAY kamu tidak mencukupi untuk transaksi ini.', 'error');
                 }
 
                 const { value: pin } = await Swal.fire({
@@ -638,7 +769,10 @@
                     preConfirm: () => document.getElementById('swal-input-pin').value
                 });
 
-                if (!pin || pin.length !== 6) return Swal.fire('Gagal', 'PIN harus 6 angka!', 'error');
+                if (pin === undefined) return;
+                if (!pin || pin.length !== 6) {
+                    return showSideAlert('PIN Tidak Valid', 'PIN keamanan harus 6 digit angka!', 'error');
+                }
 
                 Swal.fire({ title: 'Memproses tiket...', didOpen: () => Swal.showLoading(), background: 'var(--bg-card)', color: 'var(--text-main)' });
                 
@@ -661,18 +795,21 @@
                     });
                     
                     const data = await res.json();
+                    Swal.close();
                     
                     if (res.ok && data.success) { 
                         userData.saldo = data.sisaSaldo; 
                         localStorage.setItem('userData', JSON.stringify(userData)); 
                         localStorage.removeItem('checkoutData'); 
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: `Tiket berhasil diterbitkan!`, background: 'var(--bg-card)', color: 'var(--text-main)' }).then(() => window.location.href = '/dashboard'); 
+                        showSideAlert('Pembayaran Berhasil', 'Tiket berhasil diterbitkan! Mengalihkan ke dashboard...', 'success', 2000);
+                        setTimeout(() => { window.location.href = '/dashboard'; }, 1800);
                     } else { 
-                        Swal.fire('Gagal', data.message, 'error'); 
+                        showSideAlert('Transaksi Gagal', data.message || 'Gagal memproses tiket.', 'error');
                         turnstile.reset(); 
                     } 
                 } catch (err) { 
-                    Swal.fire('Error', 'Koneksi terputus', 'error'); 
+                    Swal.close();
+                    showSideAlert('Koneksi Terputus', 'Gagal terhubung ke server.', 'error');
                     turnstile.reset(); 
                 }
 
@@ -727,15 +864,18 @@
                                 });
                                 
                                 const saveData = await saveRes.json();
+                                Swal.close();
                                 
                                 if(saveData.success) { 
                                     localStorage.removeItem('checkoutData'); 
-                                    Swal.fire({icon: 'success', title: 'Sukses!', text: 'Tiket terbit!', background: 'var(--bg-card)', color: 'var(--text-main)'}).then(() => window.location.href = '/dashboard'); 
+                                    showSideAlert('Pembayaran Sukses', 'Tiket berhasil terbit! Mengalihkan ke dashboard...', 'success', 2000);
+                                    setTimeout(() => { window.location.href = '/dashboard'; }, 1800);
                                 } else {
-                                    Swal.fire({icon: 'error', title: 'Gagal Menerbitkan', text: saveData.message, background: 'var(--bg-card)', color: 'var(--text-main)'});
+                                    showSideAlert('Gagal Menerbitkan', saveData.message || 'Terjadi kesalahan saat menerbitkan tiket.', 'error');
                                 }
                             } catch(err) {
-                                Swal.fire({icon: 'error', title: 'Koneksi Terputus', text: 'Gagal menghubungi server database.', background: 'var(--bg-card)', color: 'var(--text-main)'});
+                                Swal.close();
+                                showSideAlert('Koneksi Terputus', 'Gagal menghubungi server database.', 'error');
                             }
                         };
 
@@ -743,17 +883,17 @@
                             onSuccess: function(result){ clearInterval(radarPembayaran); prosesSuksesMidtrans(); },
                             onPending: function(result){ 
                                 clearInterval(radarPembayaran);
-                                Swal.fire({icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan pembayaran kamu.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                showSideAlert('Menunggu Pembayaran', 'Silakan selesaikan pembayaran kamu.', 'info');
                                 turnstile.reset(); 
                             },
                             onError: function(result){ 
                                 clearInterval(radarPembayaran);
-                                Swal.fire({icon: 'error', title: 'Pembayaran Gagal', text: 'Terjadi kesalahan dari pihak bank.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                showSideAlert('Pembayaran Gagal', 'Terjadi kesalahan dari pihak bank/payment.', 'error');
                                 turnstile.reset(); 
                             },
                             onClose: function(){ 
                                 clearInterval(radarPembayaran);
-                                Swal.fire({icon: 'warning', title: 'Dibatalkan', text: 'Kamu menutup halaman pembayaran.', background: 'var(--bg-card)', color: 'var(--text-main)'}); 
+                                showSideAlert('Pembayaran Dibatalkan', 'Kamu menutup halaman pembayaran.', 'warning');
                                 turnstile.reset(); 
                             }
                         }); 
@@ -772,7 +912,7 @@
                                     } else if (status === 'cancel' || status === 'expire' || status === 'deny') {
                                         clearInterval(radarPembayaran);
                                         window.snap.hide();
-                                        Swal.fire('Gagal', 'Pembayaran dibatalkan atau kadaluarsa.', 'error');
+                                        showSideAlert('Pembayaran Gagal', 'Pembayaran dibatalkan atau kadaluarsa.', 'error');
                                         turnstile.reset();
                                     }
                                 }
@@ -780,11 +920,12 @@
                         }, 3000);
 
                     } else { 
-                        Swal.fire('Error', data.message, 'error'); 
+                        showSideAlert('Gagal Membuat Tagihan', data.message || 'Terjadi kesalahan.', 'error');
                         turnstile.reset(); 
                     }
                 } catch (err) {
-                    Swal.fire('Error', 'Koneksi terputus ke Midtrans', 'error');
+                    Swal.close();
+                    showSideAlert('Koneksi Terputus', 'Koneksi terputus ke Midtrans.', 'error');
                     turnstile.reset();
                 }
             }
