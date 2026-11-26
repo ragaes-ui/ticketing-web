@@ -309,19 +309,24 @@
                         <div class="img-preview-box"><img id="addPreview" style="display:none;"> <span id="addTxt" class="text-muted small"><i class="bi bi-image fs-4"></i></span></div>
                     </div>
                     <div class="mb-3 p-3 mt-3" style="border: 1px dashed var(--border-color); border-radius: 12px;"><label class="form-label text-info"><i class="bi bi-people-fill me-1"></i> <span data-i18n="lbl_lineup">Poster Line Up</span></label><div id="addLineups"></div><button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('addLineups')"><i class="bi bi-plus-lg"></i> <span data-i18n="btn_add_lineup">Tambah</span></button></div>
-                    <div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="category" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div><div class="col-md-6"><label class="form-label text-warning"><i class="bi bi-bank me-1"></i> <span data-i18n="lbl_tax">Pajak Event (%)</span></label><input type="text" id="taxRate" class="form-control" placeholder="0" min="0" max="100"></div></div>
+                    <div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" data-i18n="lbl_category">Kategori</label><select id="category" class="form-select"><option value="General">General</option><option value="Konser">Konser</option><option value="Olahraga">Olahraga</option><option value="Streaming">Streaming</option></select></div><div class="col-md-6"><label class="form-label text-warning"><i class="bi bi-bank me-1"></i> <span data-i18n="lbl_tax">Pajak Event (%)</span></label><input type="number" id="taxRate" class="form-control" placeholder="0" min="0" max="100"></div></div>
                     <div class="mb-3"><label class="form-label" data-i18n="lbl_event_name">Nama Event</label><input type="text" id="name" class="form-control" required></div>
 
                     <!-- 👇 INPUT MEDIA SOSIAL & LOGO PENYELENGGARA 👇 -->
                     <div class="mb-3 p-3" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.35); border-radius: 12px;">
                         <label class="form-label text-info mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
                         
-                        <div class="mb-3">
+<div class="mb-3">
                             <label class="small text-muted fw-bold mb-1 d-block">Logo Penyelenggara / EO</label>
                             <div class="d-flex align-items-center gap-3">
-                                <img id="addLogoPreview" style="display:none; width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                <div id="addLogoWrapper" class="position-relative" style="display: none; flex-shrink: 0;">
+                                    <img id="addLogoPreview" style="width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color);">
+                                    <button type="button" onclick="resetAddLogo()" class="btn btn-danger p-0 rounded-circle position-absolute shadow-sm" style="width: 20px; height: 20px; top: -6px; right: -6px; font-size: 0.7rem; line-height: 1;" title="Batal Pilih Logo">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
                                 <div class="flex-grow-1">
-                                    <input type="file" id="organizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewLocalImage(this, 'addLogoPreview', null)">
+                                    <input type="file" id="organizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewAddLogo(this)">
                                     <small class="text-info d-block mt-1" style="font-size: 0.7rem;">*Opsional, logo akan otomatis diunggah ke Supabase</small>
                                 </div>
                             </div>
@@ -669,12 +674,17 @@
                     <div class="mb-3 p-3" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.35); border-radius: 12px;">
                         <label class="form-label text-info mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
                         
-                        <div class="mb-3">
+                            <div class="mb-3">
                             <label class="small text-muted fw-bold mb-1 d-block">Logo Penyelenggara / EO</label>
                             <div class="d-flex align-items-center gap-3">
-                                <img id="editLogoPreview" style="display:none; width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                <div id="editLogoWrapper" class="position-relative" style="display: none; flex-shrink: 0;">
+                                    <img id="editLogoPreview" style="width: 52px; height: 52px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color);">
+                                    <button type="button" id="btnHapusLogoEO" onclick="hapusLogoPenyelenggara()" class="btn btn-danger p-0 rounded-circle position-absolute shadow-sm" style="width: 20px; height: 20px; top: -6px; right: -6px; font-size: 0.7rem; line-height: 1;" title="Hapus Logo dari Supabase">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
                                 <div class="flex-grow-1">
-                                    <input type="file" id="editOrganizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewLocalImage(this, 'editLogoPreview', null)">
+                                    <input type="file" id="editOrganizerLogoFile" class="form-control form-control-sm" accept="image/*" onchange="previewEditLogo(this)">
                                     <input type="hidden" id="editOrganizerLogoUrl">
                                     <small class="text-info d-block mt-1" style="font-size: 0.7rem;">*Kosongkan jika tidak ingin mengganti logo</small>
                                 </div>
@@ -922,7 +932,7 @@
 
         function filterBuyers() { 
             const dVal = document.getElementById('filterDay').value; const mVal = document.getElementById('filterMonth').value; const yVal = document.getElementById('filterYear').value; const sVal = document.getElementById('searchBuyer').value.toLowerCase(); 
-            const filtered = myBuyersData.filter(b => { let mD = true; let mS = true; const bDate = new Date(b.date); if (dVal) mD = (bDate.toISOString().split('T')[0] === dVal); else if (mVal) mD = (bDate.toISOString().slice(0, 7) === mVal); if (sVal) mS = `${b.customerName||''} ${b.eventName||''} ${b.ticketCode||''}`.toLowerCase().includes(sVal); return mD && mS; }); 
+            const filtered = myBuyersData.filter(b => { let mD = true; let mS = true; const bDate = new Date(b.date); if (dVal) mD = (bDate.toISOString().split('T')[0] === dVal); else if (mVal) mD = (bDate.toISOString().slice(0, 7) === mVal); else if (yVal) mD = (bDate.getFullYear().toString() === yVal); if (sVal) mS = `${b.customerName||''} ${b.eventName||''} ${b.ticketCode||''}`.toLowerCase().includes(sVal); return mD && mS; }); 
             currentFilteredBuyers = filtered; renderBuyerTable(filtered); 
         }
         function resetBuyerFilter() { document.getElementById('filterDay').value = ''; document.getElementById('filterMonth').value = ''; document.getElementById('filterYear').value = ''; document.getElementById('searchBuyer').value = ''; currentFilteredBuyers = myBuyersData; renderBuyerTable(myBuyersData); }
@@ -1271,7 +1281,7 @@
                     e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers'); 
                     document.getElementById('addLineups').innerHTML = ''; 
                     previewLocalImage(document.getElementById('eventImageFile'), 'addPreview', 'addTxt');
-                    previewLocalImage(document.getElementById('organizerLogoFile'), 'addLogoPreview', null);
+                    resetAddLogo();
                     await loadMyEvents(); switchMenu('myevents'); 
                 } else { Swal.fire('Gagal', 'Gagal menyimpan event', 'error'); } 
             } catch (err) { Swal.fire('Error', err.message || 'Gagal mengupload gambar.', 'error'); } 
@@ -1288,7 +1298,16 @@
                 document.getElementById('editName').value = ev.name; 
                 document.getElementById('editOrganizerLogoUrl').value = ev.organizerLogo || '';
                 document.getElementById('editOrganizerLogoFile').value = '';
-                previewImage(ev.organizerLogo, 'editLogoPreview');
+                const editLogoWrapper = document.getElementById('editLogoWrapper');
+                const editLogoPreview = document.getElementById('editLogoPreview');
+                if (ev.organizerLogo) {
+                    editLogoPreview.src = ev.organizerLogo;
+                    editLogoWrapper.style.display = 'inline-block';
+                } else {
+                    editLogoPreview.src = '';
+                    editLogoWrapper.style.display = 'none';
+                }
+                
                 document.getElementById('editWhatsapp').value = ev.whatsapp || '';
                 document.getElementById('editInstagram').value = ev.instagram || '';
                 document.getElementById('editTiktok').value = ev.tiktok || '';
@@ -1315,7 +1334,110 @@
                 editModal.show(); 
             } 
         }
-        
+        function previewAddLogo(input) {
+            const wrapper = document.getElementById('addLogoWrapper');
+            const img = document.getElementById('addLogoPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; wrapper.style.display = 'inline-block'; };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                wrapper.style.display = 'none';
+            }
+        }
+
+        function resetAddLogo() {
+            document.getElementById('organizerLogoFile').value = '';
+            document.getElementById('addLogoPreview').src = '';
+            document.getElementById('addLogoWrapper').style.display = 'none';
+        }
+
+        function previewEditLogo(input) {
+            const wrapper = document.getElementById('editLogoWrapper');
+            const img = document.getElementById('editLogoPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    wrapper.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function hapusLogoPenyelenggara() {
+            const eventId = document.getElementById('editId').value;
+            const currentLogoUrl = document.getElementById('editOrganizerLogoUrl').value.trim();
+            const fileInput = document.getElementById('editOrganizerLogoFile');
+            const wrapper = document.getElementById('editLogoWrapper');
+            const previewImg = document.getElementById('editLogoPreview');
+
+            // Jika belum tersimpan di server (hanya preview file lokal yang baru dipilih)
+            if (!currentLogoUrl) {
+                fileInput.value = '';
+                previewImg.src = '';
+                wrapper.style.display = 'none';
+                return;
+            }
+
+            const confirmRes = await Swal.fire({
+                title: 'Hapus Logo EO?',
+                text: 'Logo penyelenggara akan dihapus permanen dari Supabase!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                background: 'var(--bg-card)',
+                color: 'var(--text-main)'
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            Swal.fire({
+                title: 'Menghapus Logo...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+                background: 'var(--bg-card)',
+                color: 'var(--text-main)'
+            });
+
+            try {
+                const res = await fetch('/api/delete-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageUrl: currentLogoUrl, eventId: eventId })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    return Swal.fire('Gagal', data.message || 'Gagal menghapus logo di Supabase.', 'error');
+                }
+
+                // Bersihkan form & update array lokal myEventsData
+                document.getElementById('editOrganizerLogoUrl').value = '';
+                fileInput.value = '';
+                previewImg.src = '';
+                wrapper.style.display = 'none';
+
+                const evIndex = myEventsData.findIndex(e => e._id === eventId);
+                if (evIndex !== -1) myEventsData[evIndex].organizerLogo = '';
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Logo dihapus dari Supabase!',
+                    showConfirmButton: false,
+                    timer: 2200,
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-main)'
+                });
+            } catch (err) {
+                Swal.fire('Error', 'Koneksi ke server terputus.', 'error');
+            }
+        }
         async function saveEditEvent() { 
             const id = document.getElementById('editId').value; 
             const tiers = getTiers('editTiers'); 
