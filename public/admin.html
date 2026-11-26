@@ -276,6 +276,36 @@
                                 </div>
                                 <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nama Event" required></div>
                                 <div class="mb-3"><input type="text" id="organizer" class="form-control" placeholder="Nama Penyelenggara (Promotor)" required></div>
+
+                                <!-- 👇 INPUT MEDIA SOSIAL & LOGO PENYELENGGARA 👇 -->
+                                <div class="mb-3 p-3" style="background: rgba(0, 198, 255, 0.05); border: 1px dashed rgba(0, 198, 255, 0.3); border-radius: 12px;">
+                                    <label class="small text-info fw-bold mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-image"></i></span>
+                                        <input type="url" id="organizerLogo" class="form-control form-control-sm" placeholder="URL Logo EO (https://...)">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-dark border-secondary text-success"><i class="bi bi-whatsapp"></i></span>
+                                        <input type="text" id="whatsapp" class="form-control form-control-sm" placeholder="No. WA Admin (62812...)">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-dark border-secondary" style="color: #E1306C;"><i class="bi bi-instagram"></i></span>
+                                        <input type="url" id="instagram" class="form-control form-control-sm" placeholder="Link Instagram">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-tiktok"></i></span>
+                                        <input type="url" id="tiktok" class="form-control form-control-sm" placeholder="Link TikTok">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-dark border-secondary text-danger"><i class="bi bi-youtube"></i></span>
+                                        <input type="url" id="youtube" class="form-control form-control-sm" placeholder="Link YouTube">
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-globe2"></i></span>
+                                        <input type="url" id="website" class="form-control form-control-sm" placeholder="Link Website Resmi">
+                                    </div>
+                                </div>
+
                                 <div class="mb-3"><input type="text" id="location" class="form-control" placeholder="Lokasi" required></div>
                                 <div class="mb-3"><input type="text" id="mapsUrl" class="form-control" placeholder="Link Google Maps (https://maps.app.goo.gl/...)"></div>
                                 <div class="row g-2 mb-3">
@@ -579,25 +609,55 @@
                     <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addLineupRow('editLineups')"><i class="bi bi-plus-lg"></i> Tambah Poster Line Up</button>
                 </div>
                 <label class="small text-warning fw-bold mb-1"><i class="bi bi-bank me-1"></i> Pajak Event (%)</label>
-<div class="mb-3"><input type="number" id="editTaxRate" class="form-control"></div>
+                <div class="mb-3"><input type="number" id="editTaxRate" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_name">Nama Event</label>
                 <div class="mb-3"><input type="text" id="editName" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1">Nama Penyelenggara</label>
                 <div class="mb-3"><input type="text" id="editOrganizer" class="form-control"></div>
+
+                <!-- 👇 EDIT MEDIA SOSIAL & LOGO PENYELENGGARA 👇 -->
+                <div class="mb-3 p-3" style="background: rgba(0, 198, 255, 0.05); border: 1px dashed rgba(0, 198, 255, 0.3); border-radius: 12px;">
+                    <label class="small text-info fw-bold mb-2 d-block"><i class="bi bi-share-fill me-1"></i> Media Sosial & Logo EO (Opsional)</label>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-image"></i></span>
+                        <input type="url" id="editOrganizerLogo" class="form-control form-control-sm" placeholder="URL Logo EO (https://...)">
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-dark border-secondary text-success"><i class="bi bi-whatsapp"></i></span>
+                        <input type="text" id="editWhatsapp" class="form-control form-control-sm" placeholder="No. WA Admin (62812...)">
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-dark border-secondary" style="color: #E1306C;"><i class="bi bi-instagram"></i></span>
+                        <input type="url" id="editInstagram" class="form-control form-control-sm" placeholder="Link Instagram">
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-tiktok"></i></span>
+                        <input type="url" id="editTiktok" class="form-control form-control-sm" placeholder="Link TikTok">
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-dark border-secondary text-danger"><i class="bi bi-youtube"></i></span>
+                        <input type="url" id="editYoutube" class="form-control form-control-sm" placeholder="Link YouTube">
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-dark border-secondary text-primary"><i class="bi bi-globe2"></i></span>
+                        <input type="url" id="editWebsite" class="form-control form-control-sm" placeholder="Link Website Resmi">
+                    </div>
+                </div>
+
                 <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_loc">Lokasi</label>
                 <div class="mb-3"><input type="text" id="editLocation" class="form-control"></div>
                 <label class="small text-white-50 fw-bold mb-1">Link Google Maps</label>
                 <div class="mb-3"><input type="text" id="editMapsUrl" class="form-control" placeholder="https://maps.app.goo.gl/..."></div>
-<div class="row g-2 mb-3">
-    <div class="col-6">
-        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
-        <input type="date" id="editDate" class="form-control">
-    </div>
-    <div class="col-6">
-        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai</label>
-        <input type="date" id="editEndDate" class="form-control">
-    </div>
-</div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="small text-white-50 fw-bold mb-1" data-i18n="lbl_date">Tanggal Mulai</label>
+                        <input type="date" id="editDate" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-white-50 fw-bold mb-1">Tanggal Selesai</label>
+                        <input type="date" id="editEndDate" class="form-control">
+                    </div>
+                </div>
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <label class="small text-white-50 fw-bold mb-1">Jam Mulai</label>
@@ -825,7 +885,6 @@
         function addTierRow(id, n='', p='', s='', m='1', o='', isLocked=false, accessCode='') {
             let formatP = p ? new Intl.NumberFormat('id-ID').format(p) : '';
             
-            // Cek apakah tiket ini punya batas jam Early Entry (saat di-edit)
             const eeMatch = n.match(/\(Max\s*([0-2][0-9]:[0-5][0-9])\)/i);
             const isEarly = !!eeMatch;
             const eeTime = eeMatch ? eeMatch[1] : '';
@@ -879,7 +938,6 @@
                 </div>`);
         }
 
-        // Fungsi memunculkan input jam saat switch Early Entry dinyalakan
         function toggleEarlyTime(checkbox) {
             const row = checkbox.closest('.tier-row');
             const box = row.querySelector('.tier-early-box');
@@ -897,16 +955,15 @@
             }
         }
 
-        // Fungsi animasi untuk memunculkan kolom input kode
         function toggleAccessCode(checkbox) {
             const input = checkbox.closest('.tier-row').querySelector('.tier-access-code');
             if (checkbox.checked) {
                 input.style.display = 'block';
-                input.setAttribute('required', 'true'); // Wajib diisi kalau digembok
+                input.setAttribute('required', 'true');
             } else {
                 input.style.display = 'none';
                 input.removeAttribute('required');
-                input.value = ''; // Kosongkan jika gembok dimatikan
+                input.value = '';
             }
         }
         
@@ -927,7 +984,6 @@
                 const isEarly = r.querySelector('.tier-is-early')?.checked;
                 const earlyTime = r.querySelector('.tier-early-time')?.value;
 
-                // Jika Early Entry aktif, tempelkan batas jamnya ke nama tiket
                 if (isEarly && earlyTime) {
                     nameVal = `${nameVal} (Max ${earlyTime})`;
                 }
@@ -959,7 +1015,13 @@
             const taxInput = document.getElementById('taxRate');
             const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
-                name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value, 
+                name: document.getElementById('name').value, category: document.getElementById('category').value, organizer: document.getElementById('organizer').value,
+                organizerLogo: document.getElementById('organizerLogo').value.trim(),
+                whatsapp: document.getElementById('whatsapp').value.trim(),
+                instagram: document.getElementById('instagram').value.trim(),
+                tiktok: document.getElementById('tiktok').value.trim(),
+                youtube: document.getElementById('youtube').value.trim(),
+                website: document.getElementById('website').value.trim(),
                 location: document.getElementById('location').value,
                 date: document.getElementById('date').value,
                 endDate: document.getElementById('endDate').value || null,
@@ -973,7 +1035,7 @@
             };
             try {
                 await fetch('/api/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-                loadTable(); e.target.reset(); document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers');
+                loadTable(); e.target.reset(); document.getElementById('addLineups').innerHTML = ''; document.getElementById('addTiers').innerHTML = ''; addTierRow('addTiers');
                 previewImage('', 'addPreview'); Swal.fire(t.alert_success, t.alert_success_add, 'success');
             } catch (err) { Swal.fire(t.alert_err, t.alert_err_save, 'error'); }
         });
@@ -992,6 +1054,12 @@
                 document.getElementById('editMapsUrl').value = ev.mapsUrl || '';
                 document.getElementById('editId').value = ev._id; document.getElementById('editName').value = ev.name;
                 document.getElementById('editOrganizer').value = ev.organizer || '';
+                document.getElementById('editOrganizerLogo').value = ev.organizerLogo || '';
+                document.getElementById('editWhatsapp').value = ev.whatsapp || '';
+                document.getElementById('editInstagram').value = ev.instagram || '';
+                document.getElementById('editTiktok').value = ev.tiktok || '';
+                document.getElementById('editYoutube').value = ev.youtube || '';
+                document.getElementById('editWebsite').value = ev.website || '';
                 document.getElementById('editLocation').value = ev.location || ''; document.getElementById('editDescription').value = ev.description || '';
                 document.getElementById('editSecretData').value = ev.secretData || '';
                 const taxInput = document.getElementById('editTaxRate');
@@ -1037,6 +1105,12 @@
             const taxRateValue = taxInput ? (parseInt(taxInput.value) || 0) : 0;
             const data = {
                 name: document.getElementById('editName').value, date: document.getElementById('editDate').value, endDate: document.getElementById('editEndDate').value || null, organizer: document.getElementById('editOrganizer').value,
+                organizerLogo: document.getElementById('editOrganizerLogo').value.trim(),
+                whatsapp: document.getElementById('editWhatsapp').value.trim(),
+                instagram: document.getElementById('editInstagram').value.trim(),
+                tiktok: document.getElementById('editTiktok').value.trim(),
+                youtube: document.getElementById('editYoutube').value.trim(),
+                website: document.getElementById('editWebsite').value.trim(),
                 startTime: document.getElementById('editStartTime').value, endTime: document.getElementById('editEndTime').value, 
                 salesOpenDate: document.getElementById('editSalesOpenDate').value ? document.getElementById('editSalesOpenDate').value + ':00+07:00' : '',
                 location: document.getElementById('editLocation').value, description: document.getElementById('editDescription').value,
@@ -1051,8 +1125,6 @@
         }
 
         // --- MANAJEMEN PROMO ---
-        
-        // FUNGSI BARU: Tarik data tier tiket berdasarkan event yang dipilih
         function updatePromoTierDropdown() {
             const eventId = document.getElementById('promoEventId').value;
             const tierSelect = document.getElementById('promoTierName');
@@ -1070,7 +1142,6 @@
             tierSelect.innerHTML = html;
         }
 
-        // FUNGSI BARU: Tampilkan / Sembunyikan kolom Maks Potongan untuk Persen
         function toggleMaxDiscount() {
             const type = document.getElementById('promoType').value;
             const boxMax = document.getElementById('boxMaxDiscount');
@@ -1081,12 +1152,12 @@
                 boxMax.style.display = 'block';
                 lblDisc.innerText = 'Potongan (%)';
                 inputDisc.placeholder = '10';
-                inputDisc.value = inputDisc.value.replace(/\./g, ''); // Hapus titik kalau ganti ke persen
+                inputDisc.value = inputDisc.value.replace(/\./g, '');
             } else {
                 boxMax.style.display = 'none';
                 lblDisc.innerText = 'Potongan (Rp)';
                 inputDisc.placeholder = '20.000';
-                formatPromoNilai(inputDisc); // Kembalikan titik rupiah
+                formatPromoNilai(inputDisc);
             }
         }
         
@@ -1104,7 +1175,6 @@
         async function loadPromos() {
             const lang = localStorage.getItem('lang') || 'id'; const t = translations[lang];
             
-            // 1. ISI DROPDOWN EVENT OTOMATIS DARI DATABASE
             const promoSelect = document.getElementById('promoEventId');
             if (promoSelect && eventsData.length > 0) {
                 let opts = '<option value="ALL">-- Berlaku Untuk Semua Event --</option>';
@@ -1114,7 +1184,6 @@
                 updatePromoTierDropdown();
             }
 
-            // 2. RENDER KARTU PROMO
             try { 
                 const res = await fetch('/api/promos'); const data = await res.json(); 
                 document.getElementById('promoList').innerHTML = data.length === 0 ? `<div class="text-white-50 col-12">${t.empty_table}</div>` : data.map(p => {
@@ -1241,7 +1310,6 @@
         }
 
         // --- HELPERS & CHART ---
-        // 👇 FUNGSI OTOMATIS KASIH TITIK RUPIAH 👇
         function formatRupiah(input) {
             let angka = input.value.replace(/[^0-9]/g, '');
             input.value = angka ? new Intl.NumberFormat('id-ID').format(angka) : '';
