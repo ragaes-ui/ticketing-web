@@ -140,6 +140,10 @@
                             <input type="text" id="chkName" class="form-control" placeholder="Masukkan nama lengkap">
                         </div>
                         <div class="col-md-6">
+        <label class="small fw-bold text-muted mb-1">NIK (16 Digit KTP)</label>
+        <input type="text" id="chkNik" class="form-control" inputmode="numeric" maxlength="16" placeholder="Masukkan 16 digit NIK" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+    </div>
+                        <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">Email</label>
                             <input type="email" id="chkEmail" class="form-control" readonly>
                         </div>
@@ -457,14 +461,18 @@
 
         async function prosesBayar() {
             const name = document.getElementById('chkName').value.trim();
+            const nik = document.getElementById('chkNik').value.trim();
             const phone = document.getElementById('chkPhone').value.trim();
             const birthDate = document.getElementById('chkBirthDate').value;
             const gender = document.getElementById('chkGender').value;
             const recaptchaToken = turnstile.getResponse();
 
             if (!name || !phone || !birthDate || !gender) {
-                return Swal.fire('Data Belum Lengkap', 'Nama, No. WhatsApp, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
+                return Swal.fire('Data Belum Lengkap', 'Nama, NIK, No. WhatsApp, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
             }
+            if (nik.length !== 16) {
+        return Swal.fire('NIK Tidak Valid', 'NIK harus berjumlah 16 digit angka sesuai KTP!', 'warning');
+    }
             if (!recaptchaToken) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
             if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
 
@@ -473,6 +481,7 @@
             
             const buyerPayload = { 
                 name: name, 
+                nik: nik,
                 phone: phone, 
                 email: userData.email,
                 birthDate: birthDate,
