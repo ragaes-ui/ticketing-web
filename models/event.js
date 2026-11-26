@@ -78,6 +78,32 @@ const eventSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    // 👇 --- TAMBAHAN BARU: LOGO & MEDIA SOSIAL PENYELENGGARA (EO) --- 👇
+    organizerLogo: {
+        type: String,
+        default: ""
+    },
+    whatsapp: {
+        type: String,
+        default: ""
+    },
+    instagram: {
+        type: String,
+        default: ""
+    },
+    tiktok: {
+        type: String,
+        default: ""
+    },
+    youtube: {
+        type: String,
+        default: ""
+    },
+    website: {
+        type: String,
+        default: ""
+    },
+    // 👆 ------------------------------------------------------------- 👆
     
     // Lokasi: Nama Gedung (Event) atau Platform (Streaming)
     location: { 
@@ -88,7 +114,7 @@ const eventSchema = new mongoose.Schema({
         type: String,
         default: ""
     },// 👈 TAMBAHKAN BARIS INI
-      // --- TAMBAHKAN BARIS INI ---
+      // --- TAMBAHAN BARU ---
     image: { 
         type: String, 
         default: "" 
