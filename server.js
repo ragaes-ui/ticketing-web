@@ -897,6 +897,9 @@ app.post('/api/creator/buyers', async (req, res) => {
         const dataPembeli = myOrders.map(order => ({
             date: order.createdAt || order._id.getTimestamp(),
             customerName: order.customerName || '-',
+            phone: order.phone || '-',
+            birthDate: order.birthDate || '-',
+            gender: order.gender || '-',
             eventName: order.eventId ? order.eventId.name : 'Tiket Event',
             ticketCode: order.ticketCode || '-',
             tierName: order.tierName || 'GENERAL',
@@ -1455,6 +1458,9 @@ const user = await User.findOneAndUpdate(
                     customerName: buyerData ? buyerData.name : (user.fullName || user.username),
                     email: buyerData ? buyerData.email : user.email,
                     phone: buyerData ? buyerData.phone : user.phone,
+                    nik: buyerData ? (buyerData.nik || "") : "",
+                    birthDate: buyerData ? (buyerData.birthDate || "") : "", // 👈 TAMBAHKAN INI
+                    gender: buyerData ? (buyerData.gender || "") : "",       // 👈 TAMBAHKAN INI
                     status: 'valid',
                     paymentMethod: 'SALDO', 
                     orderIdMidtrans: orderIdRandom 
@@ -1612,6 +1618,9 @@ app.post('/api/midtrans-success', async (req, res) => {
                     customerName: customerName,
                     email: customerEmail,
                     phone: buyerData ? buyerData.phone : undefined,
+                    nik: buyerData ? (buyerData.nik || "") : "",
+                    birthDate: buyerData ? (buyerData.birthDate || "") : "", // 👈 TAMBAHKAN INI
+                    gender: buyerData ? (buyerData.gender || "") : "",       // 👈 TAMBAHKAN INI
                     status: 'valid',
                     paymentMethod: 'MIDTRANS', 
                     orderIdMidtrans: orderId
