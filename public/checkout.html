@@ -46,6 +46,7 @@
         }
 
         [data-theme="dark"] {
+            color-scheme: dark;
             --bg-body: #121212;
             --bg-nav: #1e1e1e;
             --bg-card: #1e1e1e;
@@ -66,8 +67,8 @@
 
         .glass-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 20px; }
         
-        .form-control { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
+        .form-control, .form-select { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px 15px; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background-color: var(--bg-input); color: var(--text-main); }
         .form-control:read-only { background-color: var(--bg-section); opacity: 0.7; color: var(--text-muted); }
 
         .payment-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 12px; }
@@ -86,7 +87,7 @@
         [data-theme="dark"] .bg-light { background-color: var(--bg-section) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
         [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
-        [data-theme="dark"] .form-control { color: var(--text-main) !important; background-color: var(--bg-input) !important; border-color: var(--border-color) !important; }
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select { color: var(--text-main) !important; background-color: var(--bg-input) !important; border-color: var(--border-color) !important; }
         [data-theme="dark"] .form-control::placeholder { color: var(--text-muted) !important; opacity: 0.8; }
         [data-theme="dark"] .fw-bold { color: var(--text-main) !important; }
         [data-theme="dark"] .btn-outline-secondary { color: var(--text-main) !important; border-color: var(--border-color) !important; }
@@ -145,6 +146,18 @@
                         <div class="col-md-6">
                             <label class="small fw-bold text-muted mb-1">No. WhatsApp</label>
                             <input type="tel" id="chkPhone" class="form-control" placeholder="0812xxxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Tanggal Lahir</label>
+                            <input type="date" id="chkBirthDate" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Jenis Kelamin</label>
+                            <select id="chkGender" class="form-select">
+                                <option value="">-- Pilih Jenis Kelamin --</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -297,6 +310,8 @@
             document.getElementById('chkName').value = userData.fullName || userData.username || '';
             document.getElementById('chkEmail').value = userData.email || '';
             document.getElementById('chkPhone').value = userData.phone || '';
+            if (userData.birthDate) document.getElementById('chkBirthDate').value = userData.birthDate;
+            if (userData.gender) document.getElementById('chkGender').value = userData.gender;
             document.getElementById('txtSaldo').innerText = `Rp ${(userData.saldo || 0).toLocaleString('id-ID')}`;
             document.getElementById('sumEventName').innerText = checkoutData.eventName || 'Event RCELLFEST';
             
@@ -441,18 +456,28 @@
         }
 
         async function prosesBayar() {
-            const name = document.getElementById('chkName').value;
-            const phone = document.getElementById('chkPhone').value;
+            const name = document.getElementById('chkName').value.trim();
+            const phone = document.getElementById('chkPhone').value.trim();
+            const birthDate = document.getElementById('chkBirthDate').value;
+            const gender = document.getElementById('chkGender').value;
             const recaptchaToken = turnstile.getResponse();
 
-            if (!name || !phone) return Swal.fire('Data Belum Lengkap', 'Nama dan No. WhatsApp wajib diisi!', 'warning');
+            if (!name || !phone || !birthDate || !gender) {
+                return Swal.fire('Data Belum Lengkap', 'Nama, No. WhatsApp, Tanggal Lahir, dan Jenis Kelamin wajib diisi!', 'warning');
+            }
             if (!recaptchaToken) return Swal.fire('Verifikasi Gagal', 'Harap centang "Saya bukan robot" terlebih dahulu! 🤖', 'error');
             if (!selectedPayment) return Swal.fire('Pilih Pembayaran', 'Silakan pilih metode pembayaran terlebih dahulu.', 'warning');
 
             let totalTagihanAkhir = (subTotalTagihanAwal - diskonPromo) + (window.pajakAktif || 0);
             if (totalTagihanAkhir < 0) totalTagihanAkhir = 0;
             
-            const buyerPayload = { name: name, phone: phone, email: userData.email };
+            const buyerPayload = { 
+                name: name, 
+                phone: phone, 
+                email: userData.email,
+                birthDate: birthDate,
+                gender: gender
+            };
 
             if (selectedPayment === 'saldo') {
                 if (userData.saldo < totalTagihanAkhir) {
